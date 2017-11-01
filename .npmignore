@@ -1,0 +1,11 @@
+*.log
+.nyc_output
+.travis.yml
+.npmignore
+.jshintrc
+appveyor.yml
+coverage
+test
+dist
+node_modules
+webpack.config.js
