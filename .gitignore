@@ -1,0 +1,6 @@
+*.log
+*.reapeaks
+.DS_Store
+.nyc_output
+coverage
+node_modules

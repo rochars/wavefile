@@ -1,0 +1,55 @@
+{
+  "name": "wavefile",
+  "version": "0.0.3",
+  "description": "Read wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
+  "homepage": "https://github.com/rochars/wavefile",
+  "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "wav",
+    "wave",
+    "file",
+    "read",
+    "browser",
+    "4-bit",
+    "8-bit",
+    "16-bit",
+    "24-bit",
+    "32-bit",
+    "64-bit",
+    "PCM",
+    "IEEE",
+    "IMA ADPCM"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rochars/wavefile.git"
+  },
+  "scripts": {
+    "lint": "jshint index.js && jshint test",
+    "test": "nyc ./node_modules/mocha/bin/_mocha",
+    "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
+    "bundle": "webpack",
+    "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js --useTypesForOptimization",
+    "doc": "./node_modules/.bin/jsdoc index.js -d docs",
+    "qa": "npm run lint && npm test",
+    "pack": "npm run bundle && npm run compile && npm run doc",
+    "build": "npm run qa && npm run pack"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "codecov": "^3.0.0",
+    "google-closure-compiler-js": "^20170910.0.1",
+    "jsdoc": "~3.5.5",
+    "jshint": "^2.9.5",
+    "mocha": "^3.5.3",
+    "mocha-lcov-reporter": "^1.3.0",
+    "nyc": "^3.2.2",
+    "string-replace-loader": "^1.3.0",
+    "webpack": "^3.8.1"
+  },
+  "dependencies": {
+    "byte-data": "0.1.3"
+  },
+  "main": "index.js"
+}
