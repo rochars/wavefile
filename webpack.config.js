@@ -12,10 +12,10 @@ module.exports = {
         loader: 'string-replace-loader',
         query: {
           multiple: [
-            //{
-            //  search: 'module.exports.Wavefile',
-            //  replace: "window['Wavefile']",
-            //},
+            {
+              search: 'module.exports.WaveFile',
+              replace: "window['WaveFile']",
+            },
           ]
         }
       }

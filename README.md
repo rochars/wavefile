@@ -1,32 +1,25 @@
 # wavefile
-Read wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.  
+Handle wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.  
 Copyright (c) 2017 Rafael da Silva Rocha.
 
 [![Build Status](https://travis-ci.org/rochars/wavefile.svg?branch=master)](https://travis-ci.org/rochars/wavefile) [![Build status](https://ci.appveyor.com/api/projects/status/kgaqhpahfgsta50s?svg=true)](https://ci.appveyor.com/project/rochars/wavefile) [![codecov](https://codecov.io/gh/rochars/wavefile/branch/master/graph/badge.svg)](https://codecov.io/gh/rochars/wavefile) [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=flat)](https://www.npmjs.com/package/wavefile) [![NPM downloads](https://img.shields.io/npm/dm/wavefile.svg?style=flat)](https://www.npmjs.com/package/wavefile)
-
-Read data from wave files.
-
 
 ## Install
 ```
 npm install wavefile
 ```
 
-
 ## Use
 ```javascript
 let fs = require("fs");
 let wavefile = require("wavefile");
 
-let wavBytes = fs.readFileSync("file.wav");
-
-let wav = new wavefile.Wavefile(wavBytes);
-
+let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
 console.log(wav.subChunk1Id);
+fs.writeFileSync(path, wav.toBytes());
 ```
-
 
 ### The properties
 ```javascript
@@ -34,7 +27,7 @@ console.log(wav.chunkId);
 console.log(wav.chunkSize);
 console.log(wav.subChunk1Id);
 
-// "fmt ""
+// "fmt "
 console.log(wav.format);
 console.log(wav.subChunk1Size);
 console.log(wav.audioFormat);
@@ -48,14 +41,12 @@ console.log(wav.bitsPerSample);
 console.log(wav.subChunk2Id);
 console.log(wav.subChunk2Size);
 
-// array of int or float
-console.log(wav.samples.length);
+// array of numbers
+console.log(wav.samples);
 ```
 
-
 ### The samples
-
-The samples range:
+Range:
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit
 - -8388608 to 8388607 for 24-bit
@@ -63,13 +54,7 @@ The samples range:
 - -1.0 to 1.0 for 32-bit IEEE
 - -1.0 to 1.0 for 64-bit
 
-4-bit is IMA ADPCM. You must use a codec to decode the samples before working with them.
-
-
-## Future
-- Support for RF64
-- Support for RIFX
-
+4-bit is IMA ADPCM. You must decode the samples before working with them.
 
 ## LICENSE
 Copyright (c) 2017 Rafael da Silva Rocha.

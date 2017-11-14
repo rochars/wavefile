@@ -10,8 +10,7 @@ describe("interface", function() {
 
     let wavefile = require("../index.js");
     
-    it("Should create a Wavefile object", function() {
-        let wav = new wavefile.Wavefile();
-        assert.ok(wav);
+    it("Should create a WaveFile object", function() {
+        assert.ok(new wavefile.WaveFile());
     });
 });
