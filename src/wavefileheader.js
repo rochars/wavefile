@@ -42,13 +42,17 @@ class WaveFileHeader {
         this.blockAlign = 0;
         /** @type {number} */
         this.bitsPerSample = 0;
+
+        /** @type {number} */
+        this.cbSize = 0;
+
         /** @type {string} */
         this.factChunkId = "";
         /**
          * minimum 4
          * @type {number}
          */
-        this.factChunkSize = 0;
+        this.factChunkSize = 4;
         /** @type {number} */
         this.dwSampleLength = 0;
         /**
@@ -58,12 +62,6 @@ class WaveFileHeader {
         this.subChunk2Id = "";
         /** @type {number} */
         this.subChunk2Size = 0;
-        /** @type {!Array<number>} */
-        this.samples_ = [];
-        /** @type {!Array<number>} */
-        this.bytes_ = [];
-        /** @type {string} */
-        this.bitDepth_ = "";
         /**
          * "bext"
          * @type {string}

@@ -745,9 +745,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     toBytes() {
         this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
         this.samplesToBytes_();
-        let header = this.createWaveHeader_();
-        let file = this.createWaveFile_(header);
-        return new Uint8Array(file);
+        return new Uint8Array(this.createWaveFile_());
     }
 
     /**
@@ -774,7 +772,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         if (start === -1) {
             throw Error(this.WaveErrors.wave);
         }
-        this.subChunk1Id = byteData.stringFromBytes(
+        this.format = byteData.stringFromBytes(
                 bytes.slice(start, start + 4));
     }
 
@@ -788,7 +786,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         if (start === -1) {
             throw Error(this.WaveErrors['fmt ']);
         }
-        this.format = byteData.stringFromBytes(
+        this.subChunk1Id = byteData.stringFromBytes(
             bytes.slice(start, start + 4));
         this.subChunk1Size = byteData.uIntFrom4Bytes(
             bytes.slice(start + 4, start + 8))[0];
@@ -825,10 +823,10 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         }else {
             this.factChunkId = byteData.stringFromBytes(
                 bytes.slice(start, start + 4));
-            this.factChunkSize = byteData.uIntFrom4Bytes(
-                bytes.slice(start + 4, start + 8)); // minimum 4
-            this.dwSampleLength = byteData.uIntFrom4Bytes(
-                bytes.slice(start + 8, start + 16));
+            //this.factChunkSize = byteData.uIntFrom4Bytes(
+            //    bytes.slice(start + 4, start + 8));
+            //this.dwSampleLength = byteData.uIntFrom4Bytes(
+            //    bytes.slice(start + 8, start + 12));
         }
     }
 
@@ -950,51 +948,6 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     }
 
     /**
-     * Return a object representing the wave file header data.
-     * @return {Object} The wav file header.
-     */
-    createWaveHeader_() {
-        let bytes = parseInt(this.bitDepth_, 10) / 8;
-        let chunkSizeBase;
-        let subChunk1SizeVal;
-        let byteRateVal;
-        let blockAlignVal;
-        let subChunk2SizeVal;
-        let factVal;
-        if (this.bitDepth_ == "4") {
-            chunkSizeBase = 40;
-            subChunk1SizeVal = 20;
-            byteRateVal = this.byteRate;
-            blockAlignVal = this.blockAlign;
-            subChunk2SizeVal = this.samples_.length;
-            factVal = byteData.stringToBytes("fact");
-        } else {
-            chunkSizeBase = 36;
-            subChunk1SizeVal = 16;
-            byteRateVal = (this.numChannels * bytes) * this.sampleRate;
-            blockAlignVal = this.numChannels * bytes;
-            subChunk2SizeVal = this.samples_.length * bytes;
-            factVal = [];
-        }
-        return {
-            chunkId      : byteData.stringToBytes("RIFF"),
-            chunkSize    : chunkSizeBase + this.samples_.length * bytes,
-            format       : byteData.stringToBytes("WAVE"),
-            subChunk1Id  : byteData.stringToBytes("fmt "),
-            subChunk1Size: subChunk1SizeVal,
-            audioFormat  : this.headerFormats_[this.bitDepth_],
-            numChannels  : this.numChannels,
-            sampleRate   : this.sampleRate,
-            byteRate     : byteRateVal,
-            blockAlign   : blockAlignVal,
-            bitsPerSample: parseInt(this.bitDepth_, 10),
-            fact         : factVal,
-            subChunk2Id  : byteData.stringToBytes("data"),
-            subChunk2Size: subChunk2SizeVal
-        };
-    }
-
-    /**
      * Split each sample into bytes.
      */
     samplesToBytes_() {
@@ -1019,25 +972,29 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     }
 
     /**
-     * Join the wav header and the samples.
-     * @param {Object} header The header byte array.
+     * Turn a WaveFile object into a file.
      * @return {Uint8Array} The wav file bytes.
      */
-    createWaveFile_(header) {
-        return header.chunkId.concat(
-            byteData.intTo4Bytes([header.chunkSize]),
-            header.format, 
-            header.subChunk1Id,
-            byteData.intTo4Bytes([header.subChunk1Size]),
-            byteData.intTo2Bytes([header.audioFormat]),
-            byteData.intTo2Bytes([header.numChannels]),
-            byteData.intTo4Bytes([header.sampleRate]),
-            byteData.intTo4Bytes([header.byteRate]),
-            byteData.intTo2Bytes([header.blockAlign]),
-            byteData.intTo2Bytes([header.bitsPerSample]),
-            header.fact,
-            header.subChunk2Id,
-            byteData.intTo4Bytes([header.subChunk2Size]),
+    createWaveFile_() {
+        let factVal = [];
+        let cbSizeVal = [];
+        if (this.factChunkId) {
+            factVal= byteData.stringToBytes(this.factChunkId);
+        }
+        return byteData.stringToBytes(this.chunkId).concat(
+            byteData.intTo4Bytes([this.chunkSize]),
+            byteData.stringToBytes(this.format), 
+            byteData.stringToBytes(this.subChunk1Id),
+            byteData.intTo4Bytes([this.subChunk1Size]),
+            byteData.intTo2Bytes([this.audioFormat]),
+            byteData.intTo2Bytes([this.numChannels]),
+            byteData.intTo4Bytes([this.sampleRate]),
+            byteData.intTo4Bytes([this.byteRate]),
+            byteData.intTo2Bytes([this.blockAlign]),
+            byteData.intTo2Bytes([this.bitsPerSample]),
+            factVal,
+            byteData.stringToBytes(this.subChunk2Id),
+            byteData.intTo4Bytes([this.subChunk2Size]),
             this.bytes_);
     }
 }
@@ -1947,13 +1904,17 @@ class WaveFileHeader {
         this.blockAlign = 0;
         /** @type {number} */
         this.bitsPerSample = 0;
+
+        /** @type {number} */
+        this.cbSize = 0;
+
         /** @type {string} */
         this.factChunkId = "";
         /**
          * minimum 4
          * @type {number}
          */
-        this.factChunkSize = 0;
+        this.factChunkSize = 4;
         /** @type {number} */
         this.dwSampleLength = 0;
         /**
@@ -1963,12 +1924,6 @@ class WaveFileHeader {
         this.subChunk2Id = "";
         /** @type {number} */
         this.subChunk2Size = 0;
-        /** @type {!Array<number>} */
-        this.samples_ = [];
-        /** @type {!Array<number>} */
-        this.bytes_ = [];
-        /** @type {string} */
-        this.bitDepth_ = "";
         /**
          * "bext"
          * @type {string}

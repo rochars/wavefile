@@ -20,13 +20,13 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
             function() {
         assert.equal(wav2.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'WAVE'",
+    it("subChunk1Id should be 'fmt '",
             function() {
-        assert.equal(wav2.subChunk1Id, "WAVE");
+        assert.equal(wav2.subChunk1Id, "fmt ");
     });
-    it("format should be 'fmt '",
+    it("format should be 'WAVE'",
             function() {
-        assert.equal(wav2.format, "fmt ");
+        assert.equal(wav2.format, "WAVE");
     });
     it("subChunk1Size should be 20",
             function() {
@@ -55,6 +55,14 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
     it("bitsPerSample should be 4",
             function() {
         assert.equal(wav2.bitsPerSample, 4);
+    });
+    it("factChunkId should be 'fact'",
+            function() {
+        assert.equal(wav2.factChunkId, 'fact');
+    });
+    it("factChunkSize should be 4",
+            function() {
+        assert.equal(wav2.factChunkSize, 4);
     });
     it("subChunk2Id should be 'data'",
             function() {

@@ -19,13 +19,13 @@ describe("4-bit IMA ADPCM reading", function() {
             function() {
         assert.equal(wav.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'WAVE'",
+    it("subChunk1Id should be 'fmt '",
             function() {
-        assert.equal(wav.subChunk1Id, "WAVE");
+        assert.equal(wav.subChunk1Id, "fmt ");
     });
-    it("format should be 'fmt '",
+    it("format should be 'WAVE'",
             function() {
-        assert.equal(wav.format, "fmt ");
+        assert.equal(wav.format, "WAVE");
     });
     it("subChunk1Size should be 20",
             function() {
@@ -46,6 +46,14 @@ describe("4-bit IMA ADPCM reading", function() {
     it("bitsPerSample should be 4",
             function() {
         assert.equal(wav.bitsPerSample, 4);
+    });
+    it("factChunkId should be 'fact'",
+            function() {
+        assert.equal(wav.factChunkId, 'fact');
+    });
+    it("factChunkSize should be 4",
+            function() {
+        assert.equal(wav.factChunkSize, 4);
     });
     it("subChunk2Id should be 'data'",
             function() {

@@ -18,13 +18,13 @@ describe("24-bit (with bwf) reading", function() {
             function() {
         assert.equal(wav.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'WAVE'",
+    it("subChunk1Id should be 'fmt '",
             function() {
-        assert.equal(wav.subChunk1Id, "WAVE");
+        assert.equal(wav.subChunk1Id, "fmt ");
     });
-    it("format should be 'fmt '",
+    it("format should be 'WAVE'",
             function() {
-        assert.equal(wav.format, "fmt ");
+        assert.equal(wav.format, "WAVE");
     });
     it("subChunk1Size should be 16",
             function() {

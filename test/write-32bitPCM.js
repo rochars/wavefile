@@ -20,13 +20,13 @@ describe('read 32bit PCM from disk and write to new file', function() {
             function() {
         assert.equal(wav2.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'WAVE'",
+    it("subChunk1Id should be 'fmt '",
             function() {
-        assert.equal(wav2.subChunk1Id, "WAVE");
+        assert.equal(wav2.subChunk1Id, "fmt ");
     });
-    it("format should be 'fmt '",
+    it("format should be 'WAVE'",
             function() {
-        assert.equal(wav2.format, "fmt ");
+        assert.equal(wav2.format, "WAVE");
     });
     it("subChunk1Size should be 16",
             function() {

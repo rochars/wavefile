@@ -12,21 +12,31 @@ describe('read 16bit file from disk and write to new file', function() {
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
-    let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBytes());
-    fs.writeFileSync(path + "/out/16-bit-8kHz-noBext-mono.wav", wav2.toBytes());
+    let wav = new wavefile.WaveFile();
+
+    wav.fromBytes(wBytes);
+
+    let wav2 = new wavefile.WaveFile();
+
+    let bytes3 = wav.toBytes();
+
+    wav2.fromBytes(bytes3);
+
+    let bytes4 = wav2.toBytes();
+
+    fs.writeFileSync(path + "/out/16-bit-8kHz-noBext-mono.wav", bytes4);
 
     it("chunkId should be 'RIFF'",
             function() {
         assert.equal(wav2.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'WAVE'",
+    it("subChunk1Id should be 'fmt '",
             function() {
-        assert.equal(wav2.subChunk1Id, "WAVE");
+        assert.equal(wav2.subChunk1Id, "fmt ");
     });
-    it("format should be 'fmt '",
+    it("format should be 'WAVE'",
             function() {
-        assert.equal(wav2.format, "fmt ");
+        assert.equal(wav2.format, "WAVE");
     });
     it("subChunk1Size should be 16",
             function() {
