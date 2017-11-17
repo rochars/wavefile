@@ -1,6 +1,6 @@
 # wavefile
 Handle wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.  
-Copyright (c) 2017 Rafael da Silva Rocha.
+Copyright (c) 2017 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
 [![Build Status](https://travis-ci.org/rochars/wavefile.svg?branch=master)](https://travis-ci.org/rochars/wavefile) [![Build status](https://ci.appveyor.com/api/projects/status/kgaqhpahfgsta50s?svg=true)](https://ci.appveyor.com/project/rochars/wavefile) [![codecov](https://codecov.io/gh/rochars/wavefile/branch/master/graph/badge.svg)](https://codecov.io/gh/rochars/wavefile) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/rochars/wavefile/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/rochars/wavefile/?branch=master) [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=flat)](https://www.npmjs.com/package/wavefile) [![NPM downloads](https://img.shields.io/npm/dm/wavefile.svg?style=flat)](https://www.npmjs.com/package/wavefile)
@@ -19,6 +19,13 @@ let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
 console.log(wav.subChunk1Id);
+fs.writeFileSync(path, wav.toBytes());
+```
+
+## Create wave files from scratch
+```
+let wav = new wavefile.WaveFile();
+wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 fs.writeFileSync(path, wav.toBytes());
 ```
 

@@ -58,9 +58,40 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     }
 
     /**
+     * Create a WaveFile object based on the arguments passed.
+     * @param {number} numChannels The number of channels
+     *     (Ints like 1 for mono, 2 stereo and so on).
+     * @param {number} sampleRate The sample rate.
+     *     Ints like 8000, 44100, 48000, 192000, etc.
+     * @param {string} bitDepth The audio bit depth.
+     *     One of "8", "16", "24", "32", "32f", "64".
+     * @param {!Array<number>} samples Array of samples to be written.
+     *     Samples must be in the correct range according to the bit depth.
+     *     Samples of multi-channel data must be interleaved.
+     */
+    fromScratch(numChannels, sampleRate, bitDepth, samples) {
+        let bytes = parseInt(bitDepth, 10) / 8;
+        this.chunkId = "RIFF";
+        this.chunkSize = 36 + samples.length * bytes;
+        this.format = "WAVE";
+        this.subChunk1Id = "fmt ";
+        this.subChunk1Size = 16;
+        this.audioFormat = this.headerFormats_[bitDepth];
+        this.numChannels = numChannels;
+        this.sampleRate = sampleRate;
+        this.byteRate = (numChannels * bytes) * sampleRate;
+        this.blockAlign = numChannels * bytes;
+        this.bitsPerSample = parseInt(bitDepth, 10);
+        this.subChunk2Id = "data";
+        this.subChunk2Size = samples.length * bytes;
+        this.samples_ = samples;
+        this.bitDepth_ = bitDepth;
+    }
+
+    /**
      * Read a wave file from an array of bytes.
      * @param {Uint8Array} bytes The wave file as an array of bytes.
-     */    
+     */
     fromBytes(bytes) {
         this.readRIFFChunk_(bytes);
         this.readWAVEChunk_(bytes);

@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Handle wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -27,7 +27,7 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
-    "test": "nyc ./node_modules/mocha/bin/_mocha --timeout=780000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test test/from-scratch --timeout=80000",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "bundle": "webpack",
     "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js",
