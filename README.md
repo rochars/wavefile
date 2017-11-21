@@ -23,9 +23,19 @@ fs.writeFileSync(path, wav.toBytes());
 ```
 
 ## Create wave files from scratch
-```
+```javascript
 let wav = new wavefile.WaveFile();
+
+// mono
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+fs.writeFileSync(path, wav.toBytes());
+
+// stereo
+wav.fromScratch(2, 48000, '8', [
+    [0, -2, 4, 3],
+    [0, -1, 4, 3]
+]);
+wav.interleave();
 fs.writeFileSync(path, wav.toBytes());
 ```
 
@@ -33,10 +43,10 @@ fs.writeFileSync(path, wav.toBytes());
 ```javascript
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
-console.log(wav.subChunk1Id);
+console.log(wav.format);
 
 // "fmt "
-console.log(wav.format);
+console.log(wav.subChunk1Id);
 console.log(wav.subChunk1Size);
 console.log(wav.audioFormat);
 console.log(wav.numChannels);
@@ -62,7 +72,13 @@ Range:
 - -1.0 to 1.0 for 32-bit IEEE
 - -1.0 to 1.0 for 64-bit
 
-4-bit is IMA ADPCM. You must decode the samples before working with them.
+4-bit is IMA ADPCM. You must decode the samples before working with them and encode them before writing the file.
+
+## Interleave and de-interleave the samples
+```javascript
+wav.interleave();
+wav.deInterleave();
+```
 
 ## LICENSE
 Copyright (c) 2017 Rafael da Silva Rocha.

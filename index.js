@@ -62,12 +62,12 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * @param {number} numChannels The number of channels
      *     (Ints like 1 for mono, 2 stereo and so on).
      * @param {number} sampleRate The sample rate.
-     *     Ints like 8000, 44100, 48000, 192000, etc.
+     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
      * @param {string} bitDepth The audio bit depth.
      *     One of "8", "16", "24", "32", "32f", "64".
      * @param {!Array<number>} samples Array of samples to be written.
      *     Samples must be in the correct range according to the bit depth.
-     *     Samples of multi-channel data must be interleaved.
+     *     Samples of multi-channel data .
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples) {
         let bytes = parseInt(bitDepth, 10) / 8;
@@ -122,6 +122,42 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
         this.samplesToBytes_();
         return new Uint8Array(this.createWaveFile_());
+    }
+
+    /**
+     * Interleave multi-channel samples.
+     */
+    interleave() {
+        let finalSamples = [];
+        let i;
+        let j;
+        let numChannels = this.samples_[0].length;
+        for (i = 0; i < numChannels; i++) {
+            for (j = 0; j < this.samples_.length; j++) {
+                finalSamples.push(this.samples_[j][i]);
+            }
+        }
+        this.samples_ = finalSamples;
+    }
+
+    /**
+     * De-interleave samples into multiple channels.
+     */
+    deInterleave() {
+        let finalSamples = [];
+        let i;
+        for (i = 0; i < this.numChannels; i++) {
+            finalSamples[i] = [];
+        }
+        i = 0;
+        let j;
+        while (i < this.samples_.length) {
+            for (j = 0; j < this.numChannels; j++) {
+                finalSamples[j].push(this.samples_[i+j]);
+            }
+            i += j;
+        }
+        this.samples_ = finalSamples;
     }
 
     /**
