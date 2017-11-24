@@ -13,8 +13,8 @@ describe('read 8-bit file from disk and write to new file', function() {
     
     let wBytes = fs.readFileSync(path + "8bit-16kHz-bext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBytes());
-    fs.writeFileSync(path + "/out/8bit-16kHz-bext-mono.wav", wav2.toBytes());
+    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/8bit-16kHz-bext-mono.wav", wav2.toBuffer());
     
     it("chunkId should be 'RIFF'",
             function() {

@@ -13,8 +13,8 @@ describe('read 32bit PCM from disk and write to new file', function() {
     
     let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBytes());
-    fs.writeFileSync(path + "/out/32bit-48kHz-noBext-mono.wav", wav2.toBytes());
+    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/32bit-48kHz-noBext-mono.wav", wav2.toBuffer());
     
     it("chunkId should be 'RIFF'",
             function() {

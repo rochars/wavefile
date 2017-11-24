@@ -13,8 +13,8 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
     
     let wBytes = fs.readFileSync(path + "4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav");
     let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBytes());
-    fs.writeFileSync(path + "/out/4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav", wav2.toBytes());
+    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav", wav2.toBuffer());
 
     it("chunkId should be 'RIFF'",
             function() {
@@ -80,8 +80,8 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
             function() {
         assert.equal(wav2.samples_.length, wav.samples_.length);
     });
-    //it("samples_ on the new file should be same as the original file",
-    //        function() {
-    //    assert.deepEqual(wav2.samples_, wav.samples_);
-    //});
+    it("samples_ on the new file should be same as the original file",
+            function() {
+        assert.deepEqual(wav2.samples_, wav.samples_);
+    });
 });

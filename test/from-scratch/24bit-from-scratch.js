@@ -13,7 +13,7 @@ describe('create 24-bit wave files from scratch', function() {
     wav.fromScratch(1, 48000, '24', [0, 1, -8388608, 8388607]);
 
     let fs = require('fs');
-    fs.writeFileSync("./test/files/out/24-bit-48kHz-mono-fromScratch.wav", wav.toBytes());
+    fs.writeFileSync("./test/files/out/24-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.chunkId, "RIFF");

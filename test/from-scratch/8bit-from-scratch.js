@@ -13,7 +13,7 @@ describe('create 8-bit wave files from scratch', function() {
     wav.fromScratch(1, 48000, '8', [0, 255, 2, 3]);
 
     let fs = require('fs');
-    fs.writeFileSync("./test/files/out/8-bit-48kHz-mono-fromScratch.wav", wav.toBytes());
+    fs.writeFileSync("./test/files/out/8-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.chunkId, "RIFF");

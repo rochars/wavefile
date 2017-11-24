@@ -13,8 +13,8 @@ describe('read 4-bit file from disk and write to new file', function() {
     
     let wBytes = fs.readFileSync(path + "4bit-imaadpcm-8kHz-noBext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBytes());
-    fs.writeFileSync(path + "/out/4bit-imaadpcm-8kHz-noBext-mono.wav", wav2.toBytes());
+    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/4bit-imaadpcm-8kHz-noBext-mono.wav", wav2.toBuffer());
 
     it("chunkId should be 'RIFF'",
             function() {

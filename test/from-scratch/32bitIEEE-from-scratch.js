@@ -13,7 +13,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
     wav.fromScratch(1, 44100, '32f', [0, 0.04029441, -0.04029440, 1]);
 
     let fs = require('fs');
-    fs.writeFileSync("./test/files/out/32-bitIEEE-441kHz-mono-fromScratch.wav", wav.toBytes());
+    fs.writeFileSync("./test/files/out/32-bitIEEE-441kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.chunkId, "RIFF");

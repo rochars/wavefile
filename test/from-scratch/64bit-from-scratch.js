@@ -13,7 +13,7 @@ describe('create 64-bit wave file from scratch', function() {
     wav.fromScratch(1, 44100, '64', [0.0, 0.04029440055111987, -0.04029440055111987, 1.0]);
 
     let fs = require('fs');
-    fs.writeFileSync("./test/files/out/64-bit-441kHz-mono-fromScratch.wav", wav.toBytes());
+    fs.writeFileSync("./test/files/out/64-bit-441kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.chunkId, "RIFF");

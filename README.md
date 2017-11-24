@@ -10,6 +10,11 @@ https://github.com/rochars/wavefile
 npm install wavefile
 ```
 
+## See it in action
+https://tr2099.github.io/
+
+Hit "Load in player" to generate wave files.
+
 ## Use
 ```javascript
 let fs = require("fs");
@@ -19,7 +24,7 @@ let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
 console.log(wav.subChunk1Id);
-fs.writeFileSync(path, wav.toBytes());
+fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ## Create wave files from scratch
@@ -28,7 +33,7 @@ let wav = new wavefile.WaveFile();
 
 // mono
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
-fs.writeFileSync(path, wav.toBytes());
+fs.writeFileSync(path, wav.toBuffer());
 
 // stereo
 wav.fromScratch(2, 48000, '8', [
@@ -36,13 +41,16 @@ wav.fromScratch(2, 48000, '8', [
     [0, -1, 4, 3]
 ]);
 wav.interleave();
-fs.writeFileSync(path, wav.toBytes());
+fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ### The properties
 ```javascript
+// "RIFF"
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
+
+// "WAVE"
 console.log(wav.format);
 
 // "fmt "

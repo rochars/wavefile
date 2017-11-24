@@ -1,6 +1,6 @@
 /*!
  * Wavefile
- * Handle wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
@@ -47,7 +47,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         this.samples_ = [];
         this.bytes_ = [];
         if(bytes) {
-            this.fromBytes(bytes);
+            this.fromBuffer(bytes);
         }
     }
 
@@ -87,7 +87,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * Read a wave file from a byte buffer.
      * @param {Uint8Array} bytes The buffer.
      */
-    fromBytes(bytes) {
+    fromBuffer(bytes) {
         this.isFromScratch_ = false;
         this.readRIFFChunk_(bytes);
         this.readWAVEChunk_(bytes);
@@ -101,7 +101,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * Turn the WaveFile object into a byte buffer.
      * @return {Uint8Array}
      */
-    toBytes() {
+    toBuffer() {
         this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
         this.samplesToBytes_();
         return new Uint8Array(this.createWaveFile_());

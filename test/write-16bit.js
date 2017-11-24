@@ -14,15 +14,15 @@ describe('read 16bit file from disk and write to new file', function() {
     let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
     let wav = new wavefile.WaveFile();
 
-    wav.fromBytes(wBytes);
+    wav.fromBuffer(wBytes);
 
     let wav2 = new wavefile.WaveFile();
 
-    let bytes3 = wav.toBytes();
+    let bytes3 = wav.toBuffer();
 
-    wav2.fromBytes(bytes3);
+    wav2.fromBuffer(bytes3);
 
-    let bytes4 = wav2.toBytes();
+    let bytes4 = wav2.toBuffer();
 
     fs.writeFileSync(path + "/out/16-bit-8kHz-noBext-mono.wav", bytes4);
 

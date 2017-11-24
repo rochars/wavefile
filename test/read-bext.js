@@ -13,7 +13,7 @@ describe("BWF data reading", function() {
     
     let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
-    wav.fromBytes(wBytes);
+    wav.fromBuffer(wBytes);
 
     it("should find the 'bext' chunk in a BWF",
             function() {

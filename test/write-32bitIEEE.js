@@ -13,12 +13,12 @@ describe('read 32bit IEEE from disk and write to new file', function() {
     
     let wBytes = fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBytes());
-    fs.writeFileSync(path + "/out/32bitIEEE-16kHz-bext-mono.wav", wav2.toBytes());
+    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/32bitIEEE-16kHz-bext-mono.wav", wav2.toBuffer());
     
-    it("toBytes should return a array of bytes",
+    it("toBuffer should return a array of bytes",
             function() {
-        assert.ok(wav.toBytes());
+        assert.ok(wav.toBuffer());
     });
     it("chunkId should be 'RIFF'",
             function() {

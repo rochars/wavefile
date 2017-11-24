@@ -13,7 +13,7 @@ describe('create 32-bit PCM wave files from scratch', function() {
     wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 
     let fs = require('fs');
-    fs.writeFileSync("./test/files/out/32-bitPCM-441kHz-mono-fromScratch.wav", wav.toBytes());
+    fs.writeFileSync("./test/files/out/32-bitPCM-441kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.chunkId, "RIFF");
