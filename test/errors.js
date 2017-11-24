@@ -20,7 +20,7 @@ describe('errors', function() {
     const sampleRateError = "Invalid sample rate.";
     const numChannelsError = "Invalid number of channels.";
         
-    it("should throw an error if not a RIFF file",
+    it("should throw an error if not a RIFF or RIFX file",
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "RF64-64-bit-8kHz--mono-bext.wav");

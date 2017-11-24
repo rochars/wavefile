@@ -27,7 +27,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/*!
- * Wavefile
+ * wavefile
  * Read &amp; write wave files with 8, 16, 24, 32 PCM, 32 IEEE &amp; 64-bit data.
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
@@ -91,14 +91,17 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      *     Samples must be in the correct range according to the bit depth.
      *     Samples of multi-channel data .
      */
-    fromScratch(numChannels, sampleRate, bitDepth, samples) {
+    fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
+        if (!options.container) {
+            options.container = "RIFF";
+        }
         this.isFromScratch_ = true;
         let bytes = parseInt(bitDepth, 10) / 8;
         this.chunkSize = 36 + samples.length * bytes;
         this.subChunk1Size = 16;
         this.byteRate = (numChannels * bytes) * sampleRate;
         this.blockAlign = numChannels * bytes;
-        this.chunkId = "RIFF";
+        this.chunkId = options.container;
         this.format = "WAVE";
         this.subChunk1Id = "fmt ";
         this.audioFormat = this.headerFormats_[bitDepth];
@@ -133,6 +136,20 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
         this.samplesToBytes_();
         return new Uint8Array(this.createWaveFile_());
+    }
+
+    /**
+     * Turn the file to RIFF.
+     */
+    toRIFF() {
+        this.chunkId = "RIFF";
+    }
+
+    /**
+     * Turn the file to RIFX.
+     */
+    toRIFX() {
+        this.chunkId = "RIFX";
     }
 
     /**
@@ -179,11 +196,11 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     readRIFFChunk_(bytes) {
         this.chunkId = byteData.fromBytes(bytes.slice(0, 4),
             8, {"char": true});
-        if (this.chunkId != "RIFF") {
+        if (this.chunkId != "RIFF" &amp;&amp; this.chunkId != "RIFX") {
             throw Error(this.WaveErrors.format);
         }
         this.chunkSize = byteData.fromBytes(
-            bytes.slice(4, 8), 32)[0];
+            bytes.slice(4, 8), 32, {"be": this.chunkId == "RIFX"})[0];
     }
 
     /**
@@ -209,21 +226,22 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         if (start === -1) {
             throw Error(this.WaveErrors["fmt "]);
         }
+        let options = {"be": this.chunkId == "RIFX"};
         this.subChunk1Id = "fmt ";
         this.subChunk1Size = byteData.fromBytes(
-            bytes.slice(start + 4, start + 8), 32)[0];
+            bytes.slice(start + 4, start + 8), 32, options)[0];
         this.audioFormat = byteData.fromBytes(
-            bytes.slice(start + 8, start + 10), 16)[0];
+            bytes.slice(start + 8, start + 10), 16, options)[0];
         this.numChannels = byteData.fromBytes(
-            bytes.slice(start + 10, start + 12), 16)[0];
+            bytes.slice(start + 10, start + 12), 16, options)[0];
         this.sampleRate = byteData.fromBytes(
-            bytes.slice(start + 12, start + 16), 32)[0];
+            bytes.slice(start + 12, start + 16), 32, options)[0];
         this.byteRate = byteData.fromBytes(
-            bytes.slice(start + 16, start + 20), 32)[0];
+            bytes.slice(start + 16, start + 20), 32, options)[0];
         this.blockAlign = byteData.fromBytes(
-            bytes.slice(start + 20, start + 22), 16)[0];
+            bytes.slice(start + 20, start + 22), 16, options)[0];
         this.bitsPerSample = byteData.fromBytes(
-            bytes.slice(start + 22, start + 24), 16)[0];
+            bytes.slice(start + 22, start + 24), 16, options)[0];
         if (this.audioFormat == 3 &amp;&amp; this.bitsPerSample == 32) {
             this.bitDepth_ = "32f";
         }else {
@@ -275,7 +293,9 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         }
         this.subChunk2Id = "data";
         this.subChunk2Size = byteData.fromBytes(
-            bytes.slice(start + 4, start + 8), 32)[0];
+            bytes.slice(start + 4, start + 8),
+            32,
+            {"be": this.chunkId == "RIFX"})[0];
         this.samplesFromBytes_(bytes, start);
     }
 
@@ -287,6 +307,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     samplesFromBytes_(bytes, start) {
         let params = {
             "signed": this.bitsPerSample == 8 ? false : true,
+            "be": this.chunkId == "RIFX"
         };
         if (this.bitsPerSample == 32 &amp;&amp; this.audioFormat == 3) {
             params.float = true;
@@ -357,7 +378,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * Split each sample into bytes.
      */
     samplesToBytes_() {
-        let params = {};
+        let params = {"be": this.chunkId == "RIFX"};
         if (this.bitsPerSample == 32 &amp;&amp; this.audioFormat == 3) {
             params.float = true;
         }
@@ -377,20 +398,21 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         if (this.factChunkId) {
             factVal = byteData.toBytes(this.factChunkId, 8, {"char": true});
         }
+        let options = {"be": this.chunkId == "RIFX"};
         return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
-            byteData.toBytes([this.chunkSize], 32),
+            byteData.toBytes([this.chunkSize], 32, options),
             byteData.toBytes(this.format, 8, {"char": true}), 
             byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
-            byteData.toBytes([this.subChunk1Size], 32),
-            byteData.toBytes([this.audioFormat], 16),
-            byteData.toBytes([this.numChannels], 16),
-            byteData.toBytes([this.sampleRate], 32),
-            byteData.toBytes([this.byteRate], 32),
-            byteData.toBytes([this.blockAlign], 16),
-            byteData.toBytes([this.bitsPerSample], 16),
+            byteData.toBytes([this.subChunk1Size], 32, options),
+            byteData.toBytes([this.audioFormat], 16, options),
+            byteData.toBytes([this.numChannels], 16, options),
+            byteData.toBytes([this.sampleRate], 32, options),
+            byteData.toBytes([this.byteRate], 32, options),
+            byteData.toBytes([this.blockAlign], 16, options),
+            byteData.toBytes([this.bitsPerSample], 16, options),
             factVal,
             byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
-            byteData.toBytes([this.subChunk2Size], 32),
+            byteData.toBytes([this.subChunk2Size], 32, options),
             this.bytes_);
     }
 }
@@ -412,7 +434,7 @@ module.exports.WaveFile = WaveFile;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 24 2017 01:18:27 GMT-0200 (Horário brasileiro de verão)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 24 2017 05:34:59 GMT-0200 (Horário brasileiro de verão)
 </footer>
 
 <script> prettyPrint(); </script>

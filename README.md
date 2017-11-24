@@ -42,11 +42,28 @@ wav.fromScratch(2, 48000, '8', [
 ]);
 wav.interleave();
 fs.writeFileSync(path, wav.toBuffer());
+
+// Default is RIFF. To create RIFX files:
+wav.fromScratch(
+    1, 44100, '32', [0, -2147483648, 2147483647, 4], {"container": "RIFX"});
+fs.writeFileSync(path, wav.toBuffer());
+```
+
+## RIFF to RIFX and RIFX to RIFF
+```javascript
+let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+
+// Turn a RIFF file to a RIFX file
+wav.toRIFX();
+
+// Turn a RIFX file to a RIFF file
+wav.toRIFF();
+
 ```
 
 ### The properties
 ```javascript
-// "RIFF"
+// The container, "RIFF" or "RIFX"
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
 
