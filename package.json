@@ -1,25 +1,27 @@
 {
   "name": "wavefile",
-  "version": "0.0.8",
-  "description": "Handle wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
+  "version": "0.1.0",
+  "description": "Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "keywords": [
     "wav",
     "wave",
+    "audio",
     "file",
     "read",
+    "write",
+    "create",
+    "server",
     "browser",
-    "4-bit",
     "8-bit",
     "16-bit",
     "24-bit",
     "32-bit",
     "64-bit",
     "PCM",
-    "IEEE",
-    "IMA ADPCM"
+    "IEEE"
   ],
   "repository": {
     "type": "git",
@@ -27,8 +29,8 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test test/from-scratch --timeout=80000",
-    "test_i": "nyc ./node_modules/mocha/bin/_mocha test/interleave.js",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive --timeout=8000",
+    "test_a": "nyc ./node_modules/mocha/bin/_mocha test/adpcm",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "bundle": "webpack",
     "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js",
@@ -50,7 +52,7 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "byte-data": "0.3.2"
+    "byte-data": "^0.4.1"
   },
   "main": "index.js"
 }

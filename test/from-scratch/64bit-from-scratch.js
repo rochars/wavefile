@@ -1,10 +1,7 @@
 /*!
- * riffwave64
- * Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * Wavefile
  * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/riffwave64
- * https://tr2099.github.io
- *
+ * 
  */
  
 var assert = require('assert');

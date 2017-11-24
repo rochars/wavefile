@@ -60,33 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
-
-var int8 = new Int8Array(4)
-var int32 = new Int32Array(int8.buffer, 0, 1)
-var float32 = new Float32Array(int8.buffer, 0, 1)
-
-function pack(i) {
-    int32[0] = i
-    return float32[0]
-}
-
-function unpack(f) {
-    float32[0] = f
-    return int32[0]
-}
-
-module.exports = pack
-module.exports.pack = pack
-module.exports.unpack = unpack
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports) {
 
 /*
@@ -102,16 +80,23 @@ module.exports.unpack = unpack
  * @param {number} index The byte to pad.
  */
 function padding(bytes, base, index) {
-    let offset = bytes[index].length + 1;
-    if (base == 2 && bytes[index].length < 8) {
-        offset = 9;
-    }else if (base == 16) {
-        offset = 3;
+    bytes[index] = bytePadding(bytes[index], base);
+}
+
+/**
+ * Padding with 0s for byte strings.
+ * @param {string} byte The byte as a binary or hex string.
+ * @param {number} base The base.
+ * @returns {string} The padded byte.
+ */
+function bytePadding(byte, base) {
+    let offset = byte.length + 1;
+    if (base == 2) {
+        offset = 8;
+    } else if (base == 16) {
+        offset = 2;
     }
-    if (bytes[index].length < offset -1) {
-        bytes[index] = 
-            new Array((offset - bytes[index].length)).join("0")  + bytes[index];    
-    }
+    return lPadZeros(byte, offset);
 }
 
 /**
@@ -140,29 +125,68 @@ function paddingCrumb(crumbs, base, index) {
 }   
 
 /**
- * Padding with 0s for byte strings.
- * @param {string} byte The byte as a binary or hex string.
- * @param {number} base The base.
- * @returns {string} The padded byte.
+ * Pad a string with zeros to the left.
+ * TODO: This should support both arrays and strings.
+ * @param {string} value The string (representing a binary or hex value).
+ * @param {number} numZeros the max number of zeros.
+ *      For 1 binary byte string it should be 8.
  */
-function bytePadding(byte, base) {
-    let offset = byte.length + 1;
-    if (base == 2) {
-        offset = 9;
-    } else if (base == 16) {
-        offset = 3;   
+function lPadZeros(value, numZeros) {
+    let i = 0;
+    while (value.length < numZeros) {
+        value = '0' + value;
     }
-    if (byte.length < offset -1) {
-        byte = new Array((offset - byte.length)).join("0")  + byte;
-    }
-    return byte;
+    return value;
 }
 
+/**
+ * Pad a array with zeros to the right.
+ * @param {!Array<number>} byteArray The array.
+ * @param {number} numZeros the max number of zeros.
+ *      For 1 binary byte string it should be 8.
+ *      TODO: better explanation of numZeros
+ */
+function fixByteArraySize(byteArray, numZeros) {
+    let i = 0;
+    let fix = byteArray.length % numZeros;
+    if (fix) {
+        fix = (fix - numZeros) * -1;
+        while(i < fix) {
+            byteArray.push(0);
+            i++;
+        }
+    }
+}
+
+module.exports.fixByteArraySize = fixByteArraySize;
 module.exports.padding = padding;
 module.exports.paddingNibble = paddingNibble;
 module.exports.paddingCrumb = paddingCrumb;
 module.exports.bytePadding = bytePadding;
+module.exports.lPadZeros = lPadZeros;
 
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+var int8 = new Int8Array(4)
+var int32 = new Int32Array(int8.buffer, 0, 1)
+var float32 = new Float32Array(int8.buffer, 0, 1)
+
+function pack(i) {
+    int32[0] = i
+    return float32[0]
+}
+
+function unpack(f) {
+    float32[0] = f
+    return int32[0]
+}
+
+module.exports = pack
+module.exports.pack = pack
+module.exports.unpack = unpack
 
 /***/ }),
 /* 2 */
@@ -224,135 +248,45 @@ module.exports.endianness = endianness;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
- * Functions to turn data into bytes.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/byte-data
- */
-
-const float = __webpack_require__(4);
-const intBits = __webpack_require__(0);
-const toHalf = __webpack_require__(10);
-
-function write64BitFloat(bytes, numbers, i, j) {
-    let number = float.toFloat64(numbers[i]);
-    bytes[j++] = number[1] & 0xFF;
-    bytes[j++] = number[1] >>> 8 & 0xFF;
-    bytes[j++] = number[1] >>> 16 & 0xFF;
-    bytes[j++] = number[1] >>> 24 & 0xFF;
-    bytes[j++] = number[0] & 0xFF;
-    bytes[j++] = number[0] >>> 8 & 0xFF;
-    bytes[j++] = number[0] >>> 16 & 0xFF;
-    bytes[j++] = number[0] >>> 24 & 0xFF;
-    return j;
-}
-
-// https://github.com/majimboo/c-struct
-function write48Bit(bytes, numbers, i, j) {
-    bytes[j++] = numbers[i] & 0xFF;
-    bytes[j++] = numbers[i] >> 8 & 0xFF;
-    bytes[j++] = numbers[i] >> 16 & 0xFF;
-    bytes[j++] = numbers[i] >> 24 & 0xFF;
-    bytes[j++] = numbers[i] / 0x100000000 & 0xFF;
-    bytes[j++] = numbers[i] / 0x10000000000 & 0xFF;
-    return j;
-}
-
-// https://github.com/majimboo/c-struct
-function write40Bit(bytes, numbers, i, j) {
-    bytes[j++] = numbers[i] & 0xFF;
-    bytes[j++] = numbers[i] >> 8 & 0xFF;
-    bytes[j++] = numbers[i] >> 16 & 0xFF;
-    bytes[j++] = numbers[i] >> 24 & 0xFF;
-    bytes[j++] = numbers[i] / 0x100000000 & 0xFF;
-    return j;
-}
-
-function write32BitFloat(bytes, numbers, i, j) {
-    numbers[i] = intBits.unpack(numbers[i]);
-    bytes[j++] = numbers[i] & 0xFF;
-    bytes[j++] = numbers[i] >>> 8 & 0xFF;
-    bytes[j++] = numbers[i] >>> 16 & 0xFF;
-    bytes[j++] = numbers[i] >>> 24 & 0xFF;
-    return j;
-}
-
-function write32Bit(bytes, numbers, i, j) {
-    bytes[j++] = numbers[i] & 0xFF;
-    bytes[j++] = numbers[i] >>> 8 & 0xFF;
-    bytes[j++] = numbers[i] >>> 16 & 0xFF;
-    bytes[j++] = numbers[i] >>> 24 & 0xFF;
-    return j;
-}
-
-function write24Bit(bytes, numbers, i, j) {
-    bytes[j++] = numbers[i] & 0xFF;
-    bytes[j++] = numbers[i] >>> 8 & 0xFF;
-    bytes[j++] = numbers[i] >>> 16 & 0xFF;
-    return j;
-}
-
-function write16Bit(bytes, numbers, i, j) {
-    bytes[j++] = numbers[i] & 0xFF;
-    bytes[j++] = numbers[i] >>> 8 & 0xFF;
-    return j;
-}
-
-function write16BitFloat(bytes, numbers, i, j) {
-    numbers[i] = toHalf.toHalf(numbers[i]);
-    bytes[j++] = numbers[i] >>> 8 & 0xFF;
-    bytes[j++] = numbers[i] & 0xFF;
-    return j;
-}
-
-function write8Bit(bytes, numbers, i, j) {
-    bytes[j++] = numbers[i] & 0xFF;
-    return j;
-}
-
-function writeString(bytes, string, i, j) {
-    bytes[j++] = string.charCodeAt(i);
-    return j;
-}
-
-module.exports.write64BitFloat = write64BitFloat;
-module.exports.write48Bit = write48Bit;
-module.exports.write40Bit = write40Bit;
-module.exports.write32BitFloat = write32BitFloat;
-module.exports.write32Bit = write32Bit;
-module.exports.write24Bit = write24Bit;
-module.exports.write16Bit = write16Bit;
-module.exports.write16BitFloat = write16BitFloat;
-module.exports.write8Bit = write8Bit;
-module.exports.writeString = writeString;
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-/*
  * float: Functions to work with 16, 32 & 64 bit floats.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
  */
 
+const pad = __webpack_require__(0);
+
+function getBinary(bytes, rev=false) {
+    let binary = "";
+    let i = 0;
+    let bytesLength = bytes.length;
+    while(i < bytesLength) {
+        let bits = pad.lPadZeros(bytes[i].toString(2), 8);
+        if (rev) {
+            binary = binary + bits;
+        } else {
+            binary = bits + binary;
+        }
+        i++;
+    }
+    return binary;
+}
+
 /**
  * Turn bytes to a float 16..
  * Thanks https://stackoverflow.com/a/8796597
- * @param {number} binary 2 bytes representing a float 16.
+ * @param {number} bytes 2 bytes representing a float 16.
  */
-function decodeFloat16 (binary) {
-    var exponent = (binary & 0x7C00) >> 10,
-        fraction = binary & 0x03FF;
-    return (binary >> 15 ? -1 : 1) * (
-        exponent ?
-        (
-            exponent === 0x1F ?
-            fraction ? NaN : Infinity :
-            Math.pow(2, exponent - 15) * (1 + fraction / 0x400)
-        ) :
-        6.103515625e-5 * (fraction / 0x400)
-    );
+function decodeFloat16 (bytes) {
+    let binary = parseInt(getBinary(bytes, true), 2);
+    let exponent = (binary & 0x7C00) >> 10;
+    let fraction = binary & 0x03FF;
+    let floatValue;
+    if (exponent) {
+        floatValue =  Math.pow(2, exponent - 15) * (1 + fraction / 0x400);
+    } else {
+        floatValue = 6.103515625e-5 * (fraction / 0x400);
+    }
+    return  floatValue * (binary >> 15 ? -1 : 1);
 }
 
 /**
@@ -360,26 +294,15 @@ function decodeFloat16 (binary) {
  * Thanks https://gist.github.com/kg/2192799
  * @param {!Array<number>} bytes 8 bytes representing a float 64.
  */
-function decodeFloat(bytes) {
+function decodeFloat64(bytes) {
     if (bytes.toString() == "0,0,0,0,0,0,0,0") {
         return 0;
     }
-    let binary = "";
-    let bits;
-    let i = 0;
-    let bytesLength = bytes.length;
-    while(i < bytesLength) {
-        bits = bytes[i].toString(2);
-        while (bits.length < 8) {
-            bits = "0" + bits;
-        }
-        binary = bits + binary;
-        i++;
-    }
+    let binary = getBinary(bytes);
     let significandBin = "1" + binary.substr(1 + 11, 52);
     let val = 1;
     let significand = 0;
-    i = 0;
+    let i = 0;
     while (i < significandBin.length) {
         significand += val * parseInt(significandBin.charAt(i), 10);
         val = val / 2;
@@ -388,7 +311,7 @@ function decodeFloat(bytes) {
     let sign = (binary.charAt(0) == "1") ? -1 : 1;
     let doubleValue = sign * significand *
         Math.pow(2, parseInt(binary.substr(1, 11), 2) - 1023);
-    return doubleValue === 2 ? 0 : doubleValue;
+    return doubleValue;
 }
 
 /**
@@ -418,13 +341,38 @@ function toFloat64(value) {
     return [hiWord, loWord];
 }
 
+let floatView = new Float32Array(1);
+let int32View = new Int32Array(floatView.buffer);
+
+/*!
+ * to-half: int bits of half-precision floating point values
+ * Based on:
+ * https://mail.mozilla.org/pipermail/es-discuss/2017-April/047994.html
+ * https://github.com/rochars/byte-data
+ */
+function toHalf(val) {
+    floatView[0] = val;
+    let x = int32View[0];
+    let bits = (x >> 16) & 0x8000;
+    let m = (x >> 12) & 0x07ff;
+    let e = (x >> 23) & 0xff;
+    if (e < 103) {
+        return bits;
+    }
+    bits |= ((e - 112) << 10) | (m >> 1);
+    bits += m & 1;
+    return bits;
+}
+
+module.exports.getBinary = getBinary;
 module.exports.decodeFloat16 = decodeFloat16;
-module.exports.decodeFloat = decodeFloat;
+module.exports.decodeFloat64 = decodeFloat64;
 module.exports.toFloat64 = toFloat64;
+module.exports.toHalf = toHalf;
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -470,7 +418,799 @@ module.exports.maxBitDepth = maxBitDepth;
 
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*!
+ * Wavefile
+ * Handle wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
+ * https://github.com/rochars/wavefile
+ *
+ */
+
+const byteData = __webpack_require__(6);
+const wavefileheader = __webpack_require__(12);
+
+/**
+ * A wave file.
+ */
+class WaveFile extends wavefileheader.WaveFileHeader {
+
+    /**
+     * @param {Uint8Array} bytes The file bytes.
+     * @param {boolean} enforceFact True if it should throw a error
+     *      if no "fact" chunk is found.
+     * @param {boolean} enforceBext True if it should throw a error
+     *      if no "bext" chunk is found.
+     */
+    constructor(bytes, enforceFact=false, enforceBext=false) {
+        super();
+        /** @type {boolean} */
+        this.isFromScratch_ = false;
+        /** @type {boolean} */
+        this.enforceFact = enforceFact;
+        /** @type {boolean} */
+        this.enforceBext = enforceBext;
+        /**
+         * Error messages.
+         * @enum {string}
+         */
+        this.WaveErrors = {
+            "format": "Not a supported format.",
+            "wave": "Could not find the 'WAVE' chunk",
+            "fmt ": "Could not find the 'fmt ' chunk",
+            "data": "Could not find the 'data' chunk",
+            "fact": "Could not find the 'fact' chunk",
+            "bext": "Could not find the 'bext' chunk",
+            "bitDepth": "Invalid bit depth.",
+            "numChannels": "Invalid number of channels.",
+            "sampleRate": "Invalid sample rate."
+        };
+        this.samples_ = [];
+        this.bytes_ = [];
+        if(bytes) {
+            this.fromBytes(bytes);
+        }
+    }
+
+    /**
+     * Create a WaveFile object based on the arguments passed.
+     * @param {number} numChannels The number of channels
+     *     (Ints like 1 for mono, 2 stereo and so on).
+     * @param {number} sampleRate The sample rate.
+     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
+     * @param {string} bitDepth The audio bit depth.
+     *     One of "8", "16", "24", "32", "32f", "64".
+     * @param {!Array<number>} samples Array of samples to be written.
+     *     Samples must be in the correct range according to the bit depth.
+     *     Samples of multi-channel data .
+     */
+    fromScratch(numChannels, sampleRate, bitDepth, samples) {
+        this.isFromScratch_ = true;
+        let bytes = parseInt(bitDepth, 10) / 8;
+        this.chunkSize = 36 + samples.length * bytes;
+        this.subChunk1Size = 16;
+        this.byteRate = (numChannels * bytes) * sampleRate;
+        this.blockAlign = numChannels * bytes;
+        this.chunkId = "RIFF";
+        this.format = "WAVE";
+        this.subChunk1Id = "fmt ";
+        this.audioFormat = this.headerFormats_[bitDepth];
+        this.numChannels = numChannels;
+        this.sampleRate = sampleRate;
+        this.bitsPerSample = parseInt(bitDepth, 10);
+        this.subChunk2Id = "data";
+        this.subChunk2Size = samples.length * bytes;
+        this.samples_ = samples;
+        this.bitDepth_ = bitDepth;
+    }
+
+    /**
+     * Read a wave file from a byte buffer.
+     * @param {Uint8Array} bytes The buffer.
+     */
+    fromBytes(bytes) {
+        this.isFromScratch_ = false;
+        this.readRIFFChunk_(bytes);
+        this.readWAVEChunk_(bytes);
+        this.readFmtChunk_(bytes);
+        this.readFactChunk_(bytes);
+        this.readBextChunk_(bytes);
+        this.readDataChunk_(bytes);
+    }
+
+    /**
+     * Turn the WaveFile object into a byte buffer.
+     * @return {Uint8Array}
+     */
+    toBytes() {
+        this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
+        this.samplesToBytes_();
+        return new Uint8Array(this.createWaveFile_());
+    }
+
+    /**
+     * Interleave multi-channel samples.
+     */
+    interleave() {
+        let finalSamples = [];
+        let i;
+        let j;
+        let numChannels = this.samples_[0].length;
+        for (i = 0; i < numChannels; i++) {
+            for (j = 0; j < this.samples_.length; j++) {
+                finalSamples.push(this.samples_[j][i]);
+            }
+        }
+        this.samples_ = finalSamples;
+    }
+
+    /**
+     * De-interleave samples into multiple channels.
+     */
+    deInterleave() {
+        let finalSamples = [];
+        let i;
+        for (i = 0; i < this.numChannels; i++) {
+            finalSamples[i] = [];
+        }
+        i = 0;
+        let j;
+        while (i < this.samples_.length) {
+            for (j = 0; j < this.numChannels; j++) {
+                finalSamples[j].push(this.samples_[i+j]);
+            }
+            i += j;
+        }
+        this.samples_ = finalSamples;
+    }
+
+    /**
+     * Read the RIFF chunk a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "RIFF" chunk is found.
+     */
+    readRIFFChunk_(bytes) {
+        this.chunkId = byteData.fromBytes(bytes.slice(0, 4),
+            8, {"char": true});
+        if (this.chunkId != "RIFF") {
+            throw Error(this.WaveErrors.format);
+        }
+        this.chunkSize = byteData.fromBytes(
+            bytes.slice(4, 8), 32)[0];
+    }
+
+    /**
+     * Read the WAVE chunk of a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "WAVE" chunk is found.
+     */
+    readWAVEChunk_(bytes) {
+        let start = byteData.findString(bytes, "WAVE");
+        if (start === -1) {
+            throw Error(this.WaveErrors.wave);
+        }
+        this.format = "WAVE";
+    }
+
+    /**
+     * Read the "fmt " chunk of a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "fmt " chunk is found.
+     */
+    readFmtChunk_(bytes) {
+        let start = byteData.findString(bytes, "fmt ");
+        if (start === -1) {
+            throw Error(this.WaveErrors["fmt "]);
+        }
+        this.subChunk1Id = "fmt ";
+        this.subChunk1Size = byteData.fromBytes(
+            bytes.slice(start + 4, start + 8), 32)[0];
+        this.audioFormat = byteData.fromBytes(
+            bytes.slice(start + 8, start + 10), 16)[0];
+        this.numChannels = byteData.fromBytes(
+            bytes.slice(start + 10, start + 12), 16)[0];
+        this.sampleRate = byteData.fromBytes(
+            bytes.slice(start + 12, start + 16), 32)[0];
+        this.byteRate = byteData.fromBytes(
+            bytes.slice(start + 16, start + 20), 32)[0];
+        this.blockAlign = byteData.fromBytes(
+            bytes.slice(start + 20, start + 22), 16)[0];
+        this.bitsPerSample = byteData.fromBytes(
+            bytes.slice(start + 22, start + 24), 16)[0];
+        if (this.audioFormat == 3 && this.bitsPerSample == 32) {
+            this.bitDepth_ = "32f";
+        }else {
+            this.bitDepth_ = this.bitsPerSample.toString();
+        }
+    }
+
+    /**
+     * Read the "fact" chunk of a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "fact" chunk is found.
+     */
+    readFactChunk_(bytes) {
+        let start = byteData.findString(bytes, "fact");
+        if (start === -1 && this.enforceFact) {
+            throw Error(this.WaveErrors.fact);
+        }else if (start > -1) {
+            this.factChunkId = "fact";
+            //this.factChunkSize = byteData.uIntFrom4Bytes(
+            //    bytes.slice(start + 4, start + 8));
+            //this.dwSampleLength = byteData.uIntFrom4Bytes(
+            //    bytes.slice(start + 8, start + 12));
+        }
+    }
+
+    /**
+     * Read the "bext" chunk of a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "bext" chunk is found.
+     */
+    readBextChunk_(bytes) {
+        let start = byteData.findString(bytes, "bext");
+        if (start === -1 && this.enforceBext) {
+            throw Error(this.WaveErrors.bext);
+        }else if (start > -1){
+            this.bextChunkId = "bext";
+        }
+    }
+
+    /**
+     * Read the "data" chunk of a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "data" chunk is found.
+     */
+    readDataChunk_(bytes) {
+        let start = byteData.findString(bytes, "data");
+        if (start === -1) {
+            throw Error(this.WaveErrors.data);
+        }
+        this.subChunk2Id = "data";
+        this.subChunk2Size = byteData.fromBytes(
+            bytes.slice(start + 4, start + 8), 32)[0];
+        this.samplesFromBytes_(bytes, start);
+    }
+
+    /**
+     * Find and return the start offset of the data chunk on a wave file.
+     * @param {Uint8Array} bytes Array of bytes representing the wave file.
+     * @param {number} start The offset to start reading.
+     */
+    samplesFromBytes_(bytes, start) {
+        let params = {
+            "signed": this.bitsPerSample == 8 ? false : true,
+        };
+        if (this.bitsPerSample == 32 && this.audioFormat == 3) {
+            params.float = true;
+        }
+        let samples = bytes.slice(start + 8, start + 8 + this.subChunk2Size);
+        if (this.bitsPerSample == 4) {
+            this.samples_ = byteData.fromBytes(samples, 8, params);
+        } else {
+            this.samples_ = byteData.fromBytes(samples, this.bitsPerSample, params);
+        }
+    }
+
+    /**
+     * Validate the input for wav writing.
+     * @param {number} numChannels The number of channels
+     *     Should be a int greater than zero smaller than the
+     *     channel limit according to the bit depth.
+     * @param {number} sampleRate The sample rate.
+     *     Should be a int greater than zero smaller than the
+     *     channel limit according to the bit depth and number of channels.
+     * @param {string} bitDepth The audio bit depth.
+     *     Should be one of "8", "16", "24", "32", "32f", "64".
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    checkWriteInput_() {
+        if (!this.headerFormats_[this.bitDepth_]) {
+            throw new Error(this.WaveErrors.bitDepth);
+        }
+        this.validateNumChannels_();
+        this.validateSampleRate_();
+    }
+
+    /**
+     * Validate the sample rate value.
+     * @param {number} numChannels The number of channels
+     * @param {string} bitDepth The audio bit depth.
+     *     Should be one of "8", "16", "24", "32", "32f", "64".
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateNumChannels_() {
+        let blockAlign = this.numChannels * this.bitsPerSample / 8;
+        if (this.numChannels < 1 || blockAlign > 65535) {
+            throw new Error(this.WaveErrors.numChannels);
+        }
+        return true;
+    }
+
+    /**
+     * Validate the sample rate value.
+     * @param {number} numChannels The number of channels
+     *     Should be a int greater than zero smaller than the
+     *     channel limit according to the bit depth.
+     * @param {number} sampleRate The sample rate.
+     * @param {string} bitDepth The audio bit depth.
+     *     Should be one of "8", "16", "24", "32", "32f", "64".
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateSampleRate_() {
+        let byteRate = this.numChannels *
+            (this.bitsPerSample / 8) * this.sampleRate;
+        if (this.sampleRate < 1 || byteRate > 4294967295) {
+            throw new Error(this.WaveErrors.sampleRate);
+        }
+        return true;
+    }
+
+    /**
+     * Split each sample into bytes.
+     */
+    samplesToBytes_() {
+        let params = {};
+        if (this.bitsPerSample == 32 && this.audioFormat == 3) {
+            params.float = true;
+        }
+        let bitDepth = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
+        this.bytes_ = byteData.toBytes(this.samples_, bitDepth, params);
+        if (this.bytes_.length % 2) {
+            this.bytes_.push(0);
+        }
+    }
+
+    /**
+     * Turn a WaveFile object into a file.
+     * @return {Uint8Array} The wav file bytes.
+     */
+    createWaveFile_() {
+        let factVal = [];
+        if (this.factChunkId) {
+            factVal = byteData.toBytes(this.factChunkId, 8, {"char": true});
+        }
+        return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
+            byteData.toBytes([this.chunkSize], 32),
+            byteData.toBytes(this.format, 8, {"char": true}), 
+            byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
+            byteData.toBytes([this.subChunk1Size], 32),
+            byteData.toBytes([this.audioFormat], 16),
+            byteData.toBytes([this.numChannels], 16),
+            byteData.toBytes([this.sampleRate], 32),
+            byteData.toBytes([this.byteRate], 32),
+            byteData.toBytes([this.blockAlign], 16),
+            byteData.toBytes([this.bitsPerSample], 16),
+            factVal,
+            byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
+            byteData.toBytes([this.subChunk2Size], 32),
+            this.bytes_);
+    }
+}
+
+window['WaveFile'] = WaveFile;
+
+
+/***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*!
+ * byte-data
+ * Readable data to and from bytes.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/byte-data
+ */
+
+let toBytes = __webpack_require__(7);
+let fromBytes = __webpack_require__(9);
+let bitPacker = __webpack_require__(11);
+
+/**
+ * Find and return the start index of some string.
+ * Return -1 if the string is not found.
+ * @param {!Array<number>|Uint8Array} bytes Array of bytes.
+ * @param {string} chunk Some string to look for.
+ * @return {number} The start index of the first occurrence, -1 if not found
+ */
+function findString(bytes, chunk) {
+    let found = "";
+    for (let i = 0; i < bytes.length; i++) {
+        found = fromBytes.fromBytes(bytes.slice(i, i + chunk.length),
+            8, {"char": true});
+        if (found == chunk) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+module.exports.findString = findString;
+
+module.exports.toBytes = toBytes.toBytes;
+module.exports.fromBytes = fromBytes.fromBytes;
+
+module.exports.packBooleans = bitPacker.packBooleans;
+module.exports.unpackBooleans = bitPacker.unpackBooleans;
+module.exports.packCrumbs = bitPacker.packCrumbs;
+module.exports.unpackCrumbs = bitPacker.unpackCrumbs;
+module.exports.packNibbles = bitPacker.packNibbles;
+module.exports.unpackNibbles = bitPacker.unpackNibbles;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+ * to-bytes: bytes to numbers and strings.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/byte-data
+ */
+
+const intBits = __webpack_require__(1);
+const pad = __webpack_require__(0);
+const endianness = __webpack_require__(2);
+const writer = __webpack_require__(8);
+const bitDepths = __webpack_require__(4);
+
+/**
+ * Turn numbers and strings to bytes.
+ * @param {!Array<number>|string} values The data.
+ * @param {number} bitDepth The bit depth of the data.
+ *   Possible values are 1, 2, 4, 8, 16, 24, 32, 40, 48 or 64.
+ * @param {Object} options The options:
+ *   - "float": True for floating point numbers. Default is false.
+ *       This option is available for 16, 32 and 64-bit numbers.
+ *   - "base": The base of the output. Default is 10. Can be 2, 10 or 16.
+ *   - "char": If the bytes represent a string. Default is false.
+ *   - "be": If the values are big endian. Default is false (little endian).
+ *   - "buffer": If the bytes should be returned as a Uint8Array.
+ *       Default is false (bytes are returned as a regular array).
+ * @return {!Array<number>|Uint8Array} the data as a byte buffer.
+ */
+function toBytes(values, bitDepth, options={}) {
+    let base = 10;
+    if ("base" in options) {
+        base = options.base;
+    }
+    let bytes = writeBytes(values, options.char, options.float, bitDepth);
+    makeBigEndian(bytes, options.be, bitDepth);
+    outputToBase(bytes, bitDepth, base);
+    if (options.buffer) {
+        bytes = new Uint8Array(bytes);
+    }
+    return bytes;
+}
+
+/**
+ * Turn the output to the correct base.
+ * @param {!Array<number>} bytes The bytes.
+ * @param {number} bitDepth The bit depth of the data.
+ * @param {number} base The desired base for the output data.
+ */
+function outputToBase(bytes, bitDepth, base) {
+    if (bitDepth == 4) {
+        bytesToBase(bytes, base, pad.paddingNibble);
+    } else if (bitDepth == 2) {
+        bytesToBase(bytes, base, pad.paddingCrumb);
+    } else if(bitDepth == 1) {
+        bytesToBase(bytes, base, function(){});
+    }else {
+        bytesToBase(bytes, base);
+    }
+}
+
+/**
+ * Write values as bytes.
+ * @param {!Array<number>|string} numbers The values.
+ * @param {boolean} isChar True if it is a string.
+ * @param {boolean} isFloat True if it is a IEEE floating point number.
+ * @param {number} bitDepth The bitDepth of the data.
+ * @return {!Array<number>} the bytes.
+ */
+function writeBytes(numbers, isChar, isFloat, bitDepth) {
+    let bitWriter;
+    if (isChar) {
+        bitWriter = writer.writeString;
+    } else {
+        bitWriter = writer['write' + bitDepth + 'Bit' + (isFloat ? "Float" : "")];
+    }
+    let i = 0;
+    let j = 0;
+    let len = numbers.length;
+    let bytes = [];
+    while (i < len) {            
+        j = bitWriter(bytes, numbers, i, j);
+        i++;
+    }
+    return bytes;
+}
+
+/**
+ * Write values as bytes.
+ * @param {!Array<number>} bytes The values.
+ * @param {boolean} isBigEndian True if the bytes should be big endian.
+ * @param {number} bitDepth The bitDepth of the data.
+ */
+function makeBigEndian(bytes, isBigEndian, bitDepth) {
+    if (isBigEndian) {
+        endianness.endianness(bytes, bitDepths.bitDepthOffsets[bitDepth]);
+    }
+}
+
+/**
+ * Turn bytes to base.
+ * @param {!Array<string>|!Array<number>} bytes The bytes.
+ * @param {number} base The base.
+ * @param {Function} padFunction The function to use for padding.
+ */
+function bytesToBase(bytes, base, padFunction=pad.padding) {
+    if (base != 10) {
+        let i = 0;
+        let len = bytes.length;
+        while (i < len) {
+            bytes[i] = bytes[i].toString(base);
+            padFunction(bytes, base, i);
+            i++;
+        }
+    }
+}
+
+module.exports.toBytes = toBytes;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+ * Functions to turn data into bytes.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/byte-data
+ */
+
+const float = __webpack_require__(3);
+const intBits = __webpack_require__(1);
+
+function write64Bit(bytes, numbers, i, j) {
+    let bits = float.toFloat64(numbers[i]);
+    j = write32Bit(bytes, bits, 1, j);
+    return write32Bit(bytes, bits, 0, j);
+}
+
+// https://github.com/majimboo/c-struct
+function write48Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xFF;
+    bytes[j++] = numbers[i] >> 8 & 0xFF;
+    bytes[j++] = numbers[i] >> 16 & 0xFF;
+    bytes[j++] = numbers[i] >> 24 & 0xFF;
+    bytes[j++] = numbers[i] / 0x100000000 & 0xFF;
+    bytes[j++] = numbers[i] / 0x10000000000 & 0xFF;
+    return j;
+}
+
+// https://github.com/majimboo/c-struct
+function write40Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xFF;
+    bytes[j++] = numbers[i] >> 8 & 0xFF;
+    bytes[j++] = numbers[i] >> 16 & 0xFF;
+    bytes[j++] = numbers[i] >> 24 & 0xFF;
+    bytes[j++] = numbers[i] / 0x100000000 & 0xFF;
+    return j;
+}
+
+function write32BitFloat(bytes, numbers, i, j) {
+    let bits = intBits.unpack(numbers[i]);
+    bytes[j++] = bits & 0xFF;
+    bytes[j++] = bits >>> 8 & 0xFF;
+    bytes[j++] = bits >>> 16 & 0xFF;
+    bytes[j++] = bits >>> 24 & 0xFF;
+    return j;
+}
+
+function write32Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xFF;
+    bytes[j++] = numbers[i] >>> 8 & 0xFF;
+    bytes[j++] = numbers[i] >>> 16 & 0xFF;
+    bytes[j++] = numbers[i] >>> 24 & 0xFF;
+    return j;
+}
+
+function write24Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xFF;
+    bytes[j++] = numbers[i] >>> 8 & 0xFF;
+    bytes[j++] = numbers[i] >>> 16 & 0xFF;
+    return j;
+}
+
+function write16Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xFF;
+    bytes[j++] = numbers[i] >>> 8 & 0xFF;
+    return j;
+}
+
+function write16BitFloat(bytes, numbers, i, j) {
+    let bits = float.toHalf(numbers[i]);
+    bytes[j++] = bits  >>> 8 & 0xFF;
+    bytes[j++] = bits  & 0xFF;
+    return j;
+}
+
+function write8Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xFF;
+    return j;
+}
+
+function write4Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] & 0xF;
+    return j;
+}
+
+function write2Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] < 0 ? numbers[i] + 4 : numbers[i];
+    return j;
+}
+
+function write1Bit(bytes, numbers, i, j) {
+    bytes[j++] = numbers[i] ? 1 : 0;
+    return j;
+}
+
+function writeString(bytes, string, i, j) {
+    bytes[j++] = string.charCodeAt(i);
+    return j;
+}
+
+module.exports.write64Bit = write64Bit;
+module.exports.write48Bit = write48Bit;
+module.exports.write40Bit = write40Bit;
+module.exports.write32BitFloat = write32BitFloat;
+module.exports.write32Bit = write32Bit;
+module.exports.write24Bit = write24Bit;
+module.exports.write16Bit = write16Bit;
+module.exports.write16BitFloat = write16BitFloat;
+module.exports.write8Bit = write8Bit;
+module.exports.write4Bit = write4Bit;
+module.exports.write2Bit = write2Bit;
+module.exports.write1Bit = write1Bit;
+module.exports.writeString = writeString;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+ * from-bytes: convert bytes to numbers and strings.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/byte-data
+ */
+
+const endianness = __webpack_require__(2);
+const reader = __webpack_require__(10);
+const bitDepths = __webpack_require__(4);
+
+/**
+ * Turn a byte buffer into what the bytes represent.
+ * @param {!Array<number>|Uint8Array} buffer An array of bytes.
+ * @param {number} bitDepth The bit depth of the data.
+ *   Possible values are 1, 2, 4, 8, 16, 24, 32, 40, 48 or 64.
+ * @param {Object} options The options. They are:
+ *   - "signed": If the numbers are signed. Default is false (unsigned).
+ *   - "float": True for floating point numbers. Default is false.
+ *       This option is available for 16, 32 and 64-bit numbers.
+ *   - "base": The base of the input. Default is 10. Can be 2, 10 or 16.
+ *   - "char": If the bytes represent a string. Default is false.
+ *   - "be": If the values are big endian. Default is false (little endian).
+ * @return {!Array<number>|string}
+ */
+function fromBytes(buffer, bitDepth, options={}) {
+    let base = 10;
+    if ("base" in options) {
+        base = options.base;
+    }
+    if (options.be) {
+        endianness.endianness(buffer, bitDepth / 8);
+    }
+    bytesToInt(buffer, base);
+    let bitReader = getBitReader(bitDepth, options.float, options.char);
+    let values = readBytes(buffer, bitDepth, options.signed, bitReader);
+    if (options.char) {
+        values = values.join("");
+    }
+    return values;
+}
+
+/**
+ * Turn a array of bytes into an array of what the bytes should represent.
+ * @param {!Array<number>|Uint8Array} bytes An array of bytes.
+ * @param {number} bitDepth The bitDepth. 1, 2, 4, 8, 16, 24, 32, 40, 48, 64.
+ * @param {boolean} isSigned True if the values should be signed.
+ * @param {Function} bitReader The function to read the bytes.
+ * @return {!Array<number>|string}
+ */
+function readBytes(bytes, bitDepth, isSigned, bitReader) {
+    let values = [];
+    let i = 0;
+    let j = 0;
+    let offset = bitDepths.bitDepthOffsets[bitDepth];
+    let len = bytes.length - (offset -1);
+    let maxBitDepthValue = bitDepths.maxBitDepth[bitDepth];
+    let signFunction = isSigned ? signed : function(x,y){return x;};
+    while (i < len) {
+        values[j] = signFunction(bitReader(bytes, i), maxBitDepthValue);
+        i += offset;
+        j++;
+    }
+    return values;
+}
+
+/**
+ * Return a function to read binary data.
+ * @param {number} bitDepth The bitDepth. 1, 2, 4, 8, 16, 24, 32, 40, 48, 64.
+ * @param {boolean} isFloat True if the values are IEEE floating point numbers.
+ * @param {boolean} isChar True if it is a string.
+ * @return {Function}
+ */
+function getBitReader(bitDepth, isFloat, isChar) {
+    let bitReader;
+    if (isChar) {
+        bitReader = reader.readChar;
+    } else {
+        bitReader = reader[getReaderFunctionName(bitDepth, isFloat)];
+    }
+    return bitReader;
+}
+
+/**
+ * Build a bit reading function name based on the arguments.
+ * @param {number} bitDepth The bitDepth. 1, 2, 4, 8, 16, 24, 32, 40, 48, 64.
+ * @param {boolean} isFloat True if the values are IEEE floating point numbers.
+ * @return {string}
+ */
+function getReaderFunctionName(bitDepth, isFloat) {
+    return 'read' +
+        ((bitDepth == 2 || bitDepth == 4) ? 8 : bitDepth) +
+        'Bit' +
+        (isFloat ? "Float" : "");
+}
+
+/**
+ * Turn bytes to base 10.
+ * @param {!Array<number>|Uint8Array} bytes The bytes as binary or hex strings.
+ * @param {number} base The base.
+ */
+function bytesToInt(bytes, base) {
+    if (base != 10) {
+        let i = 0;
+        let len = bytes.length;
+        while(i < len) {
+            bytes[i] = parseInt(bytes[i], base);
+            i++;
+        }
+    }
+}
+
+/**
+ * Turn a unsigned number to a signed number.
+ * @param {number} number The number.
+ * @param {number} maxValue The max range for the number bit depth.
+ */
+function signed(number, maxValue) {
+    if (number > parseInt(maxValue / 2, 10) - 1) {
+        number -= maxValue;
+    }
+    return number;
+}
+
+module.exports.fromBytes = fromBytes;
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -480,9 +1220,9 @@ module.exports.maxBitDepth = maxBitDepth;
  */
 
 
-let pad = __webpack_require__(1);
-const float = __webpack_require__(4);
-const intBits = __webpack_require__(0);
+let pad = __webpack_require__(0);
+const float = __webpack_require__(3);
+const intBits = __webpack_require__(1);
 
 /**
  * Read a group of bytes by turning it to bits.
@@ -514,8 +1254,6 @@ function read1Bit(bytes, i) {
     return parseInt(bytes[i], 2);
 }
 
-// read2Bit, read4Bit == read8Bit
-
 /**
  * Read 1 8-bit int from from bytes.
  * @param {!Array<number>|Uint8Array} bytes An array of bytes.
@@ -543,21 +1281,7 @@ function read16Bit(bytes, i) {
  * @return {number}
  */
 function read16BitFloat(bytes, i) {
-    let nBytes = bytes.slice(i,i+2);
-    let binary = "";
-    let bits = "";
-    let j = 0;
-    let bytesLength = nBytes.length;
-    while(j < bytesLength) {
-        bits = nBytes[j].toString(2);
-        while (bits.length < 8) {
-            bits = "0" + bits;
-        }
-        binary = binary + bits;
-        j++;
-    }
-    binary = parseInt(binary, 2);
-    return float.decodeFloat16(binary);
+    return float.decodeFloat16(bytes.slice(i,i+2));
 }
 
 /**
@@ -622,7 +1346,7 @@ function read48Bit(bytes, i) {
  * @return {number}
  */
 function read64Bit(bytes, i) {
-    return float.decodeFloat(bytes.slice(i,i+8));
+    return float.decodeFloat64(bytes.slice(i,i+8));
 }
 
 /**
@@ -648,1102 +1372,17 @@ module.exports.read48Bit = read48Bit;
 module.exports.read64Bit = read64Bit;
 
 
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*!
- * Wavefile
- * Handle wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
- * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
- * https://github.com/rochars/wavefile
- *
- */
-
-const byteData = __webpack_require__(8);
-const wavefileheader = __webpack_require__(13);
-
-/**
- * A wave file.
- */
-class WaveFile extends wavefileheader.WaveFileHeader {
-
-    /**
-     * @param {Uint8Array} bytes The file bytes.
-     * @param {boolean} enforceFact True if it should throw a error
-     *      if no "fact" chunk is found.
-     * @param {boolean} enforceBext True if it should throw a error
-     *      if no "bext" chunk is found.
-     */
-    constructor(bytes, enforceFact=false, enforceBext=false) {
-        super();
-        /** @type {boolean} */
-        this.enforceFact = enforceFact;
-        /** @type {boolean} */
-        this.enforceBext = enforceBext;        
-        /**
-         * Header formats.
-         * @enum {number}
-         */
-        this.headerFormats_ = {
-            "4": 17,
-            "8": 1,
-            "16": 1,
-            "24": 1,
-            "32": 1,
-            "32f": 3,
-            "64": 3
-        };
-        /**
-         * Error messages.
-         * @enum {string}
-         */
-        this.WaveErrors = {
-            'format': "Not a supported format.",
-            'wave': "Could not find the 'WAVE' chunk",
-            'fmt ': "Could not find the 'fmt ' chunk",
-            'data': "Could not find the 'data' chunk",
-            'fact': "Could not find the 'fact' chunk",
-            'bext': "Could not find the 'bext' chunk"
-        };
-        if(bytes) {
-            this.fromBytes(bytes);
-        }
-    }
-
-    /**
-     * Create a WaveFile object based on the arguments passed.
-     * @param {number} numChannels The number of channels
-     *     (Ints like 1 for mono, 2 stereo and so on).
-     * @param {number} sampleRate The sample rate.
-     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
-     * @param {string} bitDepth The audio bit depth.
-     *     One of "8", "16", "24", "32", "32f", "64".
-     * @param {!Array<number>} samples Array of samples to be written.
-     *     Samples must be in the correct range according to the bit depth.
-     *     Samples of multi-channel data .
-     */
-    fromScratch(numChannels, sampleRate, bitDepth, samples) {
-        let bytes = parseInt(bitDepth, 10) / 8;
-        this.chunkId = "RIFF";
-        this.chunkSize = 36 + samples.length * bytes;
-        this.format = "WAVE";
-        this.subChunk1Id = "fmt ";
-        this.subChunk1Size = 16;
-        this.audioFormat = this.headerFormats_[bitDepth];
-        this.numChannels = numChannels;
-        this.sampleRate = sampleRate;
-        this.byteRate = (numChannels * bytes) * sampleRate;
-        this.blockAlign = numChannels * bytes;
-        this.bitsPerSample = parseInt(bitDepth, 10);
-        this.subChunk2Id = "data";
-        this.subChunk2Size = samples.length * bytes;
-        this.samples_ = samples;
-        this.bitDepth_ = bitDepth;
-    }
-
-    /**
-     * Read a wave file from an array of bytes.
-     * @param {Uint8Array} bytes The wave file as an array of bytes.
-     */
-    fromBytes(bytes) {
-        this.readRIFFChunk_(bytes);
-        this.readWAVEChunk_(bytes);
-        this.readFmtChunk_(bytes);
-        try {
-            this.readFactChunk_(bytes);
-        }catch(err) {
-            if (this.enforceFact) {
-                throw err;
-            }
-        }
-        try {
-            this.readBextChunk_(bytes);
-        }catch(err) {
-            if (this.enforceBext) {
-                throw err;
-            }
-        }
-        this.readDataChunk_(bytes);
-    }
-
-    /**
-     * Turn the wave file represented by an object of this class into
-     * a array of bytes.
-     * @return {Uint8Array}
-     */
-    toBytes() {
-        this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
-        this.samplesToBytes_();
-        return new Uint8Array(this.createWaveFile_());
-    }
-
-    /**
-     * Interleave multi-channel samples.
-     */
-    interleave() {
-        let finalSamples = [];
-        let i;
-        let j;
-        let numChannels = this.samples_[0].length;
-        for (i = 0; i < numChannels; i++) {
-            for (j = 0; j < this.samples_.length; j++) {
-                finalSamples.push(this.samples_[j][i]);
-            }
-        }
-        this.samples_ = finalSamples;
-    }
-
-    /**
-     * De-interleave samples into multiple channels.
-     */
-    deInterleave() {
-        let finalSamples = [];
-        let i;
-        for (i = 0; i < this.numChannels; i++) {
-            finalSamples[i] = [];
-        }
-        i = 0;
-        let j;
-        while (i < this.samples_.length) {
-            for (j = 0; j < this.numChannels; j++) {
-                finalSamples[j].push(this.samples_[i+j]);
-            }
-            i += j;
-        }
-        this.samples_ = finalSamples;
-    }
-
-    /**
-     * Read the RIFF chunk a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
-     * @throws {Error} If no "RIFF" chunk is found.
-     */
-    readRIFFChunk_(bytes) {
-        this.chunkId = byteData.stringFromBytes(bytes.slice(0, 4));
-        if (this.chunkId != "RIFF") {
-            throw Error(this.WaveErrors.format);
-        }
-        this.chunkSize = byteData.intFrom4Bytes(
-            bytes.slice(4, 8))[0];
-    }
-
-    /**
-     * Read the WAVE chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
-     * @throws {Error} If no "WAVE" chunk is found.
-     */
-    readWAVEChunk_(bytes) {
-        let start = byteData.findString(bytes, "WAVE");
-        if (start === -1) {
-            throw Error(this.WaveErrors.wave);
-        }
-        this.format = byteData.stringFromBytes(
-                bytes.slice(start, start + 4));
-    }
-
-    /**
-     * Read the "fmt " chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
-     * @throws {Error} If no "fmt " chunk is found.
-     */
-    readFmtChunk_(bytes) {
-        let start = byteData.findString(bytes, "fmt ");
-        if (start === -1) {
-            throw Error(this.WaveErrors['fmt ']);
-        }
-        this.subChunk1Id = byteData.stringFromBytes(
-            bytes.slice(start, start + 4));
-        this.subChunk1Size = byteData.uIntFrom4Bytes(
-            bytes.slice(start + 4, start + 8))[0];
-        this.audioFormat = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 8, start + 10))[0];
-        this.numChannels = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 10, start + 12))[0];
-        this.sampleRate = byteData.uIntFrom4Bytes(
-            bytes.slice(start + 12, start + 16))[0];
-        this.byteRate = byteData.uIntFrom4Bytes(
-            bytes.slice(start + 16, start + 20))[0];
-        this.blockAlign = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 20, start + 22))[0];
-        this.bitsPerSample = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 22, start + 24))[0];
-        // The bitDepth_ is used internally to determine
-        // wich function use to read the samples
-        if (this.audioFormat == 3 && this.bitsPerSample == 32) {
-            this.bitDepth_ = "32f";
-        }else {
-            this.bitDepth_ = this.bitsPerSample.toString();
-        }
-    }
-
-    /**
-     * Read the "fact" chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
-     * @throws {Error} If no "fact" chunk is found.
-     */
-    readFactChunk_(bytes) {
-        let start = byteData.findString(bytes, "fact");
-        if (start === -1) {
-            throw Error(this.WaveErrors.fact);
-        }else {
-            this.factChunkId = byteData.stringFromBytes(
-                bytes.slice(start, start + 4));
-            //this.factChunkSize = byteData.uIntFrom4Bytes(
-            //    bytes.slice(start + 4, start + 8));
-            //this.dwSampleLength = byteData.uIntFrom4Bytes(
-            //    bytes.slice(start + 8, start + 12));
-        }
-    }
-
-    /**
-     * Read the "bext" chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
-     * @throws {Error} If no "bext" chunk is found.
-     */
-    readBextChunk_(bytes) {
-        let start = byteData.findString(bytes, "bext");
-        if (start === -1) {
-            throw Error(this.WaveErrors.bext);
-        }else {
-            this.bextChunkId = byteData.stringFromBytes(
-                bytes.slice(start, start + 4));
-        }
-    }
-
-    /**
-     * Read the "data" chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
-     * @throws {Error} If no "data" chunk is found.
-     */
-    readDataChunk_(bytes) {
-        let start = byteData.findString(bytes, "data");
-        if (start === -1) {
-            throw Error(this.WaveErrors.data);
-        }
-        this.subChunk2Id = byteData.stringFromBytes(
-            bytes.slice(start, start + 4));
-        this.subChunk2Size = byteData.intFrom4Bytes(
-            bytes.slice(start + 4, start + 8))[0];
-        this.samplesFromBytes_(bytes, start);
-    }
-
-    /**
-     * Find and return the start offset of the data chunk on a wave file.
-     * @param {Uint8Array} bytes Array of bytes representing the wave file.
-     * @param {number} start The offset to start reading.
-     */
-    samplesFromBytes_(bytes, start) {
-        let readingFunctions = {
-            "4": byteData.intFrom1Byte,
-            "8": byteData.uIntFrom1Byte,
-            "16": byteData.intFrom2Bytes,
-            "24": byteData.intFrom3Bytes,
-            "32": byteData.intFrom4Bytes,
-            "32f": byteData.floatFrom4Bytes,
-            "64" : byteData.floatFrom8Bytes
-        };
-        let samples = bytes.slice(start + 8, start + 8 + this.subChunk2Size);
-        this.samples_ = readingFunctions[this.bitDepth_](samples);
-    }
-
-    /**
-     * Validate the input for wav writing.
-     * @param {number} numChannels The number of channels
-     *     Should be a int greater than zero smaller than the
-     *     channel limit according to the bit depth.
-     * @param {number} sampleRate The sample rate.
-     *     Should be a int greater than zero smaller than the
-     *     channel limit according to the bit depth and number of channels.
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
-     * @throws {Error} If any argument does not meet the criteria.
-     */
-    checkWriteInput_(numChannels, sampleRate, bitDepth) {
-        if (typeof bitDepth !== "string" ||
-            !(bitDepth in this.headerFormats_)) {
-            throw new Error("Invalid bit depth.");
-        }
-        this.validateNumChannels_(numChannels, bitDepth);
-        this.validateSampleRate_(numChannels, sampleRate, bitDepth);
-    }
-
-    /**
-     * Validate the sample rate value.
-     * @param {number} numChannels The number of channels
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
-     * @throws {Error} If any argument does not meet the criteria.
-     */
-    validateNumChannels_(numChannels, bitDepth) {
-        let errorText = "Invalid number of channels.";
-        let validChannnelNumber = false;
-        let blockAlign = numChannels * (parseInt(bitDepth, 10) / 8);
-        if (blockAlign <= 65535) {
-            validChannnelNumber = true;
-        }
-        if (numChannels < 1 || !validChannnelNumber ||
-            !(typeof numChannels==="number" && (numChannels%1)===0)) {
-            throw new Error(errorText);
-        }
-        return true;
-    }
-
-    /**
-     * Validate the sample rate value.
-     * @param {number} numChannels The number of channels
-     *     Should be a int greater than zero smaller than the
-     *     channel limit according to the bit depth.
-     * @param {number} sampleRate The sample rate.
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
-     * @throws {Error} If any argument does not meet the criteria.
-     */
-    validateSampleRate_(numChannels, sampleRate, bitDepth) {
-        let errorText = "Invalid sample rate.";
-        let validSampleRateValue = false;
-        let byteRate = numChannels * (parseInt(bitDepth, 10) / 8) * sampleRate;
-        if (byteRate <= 4294967295) {
-            validSampleRateValue = true;
-        }
-        if (sampleRate < 1 || !validSampleRateValue ||
-            !(typeof sampleRate==="number" && (sampleRate%1)===0)) {
-            throw new Error(errorText);
-        }
-        return true;
-    }
-
-    /**
-     * Split each sample into bytes.
-     */
-    samplesToBytes_() {
-        let writingFunctions = {
-            "4": byteData.intTo1Byte,
-            "8": byteData.intTo1Byte,
-            "16": byteData.intTo2Bytes,
-            "24": byteData.intTo3Bytes,
-            "32": byteData.intTo4Bytes,
-            "32f": byteData.floatTo4Bytes,
-            "64" : byteData.floatTo8Bytes
-        };
-        // FIXME byte-data should not modify the original array
-        let s = [];
-        for (let l=0; l<this.samples_.length; l++) {
-            s[l] = this.samples_[l];
-        }
-        this.bytes_ = writingFunctions[this.bitDepth_](s);
-        if (this.bytes_.length % 2) {
-            this.bytes_.push(0);
-        }
-    }
-
-    /**
-     * Turn a WaveFile object into a file.
-     * @return {Uint8Array} The wav file bytes.
-     */
-    createWaveFile_() {
-        let factVal = [];
-        let cbSizeVal = [];
-        if (this.factChunkId) {
-            factVal= byteData.stringToBytes(this.factChunkId);
-        }
-        return byteData.stringToBytes(this.chunkId).concat(
-            byteData.intTo4Bytes([this.chunkSize]),
-            byteData.stringToBytes(this.format), 
-            byteData.stringToBytes(this.subChunk1Id),
-            byteData.intTo4Bytes([this.subChunk1Size]),
-            byteData.intTo2Bytes([this.audioFormat]),
-            byteData.intTo2Bytes([this.numChannels]),
-            byteData.intTo4Bytes([this.sampleRate]),
-            byteData.intTo4Bytes([this.byteRate]),
-            byteData.intTo2Bytes([this.blockAlign]),
-            byteData.intTo2Bytes([this.bitsPerSample]),
-            factVal,
-            byteData.stringToBytes(this.subChunk2Id),
-            byteData.intTo4Bytes([this.subChunk2Size]),
-            this.bytes_);
-    }
-}
-
-window['WaveFile'] = WaveFile;
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*!
- * byte-data
- * Readable data to and from bytes.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/byte-data
- */
-
-let toBytes = __webpack_require__(9);
-let fromBytes = __webpack_require__(11);
-let bitPacker = __webpack_require__(12);
-let writer = __webpack_require__(3);
-let reader = __webpack_require__(6);
-
-/**
- * Find and return the start offset of some string.
- * @param {!Array<number>|Uint8Array} bytes Array of bytes.
- * @param {string} chunk Some string to look for.
- * @return {number} The start offset of the first occurrence found.
- */
-function findString(bytes, chunk) {
-    let found = "";
-    for (let i = 0; i < bytes.length; i++) {
-        found = fromBytes.stringFromBytes(bytes.slice(i, i + chunk.length));
-        if (found == chunk) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-module.exports.packBooleans = bitPacker.packBooleans;
-module.exports.unpackBooleans = bitPacker.unpackBooleans;
-module.exports.packCrumbs = bitPacker.packCrumbs;
-module.exports.unpackCrumbs = bitPacker.unpackCrumbs;
-module.exports.packNibbles = bitPacker.packNibbles;
-module.exports.unpackNibbles = bitPacker.unpackNibbles;
-
-module.exports.findString = findString;
-module.exports.stringToBytes = toBytes.stringToBytes;
-module.exports.stringFromBytes = fromBytes.stringFromBytes;
-
-module.exports.doubleTo8Bytes = toBytes.floatTo8Bytes;
-module.exports.floatTo8Bytes = toBytes.floatTo8Bytes;
-module.exports.floatTo4Bytes = toBytes.floatTo4Bytes;
-module.exports.intTo6Bytes = toBytes.intTo6Bytes;
-module.exports.intTo5Bytes = toBytes.intTo5Bytes;
-module.exports.intTo4Bytes = toBytes.intTo4Bytes;
-module.exports.intTo3Bytes = toBytes.intTo3Bytes;
-module.exports.intTo2Bytes = toBytes.intTo2Bytes;
-module.exports.floatTo2Bytes = toBytes.floatTo2Bytes;
-module.exports.intTo1Byte = toBytes.intTo1Byte;
-module.exports.intToNibble = toBytes.intToNibble;
-module.exports.toCrumb = toBytes.toCrumb;
-module.exports.toBoolean = toBytes.toBoolean;
-
-module.exports.floatFrom8Bytes = fromBytes.floatFrom8Bytes;
-module.exports.doubleFrom8Bytes = fromBytes.floatFrom8Bytes;
-module.exports.intFrom6Bytes = fromBytes.intFrom6Bytes;
-module.exports.uIntFrom6Bytes = fromBytes.uIntFrom6Bytes;
-module.exports.intFrom5Bytes = fromBytes.intFrom5Bytes;
-module.exports.uIntFrom5Bytes = fromBytes.uIntFrom5Bytes;
-module.exports.intFrom4Bytes = fromBytes.intFrom4Bytes;
-module.exports.uIntFrom4Bytes = fromBytes.uIntFrom4Bytes;
-module.exports.floatFrom4Bytes = fromBytes.floatFrom4Bytes;
-module.exports.intFrom3Bytes = fromBytes.intFrom3Bytes;
-module.exports.uIntFrom3Bytes = fromBytes.uIntFrom3Bytes;
-module.exports.floatFrom2Bytes = fromBytes.floatFrom2Bytes;
-module.exports.intFrom2Bytes = fromBytes.intFrom2Bytes;
-module.exports.uIntFrom2Bytes = fromBytes.uIntFrom2Bytes;
-module.exports.intFrom1Byte = fromBytes.intFrom1Byte;
-module.exports.uIntFrom1Byte = fromBytes.uIntFrom1Byte;
-module.exports.intFromNibble = fromBytes.intFromNibble;
-module.exports.uIntFromNibble = fromBytes.uIntFromNibble;
-module.exports.intFromCrumb = fromBytes.intFromCrumb;
-module.exports.uIntFromCrumb = fromBytes.uIntFromCrumb;
-module.exports.fromBoolean = fromBytes.fromBoolean;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
- * to-bytes: convert bytes to numbers and strings.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/byte-data
- */
-
-const intBits = __webpack_require__(0);
-const pad = __webpack_require__(1);
-const endianness = __webpack_require__(2);
-const writer = __webpack_require__(3);
-const bitDepths = __webpack_require__(5);
-
-/**
- * Turn numbers and strings to bytes.
- * @param {!Array<number>|string} numbers float64 numbers.
- * @param {number} base The base, 2, 10 or 16.
- * @param {Function} writer The function to turn the data to bytes.
- * @param {number} bitDepth The desired bitDepth for the data.
- * @param {boolean} bigEndian If the the bytes should be big endian or not.
- * @return {!Array<number>} the bytes.
- */
-function toBytes(numbers, base, writer, bitDepth, bigEndian) {
-    let i = 0;
-    let j = 0;
-    let len = numbers.length;
-    let bytes = [];
-    while (i < len) {            
-        j = writer(bytes, numbers, i, j);
-        i++;
-    }
-    bytesToBase(bytes, base);
-    if (bigEndian) {
-        endianness.endianness(bytes, bitDepths.bitDepthOffsets[bitDepth]);
-    }
-    return bytes;
-}
-
-/**
- * Turn bytes to base.
- * @param {!Array<string>|!Array<number>} bytes The bytes.
- * @param {number} base The base.
- * @param {Function} padFunction The function to use for padding.
- */
-function bytesToBase(bytes, base, padFunction=pad.padding) {
-    if (base != 10) {
-        let i = 0;
-        let len = bytes.length;
-        while (i < len) {
-            bytes[i] = bytes[i].toString(base);
-            padFunction(bytes, base, i);
-            i++;
-        }
-    }
-}
-
-/**
- * Split 64 bit numbers into bytes.
- * @param {!Array<number>} numbers float64 numbers.
- * @return {!Array<number>} the bytes.
- */
-function floatTo8Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write64BitFloat, 64, bigEndian);
-}
-
-/**
- * Split 32 bit float numbers into bytes.
- * @param {!Array<number>} numbers float32 numbers.
- * @return {!Array<number>} the bytes.
- */
-function floatTo4Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write32BitFloat, 32, bigEndian);
-}
-
-/**
- * Split 48 bit int numbers into 6 bytes.
- * @param {!Array<number>} numbers.
- * @return {!Array<number>} the bytes.
- */
-function intTo6Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write48Bit, 48, bigEndian);
-}
-
-/**
- * Split 40 bit int numbers into 5 bytes.
- * @param {!Array<number>} numbers.
- * @return {!Array<number>} the bytes.
- */
-function intTo5Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write40Bit, 40, bigEndian);
-}
-
-/**
- * Split 32 bit int numbers into bytes.
- * @param {!Array<number>} numbers int32 numbers.
- * @return {!Array<number>} the bytes.
- */
-function intTo4Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write32Bit, 32, bigEndian);
-}
-
-/**
- * Split 24 bit int numbers into bytes.
- * @param {!Array<number>} numbers int24 numbers.
- * @return {!Array<number>} the bytes.
- */
-function intTo3Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write24Bit, 24, bigEndian);
-}
-
-/**
- * Split 16 bit int numbers into bytes.
- * @param {!Array<number>} numbers int16 numbers.
- * @return {!Array<number>} the bytes.
- */
-function intTo2Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write16Bit, 16, bigEndian);
-}
-
-/**
- * Split a 8 bit int numbers into bytes
- * @param {!Array<number>} numbers int8 numbers.
- * @return {!Array<number>} the bytes.
- */
-function intTo1Byte(numbers, base=10) {
-    return toBytes(numbers, base, writer.write8Bit, 8, false);
-}
-
-/**
- * 4-bit int numbers into a nibbles.
- * @param {!Array<number>} numbers int8 numbers.
- * @return {!Array<number>} the bytes.
- */
-function intToNibble(numbers, base=10) {
-    let i = 0;
-    let j = 0;
-    let len = numbers.length;
-    let bytes = [];
-    while (i < len) {
-        bytes[j++] = numbers[i] & 0xF;
-        i++;
-    }
-    bytesToBase(bytes, base, pad.paddingNibble);
-    return bytes;
-}
-
-/**
- * Values to crumb form.
- * @param {!Array<number>} values Array of numbers.
- * @param {number} base The base.
- * @return {!Array<number>} the crumbs.
- */
-function toCrumb(values, base=10) {
-    let i = 0;
-    let j = 0;
-    let len = values.length;
-    let bytes = [];
-    while (i < len) {
-        bytes[j++] = values[i] < 0 ? values[i] + 4 : values[i];
-        i++;
-    }
-    bytesToBase(bytes, base, pad.paddingCrumb);
-    return bytes;
-}
-
-/**
- * Values to boolean form.
- * @param {!Array<number>} values Array of numbers.
- * @param {number} base The base.
- * @return {!Array<number>} the booleans.
- */
-function toBoolean(values, base=10) {
-    let i = 0;
-    let j = 0;
-    let len = values.length;
-    let booleans = [];
-    while (i < len) {
-        booleans[j++] = values[i] ? 1 : 0;
-        i++;
-    }
-    bytesToBase(booleans, base, function(){});
-    return booleans;
-}
-
-/**
- * Turn a string to an array of bytes.
- * @param {string} string The string.
- * @return {!Array<number>} the bytes.
- */
-function stringToBytes(string, base=10) {
-    return toBytes(string, base, writer.writeString, 8, false);
-}
-
-function floatTo2Bytes(numbers, base=10, bigEndian=false) {
-    return toBytes(numbers, base, writer.write16BitFloat, 16, bigEndian);
-}
-
-module.exports.toBytes = toBytes;
-
-// old interface
-module.exports.floatTo8Bytes = floatTo8Bytes;
-module.exports.floatTo4Bytes = floatTo4Bytes;
-module.exports.floatTo2Bytes = floatTo2Bytes;
-module.exports.intTo6Bytes = intTo6Bytes;
-module.exports.intTo5Bytes = intTo5Bytes;
-module.exports.intTo4Bytes = intTo4Bytes;
-module.exports.intTo3Bytes = intTo3Bytes;
-module.exports.intTo2Bytes = intTo2Bytes;
-module.exports.intTo1Byte = intTo1Byte;
-module.exports.intToNibble = intToNibble;
-module.exports.toCrumb = toCrumb;
-module.exports.toBoolean = toBoolean;
-module.exports.stringToBytes = stringToBytes;
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-/*!
- * to-half: int bits of half-precision floating point values
- * Based on:
- * https://mail.mozilla.org/pipermail/es-discuss/2017-April/047994.html
- * https://github.com/rochars/byte-data
- */
-
-var floatView = new Float32Array(1);
-var int32View = new Int32Array(floatView.buffer);
-
-function toHalf(val) {
-    floatView[0] = val;
-    var x = int32View[0];
-    var bits = (x >> 16) & 0x8000;
-    var m = (x >> 12) & 0x07ff;
-    var e = (x >> 23) & 0xff;
-    if (e < 103) {
-        return bits;
-    }
-    bits |= ((e - 112) << 10) | (m >> 1);
-    bits += m & 1;
-    return bits;
-}
-
-module.exports.toHalf = toHalf;
-
-
 /***/ }),
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
- * from-bytes: convert bytes to numbers and strings.
+ * bit-packer: Pack and unpack nibbles, crumbs and booleans into bytes.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
  */
 
-const pad = __webpack_require__(1);
-const endianness = __webpack_require__(2);
-const reader = __webpack_require__(6);
-const bitDepths = __webpack_require__(5);
-
-/**
- * Turn a array of bytes into an array of what the bytes should represent.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. 2, 10 or 16.
- * @param {Function} reader The function to read the bytes.
- * @param {number} bitDepth The bitDepth. 1, 2, 4, 8, 16, 24, 32, 40, 48, 64.
- * @param {boolean} isSigned If readed numbers should be signed or not.
- * @return {!Array<number>} The values represented in the bytes.
- */
-function fromBytes(bytes, base, reader, bitDepth, isSigned=false) {
-    let numbers = [];
-    let i = 0;
-    let j = 0;
-    let offset = bitDepths.bitDepthOffsets[bitDepth];
-    let len = bytes.length - (offset -1);
-    let maxBitDepthValue = bitDepths.maxBitDepth[bitDepth];
-    bytesToInt(bytes, base);   
-    if (isSigned) {
-        while (i < len) {
-            numbers[j] = signed(reader(bytes, i), maxBitDepthValue);
-            i += offset;
-            j++;
-        }    
-    } else {
-        while (i < len) {
-            numbers[j] = reader(bytes, i);
-            i += offset;
-            j++;
-        }    
-    }
-    return numbers;
-}
-
-/**
- * Turn bytes to base 10.
- * @param {!Array<number>|Uint8Array} bytes The bytes as binary or hex strings.
- * @param {number} base The base.
- */
-function bytesToInt(bytes, base) {
-    if (base != 10) {
-        let i = 0;
-        let len = bytes.length;
-        while(i < len) {
-            bytes[i] = parseInt(bytes[i], base);
-            i++;
-        }
-    }
-}
-
-/**
- * Turn a unsigned number to a signed number.
- * @param {number} number The number.
- * @param {number} maxValue The max range for the number bit depth.
- */
-function signed(number, maxValue) {
-    if (number > parseInt(maxValue / 2, 10) - 1) {
-        number -= maxValue;
-    }
-    return number;
-}
-
-/**
- * Read numbers from a array of booleans.
- * @param {!Array<number>|Uint8Array} booleans An array of booleans.
- * @param {number} base The base. Defaults to 10.
- * @return {!Array<number>} The numbers.
- */
-function fromBoolean(booleans, base=10) {
-    return fromBytes(booleans, base, reader.read1Bit, 1);
-}
-
-/**
- * Read 2-bit signed ints from an array of crumbs.
- * @param {!Array<number>|Uint8Array} bytes An array of crumbs.
- * @param {number} base The base. Defaults to 10.
- * @return {!Array<number>} The numbers.
- */
-function intFromCrumb(bytes, base=10) {
-    return fromBytes(bytes, base, reader.read8Bit, 2, true);
-}
-
-/**
- * Read 4-bit signed ints from an array of nibbles.
- * @param {!Array<number>|Uint8Array} bytes An array of nibbles.
- * @param {number} base The base. Defaults to 10.
- * @return {!Array<number>} The numbers.
- */
-function intFromNibble(bytes, base=10) {
-    return fromBytes(bytes, base, reader.read8Bit, 4, true);
-}
-
-/**
- * Read 8-bit unsigned ints from an array of bytes.
- * Just return a copy of the original array.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @return {!Array<number>} The numbers.
- */
-function uIntFrom1Byte(bytes, base=10) {
-    return fromBytes(bytes, base, reader.read8Bit, 8);
-}
-
-/**
- * Read 8-bit signed ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @return {!Array<number>} The numbers.
- */
-function intFrom1Byte(bytes, base=10) {
-    return fromBytes(bytes, base, reader.read8Bit, 8, true);
-}
-
-/**
- * Read 16-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function uIntFrom2Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 2);
-    }
-    return fromBytes(bytes, base, reader.read16Bit, 16);
-}
-
-/**
- * Read 16-bit signed ints from an array of bytes.
- * Thanks https://stackoverflow.com/a/38298413
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function intFrom2Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 2);
-    }
-    return fromBytes(bytes, base, reader.read16Bit, 16, true);
-}
-
-function floatFrom2Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 2);
-    }
-    return fromBytes(bytes, base, reader.read16BitFloat, 16);
-}
-
-/**
- * Read 24-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function uIntFrom3Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 3);
-    }
-    return fromBytes(bytes, base, reader.read24Bit, 24);
-}
-
-/**
- * Read 24-bit signed ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function intFrom3Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 3);
-    }
-    return fromBytes(bytes, base, reader.read24Bit, 24, true);
-}
-
-/**
- * Read 32-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function uIntFrom4Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 4);
-    }
-    return fromBytes(bytes, base, reader.read32Bit, 32);
-}
-
-/**
- * Read 32-bit signed ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function intFrom4Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 4);
-    }
-    return fromBytes(bytes, base, reader.read32Bit, 32, true);
-}
-
-/**
- * Read 32-bit float numbers from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function floatFrom4Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 4);
-    }
-    return fromBytes(bytes, base, reader.read32BitFloat, 32);
-}
-
-/**
- * Read 40-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function uIntFrom5Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 5);
-    }
-    return fromBytes(bytes, base, reader.read40Bit, 40);
-}
-
-/**
- * Read 40-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function intFrom5Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 5);
-    }
-    return fromBytes(bytes, base, reader.read40Bit, 40, true);
-}
-
-/**
- * Read 48-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function uIntFrom6Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 6);
-    }
-    return fromBytes(bytes, base, reader.read48Bit, 48);
-}
-
-/**
- * Read 48-bit unsigned ints from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function intFrom6Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 6);
-    }
-    return fromBytes(bytes, base, reader.read48Bit, 48, true);
-}
-
-/**
- * Read 64-bit double precision numbers from an array of bytes.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} base The base. Defaults to 10.
- * @param {boolean} bigEndian If the bytes are big endian. Defaults to false.
- * @return {!Array<number>} The numbers.
- */
-function floatFrom8Bytes(bytes, base=10, bigEndian=false) {
-    if (bigEndian) {
-        endianness.endianness(bytes, 8);
-    }
-    return fromBytes(bytes, base, reader.read64Bit, 64);
-}
-
-/**
- * Convert an array of bytes to a string.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @return {string} The string.
- */
-function stringFromBytes(bytes, base=10) {
-    return fromBytes(bytes, base, reader.readChar, 8).join("");
-}
-
-module.exports.fromBoolean = fromBoolean;
-module.exports.intFromCrumb = intFromCrumb;
-module.exports.uIntFromCrumb = uIntFrom1Byte;
-module.exports.intFromNibble = intFromNibble;
-module.exports.uIntFromNibble = uIntFrom1Byte;
-module.exports.intFrom1Byte = intFrom1Byte;
-module.exports.uIntFrom1Byte = uIntFrom1Byte;
-module.exports.intFrom2Bytes = intFrom2Bytes;
-module.exports.uIntFrom2Bytes = uIntFrom2Bytes;
-module.exports.floatFrom2Bytes = floatFrom2Bytes;
-module.exports.intFrom3Bytes = intFrom3Bytes;
-module.exports.uIntFrom3Bytes = uIntFrom3Bytes;
-module.exports.intFrom4Bytes = intFrom4Bytes;
-module.exports.uIntFrom4Bytes = uIntFrom4Bytes;
-module.exports.floatFrom4Bytes = floatFrom4Bytes;
-module.exports.intFrom5Bytes = intFrom5Bytes;
-module.exports.uIntFrom5Bytes = uIntFrom5Bytes;
-module.exports.intFrom6Bytes = intFrom6Bytes;
-module.exports.uIntFrom6Bytes = uIntFrom6Bytes;
-module.exports.floatFrom8Bytes = floatFrom8Bytes;
-module.exports.stringFromBytes = stringFromBytes;
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-/*
- * bit-packer: Pack and unpacl nibbles, crumbs and booleans into bytes.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/byte-data
- */
+let pad = __webpack_require__(0);
 
 /**
  * Pack 2 nibbles in 1 byte.
@@ -1793,14 +1432,14 @@ function packCrumbs(crumbs) {
     let packed = [];
     let i = 0;
     let j = 0;
-    fixByteArraySize(crumbs, 4);
+    pad.fixByteArraySize(crumbs, 4);
     let len = crumbs.length - 3;
     while (i < len) {
         packed[j++] = parseInt(
-            lPadZeros(crumbs[i].toString(2), 2) +
-            lPadZeros(crumbs[i+1].toString(2), 2) +
-            lPadZeros(crumbs[i+2].toString(2), 2) +
-            lPadZeros(crumbs[i+3].toString(2), 2), 2);
+            pad.lPadZeros(crumbs[i].toString(2), 2) +
+            pad.lPadZeros(crumbs[i+1].toString(2), 2) +
+            pad.lPadZeros(crumbs[i+2].toString(2), 2) +
+            pad.lPadZeros(crumbs[i+3].toString(2), 2), 2);
         i+=4;
     }
     return packed;
@@ -1819,7 +1458,7 @@ function unpackCrumbs(crumbs) {
     let bitCrumb;
     console.log(len);
     while (i < len) {
-        bitCrumb = lPadZeros(crumbs[i].toString(2), 8);
+        bitCrumb = pad.lPadZeros(crumbs[i].toString(2), 8);
         unpacked[j++] = parseInt(bitCrumb[0] + bitCrumb[1], 2);
         unpacked[j++] = parseInt(bitCrumb[2] + bitCrumb[3], 2);
         unpacked[j++] = parseInt(bitCrumb[4] + bitCrumb[5], 2);
@@ -1838,18 +1477,18 @@ function packBooleans(booleans) {
     let packed = [];
     let i = 0;
     let j = 0;
-    fixByteArraySize(booleans, 8);
+    pad.fixByteArraySize(booleans, 8);
     let len = booleans.length - 7;
     while (i < len) {
         packed[j++] = parseInt(
-            lPadZeros(booleans[i].toString(2), 1) +
-            lPadZeros(booleans[i+1].toString(2), 1) +
-            lPadZeros(booleans[i+2].toString(2), 1) +
-            lPadZeros(booleans[i+3].toString(2), 1) +
-            lPadZeros(booleans[i+4].toString(2), 1) +
-            lPadZeros(booleans[i+5].toString(2), 1) +
-            lPadZeros(booleans[i+6].toString(2), 1) +
-            lPadZeros(booleans[i+7].toString(2), 1), 2);
+            booleans[i].toString(2) +
+            booleans[i+1].toString(2) +
+            booleans[i+2].toString(2) +
+            booleans[i+3].toString(2) +
+            booleans[i+4].toString(2) +
+            booleans[i+5].toString(2) +
+            booleans[i+6].toString(2) +
+            booleans[i+7].toString(2), 2);
         i+=8;
     }
     return packed;
@@ -1867,7 +1506,7 @@ function unpackBooleans(booleans) {
     let len = booleans.length;
     let bitBoolean;
     while (i < len) {
-        bitBoolean = lPadZeros(booleans[i].toString(2), 8);
+        bitBoolean = pad.lPadZeros(booleans[i].toString(2), 8);
         unpacked[j++] = parseInt(bitBoolean[0], 2);
         unpacked[j++] = parseInt(bitBoolean[1], 2);
         unpacked[j++] = parseInt(bitBoolean[2], 2);
@@ -1881,40 +1520,6 @@ function unpackBooleans(booleans) {
     return unpacked;
 }
 
-/**
- * Pad a string with zeros to the left.
- * TODO: This should support both arrays and strings.
- * @param {string} value The string (representing a binary or hex value).
- * @param {number} numZeros the max number of zeros.
- *      For 1 binary byte string it should be 8.
- */
-function lPadZeros(value, numZeros) {
-    let i = 0;
-    while (value.length < numZeros) {
-        value = '0' + value;
-    }
-    return value;
-}
-
-/**
- * Pad a array with zeros to the right.
- * @param {!Array<number>} byteArray The array.
- * @param {number} numZeros the max number of zeros.
- *      For 1 binary byte string it should be 8.
- *      TODO: better explanation of numZeros
- */
-function fixByteArraySize(byteArray, numZeros) {
-    let i = 0;
-    let fix = byteArray.length % numZeros;
-    if (fix) {
-        fix = (fix - numZeros) * -1;
-        while(i < fix) {
-            byteArray.push(0);
-            i++;
-        }
-    }
-}
-
 module.exports.packBooleans = packBooleans;
 module.exports.unpackBooleans = unpackBooleans;
 module.exports.packCrumbs = packCrumbs;
@@ -1924,11 +1529,11 @@ module.exports.unpackNibbles = unpackNibbles;
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /*
- * WaveFileHeader
+ * wavefileheader.js: WaveFileHeader class
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
@@ -1937,7 +1542,7 @@ module.exports.unpackNibbles = unpackNibbles;
 /**
  * Wave file headers.
  */
-class WaveFileHeader {
+module.exports.WaveFileHeader = class {
 
     constructor() {
         /**
@@ -1996,10 +1601,22 @@ class WaveFileHeader {
          * @type {string}
          */
         this.bextChunkId = "";
+        // TODO bext data
+        /**
+         * Header formats.
+         * @enum {number}
+         */
+        this.headerFormats_ = {
+            "4": 17,
+            "8": 1,
+            "16": 1,
+            "24": 1,
+            "32": 1,
+            "32f": 3,
+            "64": 3
+        };
     }
 }
-
-module.exports.WaveFileHeader = WaveFileHeader;
 
 
 /***/ })

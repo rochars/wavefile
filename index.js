@@ -1,6 +1,6 @@
 /*!
  * Wavefile
- * Handle wave files with 4, 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * Handle wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
@@ -24,34 +24,28 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     constructor(bytes, enforceFact=false, enforceBext=false) {
         super();
         /** @type {boolean} */
+        this.isFromScratch_ = false;
+        /** @type {boolean} */
         this.enforceFact = enforceFact;
         /** @type {boolean} */
-        this.enforceBext = enforceBext;        
-        /**
-         * Header formats.
-         * @enum {number}
-         */
-        this.headerFormats_ = {
-            "4": 17,
-            "8": 1,
-            "16": 1,
-            "24": 1,
-            "32": 1,
-            "32f": 3,
-            "64": 3
-        };
+        this.enforceBext = enforceBext;
         /**
          * Error messages.
          * @enum {string}
          */
         this.WaveErrors = {
-            'format': "Not a supported format.",
-            'wave': "Could not find the 'WAVE' chunk",
-            'fmt ': "Could not find the 'fmt ' chunk",
-            'data': "Could not find the 'data' chunk",
-            'fact': "Could not find the 'fact' chunk",
-            'bext': "Could not find the 'bext' chunk"
+            "format": "Not a supported format.",
+            "wave": "Could not find the 'WAVE' chunk",
+            "fmt ": "Could not find the 'fmt ' chunk",
+            "data": "Could not find the 'data' chunk",
+            "fact": "Could not find the 'fact' chunk",
+            "bext": "Could not find the 'bext' chunk",
+            "bitDepth": "Invalid bit depth.",
+            "numChannels": "Invalid number of channels.",
+            "sampleRate": "Invalid sample rate."
         };
+        this.samples_ = [];
+        this.bytes_ = [];
         if(bytes) {
             this.fromBytes(bytes);
         }
@@ -70,17 +64,18 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      *     Samples of multi-channel data .
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples) {
+        this.isFromScratch_ = true;
         let bytes = parseInt(bitDepth, 10) / 8;
-        this.chunkId = "RIFF";
         this.chunkSize = 36 + samples.length * bytes;
+        this.subChunk1Size = 16;
+        this.byteRate = (numChannels * bytes) * sampleRate;
+        this.blockAlign = numChannels * bytes;
+        this.chunkId = "RIFF";
         this.format = "WAVE";
         this.subChunk1Id = "fmt ";
-        this.subChunk1Size = 16;
         this.audioFormat = this.headerFormats_[bitDepth];
         this.numChannels = numChannels;
         this.sampleRate = sampleRate;
-        this.byteRate = (numChannels * bytes) * sampleRate;
-        this.blockAlign = numChannels * bytes;
         this.bitsPerSample = parseInt(bitDepth, 10);
         this.subChunk2Id = "data";
         this.subChunk2Size = samples.length * bytes;
@@ -89,33 +84,21 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     }
 
     /**
-     * Read a wave file from an array of bytes.
-     * @param {Uint8Array} bytes The wave file as an array of bytes.
+     * Read a wave file from a byte buffer.
+     * @param {Uint8Array} bytes The buffer.
      */
     fromBytes(bytes) {
+        this.isFromScratch_ = false;
         this.readRIFFChunk_(bytes);
         this.readWAVEChunk_(bytes);
         this.readFmtChunk_(bytes);
-        try {
-            this.readFactChunk_(bytes);
-        }catch(err) {
-            if (this.enforceFact) {
-                throw err;
-            }
-        }
-        try {
-            this.readBextChunk_(bytes);
-        }catch(err) {
-            if (this.enforceBext) {
-                throw err;
-            }
-        }
+        this.readFactChunk_(bytes);
+        this.readBextChunk_(bytes);
         this.readDataChunk_(bytes);
     }
 
     /**
-     * Turn the wave file represented by an object of this class into
-     * a array of bytes.
+     * Turn the WaveFile object into a byte buffer.
      * @return {Uint8Array}
      */
     toBytes() {
@@ -166,12 +149,13 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * @throws {Error} If no "RIFF" chunk is found.
      */
     readRIFFChunk_(bytes) {
-        this.chunkId = byteData.stringFromBytes(bytes.slice(0, 4));
+        this.chunkId = byteData.fromBytes(bytes.slice(0, 4),
+            8, {"char": true});
         if (this.chunkId != "RIFF") {
             throw Error(this.WaveErrors.format);
         }
-        this.chunkSize = byteData.intFrom4Bytes(
-            bytes.slice(4, 8))[0];
+        this.chunkSize = byteData.fromBytes(
+            bytes.slice(4, 8), 32)[0];
     }
 
     /**
@@ -184,8 +168,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         if (start === -1) {
             throw Error(this.WaveErrors.wave);
         }
-        this.format = byteData.stringFromBytes(
-                bytes.slice(start, start + 4));
+        this.format = "WAVE";
     }
 
     /**
@@ -196,26 +179,23 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     readFmtChunk_(bytes) {
         let start = byteData.findString(bytes, "fmt ");
         if (start === -1) {
-            throw Error(this.WaveErrors['fmt ']);
+            throw Error(this.WaveErrors["fmt "]);
         }
-        this.subChunk1Id = byteData.stringFromBytes(
-            bytes.slice(start, start + 4));
-        this.subChunk1Size = byteData.uIntFrom4Bytes(
-            bytes.slice(start + 4, start + 8))[0];
-        this.audioFormat = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 8, start + 10))[0];
-        this.numChannels = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 10, start + 12))[0];
-        this.sampleRate = byteData.uIntFrom4Bytes(
-            bytes.slice(start + 12, start + 16))[0];
-        this.byteRate = byteData.uIntFrom4Bytes(
-            bytes.slice(start + 16, start + 20))[0];
-        this.blockAlign = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 20, start + 22))[0];
-        this.bitsPerSample = byteData.uIntFrom2Bytes(
-            bytes.slice(start + 22, start + 24))[0];
-        // The bitDepth_ is used internally to determine
-        // wich function use to read the samples
+        this.subChunk1Id = "fmt ";
+        this.subChunk1Size = byteData.fromBytes(
+            bytes.slice(start + 4, start + 8), 32)[0];
+        this.audioFormat = byteData.fromBytes(
+            bytes.slice(start + 8, start + 10), 16)[0];
+        this.numChannels = byteData.fromBytes(
+            bytes.slice(start + 10, start + 12), 16)[0];
+        this.sampleRate = byteData.fromBytes(
+            bytes.slice(start + 12, start + 16), 32)[0];
+        this.byteRate = byteData.fromBytes(
+            bytes.slice(start + 16, start + 20), 32)[0];
+        this.blockAlign = byteData.fromBytes(
+            bytes.slice(start + 20, start + 22), 16)[0];
+        this.bitsPerSample = byteData.fromBytes(
+            bytes.slice(start + 22, start + 24), 16)[0];
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
             this.bitDepth_ = "32f";
         }else {
@@ -230,11 +210,10 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      */
     readFactChunk_(bytes) {
         let start = byteData.findString(bytes, "fact");
-        if (start === -1) {
+        if (start === -1 && this.enforceFact) {
             throw Error(this.WaveErrors.fact);
-        }else {
-            this.factChunkId = byteData.stringFromBytes(
-                bytes.slice(start, start + 4));
+        }else if (start > -1) {
+            this.factChunkId = "fact";
             //this.factChunkSize = byteData.uIntFrom4Bytes(
             //    bytes.slice(start + 4, start + 8));
             //this.dwSampleLength = byteData.uIntFrom4Bytes(
@@ -249,11 +228,10 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      */
     readBextChunk_(bytes) {
         let start = byteData.findString(bytes, "bext");
-        if (start === -1) {
+        if (start === -1 && this.enforceBext) {
             throw Error(this.WaveErrors.bext);
-        }else {
-            this.bextChunkId = byteData.stringFromBytes(
-                bytes.slice(start, start + 4));
+        }else if (start > -1){
+            this.bextChunkId = "bext";
         }
     }
 
@@ -267,10 +245,9 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         if (start === -1) {
             throw Error(this.WaveErrors.data);
         }
-        this.subChunk2Id = byteData.stringFromBytes(
-            bytes.slice(start, start + 4));
-        this.subChunk2Size = byteData.intFrom4Bytes(
-            bytes.slice(start + 4, start + 8))[0];
+        this.subChunk2Id = "data";
+        this.subChunk2Size = byteData.fromBytes(
+            bytes.slice(start + 4, start + 8), 32)[0];
         this.samplesFromBytes_(bytes, start);
     }
 
@@ -280,17 +257,18 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * @param {number} start The offset to start reading.
      */
     samplesFromBytes_(bytes, start) {
-        let readingFunctions = {
-            "4": byteData.intFrom1Byte,
-            "8": byteData.uIntFrom1Byte,
-            "16": byteData.intFrom2Bytes,
-            "24": byteData.intFrom3Bytes,
-            "32": byteData.intFrom4Bytes,
-            "32f": byteData.floatFrom4Bytes,
-            "64" : byteData.floatFrom8Bytes
+        let params = {
+            "signed": this.bitsPerSample == 8 ? false : true,
         };
+        if (this.bitsPerSample == 32 && this.audioFormat == 3) {
+            params.float = true;
+        }
         let samples = bytes.slice(start + 8, start + 8 + this.subChunk2Size);
-        this.samples_ = readingFunctions[this.bitDepth_](samples);
+        if (this.bitsPerSample == 4) {
+            this.samples_ = byteData.fromBytes(samples, 8, params);
+        } else {
+            this.samples_ = byteData.fromBytes(samples, this.bitsPerSample, params);
+        }
     }
 
     /**
@@ -305,13 +283,12 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
-    checkWriteInput_(numChannels, sampleRate, bitDepth) {
-        if (typeof bitDepth !== "string" ||
-            !(bitDepth in this.headerFormats_)) {
-            throw new Error("Invalid bit depth.");
+    checkWriteInput_() {
+        if (!this.headerFormats_[this.bitDepth_]) {
+            throw new Error(this.WaveErrors.bitDepth);
         }
-        this.validateNumChannels_(numChannels, bitDepth);
-        this.validateSampleRate_(numChannels, sampleRate, bitDepth);
+        this.validateNumChannels_();
+        this.validateSampleRate_();
     }
 
     /**
@@ -321,16 +298,10 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
-    validateNumChannels_(numChannels, bitDepth) {
-        let errorText = "Invalid number of channels.";
-        let validChannnelNumber = false;
-        let blockAlign = numChannels * (parseInt(bitDepth, 10) / 8);
-        if (blockAlign <= 65535) {
-            validChannnelNumber = true;
-        }
-        if (numChannels < 1 || !validChannnelNumber ||
-            !(typeof numChannels==="number" && (numChannels%1)===0)) {
-            throw new Error(errorText);
+    validateNumChannels_() {
+        let blockAlign = this.numChannels * this.bitsPerSample / 8;
+        if (this.numChannels < 1 || blockAlign > 65535) {
+            throw new Error(this.WaveErrors.numChannels);
         }
         return true;
     }
@@ -345,16 +316,11 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
-    validateSampleRate_(numChannels, sampleRate, bitDepth) {
-        let errorText = "Invalid sample rate.";
-        let validSampleRateValue = false;
-        let byteRate = numChannels * (parseInt(bitDepth, 10) / 8) * sampleRate;
-        if (byteRate <= 4294967295) {
-            validSampleRateValue = true;
-        }
-        if (sampleRate < 1 || !validSampleRateValue ||
-            !(typeof sampleRate==="number" && (sampleRate%1)===0)) {
-            throw new Error(errorText);
+    validateSampleRate_() {
+        let byteRate = this.numChannels *
+            (this.bitsPerSample / 8) * this.sampleRate;
+        if (this.sampleRate < 1 || byteRate > 4294967295) {
+            throw new Error(this.WaveErrors.sampleRate);
         }
         return true;
     }
@@ -363,21 +329,12 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * Split each sample into bytes.
      */
     samplesToBytes_() {
-        let writingFunctions = {
-            "4": byteData.intTo1Byte,
-            "8": byteData.intTo1Byte,
-            "16": byteData.intTo2Bytes,
-            "24": byteData.intTo3Bytes,
-            "32": byteData.intTo4Bytes,
-            "32f": byteData.floatTo4Bytes,
-            "64" : byteData.floatTo8Bytes
-        };
-        // FIXME byte-data should not modify the original array
-        let s = [];
-        for (let l=0; l<this.samples_.length; l++) {
-            s[l] = this.samples_[l];
+        let params = {};
+        if (this.bitsPerSample == 32 && this.audioFormat == 3) {
+            params.float = true;
         }
-        this.bytes_ = writingFunctions[this.bitDepth_](s);
+        let bitDepth = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
+        this.bytes_ = byteData.toBytes(this.samples_, bitDepth, params);
         if (this.bytes_.length % 2) {
             this.bytes_.push(0);
         }
@@ -389,24 +346,23 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      */
     createWaveFile_() {
         let factVal = [];
-        let cbSizeVal = [];
         if (this.factChunkId) {
-            factVal= byteData.stringToBytes(this.factChunkId);
+            factVal = byteData.toBytes(this.factChunkId, 8, {"char": true});
         }
-        return byteData.stringToBytes(this.chunkId).concat(
-            byteData.intTo4Bytes([this.chunkSize]),
-            byteData.stringToBytes(this.format), 
-            byteData.stringToBytes(this.subChunk1Id),
-            byteData.intTo4Bytes([this.subChunk1Size]),
-            byteData.intTo2Bytes([this.audioFormat]),
-            byteData.intTo2Bytes([this.numChannels]),
-            byteData.intTo4Bytes([this.sampleRate]),
-            byteData.intTo4Bytes([this.byteRate]),
-            byteData.intTo2Bytes([this.blockAlign]),
-            byteData.intTo2Bytes([this.bitsPerSample]),
+        return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
+            byteData.toBytes([this.chunkSize], 32),
+            byteData.toBytes(this.format, 8, {"char": true}), 
+            byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
+            byteData.toBytes([this.subChunk1Size], 32),
+            byteData.toBytes([this.audioFormat], 16),
+            byteData.toBytes([this.numChannels], 16),
+            byteData.toBytes([this.sampleRate], 32),
+            byteData.toBytes([this.byteRate], 32),
+            byteData.toBytes([this.blockAlign], 16),
+            byteData.toBytes([this.bitsPerSample], 16),
             factVal,
-            byteData.stringToBytes(this.subChunk2Id),
-            byteData.intTo4Bytes([this.subChunk2Size]),
+            byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
+            byteData.toBytes([this.subChunk2Size], 32),
             this.bytes_);
     }
 }
