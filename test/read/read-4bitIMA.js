@@ -1,17 +1,18 @@
 /*!
+ * Wavefile
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * 
  */
 
 let assert = require("assert");
 
-describe("8-bit file (with bwf) reading", function() {
+describe("4-bit IMA ADPCM reading", function() {
 
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
 
-    let wBytes = fs.readFileSync(path + "8bit-16kHz-bext-mono.wav");
+    let wBytes = fs.readFileSync(path + '4bit-imaadpcm-8kHz-noBext-mono.wav');
     let wav = new wavefile.WaveFile(wBytes);
 
     it("chunkId should be 'RIFF'",
@@ -26,33 +27,33 @@ describe("8-bit file (with bwf) reading", function() {
             function() {
         assert.equal(wav.format, "WAVE");
     });
-    it("subChunk1Size should be 16",
+    it("subChunk1Size should be 20",
             function() {
-        assert.equal(wav.subChunk1Size, 16);
+        assert.equal(wav.subChunk1Size, 20);
     });
-    it("audioFormat should be 1 (PCM)",
+    it("audioFormat should be 17 (IMA ADPCM)",
             function() {
-        assert.equal(wav.audioFormat, 1);
+        assert.equal(wav.audioFormat, 17);
     });
     it("numChannels should be 1",
             function() {
         assert.equal(wav.numChannels, 1);
     });
-    it("sampleRate should be 16000",
+    it("sampleRate should be 8000",
             function() {
-        assert.equal(wav.sampleRate, 16000);
+        assert.equal(wav.sampleRate, 8000);
     });
-    it("byteRate should be 16000",
+    it("bitsPerSample should be 4",
             function() {
-        assert.equal(wav.byteRate, 16000);
+        assert.equal(wav.bitsPerSample, 4);
     });
-    it("blockAlign should be 1",
+    it("factChunkId should be 'fact'",
             function() {
-        assert.equal(wav.blockAlign, 1);
+        assert.equal(wav.factChunkId, 'fact');
     });
-    it("bitsPerSample should be 8",
+    it("factChunkSize should be 4",
             function() {
-        assert.equal(wav.bitsPerSample, 8);
+        assert.equal(wav.factChunkSize, 4);
     });
     it("subChunk2Id should be 'data'",
             function() {

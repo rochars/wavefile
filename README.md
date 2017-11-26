@@ -50,11 +50,14 @@ fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ## Change the bit depth
+
+Currently there is **no dithering** when changing the bit depth.
+
+If the samples are stereo they need to be interleaved before changing the bit depth.
+
 ```javascript
 let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
 
-// Stereo samples must be interleaved with interleave()
-// before changing the bit depth.
 // Possible values are:
 //  "8", "16", "24", "32", "32f", "64"
 wav.toBitDepth("24");

@@ -8,7 +8,7 @@ var assert = require('assert');
 describe('read 32bit IEEE from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav");
@@ -86,7 +86,7 @@ describe('read 32bit IEEE from disk and write to new file', function() {
 describe('read 32bit IEEE with markers and regions and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "32IEEE-meta.wav");

@@ -127,6 +127,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     }
 
     /**
+     * TODO this should be a external module.
      * Change the bit depth of the data.
      * @param {string} bitDepth The new bit depth of the data.
      *      One of "8", "16", "24", "32", "32f", "64"
@@ -146,39 +147,79 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         let len = this.samples_.length;
         let newSamples = [];
 
-        // change the bit depth of the samples
+        // Get the max values for both original and target bit depth
         let oldMaxValue =
             parseInt((byteData.BitDepthMaxValues[parseInt(originalBitDepth, 10)]) / 2, 10);
         let newMaxValue =
-            parseInt((byteData.BitDepthMaxValues[parseInt(this.bitDepth_, 10)] -1) / 2, 10);
+            parseInt((byteData.BitDepthMaxValues[parseInt(this.bitDepth_, 10)]) / 2, 10);
+
+        // needs dithering if the target bit depth
+        // is lower than the original bit depth
+        if (parseInt(this.bitDepth_, 10) < parseInt(originalBitDepth)) {
+            // TODO: dithering
+        }
 
         for (let i=0; i<len;i++) {
+            
+            // 8-bit samples are unsigned;
+            // They are signed here before conversion
+            // (other bit depths are all signed)
             if (originalBitDepth == "8") {
                 this.samples_[i] -= 128;
             }
+
+            // If it is a float-to-float or int-to-float conversion then
+            // the samples in the target bit depth will be normalized in the
+            // -1.0 to 1.0 range; there is no need to multiply
             if (this.bitDepth_ == "32f" || this.bitDepth_ == "64") {
                 if (originalBitDepth == "32f" || originalBitDepth == "64") {
                     newSamples.push(this.samples_[i]);
                 } else {
-                    newSamples.push(this.samples_[i] / oldMaxValue);
+                    if (this.samples_[i] > 0) {
+                        newSamples.push(this.samples_[i] / (oldMaxValue - 1));
+                    } else {
+                        newSamples.push(this.samples_[i] / oldMaxValue);
+                    }
                 }
+
+            // If it is a float-to-int or int-to-int conversion then the
+            // samples will be de-normalized according to the bit depth
             }else {
+                
+                // If the original samples are float, then they are already
+                // normalized between -1.0 and 1.0; All that is need is to
+                // multiply the sample values by the new bit depth max value
                 if (originalBitDepth == "32f" || originalBitDepth == "64" ) {
-                    newSamples.push(this.samples_[i] * newMaxValue);
+                    if (this.samples_[i] > 0) {
+                        newSamples.push((this.samples_[i] * newMaxValue) -1);
+                    } else {
+                        newSamples.push(this.samples_[i] * newMaxValue);
+                    }
+
+                // If the original samples are integers, then they need to be
+                // divided by the maximum values of its original bit depth
+                // (to normalize them between -1.0 and .10) and then multiply
+                // them by the new bit depth max value
                 } else {
-                    newSamples.push(
-                        parseInt((this.samples_[i] / oldMaxValue) * newMaxValue, 10)
-                    );
+                    if (this.samples_[i] > 0) {
+                        newSamples.push(
+                            parseInt((this.samples_[i] / (oldMaxValue - 1)) * newMaxValue - 1, 10)
+                        );
+                    } else {
+                        newSamples.push(
+                            parseInt((this.samples_[i] / oldMaxValue) * newMaxValue, 10)
+                        );
+                    }
                 }
-                if (newSamples[i] < 0) {
-                    newSamples[i]--;
-                }
+                
+                // Make the samples unsigned if the target bit depth is "8"
                 if (this.bitDepth_ == "8") {
                     newSamples[i] += 128;
                 }
             }  
         }
         // recreate the file with the new samples
+        // and the new bit depth
         this.fromScratch(
             this.numChannels,
             this.sampleRate,

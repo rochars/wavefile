@@ -5,13 +5,13 @@
 
 let assert = require("assert");
 
-describe("24-bit (with bwf) reading", function() {
+describe("32-bit IEEE (with bwf) reading", function() {
 
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
     
-    let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");
+    let wBytes = fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
 
     it("chunkId should be 'RIFF'",
@@ -30,9 +30,9 @@ describe("24-bit (with bwf) reading", function() {
             function() {
         assert.equal(wav.subChunk1Size, 16);
     });
-    it("audioFormat should be 1 (PCM)",
+    it("audioFormat should be 3 (IEEE)",
             function() {
-        assert.equal(wav.audioFormat, 1);
+        assert.equal(wav.audioFormat, 3);
     });
     it("numChannels should be 1",
             function() {
@@ -42,19 +42,19 @@ describe("24-bit (with bwf) reading", function() {
             function() {
         assert.equal(wav.sampleRate, 16000);
     });
-    it("byteRate should be 48000",
+    it("byteRate should be 64000",
             function() {
-        assert.equal(wav.byteRate, 48000);
+        assert.equal(wav.byteRate, 64000);
     });
-    it("blockAlign should be 3",
+    it("blockAlign should be 4",
             function() {
-        assert.equal(wav.blockAlign, 3);
+        assert.equal(wav.blockAlign, 4);
     });
-    it("bitsPerSample should be 24",
+    it("bitsPerSample should be 32",
             function() {
-        assert.equal(wav.bitsPerSample, 24);
+        assert.equal(wav.bitsPerSample, 32);
     });
-    it("subChunk2Id should be 'data'",
+    it("subChunk2Id be 'data'",
             function() {
         assert.equal(wav.subChunk2Id, 'data');
     });

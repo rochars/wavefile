@@ -5,17 +5,17 @@
 
 var assert = require('assert');
 
-describe('read 24bit file from disk and write to new file', function() {
+describe('read 4-bit file from disk and write to new file (different APDCM source)', function() {
     
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
     
-    let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");
+    let wBytes = fs.readFileSync(path + "4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav");
     let wav = new wavefile.WaveFile(wBytes);
     let wav2 = new wavefile.WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/24bit-16kHz-bext-mono.wav", wav2.toBuffer());
-    
+    fs.writeFileSync(path + "/out/4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav", wav2.toBuffer());
+
     it("chunkId should be 'RIFF'",
             function() {
         assert.equal(wav2.chunkId, "RIFF");
@@ -28,33 +28,41 @@ describe('read 24bit file from disk and write to new file', function() {
             function() {
         assert.equal(wav2.format, "WAVE");
     });
-    it("subChunk1Size should be 16",
+    it("subChunk1Size should be 20",
             function() {
-        assert.equal(wav2.subChunk1Size, 16);
+        assert.equal(wav2.subChunk1Size, 20);
     });
-    it("audioFormat should be 1 (PCM)",
+    it("audioFormat should be 17 (IMA ADPCM)",
             function() {
-        assert.equal(wav2.audioFormat, 1);
+        assert.equal(wav2.audioFormat, 17);
     });
     it("numChannels should be 1",
             function() {
         assert.equal(wav2.numChannels, 1);
     });
-    it("sampleRate should be 16000",
+    it("sampleRate should be 8000",
             function() {
-        assert.equal(wav2.sampleRate, 16000);
+        assert.equal(wav2.sampleRate, 8000);
     });
-    it("byteRate should be 48000",
+    it("byteRate should be 4000",
             function() {
-        assert.equal(wav2.byteRate, 48000);
+        assert.equal(wav2.byteRate, 4000);
     });
-    it("blockAlign should be 3",
+    it("blockAlign should be 1024",
             function() {
-        assert.equal(wav2.blockAlign, 3);
+        assert.equal(wav2.blockAlign, 1024);
     });
-    it("bitsPerSample should be 24",
+    it("bitsPerSample should be 4",
             function() {
-        assert.equal(wav2.bitsPerSample, 24);
+        assert.equal(wav2.bitsPerSample, 4);
+    });
+    it("factChunkId should be 'fact'",
+            function() {
+        assert.equal(wav2.factChunkId, 'fact');
+    });
+    it("factChunkSize should be 4",
+            function() {
+        assert.equal(wav2.factChunkSize, 4);
     });
     it("subChunk2Id should be 'data'",
             function() {

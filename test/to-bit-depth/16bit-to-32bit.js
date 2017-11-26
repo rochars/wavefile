@@ -125,6 +125,10 @@ describe("16-bit mono from scratch to 32-bit (max range)", function() {
             function() {
         assert.equal(wav.subChunk2Id, 'data');
     });
+    it("samples_ should be [-2147483648, 2147483647]",
+            function() {
+        assert.deepEqual(wav.samples_, [-2147483648, 2147483647]);
+    });
 });
 
 

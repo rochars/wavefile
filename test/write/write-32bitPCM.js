@@ -5,27 +5,17 @@
 
 var assert = require('assert');
 
-describe('read 16bit file from disk and write to new file', function() {
+describe('read 32bit PCM from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
     
-    let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
-    let wav = new wavefile.WaveFile();
-
-    wav.fromBuffer(wBytes);
-
-    let wav2 = new wavefile.WaveFile();
-
-    let bytes3 = wav.toBuffer();
-
-    wav2.fromBuffer(bytes3);
-
-    let bytes4 = wav2.toBuffer();
-
-    fs.writeFileSync(path + "/out/16-bit-8kHz-noBext-mono.wav", bytes4);
-
+    let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
+    let wav = new wavefile.WaveFile(wBytes);
+    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/32bit-48kHz-noBext-mono.wav", wav2.toBuffer());
+    
     it("chunkId should be 'RIFF'",
             function() {
         assert.equal(wav2.chunkId, "RIFF");
@@ -50,21 +40,21 @@ describe('read 16bit file from disk and write to new file', function() {
             function() {
         assert.equal(wav2.numChannels, 1);
     });
-    it("sampleRate should be 8000",
+    it("sampleRate should be 48000",
             function() {
-        assert.equal(wav2.sampleRate, 8000);
+        assert.equal(wav2.sampleRate, 48000);
     });
-    it("byteRate should be 16000",
+    it("byteRate should be 192000",
             function() {
-        assert.equal(wav2.byteRate, 16000);
+        assert.equal(wav2.byteRate, 192000);
     });
-    it("blockAlign should be 2",
+    it("blockAlign should be 4",
             function() {
-        assert.equal(wav2.blockAlign, 2);
+        assert.equal(wav2.blockAlign, 4);
     });
-    it("bitsPerSample should be 16",
+    it("bitsPerSample should be 32",
             function() {
-        assert.equal(wav2.bitsPerSample, 16);
+        assert.equal(wav2.bitsPerSample, 32);
     });
     it("subChunk2Id should be 'data'",
             function() {

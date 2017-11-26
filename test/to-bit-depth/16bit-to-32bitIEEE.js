@@ -129,6 +129,10 @@ describe("16-bit mono from scratch to 32-bit IEEE (max range)", function() {
             function() {
         assert.ok(wav.subChunk2Size > 0);
     });
+    it("samples_ should be [-1, 1]",
+            function() {
+        assert.deepEqual(wav.samples_, [-1, 1]);
+    });
 });
 
 describe("16-bit mono from scratch to 32-bit IEEE (0)", function() {

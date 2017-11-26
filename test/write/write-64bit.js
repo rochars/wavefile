@@ -5,17 +5,17 @@
 
 var assert = require('assert');
 
-describe('read 32bit PCM from disk and write to new file', function() {
+describe('read 64-bit file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
     
-    let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
+    let wBytes = fs.readFileSync(path + "64bit-48kHz-noBext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
     let wav2 = new wavefile.WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/32bit-48kHz-noBext-mono.wav", wav2.toBuffer());
-    
+    fs.writeFileSync(path + "/out/64bit-48kHz-noBext-mono.wav", wav2.toBuffer());
+
     it("chunkId should be 'RIFF'",
             function() {
         assert.equal(wav2.chunkId, "RIFF");
@@ -32,9 +32,9 @@ describe('read 32bit PCM from disk and write to new file', function() {
             function() {
         assert.equal(wav2.subChunk1Size, 16);
     });
-    it("audioFormat should be 1 (PCM)",
+    it("audioFormat should be 3 (IEEE)",
             function() {
-        assert.equal(wav2.audioFormat, 1);
+        assert.equal(wav2.audioFormat, 3);
     });
     it("numChannels should be 1",
             function() {
@@ -44,17 +44,17 @@ describe('read 32bit PCM from disk and write to new file', function() {
             function() {
         assert.equal(wav2.sampleRate, 48000);
     });
-    it("byteRate should be 192000",
+    it("byteRate should be 384000",
             function() {
-        assert.equal(wav2.byteRate, 192000);
+        assert.equal(wav2.byteRate, 384000);
     });
-    it("blockAlign should be 4",
+    it("blockAlign should be 8",
             function() {
-        assert.equal(wav2.blockAlign, 4);
+        assert.equal(wav2.blockAlign, 8);
     });
-    it("bitsPerSample should be 32",
+    it("bitsPerSample should be 64",
             function() {
-        assert.equal(wav2.bitsPerSample, 32);
+        assert.equal(wav2.bitsPerSample, 64);
     });
     it("subChunk2Id should be 'data'",
             function() {
@@ -68,11 +68,11 @@ describe('read 32bit PCM from disk and write to new file', function() {
             function() {
         assert.ok(wav2.samples_.length > 0);
     });
-    it("samples_ on the new file should have the same length as in the original file",
+    it("samples_ on the new file should have the same length as in the original file ",
             function() {
         assert.equal(wav2.samples_.length, wav.samples_.length);
     });
-    it("samples_ on the new file should be same as the original file",
+    it("samples_ on the new file should be same as the original file ",
             function() {
         assert.deepEqual(wav2.samples_, wav.samples_);
     });

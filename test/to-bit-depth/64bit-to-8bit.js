@@ -129,6 +129,10 @@ describe("64-bit mono from scratch to 8-bit (max range)", function() {
             function() {
         assert.ok(wav.subChunk2Size > 0);
     });
+    it("samples_ should be [0, 255]",
+            function() {
+        assert.deepEqual(wav.samples_, [0, 255]);
+    });
 });
 
 describe("64-bit mono from scratch to 8-bit (0)", function() {

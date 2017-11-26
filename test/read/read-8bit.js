@@ -5,13 +5,13 @@
 
 let assert = require("assert");
 
-describe("32-bit PCM reading", function() {
+describe("8-bit file (with bwf) reading", function() {
 
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let wavefile = require("../../index.js");
     let path = "test/files/";
-    
-    let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
+
+    let wBytes = fs.readFileSync(path + "8bit-16kHz-bext-mono.wav");
     let wav = new wavefile.WaveFile(wBytes);
 
     it("chunkId should be 'RIFF'",
@@ -38,21 +38,21 @@ describe("32-bit PCM reading", function() {
             function() {
         assert.equal(wav.numChannels, 1);
     });
-    it("sampleRate should be 48000",
+    it("sampleRate should be 16000",
             function() {
-        assert.equal(wav.sampleRate, 48000);
+        assert.equal(wav.sampleRate, 16000);
     });
-    it("byteRate should be 192000",
+    it("byteRate should be 16000",
             function() {
-        assert.equal(wav.byteRate, 192000);
+        assert.equal(wav.byteRate, 16000);
     });
-    it("blockAlign should be 4",
+    it("blockAlign should be 1",
             function() {
-        assert.equal(wav.blockAlign, 4);
+        assert.equal(wav.blockAlign, 1);
     });
-    it("bitsPerSample should be 32",
+    it("bitsPerSample should be 8",
             function() {
-        assert.equal(wav.bitsPerSample, 32);
+        assert.equal(wav.bitsPerSample, 8);
     });
     it("subChunk2Id should be 'data'",
             function() {
