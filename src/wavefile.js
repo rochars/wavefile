@@ -1,13 +1,11 @@
 /*!
- * wavefile
- * Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * WaveFile
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
  */
 
 const byteData = require("byte-data");
-const bitDepthLib = require("bitdepth");
 const wavefileheader = require("../src/wavefileheader");
 
 /**
@@ -44,6 +42,19 @@ class WaveFile extends wavefileheader.WaveFileHeader {
             "bitDepth": "Invalid bit depth.",
             "numChannels": "Invalid number of channels.",
             "sampleRate": "Invalid sample rate."
+        };
+        /**
+         * Header formats.
+         * @enum {number}
+         */
+        this.headerFormats_ = {
+            "4": 17,
+            "8": 1,
+            "16": 1,
+            "24": 1,
+            "32": 1,
+            "32f": 3,
+            "64": 3
         };
         this.samples_ = [];
         this.bytes_ = [];

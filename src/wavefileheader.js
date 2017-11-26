@@ -1,5 +1,6 @@
 /*
- * wavefileheader.js: WaveFileHeader class
+ * WaveFileHeader class
+ * A structure representing a WAVE file header.
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
@@ -68,18 +69,5 @@ module.exports.WaveFileHeader = class {
          */
         this.bextChunkId = "";
         // TODO bext data
-        /**
-         * Header formats.
-         * @enum {number}
-         */
-        this.headerFormats_ = {
-            "4": 17,
-            "8": 1,
-            "16": 1,
-            "24": 1,
-            "32": 1,
-            "32f": 3,
-            "64": 3
-        };
     }
 }
