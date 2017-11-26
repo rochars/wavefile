@@ -6,12 +6,12 @@
  */
 
 const byteData = require("byte-data");
-const wavefileheader = require("../src/wavefileheader");
+const waveFileHeader = require("../src/wavefile-header");
 
 /**
  * A wave file.
  */
-class WaveFile extends wavefileheader.WaveFileHeader {
+class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * @param {Uint8Array} bytes The file bytes.
@@ -20,7 +20,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * @param {boolean} enforceBext True if it should throw a error
      *      if no "bext" chunk is found.
      */
-    constructor(bytes, enforceFact=false, enforceBext=false) {
+    constructor(enforceFact=false, enforceBext=false) {
         super();
         /** @type {boolean} */
         this.isFromScratch_ = false;
@@ -58,6 +58,65 @@ class WaveFile extends wavefileheader.WaveFileHeader {
         };
         this.samples_ = [];
         this.bytes_ = [];
+    }
+
+    /**
+     * Create a WaveFile object based on the arguments passed.
+     * @param {number} numChannels The number of channels
+     *     (Ints like 1 for mono, 2 stereo and so on).
+     * @param {number} sampleRate The sample rate.
+     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
+     * @param {string} bitDepth The audio bit depth.
+     *     One of "8", "16", "24", "32", "32f", "64".
+     * @param {!Array<number>} samples Array of samples to be written.
+     *     Samples must be in the correct range according to the bit depth.
+     *     Samples of multi-channel data .
+     */
+    fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
+        if (!options.container) {
+            options.container = "RIFF";
+        }
+        this.isFromScratch_ = true;
+        let bytes = parseInt(bitDepth, 10) / 8;
+        this.chunkSize = 36 + samples.length * bytes;
+        this.subChunk1Size = 16;
+        this.byteRate = (numChannels * bytes) * sampleRate;
+        this.blockAlign = numChannels * bytes;
+        this.chunkId = options.container;
+        this.format = "WAVE";
+        this.subChunk1Id = "fmt ";
+        this.audioFormat = this.headerFormats_[bitDepth];
+        this.numChannels = numChannels;
+        this.sampleRate = sampleRate;
+        this.bitsPerSample = parseInt(bitDepth, 10);
+        this.subChunk2Id = "data";
+        this.subChunk2Size = samples.length * bytes;
+        this.samples_ = samples;
+        this.bitDepth_ = bitDepth;
+    }
+
+    /**
+     * Read a wave file from a byte buffer.
+     * @param {Uint8Array} bytes The buffer.
+     */
+    fromBuffer(bytes) {
+        this.isFromScratch_ = false;
+        this.readRIFFChunk_(bytes);
+        this.readWAVEChunk_(bytes);
+        this.readFmtChunk_(bytes);
+        this.readFactChunk_(bytes);
+        this.readBextChunk_(bytes);
+        this.readDataChunk_(bytes);
+    }
+
+    /**
+     * Turn the WaveFile object into a byte buffer.
+     * @return {Uint8Array}
+     */
+    toBuffer() {
+        this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
+        this.samplesToBytes_();
+        return new Uint8Array(this.createWaveFile_());
     }
     
     /**
@@ -301,4 +360,4 @@ class WaveFile extends wavefileheader.WaveFileHeader {
     }
 }
 
-module.exports.WaveFile = WaveFile;
+module.exports.WaveFileReaderWriter = WaveFileReaderWriter;

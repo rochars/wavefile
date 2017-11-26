@@ -50,7 +50,6 @@ fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ## Change the bit depth
-
 Currently there is **no dithering** when changing the bit depth.
 
 If the samples are stereo they need to be interleaved before changing the bit depth.
