@@ -112,6 +112,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
 
     /**
      * Turn the file to RIFF.
+     * All values will be little-endian when writing.
      */
     toRIFF() {
         this.chunkId = "RIFF";
@@ -119,9 +120,72 @@ class WaveFile extends wavefileheader.WaveFileHeader {
 
     /**
      * Turn the file to RIFX.
+     * All values but FourCCs will be big-endian when writing.
      */
     toRIFX() {
         this.chunkId = "RIFX";
+    }
+
+    /**
+     * Change the bit depth of the data.
+     * @param {string} bitDepth The new bit depth of the data.
+     *      One of "8", "16", "24", "32", "32f", "64"
+     */
+    toBitDepth(bitDepth) {
+        if (bitDepth == this.bitDepth_) {
+            return;
+        }
+        let originalBitDepth = this.bitDepth_;
+        this.bitDepth_ = bitDepth;
+        try {
+            this.validateBitDepth_();
+        } catch(err) {
+            this.bitDepth_ = originalBitDepth;
+            throw err;
+        }
+        let len = this.samples_.length;
+        let newSamples = [];
+
+        // change the bit depth of the samples
+        let oldMaxValue =
+            parseInt((byteData.BitDepthMaxValues[parseInt(originalBitDepth, 10)]) / 2, 10);
+        let newMaxValue =
+            parseInt((byteData.BitDepthMaxValues[parseInt(this.bitDepth_, 10)] -1) / 2, 10);
+
+        for (let i=0; i<len;i++) {
+            if (originalBitDepth == "8") {
+                this.samples_[i] -= 128;
+            }
+            if (this.bitDepth_ == "32f" || this.bitDepth_ == "64") {
+                if (originalBitDepth == "32f" || originalBitDepth == "64") {
+                    newSamples.push(this.samples_[i]);
+                } else {
+                    newSamples.push(this.samples_[i] / oldMaxValue);
+                }
+            }else {
+                if (originalBitDepth == "32f" || originalBitDepth == "64" ) {
+                    newSamples.push(this.samples_[i] * newMaxValue);
+                } else {
+                    newSamples.push(
+                        parseInt((this.samples_[i] / oldMaxValue) * newMaxValue, 10)
+                    );
+                }
+                if (newSamples[i] < 0) {
+                    newSamples[i]--;
+                }
+                if (this.bitDepth_ == "8") {
+                    newSamples[i] += 128;
+                }
+            }  
+        }
+        // recreate the file with the new samples
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            this.bitDepth_,
+            newSamples,
+            {"container": this.chunkId}
+        );
     }
 
     /**
@@ -305,11 +369,23 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * @throws {Error} If any argument does not meet the criteria.
      */
     checkWriteInput_() {
+        this.validateBitDepth_();
+        this.validateNumChannels_();
+        this.validateSampleRate_();
+    }
+
+    /**
+     * Validate the bit depth.
+     * @param {number} numChannels The number of channels
+     * @param {string} bitDepth The audio bit depth.
+     *     Should be one of "8", "16", "24", "32", "32f", "64".
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth_]) {
             throw new Error(this.WaveErrors.bitDepth);
         }
-        this.validateNumChannels_();
-        this.validateSampleRate_();
+        return true;
     }
 
     /**

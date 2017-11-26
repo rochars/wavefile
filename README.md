@@ -49,6 +49,28 @@ wav.fromScratch(
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
+## Change the bit depth
+```javascript
+let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+
+// Stereo samples must be interleaved with interleave()
+// before changing the bit depth.
+// Possible values are:
+//  "8", "16", "24", "32", "32f", "64"
+wav.toBitDepth("24");
+```
+
+## Interleave and de-interleave stereo samples
+```javascript
+let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+
+// Interleave stereo samples
+wav.interleave();
+
+// De-interleave the samples into multiple channels
+wav.deInterleave();
+```
+
 ## RIFF to RIFX and RIFX to RIFF
 ```javascript
 let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
@@ -96,12 +118,6 @@ Range:
 - -2147483648 to 2147483647 for 32-bit PCM
 - -1.0 to 1.0 for 32-bit IEEE
 - -1.0 to 1.0 for 64-bit
-
-## Interleave and de-interleave stereo samples
-```javascript
-wav.interleave();
-wav.deInterleave();
-```
 
 ## LICENSE
 Copyright (c) 2017 Rafael da Silva Rocha.

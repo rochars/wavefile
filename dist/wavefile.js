@@ -192,6 +192,52 @@ module.exports.unpack = unpack
 /* 2 */
 /***/ (function(module, exports) {
 
+/*
+ * bit-depth: Configurations based on bit depth.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/byte-data
+ */
+
+/**
+ * Offset for reading each bit depth.
+ * @enum {number}
+ */
+const BitDepthOffsets = {
+    1: 1,
+    2: 1,
+    4: 1,
+    8: 1,
+    16: 2,
+    24: 3,
+    32: 4,
+    40: 5,
+    48: 6,
+    64: 8
+};
+
+/**
+ * Max value for each bit depth.
+ * @enum {number}
+ */
+const BitDepthMaxValues = {
+    2: 4,
+    4: 16,
+    8: 256,
+    16: 65536,
+    24: 16777216,
+    32: 4294967296,
+    40: 1099511627776,
+    48: 281474976710656
+};
+
+module.exports.BitDepthOffsets = BitDepthOffsets;
+module.exports.BitDepthMaxValues = BitDepthMaxValues;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
 /*!
  * endianness: Swap byte endianness in a array of bytes.
  * Copyright (c) 2017 Rafael da Silva Rocha.
@@ -244,7 +290,7 @@ module.exports.endianness = endianness;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -372,52 +418,6 @@ module.exports.toHalf = toHalf;
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-/*
- * bit-depth: Configurations based on bit depth.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/byte-data
- */
-
-/**
- * Offset for reading each bit depth.
- * @enum {number}
- */
-const bitDepthOffsets = {
-    1: 1,
-    2: 1,
-    4: 1,
-    8: 1,
-    16: 2,
-    24: 3,
-    32: 4,
-    40: 5,
-    48: 6,
-    64: 8
-};
-
-/**
- * Max value for each bit depth.
- * @enum {number}
- */
-const maxBitDepth = {
-    2: 4,
-    4: 16,
-    8: 256,
-    16: 65536,
-    24: 16777216,
-    32: 4294967296,
-    40: 1099511627776,
-    48: 281474976710656
-};
-
-module.exports.bitDepthOffsets = bitDepthOffsets;
-module.exports.maxBitDepth = maxBitDepth;
-
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -535,6 +535,7 @@ class WaveFile extends wavefileheader.WaveFileHeader {
 
     /**
      * Turn the file to RIFF.
+     * All values will be little-endian when writing.
      */
     toRIFF() {
         this.chunkId = "RIFF";
@@ -542,9 +543,72 @@ class WaveFile extends wavefileheader.WaveFileHeader {
 
     /**
      * Turn the file to RIFX.
+     * All values but FourCCs will be big-endian when writing.
      */
     toRIFX() {
         this.chunkId = "RIFX";
+    }
+
+    /**
+     * Change the bit depth of the data.
+     * @param {string} bitDepth The new bit depth of the data.
+     *      One of "8", "16", "24", "32", "32f", "64"
+     */
+    toBitDepth(bitDepth) {
+        if (bitDepth == this.bitDepth_) {
+            return;
+        }
+        let originalBitDepth = this.bitDepth_;
+        this.bitDepth_ = bitDepth;
+        try {
+            this.validateBitDepth_();
+        } catch(err) {
+            this.bitDepth_ = originalBitDepth;
+            throw err;
+        }
+        let len = this.samples_.length;
+        let newSamples = [];
+
+        // change the bit depth of the samples
+        let oldMaxValue =
+            parseInt((byteData.BitDepthMaxValues[parseInt(originalBitDepth, 10)]) / 2, 10);
+        let newMaxValue =
+            parseInt((byteData.BitDepthMaxValues[parseInt(this.bitDepth_, 10)] -1) / 2, 10);
+
+        for (let i=0; i<len;i++) {
+            if (originalBitDepth == "8") {
+                this.samples_[i] -= 128;
+            }
+            if (this.bitDepth_ == "32f" || this.bitDepth_ == "64") {
+                if (originalBitDepth == "32f" || originalBitDepth == "64") {
+                    newSamples.push(this.samples_[i]);
+                } else {
+                    newSamples.push(this.samples_[i] / oldMaxValue);
+                }
+            }else {
+                if (originalBitDepth == "32f" || originalBitDepth == "64" ) {
+                    newSamples.push(this.samples_[i] * newMaxValue);
+                } else {
+                    newSamples.push(
+                        parseInt((this.samples_[i] / oldMaxValue) * newMaxValue, 10)
+                    );
+                }
+                if (newSamples[i] < 0) {
+                    newSamples[i]--;
+                }
+                if (this.bitDepth_ == "8") {
+                    newSamples[i] += 128;
+                }
+            }  
+        }
+        // recreate the file with the new samples
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            this.bitDepth_,
+            newSamples,
+            {"container": this.chunkId}
+        );
     }
 
     /**
@@ -728,11 +792,23 @@ class WaveFile extends wavefileheader.WaveFileHeader {
      * @throws {Error} If any argument does not meet the criteria.
      */
     checkWriteInput_() {
+        this.validateBitDepth_();
+        this.validateNumChannels_();
+        this.validateSampleRate_();
+    }
+
+    /**
+     * Validate the bit depth.
+     * @param {number} numChannels The number of channels
+     * @param {string} bitDepth The audio bit depth.
+     *     Should be one of "8", "16", "24", "32", "32f", "64".
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth_]) {
             throw new Error(this.WaveErrors.bitDepth);
         }
-        this.validateNumChannels_();
-        this.validateSampleRate_();
+        return true;
     }
 
     /**
@@ -829,6 +905,7 @@ window['WaveFile'] = WaveFile;
 let toBytes = __webpack_require__(7);
 let fromBytes = __webpack_require__(9);
 let bitPacker = __webpack_require__(11);
+let bitDepth = __webpack_require__(2);
 
 /**
  * Find and return the start index of some string.
@@ -861,6 +938,9 @@ module.exports.unpackCrumbs = bitPacker.unpackCrumbs;
 module.exports.packNibbles = bitPacker.packNibbles;
 module.exports.unpackNibbles = bitPacker.unpackNibbles;
 
+module.exports.BitDepthOffsets = bitDepth.BitDepthOffsets;
+module.exports.BitDepthMaxValues = bitDepth.BitDepthMaxValues;
+
 
 /***/ }),
 /* 7 */
@@ -874,9 +954,9 @@ module.exports.unpackNibbles = bitPacker.unpackNibbles;
 
 const intBits = __webpack_require__(1);
 const pad = __webpack_require__(0);
-const endianness = __webpack_require__(2);
+const endianness = __webpack_require__(3);
 const writer = __webpack_require__(8);
-const bitDepths = __webpack_require__(4);
+const bitDepths = __webpack_require__(2);
 
 /**
  * Turn numbers and strings to bytes.
@@ -959,7 +1039,7 @@ function writeBytes(numbers, isChar, isFloat, bitDepth) {
  */
 function makeBigEndian(bytes, isBigEndian, bitDepth) {
     if (isBigEndian) {
-        endianness.endianness(bytes, bitDepths.bitDepthOffsets[bitDepth]);
+        endianness.endianness(bytes, bitDepths.BitDepthOffsets[bitDepth]);
     }
 }
 
@@ -994,7 +1074,7 @@ module.exports.toBytes = toBytes;
  * https://github.com/rochars/byte-data
  */
 
-const float = __webpack_require__(3);
+const float = __webpack_require__(4);
 const intBits = __webpack_require__(1);
 
 function write64Bit(bytes, numbers, i, j) {
@@ -1111,9 +1191,9 @@ module.exports.writeString = writeString;
  * https://github.com/rochars/byte-data
  */
 
-const endianness = __webpack_require__(2);
+const endianness = __webpack_require__(3);
 const reader = __webpack_require__(10);
-const bitDepths = __webpack_require__(4);
+const bitDepths = __webpack_require__(2);
 
 /**
  * Turn a byte buffer into what the bytes represent.
@@ -1158,9 +1238,9 @@ function readBytes(bytes, bitDepth, isSigned, bitReader) {
     let values = [];
     let i = 0;
     let j = 0;
-    let offset = bitDepths.bitDepthOffsets[bitDepth];
+    let offset = bitDepths.BitDepthOffsets[bitDepth];
     let len = bytes.length - (offset -1);
-    let maxBitDepthValue = bitDepths.maxBitDepth[bitDepth];
+    let maxBitDepthValue = bitDepths.BitDepthMaxValues[bitDepth];
     let signFunction = isSigned ? signed : function(x,y){return x;};
     while (i < len) {
         values[j] = signFunction(bitReader(bytes, i), maxBitDepthValue);
@@ -1243,7 +1323,7 @@ module.exports.fromBytes = fromBytes;
 
 
 let pad = __webpack_require__(0);
-const float = __webpack_require__(3);
+const float = __webpack_require__(4);
 const intBits = __webpack_require__(1);
 
 /**

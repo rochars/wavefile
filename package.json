@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -54,7 +54,7 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "byte-data": "^0.4.1"
+    "byte-data": "^0.4.2"
   },
   "main": "index.js"
 }
