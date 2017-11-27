@@ -1,4 +1,4 @@
-/*!
+/*
  * WaveFile
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
@@ -207,8 +207,17 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let start = byteData.findString(bytes, "bext");
         if (start === -1 && this.enforceBext) {
             throw Error(this.WaveErrors.bext);
-        }else if (start > -1){
+        } else if (start > -1){
             this.bextChunkId = "bext";
+            this.bextChunkSize = byteData.fromBytes(
+                    bytes.slice(start + 4, start + 8),
+                    32,
+                    {"be": this.chunkId == "RIFX"}
+                )[0];
+            this.bextChunkData = byteData.fromBytes(
+                    bytes.slice(start + 8, start + 8 + this.bextChunkSize),
+                    8
+                );
         }
     }
 
@@ -337,11 +346,21 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {Uint8Array} The wav file bytes.
      */
     createWaveFile_() {
+        let options = {"be": this.chunkId == "RIFX"};
         let factVal = [];
         if (this.factChunkId) {
             factVal = byteData.toBytes(this.factChunkId, 8, {"char": true});
         }
-        let options = {"be": this.chunkId == "RIFX"};
+        let bextVal = [];
+        if (this.bextChunkId) {
+            bextVal = bextVal.concat(
+                    byteData.toBytes(this.bextChunkId, 8, {"char": true}),
+                    byteData.toBytes([this.bextChunkSize], 32, options),
+                    byteData.toBytes(this.bextChunkData, 8)
+                );
+        }
+
+        
         return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
             byteData.toBytes([this.chunkSize], 32, options),
             byteData.toBytes(this.format, 8, {"char": true}), 
@@ -353,6 +372,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             byteData.toBytes([this.byteRate], 32, options),
             byteData.toBytes([this.blockAlign], 16, options),
             byteData.toBytes([this.bitsPerSample], 16, options),
+            bextVal,
             factVal,
             byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
             byteData.toBytes([this.subChunk2Size], 32, options),

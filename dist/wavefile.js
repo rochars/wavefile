@@ -239,15 +239,16 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 /***/ (function(module, exports) {
 
 /*!
- * endianness: Swap byte endianness in a array of bytes.
+ * endianness: Swap byte endianness in arrays.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/endianness
+ *
  */
 
 /**
- * Make the resulting byte array big endian or little endian.
+ * Swap the endianness of units of information in a array of bytes.
  * @param {!Array<number>|Uint8Array} bytes An array of bytes.
- * @param {number} offset The swap offset according to the bit depth.
+ * @param {number} offset The offset according to the bit depth.
  *  - 2 for 16-bit
  *  - 3 for 24-bit
  *  - 4 for 32-bit
@@ -266,7 +267,7 @@ function endianness(bytes, offset) {
 }
 
 /**
- * Swap the endianees of a unit of information in a array of bytes.
+ * Swap the endianness of a unit of information in a array of bytes.
  * @param {!Array<number>|Uint8Array} bytes An array of bytes.
  * @param {number} i The index to read.
  * @param {number} numBytes The number of bytes according to
@@ -390,7 +391,7 @@ function toFloat64(value) {
 let floatView = new Float32Array(1);
 let int32View = new Int32Array(floatView.buffer);
 
-/*!
+/**
  * to-half: int bits of half-precision floating point values
  * Based on:
  * https://mail.mozilla.org/pipermail/es-discuss/2017-April/047994.html
@@ -424,7 +425,7 @@ module.exports.toHalf = toHalf;
 /*!
  * wavefile
  * Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
- * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
  */
@@ -695,7 +696,7 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/*!
+/*
  * WaveFile
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
@@ -904,8 +905,17 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let start = byteData.findString(bytes, "bext");
         if (start === -1 && this.enforceBext) {
             throw Error(this.WaveErrors.bext);
-        }else if (start > -1){
+        } else if (start > -1){
             this.bextChunkId = "bext";
+            this.bextChunkSize = byteData.fromBytes(
+                    bytes.slice(start + 4, start + 8),
+                    32,
+                    {"be": this.chunkId == "RIFX"}
+                )[0];
+            this.bextChunkData = byteData.fromBytes(
+                    bytes.slice(start + 8, start + 8 + this.bextChunkSize),
+                    8
+                );
         }
     }
 
@@ -1034,11 +1044,21 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {Uint8Array} The wav file bytes.
      */
     createWaveFile_() {
+        let options = {"be": this.chunkId == "RIFX"};
         let factVal = [];
         if (this.factChunkId) {
             factVal = byteData.toBytes(this.factChunkId, 8, {"char": true});
         }
-        let options = {"be": this.chunkId == "RIFX"};
+        let bextVal = [];
+        if (this.bextChunkId) {
+            bextVal = bextVal.concat(
+                    byteData.toBytes(this.bextChunkId, 8, {"char": true}),
+                    byteData.toBytes([this.bextChunkSize], 32, options),
+                    byteData.toBytes(this.bextChunkData, 8)
+                );
+        }
+
+        
         return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
             byteData.toBytes([this.chunkSize], 32, options),
             byteData.toBytes(this.format, 8, {"char": true}), 
@@ -1050,6 +1070,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             byteData.toBytes([this.byteRate], 32, options),
             byteData.toBytes([this.blockAlign], 16, options),
             byteData.toBytes([this.bitsPerSample], 16, options),
+            bextVal,
             factVal,
             byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
             byteData.toBytes([this.subChunk2Size], 32, options),
@@ -1066,9 +1087,10 @@ module.exports.WaveFileReaderWriter = WaveFileReaderWriter;
 
 /*!
  * byte-data
- * Readable data to and from bytes.
+ * Readable data to and from byte buffers.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
+ *
  */
 
 let toBytes = __webpack_require__(9);
@@ -1873,7 +1895,8 @@ module.exports.WaveFileHeader = class {
          * @type {string}
          */
         this.bextChunkId = "";
-        // TODO bext data
+        this.bextChunkSize = 0;
+        this.bextChunkData = [];
     }
 }
 

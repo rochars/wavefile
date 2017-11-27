@@ -82,8 +82,10 @@ wav.toRIFX();
 
 // Turn a RIFX file to a RIFF file
 wav.toRIFF();
-
 ```
+
+## BWF data
+Data from the "bext" chunk is preserved in BWF files but there is no way to edit its values.
 
 ### The properties
 ```javascript

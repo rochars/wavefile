@@ -68,6 +68,7 @@ module.exports.WaveFileHeader = class {
          * @type {string}
          */
         this.bextChunkId = "";
-        // TODO bext data
+        this.bextChunkSize = 0;
+        this.bextChunkData = [];
     }
 }

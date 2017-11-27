@@ -13,7 +13,7 @@ describe('create 16-bit wave files from scratch', function() {
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
 
     let fs = require('fs');
-    fs.writeFileSync("./test/files/out/16-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
+    fs.writeFileSync("./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFX"', function() {
         assert.equal(wav.chunkId, "RIFX");

@@ -10,8 +10,10 @@
     "RIFF",
     "RIFX",
     "WAVE",
+    "BWF",
     "audio",
     "file",
+    "bext",
     "read",
     "write",
     "create",
@@ -32,7 +34,8 @@
   "scripts": {
     "lint": "jshint index.js && jshint test",
     "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive --timeout=8000",
-    "test_a": "nyc ./node_modules/mocha/bin/_mocha test/to-bit-depth",
+    "test_a": "nyc ./node_modules/mocha/bin/_mocha test/read test/write",
+    "test_b": "nyc ./node_modules/mocha/bin/_mocha test/read/read-bext.js",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "bundle": "webpack",
     "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js",
@@ -54,8 +57,8 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "bitdepth": "^1.0.1",
-    "byte-data": "^0.4.2"
+    "bitdepth": "1.0.1",
+    "byte-data": "0.4.3"
   },
   "main": "index.js"
 }
