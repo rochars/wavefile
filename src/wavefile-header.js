@@ -47,13 +47,17 @@ module.exports.WaveFileHeader = class {
         /** @type {number} */
         this.cbSize = 0;
 
+        /** @type {number} */
+        this.validBitsPerSample = 0;
+
         /** @type {string} */
         this.factChunkId = "";
         /**
          * minimum 4
          * @type {number}
          */
-        this.factChunkSize = 4;
+        this.factChunkSize = 0;
+        this.factChunkData = [];
         /** @type {number} */
         this.dwSampleLength = 0;
         /**

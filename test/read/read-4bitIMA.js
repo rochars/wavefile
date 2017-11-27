@@ -51,10 +51,6 @@ describe("4-bit IMA ADPCM reading", function() {
             function() {
         assert.equal(wav.factChunkId, 'fact');
     });
-    it("factChunkSize should be 4",
-            function() {
-        assert.equal(wav.factChunkSize, 4);
-    });
     it("subChunk2Id should be 'data'",
             function() {
         assert.equal(wav.subChunk2Id, 'data');

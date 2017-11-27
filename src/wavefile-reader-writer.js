@@ -178,6 +178,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         }else {
             this.bitDepth_ = this.bitsPerSample.toString();
         }
+
+        if (this.subChunk1Size > 16) {
+            this.cbSize = byteData.fromBytes(
+                bytes.slice(start + 24, start + 26), 16);
+            if (this.subChunk1Size > 18)
+            this.validBitsPerSample = byteData.fromBytes(
+                bytes.slice(start + 26, start + 28), 16);
+        }
     }
 
     /**
@@ -189,12 +197,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let start = byteData.findString(bytes, "fact");
         if (start === -1 && this.enforceFact) {
             throw Error(this.WaveErrors.fact);
-        }else if (start > -1) {
+        } else if (start > -1) {
             this.factChunkId = "fact";
-            //this.factChunkSize = byteData.uIntFrom4Bytes(
-            //    bytes.slice(start + 4, start + 8));
-            //this.dwSampleLength = byteData.uIntFrom4Bytes(
-            //    bytes.slice(start + 8, start + 12));
+            this.factChunkSize = byteData.fromBytes(
+                bytes.slice(start + 4, start + 8),
+                32)[0];
+            this.dwSampleLength = byteData.fromBytes(
+                bytes.slice(start + 8, start + 12),
+                32)[0];
         }
     }
 
@@ -347,9 +357,21 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     createWaveFile_() {
         let options = {"be": this.chunkId == "RIFX"};
+        
+        let cbSize = [];
+        let validBitsPerSample = []
+        if (this.subChunk1Size > 16) {
+            cbSize = byteData.toBytes([this.cbSize], 16, options);
+            validBitsPerSample = byteData.toBytes([this.validBitsPerSample], 16, options);
+        }
+
         let factVal = [];
         if (this.factChunkId) {
-            factVal = byteData.toBytes(this.factChunkId, 8, {"char": true});
+            factVal = factVal.concat(
+                    byteData.toBytes(this.factChunkId, 8, {"char": true}),
+                    byteData.toBytes([this.factChunkSize], 32, options),
+                    byteData.toBytes([this.dwSampleLength], 32, options)
+                );
         }
         let bextVal = [];
         if (this.bextChunkId) {
@@ -359,11 +381,10 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                     byteData.toBytes(this.bextChunkData, 8)
                 );
         }
-
-        
         return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
             byteData.toBytes([this.chunkSize], 32, options),
             byteData.toBytes(this.format, 8, {"char": true}), 
+            bextVal,
             byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
             byteData.toBytes([this.subChunk1Size], 32, options),
             byteData.toBytes([this.audioFormat], 16, options),
@@ -372,7 +393,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             byteData.toBytes([this.byteRate], 32, options),
             byteData.toBytes([this.blockAlign], 16, options),
             byteData.toBytes([this.bitsPerSample], 16, options),
-            bextVal,
+            cbSize,
+            validBitsPerSample,
             factVal,
             byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
             byteData.toBytes([this.subChunk2Size], 32, options),

@@ -60,9 +60,15 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
             function() {
         assert.equal(wav2.factChunkId, 'fact');
     });
-    it("factChunkSize should be 4",
+    it("wav.factChunkSize should == wav2.factChunkSize",
             function() {
-        assert.equal(wav2.factChunkSize, 4);
+        console.log(wav.factChunkSize);
+        assert.equal(wav2.factChunkSize, wav.factChunkSize);
+    });
+    it("wav.dwSampleLength should == wav2.dwSampleLength",
+            function() {
+        console.log(wav.dwSampleLength);
+        assert.deepEqual(wav2.dwSampleLength, wav.dwSampleLength);
     });
     it("subChunk2Id should be 'data'",
             function() {
