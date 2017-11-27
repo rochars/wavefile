@@ -876,13 +876,13 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         }else {
             this.bitDepth_ = this.bitsPerSample.toString();
         }
-
         if (this.subChunk1Size > 16) {
             this.cbSize = byteData.fromBytes(
-                bytes.slice(start + 24, start + 26), 16);
-            if (this.subChunk1Size > 18)
-            this.validBitsPerSample = byteData.fromBytes(
-                bytes.slice(start + 26, start + 28), 16);
+                bytes.slice(start + 24, start + 26), 16)[0];
+            if (this.subChunk1Size > 18) {
+                this.validBitsPerSample = byteData.fromBytes(
+                    bytes.slice(start + 26, start + 28), 16)[0];
+            }
         }
     }
 
