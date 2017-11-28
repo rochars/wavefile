@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -13,7 +13,6 @@
     "BWF",
     "audio",
     "file",
-    "bext",
     "read",
     "write",
     "create",

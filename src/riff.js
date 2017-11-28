@@ -13,7 +13,7 @@ const byteData = require("byte-data");
  * Get the chunks of a RIFF file.
  * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
  * @param {boolean} bigEndian true if its RIFX.
- * @return {object}
+ * @return {Object}
  */
 function getChunks(buffer, bigEndian) {
     

@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>WaveFile<span class="signature">(bytes, buffer, enforceFact, enforceBext)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>WaveFile<span class="signature">(bytes, enforceFact, enforceBext)</span><span class="type-signature"></span></h2>
         
             <div class="class-description">WaveFile</div>
         
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="WaveFile"><span class="type-signature"></span>new WaveFile<span class="signature">(bytes, buffer, enforceFact, enforceBext)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="WaveFile"><span class="type-signature"></span>new WaveFile<span class="signature">(bytes, enforceFact, enforceBext)</span><span class="type-signature"></span></h4>
     
 
     
@@ -75,6 +75,8 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -100,28 +102,9 @@
             
 
             
-
-            <td class="description last">The file bytes.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>buffer</code></td>
-            
-
-            <td class="type">
-            
+                <td class="default">
                 
-<span class="param-type">Uint8Array</span>
-
-
-            
-            </td>
-
-            
-
+                </td>
             
 
             <td class="description last">A wave file buffer.</td>
@@ -146,6 +129,12 @@
             
 
             
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
 
             <td class="description last">True if it should throw a error     if no "fact" chunk is found.</td>
         </tr>
@@ -168,6 +157,12 @@
 
             
 
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
             
 
             <td class="description last">True if it should throw a error     if no "bext" chunk is found.</td>
@@ -317,7 +312,211 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line83">line 83</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line117">line 117</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromScratch"><span class="type-signature"></span>fromScratch<span class="signature">(numChannels, sampleRate, bitDepth, samples<span class="signature-attributes">non-null</span>)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a WaveFile object based on the arguments passed.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>numChannels</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of channels    (Ints like 1 for mono, 2 stereo and so on).</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sampleRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The sample rate.    Integer numbers like 8000, 44100, 48000, 96000, 192000.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bitDepth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The audio bit depth.    One of "8", "16", "24", "32", "32f", "64".</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>samples</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of samples to be written.    Samples must be in the correct range according to the bit depth.    Samples of multi-channel data .</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line43">line 43</a>
     </li></ul></dd>
     
 
@@ -403,7 +602,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line67">line 67</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -538,7 +737,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line53">line 53</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -624,7 +823,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line36">line 36</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -710,7 +909,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line44">line 44</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -760,7 +959,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 28 2017 15:02:41 GMT-0200 (Horário brasileiro de verão)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 28 2017 15:58:18 GMT-0200 (Horário brasileiro de verão)
 </footer>
 
 <script> prettyPrint(); </script>

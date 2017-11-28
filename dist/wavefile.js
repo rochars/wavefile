@@ -491,20 +491,54 @@ const waveFileReaderWriter = __webpack_require__(8);
 class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
 
     /**
-     * @param {Uint8Array} bytes The file bytes.
-     * @param {Uint8Array} buffer A wave file buffer.
+     * @param {Uint8Array} bytes A wave file buffer.
      * @param {boolean} enforceFact True if it should throw a error
      *      if no "fact" chunk is found.
      * @param {boolean} enforceBext True if it should throw a error
      *      if no "bext" chunk is found.
      */
-    constructor(buffer, enforceFact=false, enforceBext=false) {
+    constructor(bytes, enforceFact=false, enforceBext=false) {
         super(enforceFact, enforceBext);
-        if(buffer) {
-            this.fromBuffer(buffer);
+        if(bytes) {
+            this.fromBuffer(bytes);
         }
     }
 
+    /**
+     * Create a WaveFile object based on the arguments passed.
+     * @param {number} numChannels The number of channels
+     *     (Ints like 1 for mono, 2 stereo and so on).
+     * @param {number} sampleRate The sample rate.
+     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
+     * @param {string} bitDepth The audio bit depth.
+     *     One of "8", "16", "24", "32", "32f", "64".
+     * @param {!Array<number>} samples Array of samples to be written.
+     *     Samples must be in the correct range according to the bit depth.
+     *     Samples of multi-channel data .
+     */
+    fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
+        if (!options.container) {
+            options.container = "RIFF";
+        }
+        this.isFromScratch_ = true;
+        let bytes = parseInt(bitDepth, 10) / 8;
+        this.chunkSize = 36 + samples.length * bytes;
+        this.subChunk1Size = 16;
+        this.byteRate = (numChannels * bytes) * sampleRate;
+        this.blockAlign = numChannels * bytes;
+        this.chunkId = options.container;
+        this.format = "WAVE";
+        this.subChunk1Id = "fmt ";
+        this.audioFormat = this.headerFormats_[bitDepth];
+        this.numChannels = numChannels;
+        this.sampleRate = sampleRate;
+        this.bitsPerSample = parseInt(bitDepth, 10);
+        this.subChunk2Id = "data";
+        this.subChunk2Size = samples.length * bytes;
+        this.samples_ = samples;
+        this.bitDepth_ = bitDepth;
+    }
+    
     /**
      * Turn the file to RIFF.
      * All values will be little-endian when writing.
@@ -765,7 +799,6 @@ const riff = __webpack_require__(15);
 class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
-     * @param {Uint8Array} bytes The file bytes.
      * @param {boolean} enforceFact True if it should throw a error
      *      if no "fact" chunk is found.
      * @param {boolean} enforceBext True if it should throw a error
@@ -815,41 +848,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     }
 
     /**
-     * Create a WaveFile object based on the arguments passed.
-     * @param {number} numChannels The number of channels
-     *     (Ints like 1 for mono, 2 stereo and so on).
-     * @param {number} sampleRate The sample rate.
-     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
-     * @param {string} bitDepth The audio bit depth.
-     *     One of "8", "16", "24", "32", "32f", "64".
-     * @param {!Array<number>} samples Array of samples to be written.
-     *     Samples must be in the correct range according to the bit depth.
-     *     Samples of multi-channel data .
-     */
-    fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
-        if (!options.container) {
-            options.container = "RIFF";
-        }
-        this.isFromScratch_ = true;
-        let bytes = parseInt(bitDepth, 10) / 8;
-        this.chunkSize = 36 + samples.length * bytes;
-        this.subChunk1Size = 16;
-        this.byteRate = (numChannels * bytes) * sampleRate;
-        this.blockAlign = numChannels * bytes;
-        this.chunkId = options.container;
-        this.format = "WAVE";
-        this.subChunk1Id = "fmt ";
-        this.audioFormat = this.headerFormats_[bitDepth];
-        this.numChannels = numChannels;
-        this.sampleRate = sampleRate;
-        this.bitsPerSample = parseInt(bitDepth, 10);
-        this.subChunk2Id = "data";
-        this.subChunk2Size = samples.length * bytes;
-        this.samples_ = samples;
-        this.bitDepth_ = bitDepth;
-    }
-
-    /**
      * Read a wave file from a byte buffer.
      * @param {Uint8Array} bytes The buffer.
      */
@@ -857,10 +855,11 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         this.isFromScratch_ = false;
         this.readRIFFChunk_(bytes);
         let chunk = riff.getChunks(bytes, this.chunkId == "RIFX");
-        this.readFmtChunk_(chunk.subChunks);
-        this.readFactChunk_(chunk.subChunks);
-        this.readBextChunk_(chunk.subChunks);
-        this.readCueChunk_(chunk.subChunks);
+        let options = {"be": this.chunkId == "RIFX"};
+        this.readFmtChunk_(chunk.subChunks, options);
+        this.readFactChunk_(chunk.subChunks, options);
+        this.readBextChunk_(chunk.subChunks, options);
+        this.readCueChunk_(chunk.subChunks, options);
         this.readDataChunk_(chunk.subChunks);
     }
 
@@ -869,7 +868,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {Uint8Array}
      */
     toBuffer() {
-        this.checkWriteInput_(this.numChannels, this.sampleRate, this.bitDepth_);
+        this.checkWriteInput_();
         return new Uint8Array(this.createWaveFile_());
     }
     
@@ -895,13 +894,13 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Read the "fmt " chunk of a wave file.
-     * @param {Uint8Array} chunk an array representing the wave file.
+     * @param {Object} chunks The RIFF file chunks.
+     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "fmt " chunk is found.
      */
-    readFmtChunk_(chunks) {
+    readFmtChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "fmt ");
         if (chunk) {
-            let options = {"be": this.chunkId == "RIFX"};
             this.subChunk1Id = "fmt ";
             this.subChunk1Size = chunk.subChunkSize;
             this.audioFormat = byteData.fromBytes(
@@ -936,13 +935,13 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     
     /**
      * Read the "fact" chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
+     * @param {Object} chunks The RIFF file chunks.
+     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "fact" chunk is found.
      */
-    readFactChunk_(chunks) {
+    readFactChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "fact");
         if (chunk) {
-            let options = {"be": this.chunkId == "RIFX"};
             this.factChunkId = "fact";
             this.factChunkSize = chunk.subChunkSize;
             this.dwSampleLength = byteData.fromBytes(
@@ -954,13 +953,13 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Read the "bext" chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
+     * @param {Object} chunks The RIFF file chunks.
+     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "bext" chunk is found.
      */
-    readBextChunk_(chunks) {
+    readBextChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "bext");
         if (chunk) {
-            let options = {"be": this.chunkId == "RIFX"};
             this.bextChunkId = "bext";
             this.bextChunkSize = chunk.subChunkSize;
             this.bextChunkData = byteData.fromBytes(chunk.subChunkData, 8);
@@ -971,13 +970,13 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Read the "cue " chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
+     * @param {Object} chunks The RIFF file chunks.
+     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "cue" chunk is found.
      */
-    readCueChunk_(chunks) {
+    readCueChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "cue ");
         if (chunk) {
-            let options = {"be": this.chunkId == "RIFX"};
             this.cueChunkId = "cue ";
             this.cueChunkSize = chunk.subChunkSize;
             this.cueChunkData = byteData.fromBytes(chunk.subChunkData, 8);
@@ -988,7 +987,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Read the "data" chunk of a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
+     * @param {Object} chunks The RIFF file chunks.
      * @throws {Error} If no "data" chunk is found.
      */
     readDataChunk_(chunks) {
@@ -1023,7 +1022,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Find a chunk by its FourCC in a array of RIFF chunks.
-     * @return {object||null}
+     * @return {Object|null}
      */
     findChunk(chunks, fourCC) {
         for (let i = 0; i<chunks.length; i++) {
@@ -1031,18 +1030,11 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                 return chunks[i];
             }
         }
+        return null;
     }
 
     /**
      * Validate the input for wav writing.
-     * @param {number} numChannels The number of channels
-     *     Should be a int greater than zero smaller than the
-     *     channel limit according to the bit depth.
-     * @param {number} sampleRate The sample rate.
-     *     Should be a int greater than zero smaller than the
-     *     channel limit according to the bit depth and number of channels.
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
     checkWriteInput_() {
@@ -1053,9 +1045,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Validate the bit depth.
-     * @param {number} numChannels The number of channels
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
     validateBitDepth_() {
@@ -1067,9 +1056,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Validate the sample rate value.
-     * @param {number} numChannels The number of channels
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
     validateNumChannels_() {
@@ -1082,12 +1068,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
     /**
      * Validate the sample rate value.
-     * @param {number} numChannels The number of channels
-     *     Should be a int greater than zero smaller than the
-     *     channel limit according to the bit depth.
-     * @param {number} sampleRate The sample rate.
-     * @param {string} bitDepth The audio bit depth.
-     *     Should be one of "8", "16", "24", "32", "32f", "64".
      * @throws {Error} If any argument does not meet the criteria.
      */
     validateSampleRate_() {
@@ -1102,8 +1082,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     /**
      * Split each sample into bytes.
      */
-    samplesToBytes_() {
-        let options = {"be": this.chunkId == "RIFX"};
+    samplesToBytes_(options) {
         let bytes = [];
         if (this.bitsPerSample == 32 && this.audioFormat == 3) {
             options.float = true;
@@ -1116,8 +1095,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         return bytes;
     }
 
-    getBextBytes() {
-        let options = {"be": this.chunkId == "RIFX"};
+    getBextBytes(options) {
         let bext = [];
         if (this.bextChunkId) {
             bext = bext.concat(
@@ -1129,8 +1107,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         return bext;
     }
 
-    getCueBytes() {
-        let options = {"be": this.chunkId == "RIFX"};
+    getCueBytes(options) {
         let cue = [];
         if (this.cueChunkId) {
             cue = cue.concat(
@@ -1142,8 +1119,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         return cue;
     }
 
-    getFactBytes() {
-        let options = {"be": this.chunkId == "RIFX"};
+    getFactBytes(options) {
         let fact = []
         if (this.factChunkId) {
             fact = fact.concat(
@@ -1172,7 +1148,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
                 byteData.toBytes([this.chunkSize], 32, options),
                 byteData.toBytes(this.format, 8, {"char": true}), 
-                this.getBextBytes(),
+                this.getBextBytes(options),
                 byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
                 byteData.toBytes([this.subChunk1Size], 32, options),
                 byteData.toBytes([this.audioFormat], 16, options),
@@ -1183,11 +1159,11 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                 byteData.toBytes([this.bitsPerSample], 16, options),
                 cbSize,
                 validBitsPerSample,
-                this.getFactBytes(),
+                this.getFactBytes(options),
                 byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
                 byteData.toBytes([this.subChunk2Size], 32, options),
-                this.samplesToBytes_(),
-                this.getCueBytes()
+                this.samplesToBytes_(options),
+                this.getCueBytes(options)
             );
     }
 }
@@ -1996,7 +1972,7 @@ const byteData = __webpack_require__(3);
  * Get the chunks of a RIFF file.
  * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
  * @param {boolean} bigEndian true if its RIFX.
- * @return {object}
+ * @return {Object}
  */
 function getChunks(buffer, bigEndian) {
     
