@@ -56,7 +56,11 @@ describe('read 4-bit file from disk and write to new file', function() {
             function() {
         assert.equal(wav2.bitsPerSample, 4);
     });
-    it("factChunkId should be 'fact'",
+    it("factChunkId should be 'fact' on the original file",
+            function() {
+        assert.equal(wav.factChunkId, 'fact');
+    });
+    it("factChunkId should be 'fact' on the new file",
             function() {
         assert.equal(wav2.factChunkId, 'fact');
     });
@@ -148,7 +152,6 @@ describe('read 4-bit 22050kHz file from disk and write to new file', function() 
             function() {
         assert.equal(wav2.factChunkId, 'fact');
     });
-    /*
     it("wav.factChunkSize should == wav2.factChunkSize",
             function() {
         console.log(wav.factChunkSize);
@@ -159,7 +162,11 @@ describe('read 4-bit 22050kHz file from disk and write to new file', function() 
         console.log(wav.dwSampleLength);
         assert.deepEqual(wav2.dwSampleLength, wav.dwSampleLength);
     });
-    */
+    it("wav2.dwSampleLength should be > 0",
+            function() {
+        console.log(wav.dwSampleLength);
+        assert.ok(wav2.dwSampleLength > 0);
+    });
     it("subChunk2Id should be 'data'",
             function() {
         assert.equal(wav2.subChunk2Id, 'data');

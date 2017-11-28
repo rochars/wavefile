@@ -14,7 +14,7 @@ describe('errors', function() {
 
     let testFunc;
     const unsupportedFormatError = "Not a supported format.";
-    const noWAVEChunkError = "Could not find the 'WAVE' chunk";
+    const noWAVEChunkError = "Could not find the 'WAVE' format identifier";
     const noFmtChunkError = "Could not find the 'fmt ' chunk";
     const noDataChunkError = "Could not find the 'data' chunk";
     const sampleRateError = "Invalid sample rate.";
