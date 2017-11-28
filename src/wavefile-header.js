@@ -50,16 +50,26 @@ module.exports.WaveFileHeader = class {
         /** @type {number} */
         this.validBitsPerSample = 0;
 
-        /** @type {string} */
-        this.factChunkId = "";
         /**
-         * minimum 4
-         * @type {number}
+         * "fact" 
+         * @type {string} 
          */
+        this.factChunkId = "";
+        /** @type {number} */
         this.factChunkSize = 0;
+        /** @type {!Array<number>} */
         this.factChunkData = [];
         /** @type {number} */
         this.dwSampleLength = 0;
+
+        /**
+         * "cue "
+         * @type {string}
+         */
+        this.cueChunkId = "";
+        this.cueChunkSize = -1;
+        this.cueChunkData = [];
+
         /**
          * "data"
          * @type {string}

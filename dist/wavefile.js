@@ -726,6 +726,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         this.enforceFact = enforceFact;
         /** @type {boolean} */
         this.enforceBext = enforceBext;
+        /** @type {boolean} */
+        this.enforceCue = false;
         /**
          * Error messages.
          * @enum {string}
@@ -737,6 +739,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             "data": "Could not find the 'data' chunk",
             "fact": "Could not find the 'fact' chunk",
             "bext": "Could not find the 'bext' chunk",
+            "cue ": "Could not find the 'cue ' chunk",
             "bitDepth": "Invalid bit depth.",
             "numChannels": "Invalid number of channels.",
             "sampleRate": "Invalid sample rate."
@@ -754,7 +757,9 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             "32f": 3,
             "64": 3
         };
+        /** @type {!Array<number>} */
         this.samples_ = [];
+        /** @type {!Array<number>} */
         this.bytes_ = [];
     }
 
@@ -804,6 +809,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         this.readFmtChunk_(bytes);
         this.readFactChunk_(bytes);
         this.readBextChunk_(bytes);
+        this.readCueChunk_(bytes);
         this.readDataChunk_(bytes);
     }
 
@@ -930,6 +936,29 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     }
 
     /**
+     * Read the "cue " chunk of a wave file.
+     * @param {Uint8Array} bytes an array representing the wave file.
+     * @throws {Error} If no "cue" chunk is found.
+     */
+    readCueChunk_(bytes) {
+        let start = byteData.findString(bytes, "cue ");
+        if (start === -1 && this.enforceCue) {
+            throw Error(this.WaveErrors.cue);
+        } else if (start > -1){
+            this.cueChunkId = "cue ";
+            this.cueChunkSize = byteData.fromBytes(
+                    bytes.slice(start + 4, start + 8),
+                    32,
+                    {"be": this.chunkId == "RIFX"}
+                )[0];
+            this.cueChunkData = byteData.fromBytes(
+                    bytes.slice(start + 8, start + 8 + this.cueChunkSize),
+                    8
+                );
+        }
+    }
+
+    /**
      * Read the "data" chunk of a wave file.
      * @param {Uint8Array} bytes an array representing the wave file.
      * @throws {Error} If no "data" chunk is found.
@@ -1038,15 +1067,54 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * Split each sample into bytes.
      */
     samplesToBytes_() {
-        let params = {"be": this.chunkId == "RIFX"};
+        let options = {"be": this.chunkId == "RIFX"};
         if (this.bitsPerSample == 32 && this.audioFormat == 3) {
-            params.float = true;
+            options.float = true;
         }
         let bitDepth = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
-        this.bytes_ = byteData.toBytes(this.samples_, bitDepth, params);
+        this.bytes_ = byteData.toBytes(this.samples_, bitDepth, options);
         if (this.bytes_.length % 2) {
             this.bytes_.push(0);
         }
+    }
+
+    getBextBytes() {
+        let options = {"be": this.chunkId == "RIFX"};
+        let bext = [];
+        if (this.bextChunkId) {
+            bext = bext.concat(
+                    byteData.toBytes(this.bextChunkId, 8, {"char": true}),
+                    byteData.toBytes([this.bextChunkSize], 32, options),
+                    byteData.toBytes(this.bextChunkData, 8)
+                );
+        }
+        return bext;
+    }
+
+    getCueBytes() {
+        let options = {"be": this.chunkId == "RIFX"};
+        let cue = [];
+        if (this.cueChunkId) {
+            cue = cue.concat(
+                    byteData.toBytes(this.cueChunkId, 8, {"char": true}),
+                    byteData.toBytes([this.cueChunkSize], 32, options),
+                    byteData.toBytes(this.cueChunkData, 8)
+                );
+        }
+        return cue;
+    }
+
+    getFactBytes() {
+        let options = {"be": this.chunkId == "RIFX"};
+        let fact = []
+        if (this.factChunkId) {
+            fact = fact.concat(
+                    byteData.toBytes(this.factChunkId, 8, {"char": true}),
+                    byteData.toBytes([this.factChunkSize], 32, options),
+                    byteData.toBytes([this.dwSampleLength], 32, options)
+                );
+        }
+        return fact;
     }
 
     /**
@@ -1055,48 +1123,37 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     createWaveFile_() {
         let options = {"be": this.chunkId == "RIFX"};
-        
         let cbSize = [];
         let validBitsPerSample = []
         if (this.subChunk1Size > 16) {
             cbSize = byteData.toBytes([this.cbSize], 16, options);
-            validBitsPerSample = byteData.toBytes([this.validBitsPerSample], 16, options);
+            if (this.subChunk1Size > 18) {
+                validBitsPerSample = byteData.toBytes([this.validBitsPerSample], 16, options);
+            }
         }
-
-        let factVal = [];
-        if (this.factChunkId) {
-            factVal = factVal.concat(
-                    byteData.toBytes(this.factChunkId, 8, {"char": true}),
-                    byteData.toBytes([this.factChunkSize], 32, options),
-                    byteData.toBytes([this.dwSampleLength], 32, options)
-                );
-        }
-        let bextVal = [];
-        if (this.bextChunkId) {
-            bextVal = bextVal.concat(
-                    byteData.toBytes(this.bextChunkId, 8, {"char": true}),
-                    byteData.toBytes([this.bextChunkSize], 32, options),
-                    byteData.toBytes(this.bextChunkData, 8)
-                );
-        }
+        let factVal = this.getFactBytes();
+        let bextVal = this.getBextBytes();
+        let cueVal = this.getCueBytes();
         return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
-            byteData.toBytes([this.chunkSize], 32, options),
-            byteData.toBytes(this.format, 8, {"char": true}), 
-            bextVal,
-            byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
-            byteData.toBytes([this.subChunk1Size], 32, options),
-            byteData.toBytes([this.audioFormat], 16, options),
-            byteData.toBytes([this.numChannels], 16, options),
-            byteData.toBytes([this.sampleRate], 32, options),
-            byteData.toBytes([this.byteRate], 32, options),
-            byteData.toBytes([this.blockAlign], 16, options),
-            byteData.toBytes([this.bitsPerSample], 16, options),
-            cbSize,
-            validBitsPerSample,
-            factVal,
-            byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
-            byteData.toBytes([this.subChunk2Size], 32, options),
-            this.bytes_);
+                byteData.toBytes([this.chunkSize], 32, options),
+                byteData.toBytes(this.format, 8, {"char": true}), 
+                bextVal,
+                byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
+                byteData.toBytes([this.subChunk1Size], 32, options),
+                byteData.toBytes([this.audioFormat], 16, options),
+                byteData.toBytes([this.numChannels], 16, options),
+                byteData.toBytes([this.sampleRate], 32, options),
+                byteData.toBytes([this.byteRate], 32, options),
+                byteData.toBytes([this.blockAlign], 16, options),
+                byteData.toBytes([this.bitsPerSample], 16, options),
+                cbSize,
+                validBitsPerSample,
+                factVal,
+                byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
+                byteData.toBytes([this.subChunk2Size], 32, options),
+                this.bytes_,
+                cueVal
+            );
     }
 }
 
@@ -1899,16 +1956,26 @@ module.exports.WaveFileHeader = class {
         /** @type {number} */
         this.validBitsPerSample = 0;
 
-        /** @type {string} */
-        this.factChunkId = "";
         /**
-         * minimum 4
-         * @type {number}
+         * "fact" 
+         * @type {string} 
          */
+        this.factChunkId = "";
+        /** @type {number} */
         this.factChunkSize = 0;
+        /** @type {!Array<number>} */
         this.factChunkData = [];
         /** @type {number} */
         this.dwSampleLength = 0;
+
+        /**
+         * "cue "
+         * @type {string}
+         */
+        this.cueChunkId = "";
+        this.cueChunkSize = -1;
+        this.cueChunkData = [];
+
         /**
          * "data"
          * @type {string}
