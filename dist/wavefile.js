@@ -520,7 +520,6 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
         if (!options.container) {
             options.container = "RIFF";
         }
-        this.isFromScratch_ = true;
         let bytes = parseInt(bitDepth, 10) / 8;
         this.chunkSize = 36 + samples.length * bytes;
         this.subChunk1Size = 16;
@@ -807,8 +806,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     constructor(enforceFact=false, enforceBext=false) {
         super();
         /** @type {boolean} */
-        this.isFromScratch_ = false;
-        /** @type {boolean} */
         this.enforceFact = enforceFact;
         /** @type {boolean} */
         this.enforceBext = enforceBext;
@@ -852,7 +849,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @param {Uint8Array} bytes The buffer.
      */
     fromBuffer(bytes) {
-        this.isFromScratch_ = false;
         this.readRIFFChunk_(bytes);
         let chunk = riff.getChunks(bytes, this.chunkId == "RIFX");
         let options = {"be": this.chunkId == "RIFX"};

@@ -44,7 +44,6 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
         if (!options.container) {
             options.container = "RIFF";
         }
-        this.isFromScratch_ = true;
         let bytes = parseInt(bitDepth, 10) / 8;
         this.chunkSize = 36 + samples.length * bytes;
         this.subChunk1Size = 16;
