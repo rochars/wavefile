@@ -1,5 +1,5 @@
 /*
- * WaveFile
+ * WaveFileReaderWriter
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
@@ -7,7 +7,7 @@
 
 const byteData = require("byte-data");
 const waveFileHeader = require("../src/wavefile-header");
-const riff = require("../src/riff");
+const riff = require("riff-chunks");
 
 /**
  * A wave file.
@@ -67,13 +67,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
-        let chunk = riff.getChunks(bytes, this.chunkId == "RIFX");
-        let options = {"be": this.chunkId == "RIFX"};
+        let bigEndian = this.chunkId == "RIFX";
+        let chunk = riff.getChunks(bytes, bigEndian);
+        let options = {"be": bigEndian};
         this.readFmtChunk_(chunk.subChunks, options);
         this.readFactChunk_(chunk.subChunks, options);
         this.readBextChunk_(chunk.subChunks, options);
         this.readCueChunk_(chunk.subChunks, options);
-        this.readDataChunk_(chunk.subChunks);
+        this.readDataChunk_(chunk.subChunks, options);
     }
 
     /**
@@ -203,12 +204,12 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @param {Object} chunks The RIFF file chunks.
      * @throws {Error} If no "data" chunk is found.
      */
-    readDataChunk_(chunks) {
+    readDataChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "data");
         if (chunk) {
             this.subChunk2Id = "data";
             this.subChunk2Size = chunk.subChunkSize;
-            this.samplesFromBytes_(chunk.subChunkData);
+            this.samplesFromBytes_(chunk.subChunkData, options);
         } else {
             throw Error(this.WaveErrors["data"]);
         }
@@ -218,18 +219,15 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * Find and return the start offset of the data chunk on a wave file.
      * @param {Uint8Array} bytes Array of bytes representing the wave file.
      */
-    samplesFromBytes_(bytes) {
-        let params = {
-            "signed": this.bitsPerSample == 8 ? false : true,
-            "be": this.chunkId == "RIFX"
-        };
+    samplesFromBytes_(bytes, options) {
+        options.signed = this.bitsPerSample == 8 ? false : true
         if (this.bitsPerSample == 32 && this.audioFormat == 3) {
-            params.float = true;
+            options.float = true;
         }
         if (this.bitsPerSample == 4) {
-            this.samples_ = byteData.fromBytes(bytes, 8, params);
+            this.samples_ = byteData.fromBytes(bytes, 8, options);
         } else {
-            this.samples_ = byteData.fromBytes(bytes, this.bitsPerSample, params);
+            this.samples_ = byteData.fromBytes(bytes, this.bitsPerSample, options);
         }
     }
 

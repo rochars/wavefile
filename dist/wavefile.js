@@ -782,7 +782,7 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
- * WaveFile
+ * WaveFileReaderWriter
  * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
@@ -850,13 +850,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
-        let chunk = riff.getChunks(bytes, this.chunkId == "RIFX");
-        let options = {"be": this.chunkId == "RIFX"};
+        let bigEndian = this.chunkId == "RIFX";
+        let chunk = riff.getChunks(bytes, bigEndian);
+        let options = {"be": bigEndian};
         this.readFmtChunk_(chunk.subChunks, options);
         this.readFactChunk_(chunk.subChunks, options);
         this.readBextChunk_(chunk.subChunks, options);
         this.readCueChunk_(chunk.subChunks, options);
-        this.readDataChunk_(chunk.subChunks);
+        this.readDataChunk_(chunk.subChunks, options);
     }
 
     /**
@@ -986,12 +987,12 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @param {Object} chunks The RIFF file chunks.
      * @throws {Error} If no "data" chunk is found.
      */
-    readDataChunk_(chunks) {
+    readDataChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "data");
         if (chunk) {
             this.subChunk2Id = "data";
             this.subChunk2Size = chunk.subChunkSize;
-            this.samplesFromBytes_(chunk.subChunkData);
+            this.samplesFromBytes_(chunk.subChunkData, options);
         } else {
             throw Error(this.WaveErrors["data"]);
         }
@@ -1001,18 +1002,15 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * Find and return the start offset of the data chunk on a wave file.
      * @param {Uint8Array} bytes Array of bytes representing the wave file.
      */
-    samplesFromBytes_(bytes) {
-        let params = {
-            "signed": this.bitsPerSample == 8 ? false : true,
-            "be": this.chunkId == "RIFX"
-        };
+    samplesFromBytes_(bytes, options) {
+        options.signed = this.bitsPerSample == 8 ? false : true
         if (this.bitsPerSample == 32 && this.audioFormat == 3) {
-            params.float = true;
+            options.float = true;
         }
         if (this.bitsPerSample == 4) {
-            this.samples_ = byteData.fromBytes(bytes, 8, params);
+            this.samples_ = byteData.fromBytes(bytes, 8, options);
         } else {
-            this.samples_ = byteData.fromBytes(bytes, this.bitsPerSample, params);
+            this.samples_ = byteData.fromBytes(bytes, this.bitsPerSample, options);
         }
     }
 
@@ -1953,12 +1951,11 @@ module.exports.WaveFileHeader = class {
 /* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/*
- * riff
- * Get the chunks of a RIFF file.
- * TODO: This should be a npm package on its own.
- * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
- * https://github.com/rochars/wavefile
+/*!
+ * riff-chunks
+ * Get the chunks of RIFF and RIFX files.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/riff-chunks
  *
  */
 
@@ -1966,11 +1963,11 @@ const byteData = __webpack_require__(3);
 
 /**
  * Get the chunks of a RIFF file.
- * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
+ * @param {Uint8Array|!Array<number>} buffer The RIFF file bytes.
  * @param {boolean} bigEndian true if its RIFX.
  * @return {Object}
  */
-function getChunks(buffer, bigEndian) {
+function getChunks(buffer, bigEndian=false) {
     return {
         "chunkId": byteData.fromBytes(
                 buffer.slice(0, 4), 8, {"char": true}
@@ -1982,11 +1979,11 @@ function getChunks(buffer, bigEndian) {
                 buffer.slice(8, 12), 8, {"char": true}
             ),
         "subChunks": getSubChunks(buffer, bigEndian)
-    }
+    };
 }
 
 /**
- * List the sub chunks of a RIFF file.
+ * Get the sub chunks of a RIFF file.
  * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
  * @param {boolean} bigEndian true if its RIFX.
  * @return {Object}
@@ -1996,15 +1993,27 @@ function getSubChunks(buffer, bigEndian) {
     let len = buffer.length;
     let i = 12;
     let subChunkSize;
+    let subChunkId;
     while(i < len) {
+        subChunkId = byteData.fromBytes(
+            buffer.slice(i, i + 4), 8, {"char": true});
         subChunkSize = byteData.fromBytes(
             buffer.slice(i + 4, i + 8), 32, {'be': bigEndian})[0];
-        chunks.push({
-                "subChunkId": byteData.fromBytes(buffer.slice(i, i + 4), 8, {"char": true}),
-                "subChunkSize": subChunkSize,
-                "subChunkData": buffer.slice(i + 8, i + 8 + subChunkSize)
-            });
-        i = i + 8 + subChunkSize;
+        if (subChunkId == "LIST") {
+            chunks.push({
+                    "subChunkId": subChunkId,
+                    "subChunkSize": subChunkSize,
+                    "subChunks": getSubChunks(buffer.slice(i, i + subChunkSize), bigEndian)
+                });
+            i = i + 8 + subChunkSize;
+        } else {
+            chunks.push({
+                    "subChunkId": subChunkId,
+                    "subChunkSize": subChunkSize,
+                    "subChunkData": buffer.slice(i + 8, i + 8 + subChunkSize)
+                });
+            i = i + 8 + subChunkSize;
+        }
     }
     return chunks;
 }

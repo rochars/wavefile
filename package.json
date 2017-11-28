@@ -57,7 +57,8 @@
   },
   "dependencies": {
     "bitdepth": "1.0.1",
-    "byte-data": "0.4.3"
+    "byte-data": "0.4.3",
+    "riff-chunks": "1.0.0"
   },
   "main": "index.js"
 }
