@@ -24,17 +24,17 @@ describe('read 32bit IEEE from disk and write to new file', function() {
             function() {
         assert.equal(wav2.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'fmt '",
+    it("fmtChunkId should be 'fmt '",
             function() {
-        assert.equal(wav2.subChunk1Id, "fmt ");
+        assert.equal(wav2.fmtChunkId, "fmt ");
     });
     it("format should be 'WAVE'",
             function() {
         assert.equal(wav2.format, "WAVE");
     });
-    it("subChunk1Size should be 16",
+    it("fmtChunkSize should be 16",
             function() {
-        assert.equal(wav2.subChunk1Size, 16);
+        assert.equal(wav2.fmtChunkSize, 16);
     });
     it("audioFormat should be 3 (IEEE)",
             function() {
@@ -60,13 +60,13 @@ describe('read 32bit IEEE from disk and write to new file', function() {
             function() {
         assert.equal(wav2.bitsPerSample, 32);
     });
-    it("subChunk2Id should be 'data'",
+    it("dataChunkId should be 'data'",
             function() {
-        assert.equal(wav2.subChunk2Id, 'data');
+        assert.equal(wav2.dataChunkId, 'data');
     });
-    it("subChunk2Size should be > 0",
+    it("dataChunkSize should be > 0",
             function() {
-        assert.ok(wav2.subChunk2Size > 0);
+        assert.ok(wav2.dataChunkSize > 0);
     });
     it("samples.length should be > 0",
             function() {
@@ -102,17 +102,17 @@ describe('read 32bit IEEE with markers and regions and write to new file', funct
             function() {
         assert.equal(wav2.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'fmt '",
+    it("fmtChunkId should be 'fmt '",
             function() {
-        assert.equal(wav2.subChunk1Id, "fmt ");
+        assert.equal(wav2.fmtChunkId, "fmt ");
     });
     it("format should be 'WAVE'",
             function() {
         assert.equal(wav2.format, "WAVE");
     });
-    it("subChunk1Size should be 16",
+    it("fmtChunkSize should be 16",
             function() {
-        assert.equal(wav2.subChunk1Size, 16);
+        assert.equal(wav2.fmtChunkSize, 16);
     });
     it("audioFormat should be 3 (IEEE)",
             function() {
@@ -138,13 +138,13 @@ describe('read 32bit IEEE with markers and regions and write to new file', funct
             function() {
         assert.equal(wav2.bitsPerSample, 32);
     });
-    it("subChunk2Id should be 'data'",
+    it("dataChunkId should be 'data'",
             function() {
-        assert.equal(wav2.subChunk2Id, 'data');
+        assert.equal(wav2.dataChunkId, 'data');
     });
-    it("subChunk2Size should be > 0",
+    it("dataChunkSize should be > 0",
             function() {
-        assert.ok(wav2.subChunk2Size > 0);
+        assert.ok(wav2.dataChunkSize > 0);
     });
     it("samples.length should be > 0",
             function() {

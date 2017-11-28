@@ -522,18 +522,18 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
         }
         let bytes = parseInt(bitDepth, 10) / 8;
         this.chunkSize = 36 + samples.length * bytes;
-        this.subChunk1Size = 16;
+        this.fmtChunkSize = 16;
         this.byteRate = (numChannels * bytes) * sampleRate;
         this.blockAlign = numChannels * bytes;
         this.chunkId = options.container;
         this.format = "WAVE";
-        this.subChunk1Id = "fmt ";
+        this.fmtChunkId = "fmt ";
         this.audioFormat = this.headerFormats_[bitDepth];
         this.numChannels = numChannels;
         this.sampleRate = sampleRate;
         this.bitsPerSample = parseInt(bitDepth, 10);
-        this.subChunk2Id = "data";
-        this.subChunk2Size = samples.length * bytes;
+        this.dataChunkId = "data";
+        this.dataChunkSize = samples.length * bytes;
         this.samples_ = samples;
         this.bitDepth_ = bitDepth;
     }
@@ -898,8 +898,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     readFmtChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "fmt ");
         if (chunk) {
-            this.subChunk1Id = "fmt ";
-            this.subChunk1Size = chunk.subChunkSize;
+            this.fmtChunkId = "fmt ";
+            this.fmtChunkSize = chunk.subChunkSize;
             this.audioFormat = byteData.fromBytes(
                 chunk.subChunkData.slice(0, 2), 16, options)[0];
             this.numChannels = byteData.fromBytes(
@@ -917,10 +917,10 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             }else {
                 this.bitDepth_ = this.bitsPerSample.toString();
             }
-            if (this.subChunk1Size > 16) {
+            if (this.fmtChunkSize > 16) {
                 this.cbSize = byteData.fromBytes(
                     chunk.subChunkData.slice(16, 18), 16)[0];
-                if (this.subChunk1Size > 18) {
+                if (this.fmtChunkSize > 18) {
                     this.validBitsPerSample = byteData.fromBytes(
                         chunk.subChunkData.slice(18, 20), 16)[0];
                 }
@@ -990,8 +990,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     readDataChunk_(chunks, options) {
         let chunk = this.findChunk(chunks, "data");
         if (chunk) {
-            this.subChunk2Id = "data";
-            this.subChunk2Size = chunk.subChunkSize;
+            this.dataChunkId = "data";
+            this.dataChunkSize = chunk.subChunkSize;
             this.samplesFromBytes_(chunk.subChunkData, options);
         } else {
             throw Error(this.WaveErrors["data"]);
@@ -1133,9 +1133,9 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let options = {"be": this.chunkId == "RIFX"};
         let cbSize = [];
         let validBitsPerSample = []
-        if (this.subChunk1Size > 16) {
+        if (this.fmtChunkSize > 16) {
             cbSize = byteData.toBytes([this.cbSize], 16, options);
-            if (this.subChunk1Size > 18) {
+            if (this.fmtChunkSize > 18) {
                 validBitsPerSample = byteData.toBytes([this.validBitsPerSample], 16, options);
             }
         }
@@ -1143,8 +1143,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                 byteData.toBytes([this.chunkSize], 32, options),
                 byteData.toBytes(this.format, 8, {"char": true}), 
                 this.getBextBytes(options),
-                byteData.toBytes(this.subChunk1Id, 8, {"char": true}),
-                byteData.toBytes([this.subChunk1Size], 32, options),
+                byteData.toBytes(this.fmtChunkId, 8, {"char": true}),
+                byteData.toBytes([this.fmtChunkSize], 32, options),
                 byteData.toBytes([this.audioFormat], 16, options),
                 byteData.toBytes([this.numChannels], 16, options),
                 byteData.toBytes([this.sampleRate], 32, options),
@@ -1154,8 +1154,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                 cbSize,
                 validBitsPerSample,
                 this.getFactBytes(options),
-                byteData.toBytes(this.subChunk2Id, 8, {"char": true}),
-                byteData.toBytes([this.subChunk2Size], 32, options),
+                byteData.toBytes(this.dataChunkId, 8, {"char": true}),
+                byteData.toBytes([this.dataChunkSize], 32, options),
                 this.samplesToBytes_(options),
                 this.getCueBytes(options)
             );
@@ -1882,14 +1882,14 @@ module.exports.WaveFileHeader = class {
          * "WAVE"
          * @type {string}
          */
-        this.subChunk1Id = "";
+        this.format = "";
         /**
          * "fmt "
          * @type {string}
          */
-        this.format = "";
+        this.fmtChunkId = "";
         /** @type {number} */
-        this.subChunk1Size = 0;
+        this.fmtChunkSize = 0;
         /** @type {number} */
         this.audioFormat = 0;
         /** @type {number} */
@@ -1933,9 +1933,9 @@ module.exports.WaveFileHeader = class {
          * "data"
          * @type {string}
          */
-        this.subChunk2Id = "";
+        this.dataChunkId = "";
         /** @type {number} */
-        this.subChunk2Size = 0;
+        this.dataChunkSize = 0;
         /**
          * "bext"
          * @type {string}

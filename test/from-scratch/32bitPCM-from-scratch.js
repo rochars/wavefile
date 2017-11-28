@@ -23,12 +23,12 @@ describe('create 32-bit PCM wave files from scratch', function() {
         assert.equal(wav.format, "WAVE");
     });
 
-    it('subChunk1Id should be "fmt "', function() {
-        assert.equal(wav.subChunk1Id, "fmt ");
+    it('fmtChunkId should be "fmt "', function() {
+        assert.equal(wav.fmtChunkId, "fmt ");
     });
 
-    it('subChunk1Size should be 16', function() {
-        assert.equal(wav.subChunk1Size, 16);
+    it('fmtChunkSize should be 16', function() {
+        assert.equal(wav.fmtChunkSize, 16);
     });
 
     it('audioFormat should be 1', function() {
@@ -55,12 +55,12 @@ describe('create 32-bit PCM wave files from scratch', function() {
         assert.equal(wav.bitsPerSample, 32);
     });
 
-    it('subChunk2Id should be "data"', function() {
-        assert.equal(wav.subChunk2Id, "data");
+    it('dataChunkId should be "data"', function() {
+        assert.equal(wav.dataChunkId, "data");
     });
 
-    it('subChunk2Size should be 16', function() {
-        assert.equal(wav.subChunk2Size, 16);
+    it('dataChunkSize should be 16', function() {
+        assert.equal(wav.dataChunkSize, 16);
     });
 
     it('samples_ should be the same as the args', function() {
@@ -104,7 +104,7 @@ describe('create 32-bit PCM wave files from scratch', function() {
             [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 7);
         assert.equal(read.sampleRate, 48000);
@@ -121,7 +121,7 @@ describe('create 32-bit PCM wave files from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '32', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);

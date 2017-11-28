@@ -20,17 +20,17 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
             function() {
         assert.equal(wav2.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'fmt '",
+    it("fmtChunkId should be 'fmt '",
             function() {
-        assert.equal(wav2.subChunk1Id, "fmt ");
+        assert.equal(wav2.fmtChunkId, "fmt ");
     });
     it("format should be 'WAVE'",
             function() {
         assert.equal(wav2.format, "WAVE");
     });
-    it("subChunk1Size should be 20",
+    it("fmtChunkSize should be 20",
             function() {
-        assert.equal(wav2.subChunk1Size, 20);
+        assert.equal(wav2.fmtChunkSize, 20);
     });
     it("audioFormat should be 17 (IMA ADPCM)",
             function() {
@@ -70,13 +70,13 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
         console.log(wav.dwSampleLength);
         assert.deepEqual(wav2.dwSampleLength, wav.dwSampleLength);
     });
-    it("subChunk2Id should be 'data'",
+    it("dataChunkId should be 'data'",
             function() {
-        assert.equal(wav2.subChunk2Id, 'data');
+        assert.equal(wav2.dataChunkId, 'data');
     });
-    it("subChunk2Size should be > 0",
+    it("dataChunkSize should be > 0",
             function() {
-        assert.ok(wav2.subChunk2Size > 0);
+        assert.ok(wav2.dataChunkSize > 0);
     });
     it("samples.length should be > 0",
             function() {

@@ -23,14 +23,14 @@ module.exports.WaveFileHeader = class {
          * "WAVE"
          * @type {string}
          */
-        this.subChunk1Id = "";
+        this.format = "";
         /**
          * "fmt "
          * @type {string}
          */
-        this.format = "";
+        this.fmtChunkId = "";
         /** @type {number} */
-        this.subChunk1Size = 0;
+        this.fmtChunkSize = 0;
         /** @type {number} */
         this.audioFormat = 0;
         /** @type {number} */
@@ -74,9 +74,9 @@ module.exports.WaveFileHeader = class {
          * "data"
          * @type {string}
          */
-        this.subChunk2Id = "";
+        this.dataChunkId = "";
         /** @type {number} */
-        this.subChunk2Size = 0;
+        this.dataChunkSize = 0;
         /**
          * "bext"
          * @type {string}

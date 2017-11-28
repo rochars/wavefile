@@ -23,12 +23,12 @@ describe('create 16-bit wave files from scratch', function() {
         assert.equal(wav.format, "WAVE");
     });
 
-    it('subChunk1Id should be "fmt "', function() {
-        assert.equal(wav.subChunk1Id, "fmt ");
+    it('fmtChunkId should be "fmt "', function() {
+        assert.equal(wav.fmtChunkId, "fmt ");
     });
 
-    it('subChunk1Size should be 16', function() {
-        assert.equal(wav.subChunk1Size, 16);
+    it('fmtChunkSize should be 16', function() {
+        assert.equal(wav.fmtChunkSize, 16);
     });
 
     it('audioFormat should be 1', function() {
@@ -55,12 +55,12 @@ describe('create 16-bit wave files from scratch', function() {
         assert.equal(wav.bitsPerSample, 16);
     });
 
-    it('subChunk2Id should be "data"', function() {
-        assert.equal(wav.subChunk2Id, "data");
+    it('dataChunkId should be "data"', function() {
+        assert.equal(wav.dataChunkId, "data");
     });
 
-    it('subChunk2Size should be 8', function() {
-        assert.equal(wav.subChunk2Size, 8);
+    it('dataChunkSize should be 8', function() {
+        assert.equal(wav.dataChunkSize, 8);
     });
 
     it('samples_ should be the same as the args', function() {

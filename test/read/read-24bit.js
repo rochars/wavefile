@@ -18,17 +18,17 @@ describe("24-bit (with bwf) reading", function() {
             function() {
         assert.equal(wav.chunkId, "RIFF");
     });
-    it("subChunk1Id should be 'fmt '",
+    it("fmtChunkId should be 'fmt '",
             function() {
-        assert.equal(wav.subChunk1Id, "fmt ");
+        assert.equal(wav.fmtChunkId, "fmt ");
     });
     it("format should be 'WAVE'",
             function() {
         assert.equal(wav.format, "WAVE");
     });
-    it("subChunk1Size should be 16",
+    it("fmtChunkSize should be 16",
             function() {
-        assert.equal(wav.subChunk1Size, 16);
+        assert.equal(wav.fmtChunkSize, 16);
     });
     it("audioFormat should be 1 (PCM)",
             function() {
@@ -54,13 +54,13 @@ describe("24-bit (with bwf) reading", function() {
             function() {
         assert.equal(wav.bitsPerSample, 24);
     });
-    it("subChunk2Id should be 'data'",
+    it("dataChunkId should be 'data'",
             function() {
-        assert.equal(wav.subChunk2Id, 'data');
+        assert.equal(wav.dataChunkId, 'data');
     });
-    it("subChunk2Size should be > 0",
+    it("dataChunkSize should be > 0",
             function() {
-        assert.ok(wav.subChunk2Size > 0);
+        assert.ok(wav.dataChunkSize > 0);
     });
     it("samples.length should be > 0",
             function() {

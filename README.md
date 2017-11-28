@@ -23,7 +23,7 @@ let wavefile = require("wavefile");
 let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
-console.log(wav.subChunk1Id);
+console.log(wav.fmtChunkId);
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
@@ -92,23 +92,28 @@ Data from the "bext" chunk is preserved in BWF files but there is no way to edit
 // The container, "RIFF" or "RIFX"
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
-
-// "WAVE"
-console.log(wav.format);
+console.log(wav.format); // WAVE
 
 // "fmt "
-console.log(wav.subChunk1Id);
-console.log(wav.subChunk1Size);
+console.log(wav.fmtChunkId);
+console.log(wav.fmtChunkSize);
 console.log(wav.audioFormat);
 console.log(wav.numChannels);
 console.log(wav.sampleRate);
 console.log(wav.byteRate);
 console.log(wav.blockAlign);
 console.log(wav.bitsPerSample);
+console.log(wav.cbSize);
+console.log(wav.validBitsPerSample);
+
+// "fact"
+console.log(wav.factChunkId);
+console.log(wav.factChunkSize);
+console.log(wav.dwSampleLength);
 
 // "data"
-console.log(wav.subChunk2Id);
-console.log(wav.subChunk2Size);
+console.log(wav.dataChunkId);
+console.log(wav.dataChunkSize);
 
 // array of numbers
 console.log(wav.samples);

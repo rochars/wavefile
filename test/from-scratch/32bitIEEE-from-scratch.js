@@ -23,12 +23,12 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         assert.equal(wav.format, "WAVE");
     });
 
-    it('subChunk1Id should be "fmt "', function() {
-        assert.equal(wav.subChunk1Id, "fmt ");
+    it('fmtChunkId should be "fmt "', function() {
+        assert.equal(wav.fmtChunkId, "fmt ");
     });
 
-    it('subChunk1Size should be 16', function() {
-        assert.equal(wav.subChunk1Size, 16);
+    it('fmtChunkSize should be 16', function() {
+        assert.equal(wav.fmtChunkSize, 16);
     });
 
     it('audioFormat should be 3', function() {
@@ -55,12 +55,12 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         assert.equal(wav.bitsPerSample, 32);
     });
 
-    it('subChunk2Id should be "data"', function() {
-        assert.equal(wav.subChunk2Id, "data");
+    it('dataChunkId should be "data"', function() {
+        assert.equal(wav.dataChunkId, "data");
     });
 
-    it('subChunk2Size should be 16', function() {
-        assert.equal(wav.subChunk2Size, 16);
+    it('dataChunkSize should be 16', function() {
+        assert.equal(wav.dataChunkSize, 16);
     });
 
     it('samples_ should be the same as the args', function() {
@@ -122,7 +122,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         assert.equal(wavRead.blockAlign, 3);
         assert.equal(wavRead.sampleRate, 48000);
         assert.equal(wavRead.bitsPerSample, 24);
-        assert.equal(wavRead.subChunk2Size, 12); // 4 x 3
+        assert.equal(wavRead.dataChunkSize, 12); // 4 x 3
         assert.deepEqual(wavRead.samples, [0, 1, -8388608, 8388607]);
     });
 
@@ -137,7 +137,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         assert.equal(wavRead.sampleRate, 48000);
         assert.equal(wavRead.bitsPerSample, 24);
         assert.equal(wavRead.blockAlign, 3);
-        assert.equal(wavRead.subChunk2Size, 15); // 5 x 3
+        assert.equal(wavRead.dataChunkSize, 15); // 5 x 3
         assert.deepEqual(wavRead.samples, [0, 1, -8388608, 8388607, 4]);
     });
 
@@ -303,7 +303,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
             [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 8);
         assert.equal(read.sampleRate, 48000);
@@ -316,7 +316,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
             [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 7);
         assert.equal(read.sampleRate, 48000);
@@ -372,7 +372,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(1, 1, '8', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 1);
         assert.equal(read.sampleRate, 1);
@@ -389,7 +389,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '8', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);
@@ -406,7 +406,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '16', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);
@@ -423,7 +423,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '24', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);
@@ -440,7 +440,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '24', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);
@@ -457,7 +457,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '32', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 1);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);
@@ -474,7 +474,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '32f', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 3);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);
@@ -491,7 +491,7 @@ describe('create 32-bit IEEE wave file from scratch', function() {
         let wav = rw64.writeWavBytes(2, 44100, '64', samples);
         let read = rw64.readWavBytes(wav);
         
-        assert.equal(read.subChunk1Size, 16);
+        assert.equal(read.fmtChunkSize, 16);
         assert.equal(read.audioFormat, 3);
         assert.equal(read.numChannels, 2);
         assert.equal(read.sampleRate, 44100);

@@ -46,18 +46,18 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
         }
         let bytes = parseInt(bitDepth, 10) / 8;
         this.chunkSize = 36 + samples.length * bytes;
-        this.subChunk1Size = 16;
+        this.fmtChunkSize = 16;
         this.byteRate = (numChannels * bytes) * sampleRate;
         this.blockAlign = numChannels * bytes;
         this.chunkId = options.container;
         this.format = "WAVE";
-        this.subChunk1Id = "fmt ";
+        this.fmtChunkId = "fmt ";
         this.audioFormat = this.headerFormats_[bitDepth];
         this.numChannels = numChannels;
         this.sampleRate = sampleRate;
         this.bitsPerSample = parseInt(bitDepth, 10);
-        this.subChunk2Id = "data";
-        this.subChunk2Size = samples.length * bytes;
+        this.dataChunkId = "data";
+        this.dataChunkSize = samples.length * bytes;
         this.samples_ = samples;
         this.bitDepth_ = bitDepth;
     }
