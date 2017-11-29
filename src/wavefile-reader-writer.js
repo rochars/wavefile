@@ -64,6 +64,11 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         this.readBextChunk_(chunk.subChunks, options);
         this.readCueChunk_(chunk.subChunks, options);
         this.readDataChunk_(chunk.subChunks, options);
+        if (this.audioFormat == 3 && this.bitsPerSample == 32) {
+            this.bitDepth_ = "32f";
+        }else {
+            this.bitDepth_ = this.bitsPerSample.toString();
+        }
     }
 
     /**
@@ -120,11 +125,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                 chunk.subChunkData.slice(12, 14), 16, options);
             this.bitsPerSample = byteData.fromBytes(
                     chunk.subChunkData.slice(14, 16), 16, options);
-            if (this.audioFormat == 3 && this.bitsPerSample == 32) {
-                this.bitDepth_ = "32f";
-            }else {
-                this.bitDepth_ = this.bitsPerSample.toString();
-            }
             if (this.fmtChunkSize > 16) {
                 this.cbSize = byteData.fromBytes(
                     chunk.subChunkData.slice(16, 18), 16);

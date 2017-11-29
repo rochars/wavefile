@@ -1,7 +1,7 @@
 {
   "name": "wavefile",
-  "version": "0.5.1",
-  "description": "Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.",
+  "version": "0.6.0",
+  "description": "Read & write wave files with 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
@@ -24,7 +24,6 @@
     "32-bit",
     "64-bit",
     "PCM",
-    "IEEE",
     "resample"
   ],
   "repository": {
@@ -56,7 +55,7 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "bitdepth": "1.0.1",
+    "bitdepth": "1.0.2",
     "byte-data": "0.5.0",
     "riff-chunks": "1.0.0"
   },

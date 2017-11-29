@@ -1,5 +1,5 @@
 # wavefile
-Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.  
+Read & write wave files with 8, 16, 24, 32 & 64-bit data.  
 Copyright (c) 2017 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
@@ -123,9 +123,9 @@ Range:
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit
 - -8388608 to 8388607 for 24-bit
-- -2147483648 to 2147483647 for 32-bit PCM
-- -1.0 to 1.0 for 32-bit IEEE
-- -1.0 to 1.0 for 64-bit
+- -2147483648 to 2147483647 for 32-bit
+- -1.0 to 1.0 for 32-bit (float)
+- -1.0 to 1.0 for 64-bit (float)
 
 ## LICENSE
 Copyright (c) 2017 Rafael da Silva Rocha.

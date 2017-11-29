@@ -701,7 +701,7 @@ module.exports.toHalf = toHalf;
 
 /*!
  * wavefile
- * Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
@@ -717,10 +717,6 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
 
     /**
      * @param {Uint8Array} bytes A wave file buffer.
-     * @param {boolean} enforceFact True if it should throw a error
-     *      if no "fact" chunk is found.
-     * @param {boolean} enforceBext True if it should throw a error
-     *      if no "bext" chunk is found.
      */
     constructor(bytes) {
         super();
@@ -835,15 +831,14 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
 window['WaveFile'] = WaveFile;
 
 
-
 /***/ }),
 /* 9 */
 /***/ (function(module, exports) {
 
 /*!
  * bitdepth
- * Change the bit depth of audio samples to and from 8, 16, 24, 32, 32 IEEE & 64-bit.
- * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
+ * Change the bit depth of samples to and from 8, 16, 24, 32 & 64-bit..
+ * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/bitdepth
  *
  */
@@ -869,28 +864,25 @@ const BitDepthMaxValues = {
  *      One of "8", "16", "24", "32", "32f", "64"
  */
 function toBitDepth(samples, originalBitDepth, targetBitDepth) {
-    if (originalBitDepth == targetBitDepth) {
-        return;
-    }
     validateBitDepths(originalBitDepth, targetBitDepth);
     let len = samples.length;
-
     for (let i=0; i<len; i++) {        
         let sample = samples[i];
+        
         // 8-bit samples are unsigned;
         // They are signed here before conversion
         // (other bit depths are all signed)
         sample = sign8Bit(sample, originalBitDepth);
 
         // If it is a float-to-float or int-to-float conversion then
-        // the samples in the target bit depth will be normalized in the
+        // the samples in the target bit depth need to be normalized in the
         // -1.0 to 1.0 range; there is no need to multiply
         if (targetBitDepth == "32f" || targetBitDepth == "64") {
             sample = toFloat(sample, originalBitDepth);
 
         // If it is a float-to-int or int-to-int conversion then the
-        // samples will be de-normalized according to the bit depth
-        }else {
+        // samples need to be de-normalized according to the bit depth
+        } else {
             sample = toInt(sample, originalBitDepth, targetBitDepth);
         }
         samples[i] = sample;
@@ -924,7 +916,7 @@ function unsign8Bit(sample, targetBitDepth) {
 }
 
 /**
- * Change the bit depth from int to float.
+ * Change the bit depth of a sample to a new floating point bit depth.
  * The input array is modified in-place.
  * @param {number} sample The sample.
  * @param {string} originalBitDepth The original bit depth of the data.
@@ -943,8 +935,7 @@ function toFloat(sample, originalBitDepth) {
 }
 
 /**
- * Change the bit depth of the data.
- * The input array is modified in-place.
+ * Change the bit depth of a sample to a new integer bit depth.
  * @param {number} sample The sample.
  * @param {string} originalBitDepth The original bit depth of the data.
  *      One of "8", "16", "24", "32", "32f", "64"
@@ -955,30 +946,54 @@ function toInt(sample, originalBitDepth, targetBitDepth) {
     // If the original samples are float, then they are already
     // normalized between -1.0 and 1.0; All that is need is to
     // multiply the sample values by the new bit depth max value
-    let oldMaxValue = parseInt((BitDepthMaxValues[originalBitDepth]) / 2, 10);
     let newMaxValue = parseInt((BitDepthMaxValues[targetBitDepth]) / 2, 10);
     if (originalBitDepth == "32f" || originalBitDepth == "64" ) {
-        if (sample > 0) {
-            sample = sample * (newMaxValue - 1);
-        } else {
-            sample = sample * newMaxValue;
-        }
-
+        sample = floatToInt(sample, newMaxValue);
     // If the original samples are integers, then they need to be
     // divided by the maximum values of its original bit depth
-    // (to normalize them between -1.0 and .10) and then multiply
-    // them by the new bit depth max value
+    // (to normalize them between -1.0 and .10) and then multiplied
+    // by the new bit depth max value
     } else {
-        if (sample > 0) {
-            sample =
-                parseInt((sample / (oldMaxValue - 1)) * newMaxValue - 1, 10);
-        } else {
-            sample = parseInt((sample / oldMaxValue) * newMaxValue, 10);
-        }
+        sample = intToInt(
+                sample,
+                parseInt((BitDepthMaxValues[originalBitDepth]) / 2, 10),
+                newMaxValue
+            );
     }
-    
     // Make the samples unsigned if the target bit depth is "8"
     return unsign8Bit(sample, targetBitDepth);
+}
+
+/**
+ * Perform a int-to-int conversion.
+ * @param {number} sample The sample.
+ * @param {number} oldMaxValue The max value for the original bit depth.
+ * @param {number} newMaxValue The max value for the target bit depth.
+ * @return {number}
+ */
+function intToInt(sample, oldMaxValue, newMaxValue) {
+    if (sample > 0) {
+        sample =
+            parseInt((sample / (oldMaxValue - 1)) * newMaxValue - 1, 10);
+    } else {
+        sample = parseInt((sample / oldMaxValue) * newMaxValue, 10);
+    }
+    return sample;
+}
+
+/**
+ * Perform a float-to-int conversion.
+ * @param {number} sample The sample.
+ * @param {number} newMaxValue The max value for the target bit depth.
+ * @return {number}
+ */
+function floatToInt(sample, newMaxValue) {
+    if (sample > 0) {
+        sample = sample * (newMaxValue - 1);
+    } else {
+        sample = sample * newMaxValue;
+    }
+    return sample;
 }
 
 /**
@@ -1072,6 +1087,11 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         this.readBextChunk_(chunk.subChunks, options);
         this.readCueChunk_(chunk.subChunks, options);
         this.readDataChunk_(chunk.subChunks, options);
+        if (this.audioFormat == 3 && this.bitsPerSample == 32) {
+            this.bitDepth_ = "32f";
+        }else {
+            this.bitDepth_ = this.bitsPerSample.toString();
+        }
     }
 
     /**
@@ -1128,11 +1148,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
                 chunk.subChunkData.slice(12, 14), 16, options);
             this.bitsPerSample = byteData.fromBytes(
                     chunk.subChunkData.slice(14, 16), 16, options);
-            if (this.audioFormat == 3 && this.bitsPerSample == 32) {
-                this.bitDepth_ = "32f";
-            }else {
-                this.bitDepth_ = this.bitsPerSample.toString();
-            }
             if (this.fmtChunkSize > 16) {
                 this.cbSize = byteData.fromBytes(
                     chunk.subChunkData.slice(16, 18), 16);

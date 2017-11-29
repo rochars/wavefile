@@ -1,6 +1,6 @@
 /*!
  * wavefile
- * Read & write wave files with 8, 16, 24, 32 PCM, 32 IEEE & 64-bit data.
+ * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
@@ -16,10 +16,6 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
 
     /**
      * @param {Uint8Array} bytes A wave file buffer.
-     * @param {boolean} enforceFact True if it should throw a error
-     *      if no "fact" chunk is found.
-     * @param {boolean} enforceBext True if it should throw a error
-     *      if no "bext" chunk is found.
      */
     constructor(bytes) {
         super();
@@ -132,4 +128,3 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
 }
 
 module.exports.WaveFile = WaveFile;
-
