@@ -89,6 +89,8 @@ Data from the "bext" chunk is preserved in BWF files but there is no way to edit
 
 ### The properties
 ```javascript
+let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+
 // The container, "RIFF" or "RIFX"
 console.log(wav.chunkId);
 console.log(wav.chunkSize);

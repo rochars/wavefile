@@ -33,7 +33,7 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive --timeout=8000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive",
     "test_a": "nyc ./node_modules/mocha/bin/_mocha test/write",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "bundle": "webpack",
@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "bitdepth": "1.0.1",
-    "byte-data": "0.4.3",
+    "byte-data": "0.5.0",
     "riff-chunks": "1.0.0"
   },
   "main": "index.js"
