@@ -21,8 +21,8 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
      * @param {boolean} enforceBext True if it should throw a error
      *      if no "bext" chunk is found.
      */
-    constructor(bytes, enforceFact=false, enforceBext=false) {
-        super(enforceFact, enforceBext);
+    constructor(bytes) {
+        super();
         if(bytes) {
             this.fromBuffer(bytes);
         }

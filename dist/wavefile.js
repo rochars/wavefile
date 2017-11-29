@@ -722,8 +722,8 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
      * @param {boolean} enforceBext True if it should throw a error
      *      if no "bext" chunk is found.
      */
-    constructor(bytes, enforceFact=false, enforceBext=false) {
-        super(enforceFact, enforceBext);
+    constructor(bytes) {
+        super();
         if(bytes) {
             this.fromBuffer(bytes);
         }
@@ -1022,18 +1022,11 @@ const riff = __webpack_require__(18);
  */
 class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
 
-    /**
-     * @param {boolean} enforceFact True if it should throw a error
-     *      if no "fact" chunk is found.
-     * @param {boolean} enforceBext True if it should throw a error
-     *      if no "bext" chunk is found.
-     */
-    constructor(enforceFact=false, enforceBext=false) {
+    constructor() {
         super();
         /** @type {boolean} */
-        this.enforceFact = enforceFact;
-        /** @type {boolean} */
-        this.enforceBext = enforceBext;
+        // TODO fact must be enforced in some cases
+        this.enforceFact_ = false;
         /**
          * Error messages.
          * @enum {string}
@@ -1044,7 +1037,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             "fmt ": "Could not find the 'fmt ' chunk",
             "data": "Could not find the 'data' chunk",
             "fact": "Could not find the 'fact' chunk",
-            "bext": "Could not find the 'bext' chunk",
             "bitDepth": "Invalid bit depth.",
             "numChannels": "Invalid number of channels.",
             "sampleRate": "Invalid sample rate."
@@ -1184,8 +1176,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
             this.bextChunkId = "bext";
             this.bextChunkSize = chunk.subChunkSize;
             this.bextChunkData = byteData.fromBytes(chunk.subChunkData, 8);
-        } else if (this.enforceBext) {
-            throw Error(this.WaveErrors["bext"]);
         }
     }
 

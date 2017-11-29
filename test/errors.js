@@ -99,18 +99,6 @@ describe('errors', function() {
         expect(testFunc).to.throw("Could not find the 'fact' chunk");
     });
 
-    it("should throw an error if enforceBext is true and there is not 'bext' chunk",
-            function () {
-        testFunc = function() {
-            let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
-            let wav = new wavefile.WaveFile();
-            wav.enforceBext = true;
-            wav.fromBuffer(wBytes);
-            wav.toBuffer();
-        };
-        expect(testFunc).to.throw("Could not find the 'bext' chunk");
-    });
-
     it("should throw an error if the bit depth is not valid",
             function () {
         testFunc = function() {
