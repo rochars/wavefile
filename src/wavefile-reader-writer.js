@@ -137,7 +137,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "bext" chunk is found.
      */
-    readBextChunk_(chunks, options) {
+    readBextChunk_(chunks) {
         let chunk = this.findChunk(chunks, "bext");
         if (chunk) {
             this.bextChunkId = "bext";
@@ -152,7 +152,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "cue" chunk is found.
      */
-    readCueChunk_(chunks, options) {
+    readCueChunk_(chunks) {
         let chunk = this.findChunk(chunks, "cue ");
         if (chunk) {
             this.cueChunkId = "cue ";
@@ -212,12 +212,12 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * Split each sample into bytes.
      */
     samplesToBytes_(options) {
-        let bytes = [];
+        //bytes = [];
         if (this.bitsPerSample == 32 && this.audioFormat == 3) {
             options.float = true;
         }
         let bitDepth = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
-        bytes = byteData.toBytes(this.samples_, bitDepth, options);
+        let bytes = byteData.toBytes(this.samples_, bitDepth, options);
         if (bytes.length % 2) {
             bytes.push(0);
         }

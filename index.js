@@ -70,8 +70,8 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
         let options = {"be": bigEndian, "single": true};
         this.readFmtChunk_(chunk.subChunks, options);
         this.readFactChunk_(chunk.subChunks, options);
-        this.readBextChunk_(chunk.subChunks, options);
-        this.readCueChunk_(chunk.subChunks, options);
+        this.readBextChunk_(chunk.subChunks);
+        this.readCueChunk_(chunk.subChunks);
         this.readDataChunk_(chunk.subChunks, options);
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
             this.bitDepth_ = "32f";
