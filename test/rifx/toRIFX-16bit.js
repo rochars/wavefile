@@ -75,3 +75,34 @@ describe("16-bit RIFF to RIFX", function() {
         assert.deepEqual(wav.samples_, riffWav.samples_);
     });
 });
+
+describe("RIFX cbSize and validBitsPerSample", function() {
+
+    let fs = require("fs");
+    let wavefile = require("../../index.js");
+    let path = "test/files/";
+    
+    let riffWav = new wavefile.WaveFile(
+        fs.readFileSync(path + "4bit-imaadpcm-8kHz-noBext-mono.wav"));
+    riffWav.toRIFX();
+    fs.writeFileSync(path + "/out/RIFF-to-RIFX-4bit-imaadpcm-8kHz-noBext-mono.wav", riffWav.toBuffer());
+    let wav = new wavefile.WaveFile(
+        fs.readFileSync(path + "/out/RIFF-to-RIFX-4bit-imaadpcm-8kHz-noBext-mono.wav"));
+
+    it("cbSize should be 2 in the original file",
+            function() {
+        assert.equal(riffWav.cbSize, 2);
+    });
+    it("validBitsPerSample should be 505 in the original file",
+            function() {
+        assert.equal(riffWav.validBitsPerSample, 505);
+    });
+    it("cbSize should be 2 in the RIFX file",
+            function() {
+        assert.equal(wav.cbSize, 2);
+    });
+    it("validBitsPerSample should be 505 in the RIFX file",
+            function() {
+        assert.equal(wav.validBitsPerSample, 505);
+    });
+});

@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Read & write wave files with 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -55,9 +55,9 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "bitdepth": "1.0.2",
-    "byte-data": "0.5.0",
-    "riff-chunks": "1.0.0"
+    "bitdepth": "1.0.3",
+    "byte-data": "0.5.1",
+    "riff-chunks": "1.0.1"
   },
   "main": "index.js"
 }

@@ -3,7 +3,7 @@ Read & write wave files with 8, 16, 24, 32 & 64-bit data.
 Copyright (c) 2017 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
-[![Build Status](https://travis-ci.org/rochars/wavefile.svg?branch=master)](https://travis-ci.org/rochars/wavefile) [![Build status](https://ci.appveyor.com/api/projects/status/kgaqhpahfgsta50s?svg=true)](https://ci.appveyor.com/project/rochars/wavefile) [![codecov](https://codecov.io/gh/rochars/wavefile/branch/master/graph/badge.svg)](https://codecov.io/gh/rochars/wavefile) [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=flat)](https://www.npmjs.com/package/wavefile) [![NPM downloads](https://img.shields.io/npm/dm/wavefile.svg?style=flat)](https://www.npmjs.com/package/wavefile)
+[![Travis](https://img.shields.io/travis/rochars/wavefile.svg?style=for-the-badge)](https://travis-ci.org/rochars/wavefile) [![AppVeyor](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=for-the-badge&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=for-the-badge)](https://codecov.io/gh/rochars/wavefile) [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile)
 
 ## Install
 ```

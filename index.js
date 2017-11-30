@@ -8,6 +8,7 @@
 
 const bitDepthLib = require("bitdepth");
 const waveFileReaderWriter = require("./src/wavefile-reader-writer");
+const riff = require("riff-chunks");
 
 /**
  * WaveFile
@@ -57,7 +58,37 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
         this.samples_ = samples;
         this.bitDepth_ = bitDepth;
     }
+
+    /**
+     * Init a WaveFile object from a byte buffer.
+     * @param {Uint8Array} bytes The buffer.
+     */
+    fromBuffer(bytes) {
+        this.readRIFFChunk_(bytes);
+        let bigEndian = this.chunkId == "RIFX";
+        let chunk = riff.getChunks(bytes, bigEndian);
+        let options = {"be": bigEndian, "single": true};
+        this.readFmtChunk_(chunk.subChunks, options);
+        this.readFactChunk_(chunk.subChunks, options);
+        this.readBextChunk_(chunk.subChunks, options);
+        this.readCueChunk_(chunk.subChunks, options);
+        this.readDataChunk_(chunk.subChunks, options);
+        if (this.audioFormat == 3 && this.bitsPerSample == 32) {
+            this.bitDepth_ = "32f";
+        }else {
+            this.bitDepth_ = this.bitsPerSample.toString();
+        }
+    }
     
+    /**
+     * Turn the WaveFile object into a byte buffer.
+     * @return {Uint8Array}
+     */
+    toBuffer() {
+        this.checkWriteInput_();
+        return new Uint8Array(this.createWaveFile_());
+    }
+
     /**
      * Turn the file to RIFF.
      * All values will be little-endian when writing.
@@ -124,6 +155,52 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
             i += j;
         }
         this.samples_ = finalSamples;
+    }
+
+    /**
+     * Validate the input for wav writing.
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    checkWriteInput_() {
+        this.validateBitDepth_();
+        this.validateNumChannels_();
+        this.validateSampleRate_();
+    }
+
+    /**
+     * Validate the bit depth.
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateBitDepth_() {
+        if (!this.headerFormats_[this.bitDepth_]) {
+            throw new Error(this.WaveErrors.bitDepth);
+        }
+        return true;
+    }
+
+    /**
+     * Validate the sample rate value.
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateNumChannels_() {
+        let blockAlign = this.numChannels * this.bitsPerSample / 8;
+        if (this.numChannels < 1 || blockAlign > 65535) {
+            throw new Error(this.WaveErrors.numChannels);
+        }
+        return true;
+    }
+
+    /**
+     * Validate the sample rate value.
+     * @throws {Error} If any argument does not meet the criteria.
+     */
+    validateSampleRate_() {
+        let byteRate = this.numChannels *
+            (this.bitsPerSample / 8) * this.sampleRate;
+        if (this.sampleRate < 1 || byteRate > 4294967295) {
+            throw new Error(this.WaveErrors.sampleRate);
+        }
+        return true;
     }
 }
 
