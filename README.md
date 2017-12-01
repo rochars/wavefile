@@ -18,9 +18,9 @@ Hit "Load in player" to generate wave files.
 ## Use
 ```javascript
 let fs = require("fs");
-let wavefile = require("wavefile");
+let Wavefile = require("wavefile");
 
-let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+let wav = new Wavefile(fs.readFileSync("file.wav"));
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
 console.log(wav.fmtChunkId);
@@ -29,7 +29,7 @@ fs.writeFileSync(path, wav.toBuffer());
 
 ## Create wave files from scratch
 ```javascript
-let wav = new wavefile.WaveFile();
+let wav = new WaveFile();
 
 // mono
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
@@ -54,7 +54,7 @@ Currently there is **no dithering** when changing the bit depth.
 If the samples are stereo they need to be interleaved before changing the bit depth.
 
 ```javascript
-let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+let wav = new Wavefile(fs.readFileSync("file.wav"));
 
 // Possible values are:
 //  "8", "16", "24", "32", "32f", "64"
@@ -63,7 +63,7 @@ wav.toBitDepth("24");
 
 ## Interleave and de-interleave stereo samples
 ```javascript
-let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+let wav = new Wavefile(fs.readFileSync("file.wav"));
 
 // Interleave stereo samples
 wav.interleave();
@@ -74,7 +74,7 @@ wav.deInterleave();
 
 ## RIFF to RIFX and RIFX to RIFF
 ```javascript
-let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+let wav = new Wavefile(fs.readFileSync("file.wav"));
 
 // Turn a RIFF file to a RIFX file
 wav.toRIFX();
@@ -85,7 +85,7 @@ wav.toRIFF();
 
 ### The properties
 ```javascript
-let wav = new wavefile.Wavefile(fs.readFileSync("file.wav"));
+let wav = new Wavefile(fs.readFileSync("file.wav"));
 
 // The container, "RIFF" or "RIFX"
 console.log(wav.chunkId);

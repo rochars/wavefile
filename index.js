@@ -67,12 +67,14 @@ class WaveFile extends WaveFileReaderWriter {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.chunkId == "RIFX";
         let chunk = riffChunks.read(bytes, bigEndian);
-        let options = {"be": bigEndian, "single": true};
-        this.readFmtChunk_(chunk.subChunks, options);
-        this.readFactChunk_(chunk.subChunks, options);
+        this.readFmtChunk_(chunk.subChunks);
+        this.readFactChunk_(chunk.subChunks);
         this.readBextChunk_(chunk.subChunks);
         this.readCueChunk_(chunk.subChunks);
-        this.readDataChunk_(chunk.subChunks, options);
+        this.readDataChunk_(
+                chunk.subChunks,
+                {"be": bigEndian, "single": true}
+            );
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
             this.bitDepth_ = "32f";
         }else {

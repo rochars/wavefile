@@ -684,12 +684,14 @@ class WaveFile extends WaveFileReaderWriter {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.chunkId == "RIFX";
         let chunk = riffChunks.read(bytes, bigEndian);
-        let options = {"be": bigEndian, "single": true};
-        this.readFmtChunk_(chunk.subChunks, options);
-        this.readFactChunk_(chunk.subChunks, options);
+        this.readFmtChunk_(chunk.subChunks);
+        this.readFactChunk_(chunk.subChunks);
         this.readBextChunk_(chunk.subChunks);
         this.readCueChunk_(chunk.subChunks);
-        this.readDataChunk_(chunk.subChunks, options);
+        this.readDataChunk_(
+                chunk.subChunks,
+                {"be": bigEndian, "single": true}
+            );
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
             this.bitDepth_ = "32f";
         }else {
@@ -1104,10 +1106,9 @@ class WaveFileReaderWriter extends WaveFileHeader {
     /**
      * Read the "fmt " chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
-     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "fmt " chunk is found.
      */
-    readFmtChunk_(chunks, options) {
+    readFmtChunk_(chunks) {
         let chunk = this.findChunk(chunks, "fmt ");
         if (chunk) {
             this.fmtChunkId = "fmt ";
@@ -1124,7 +1125,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
                 chunk.chunkData.slice(12, 14), uInt16);
             this.bitsPerSample = byteData.unpack(
                     chunk.chunkData.slice(14, 16), uInt16);
-            this.readFmtExtension(chunk, options);
+            this.readFmtExtension(chunk);
         } else {
             throw Error(this.WaveErrors["fmt "]);
         }
@@ -1133,9 +1134,8 @@ class WaveFileReaderWriter extends WaveFileHeader {
     /**
      * Read the "fmt " chunk extension.
      * @param {Object} chunk The "fmt " chunk.
-     * @param {Object} options The options to read the bytes.
      */
-    readFmtExtension(chunk, options) {
+    readFmtExtension(chunk) {
         if (this.fmtChunkSize > 16) {
             this.cbSize = byteData.unpack(
                 chunk.chunkData.slice(16, 18), uInt16);
@@ -1149,10 +1149,9 @@ class WaveFileReaderWriter extends WaveFileHeader {
     /**
      * Read the "fact" chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
-     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "fact" chunk is found.
      */
-    readFactChunk_(chunks, options) {
+    readFactChunk_(chunks) {
         let chunk = this.findChunk(chunks, "fact");
         if (chunk) {
             this.factChunkId = "fact";
@@ -1256,10 +1255,9 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     /**
      * Get the bytes of the "bext" chunk.
-     * @param options The options to write the bytes.
      * @return {!Array<number>} The "bext" chunk bytes.
      */
-    getBextBytes_(options) {
+    getBextBytes_() {
         if (this.bextChunkId) {
             return [].concat(
                     byteData.packSequence(this.bextChunkId, char),
@@ -1272,10 +1270,9 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     /**
      * Get the bytes of the "cue " chunk.
-     * @param options The options to write the bytes.
      * @return {!Array<number>} The "cue " chunk bytes.
      */
-    getCueBytes_(options) {
+    getCueBytes_() {
         if (this.cueChunkId) {
             return [].concat(
                     byteData.packSequence(this.cueChunkId, char),
@@ -1288,10 +1285,9 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     /**
      * Get the bytes of the "fact" chunk.
-     * @param options The options to write the bytes.
      * @return {!Array<number>} The "fact" chunk bytes.
      */
-    getFactBytes_(options) {
+    getFactBytes_() {
         if (this.factChunkId) {
             return [].concat(
                     byteData.packSequence(this.factChunkId, char),
@@ -1304,10 +1300,9 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     /**
      * Get the bytes of the cbSize field.
-     * @param options The options to write the bytes.
      * @return {!Array<number>} The cbSize bytes.
      */
-    getCbSizeBytes_(options) {
+    getCbSizeBytes_() {
         if (this.fmtChunkSize > 16) {
             return byteData.pack(this.cbSize, uInt16);
         }
@@ -1319,7 +1314,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
      * @param options The options to write the bytes.
      * @return {!Array<number>} The validBitsPerSample bytes.
      */
-    getValidBitsPerSampleBytes_(options) {
+    getValidBitsPerSampleBytes_() {
         if (this.fmtChunkSize > 18) {
             return byteData.pack(this.validBitsPerSample, uInt16);
         }
@@ -1335,7 +1330,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         return byteData.packSequence(this.chunkId, char).concat(
                 byteData.pack(this.chunkSize, uInt32),
                 byteData.packSequence(this.format, char),
-                this.getBextBytes_(options),
+                this.getBextBytes_(),
                 byteData.packSequence(this.fmtChunkId, char),
                 byteData.pack(this.fmtChunkSize, uInt32),
                 byteData.pack(this.audioFormat, uInt16),
@@ -1344,13 +1339,13 @@ class WaveFileReaderWriter extends WaveFileHeader {
                 byteData.pack(this.byteRate, uInt32),
                 byteData.pack(this.blockAlign, uInt16),
                 byteData.pack(this.bitsPerSample, uInt16),
-                this.getCbSizeBytes_(options),
-                this.getValidBitsPerSampleBytes_(options),
-                this.getFactBytes_(options),
+                this.getCbSizeBytes_(),
+                this.getValidBitsPerSampleBytes_(),
+                this.getFactBytes_(),
                 byteData.packSequence(this.dataChunkId, char),
                 byteData.pack(this.dataChunkSize, uInt32),
                 this.samplesToBytes_(options),
-                this.getCueBytes_(options)
+                this.getCueBytes_()
             );
     }
 }
