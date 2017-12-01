@@ -7,6 +7,7 @@
  */
 
 const bitDepthLib = require("bitdepth");
+const WaveErrors = require("./src/wave-errors");
 const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
 
@@ -177,7 +178,7 @@ class WaveFile extends WaveFileReaderWriter {
      */
     validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth_]) {
-            throw new Error(this.WaveErrors.bitDepth);
+            throw new Error(WaveErrors.bitDepth);
         }
         return true;
     }
@@ -189,7 +190,7 @@ class WaveFile extends WaveFileReaderWriter {
     validateNumChannels_() {
         let blockAlign = this.numChannels * this.bitsPerSample / 8;
         if (this.numChannels < 1 || blockAlign > 65535) {
-            throw new Error(this.WaveErrors.numChannels);
+            throw new Error(WaveErrors.numChannels);
         }
         return true;
     }
@@ -202,7 +203,7 @@ class WaveFile extends WaveFileReaderWriter {
         let byteRate = this.numChannels *
             (this.bitsPerSample / 8) * this.sampleRate;
         if (this.sampleRate < 1 || byteRate > 4294967295) {
-            throw new Error(this.WaveErrors.sampleRate);
+            throw new Error(WaveErrors.sampleRate);
         }
         return true;
     }

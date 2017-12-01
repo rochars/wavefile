@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,7 +73,7 @@
  * https://github.com/rochars/byte-data
  */
 
-const endianness = __webpack_require__(10);
+const endianness = __webpack_require__(11);
 const bitDepths = __webpack_require__(1);
 
 /**
@@ -311,6 +311,33 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+/*!
+ * wavefile
+ * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefile
+ *
+ */
+
+/**
+ * Error messages.
+ * @enum {string}
+ */
+module.exports =  {
+    "format": "Not a supported format.",
+    "wave": "Could not find the 'WAVE' format identifier",
+    "fmt ": "Could not find the 'fmt ' chunk",
+    "data": "Could not find the 'data' chunk",
+    "fact": "Could not find the 'fact' chunk",
+    "bitDepth": "Invalid bit depth.",
+    "numChannels": "Invalid number of channels.",
+    "sampleRate": "Invalid sample rate."
+};
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -321,9 +348,9 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
  *
  */
 
-let toBytes = __webpack_require__(8);
-let fromBytes = __webpack_require__(11);
-let bitPacker = __webpack_require__(13);
+let toBytes = __webpack_require__(9);
+let fromBytes = __webpack_require__(12);
+let bitPacker = __webpack_require__(14);
 let bitDepth = __webpack_require__(1);
 
 /**
@@ -462,7 +489,7 @@ module.exports.BitDepthMaxValues = bitDepth.BitDepthMaxValues;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -590,7 +617,7 @@ module.exports.toHalf = toHalf;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 var int8 = new Int8Array(4)
@@ -612,7 +639,7 @@ module.exports.pack = pack
 module.exports.unpack = unpack
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -623,9 +650,10 @@ module.exports.unpack = unpack
  *
  */
 
-const bitDepthLib = __webpack_require__(6);
-const WaveFileReaderWriter = __webpack_require__(7);
-const riffChunks = __webpack_require__(15);
+const bitDepthLib = __webpack_require__(7);
+const WaveErrors = __webpack_require__(2);
+const WaveFileReaderWriter = __webpack_require__(8);
+const riffChunks = __webpack_require__(16);
 
 /**
  * WaveFile
@@ -794,7 +822,7 @@ class WaveFile extends WaveFileReaderWriter {
      */
     validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth_]) {
-            throw new Error(this.WaveErrors.bitDepth);
+            throw new Error(WaveErrors.bitDepth);
         }
         return true;
     }
@@ -806,7 +834,7 @@ class WaveFile extends WaveFileReaderWriter {
     validateNumChannels_() {
         let blockAlign = this.numChannels * this.bitsPerSample / 8;
         if (this.numChannels < 1 || blockAlign > 65535) {
-            throw new Error(this.WaveErrors.numChannels);
+            throw new Error(WaveErrors.numChannels);
         }
         return true;
     }
@@ -819,7 +847,7 @@ class WaveFile extends WaveFileReaderWriter {
         let byteRate = this.numChannels *
             (this.bitsPerSample / 8) * this.sampleRate;
         if (this.sampleRate < 1 || byteRate > 4294967295) {
-            throw new Error(this.WaveErrors.sampleRate);
+            throw new Error(WaveErrors.sampleRate);
         }
         return true;
     }
@@ -829,7 +857,7 @@ module.exports = WaveFile;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1019,7 +1047,7 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1029,12 +1057,13 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
  *
  */
 
-const byteData = __webpack_require__(2);
-let WaveFileHeader = __webpack_require__(14);
+const byteData = __webpack_require__(3);
+const WaveErrors = __webpack_require__(2);
 const uInt8 = byteData.uInt8;
 const uInt16 = byteData.uInt16;
 const uInt32 = byteData.uInt32;
 const char = byteData.char;
+let WaveFileHeader = __webpack_require__(15);
 
 /**
  * Read and write wave files.
@@ -1043,20 +1072,6 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     constructor() {
         super();
-        /**
-         * Error messages.
-         * @enum {string}
-         */
-        this.WaveErrors = {
-            "format": "Not a supported format.",
-            "wave": "Could not find the 'WAVE' format identifier",
-            "fmt ": "Could not find the 'fmt ' chunk",
-            "data": "Could not find the 'data' chunk",
-            "fact": "Could not find the 'fact' chunk",
-            "bitDepth": "Invalid bit depth.",
-            "numChannels": "Invalid number of channels.",
-            "sampleRate": "Invalid sample rate."
-        };
         /**
          * Header formats.
          * @enum {number}
@@ -1082,7 +1097,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
     readRIFFChunk_(bytes) {
         this.chunkId = byteData.unpackSequence(bytes.slice(0, 4), char);
         if (this.chunkId != "RIFF" && this.chunkId != "RIFX") {
-            throw Error(this.WaveErrors.format);
+            throw Error(WaveErrors.format);
         }
         let bigEndian = this.LEorBE();
         this.chunkSize = byteData.fromBytes(
@@ -1091,7 +1106,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             {"be": bigEndian, "single": true});
         this.format = byteData.unpackSequence(bytes.slice(8, 12), char);
         if (this.format != "WAVE") {
-            throw Error(this.WaveErrors.wave);
+            throw Error(WaveErrors.wave);
         }
     }
 
@@ -1127,7 +1142,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
                     chunk.chunkData.slice(14, 16), uInt16);
             this.readFmtExtension(chunk);
         } else {
-            throw Error(this.WaveErrors["fmt "]);
+            throw Error(WaveErrors["fmt "]);
         }
     }
 
@@ -1159,7 +1174,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             this.dwSampleLength = byteData.unpack(
                 chunk.chunkData.slice(0, 4), uInt32);
         } else if (this.enforceFact) {
-            throw Error(this.WaveErrors["fact"]);
+            throw Error(WaveErrors["fact"]);
         }
     }
 
@@ -1203,7 +1218,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             this.dataChunkSize = chunk.chunkSize;
             this.samplesFromBytes_(chunk.chunkData, options);
         } else {
-            throw Error(this.WaveErrors["data"]);
+            throw Error(WaveErrors["data"]);
         }
     }
 
@@ -1311,7 +1326,6 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     /**
      * Get the bytes of the validBitsPerSample field.
-     * @param options The options to write the bytes.
      * @return {!Array<number>} The validBitsPerSample bytes.
      */
     getValidBitsPerSampleBytes_() {
@@ -1354,7 +1368,7 @@ module.exports = WaveFileReaderWriter;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1363,7 +1377,7 @@ module.exports = WaveFileReaderWriter;
  * https://github.com/rochars/byte-data
  */
 
-const writer = __webpack_require__(9);
+const writer = __webpack_require__(10);
 const helpers = __webpack_require__(0);
 
 /**
@@ -1422,7 +1436,7 @@ module.exports.toBytes = toBytes;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1431,8 +1445,8 @@ module.exports.toBytes = toBytes;
  * https://github.com/rochars/byte-data
  */
 
-const float = __webpack_require__(3);
-const intBits = __webpack_require__(4);
+const float = __webpack_require__(4);
+const intBits = __webpack_require__(5);
 
 function write64Bit(bytes, numbers, i, j) {
     let bits = float.toFloat64(numbers[i]);
@@ -1539,7 +1553,7 @@ module.exports.writeString = writeString;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1597,7 +1611,7 @@ module.exports = endianness;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1606,7 +1620,7 @@ module.exports = endianness;
  * https://github.com/rochars/byte-data
  */
 
-const reader = __webpack_require__(12);
+const reader = __webpack_require__(13);
 const bitDepths = __webpack_require__(1);
 const helpers = __webpack_require__(0);
 
@@ -1702,7 +1716,7 @@ module.exports.fromBytes = fromBytes;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1713,8 +1727,8 @@ module.exports.fromBytes = fromBytes;
 
 
 let helpers = __webpack_require__(0);
-const float = __webpack_require__(3);
-const intBits = __webpack_require__(4);
+const float = __webpack_require__(4);
+const intBits = __webpack_require__(5);
 
 /**
  * Read a group of bytes by turning it to bits.
@@ -1865,7 +1879,7 @@ module.exports.read64Bit = read64Bit;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -2020,7 +2034,7 @@ module.exports.unpackNibbles = unpackNibbles;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /*
@@ -2116,7 +2130,7 @@ module.exports = WaveFileHeader;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -2127,7 +2141,7 @@ module.exports = WaveFileHeader;
  *
  */
 
-const byteData = __webpack_require__(2);
+const byteData = __webpack_require__(3);
 const uInt32 = byteData.uInt32;
 const char = byteData.char;
 

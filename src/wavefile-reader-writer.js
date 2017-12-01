@@ -6,11 +6,12 @@
  */
 
 const byteData = require("byte-data");
-let WaveFileHeader = require("../src/wavefile-header");
+const WaveErrors = require("../src/wave-errors");
 const uInt8 = byteData.uInt8;
 const uInt16 = byteData.uInt16;
 const uInt32 = byteData.uInt32;
 const char = byteData.char;
+let WaveFileHeader = require("../src/wavefile-header");
 
 /**
  * Read and write wave files.
@@ -19,20 +20,6 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     constructor() {
         super();
-        /**
-         * Error messages.
-         * @enum {string}
-         */
-        this.WaveErrors = {
-            "format": "Not a supported format.",
-            "wave": "Could not find the 'WAVE' format identifier",
-            "fmt ": "Could not find the 'fmt ' chunk",
-            "data": "Could not find the 'data' chunk",
-            "fact": "Could not find the 'fact' chunk",
-            "bitDepth": "Invalid bit depth.",
-            "numChannels": "Invalid number of channels.",
-            "sampleRate": "Invalid sample rate."
-        };
         /**
          * Header formats.
          * @enum {number}
@@ -58,7 +45,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
     readRIFFChunk_(bytes) {
         this.chunkId = byteData.unpackSequence(bytes.slice(0, 4), char);
         if (this.chunkId != "RIFF" && this.chunkId != "RIFX") {
-            throw Error(this.WaveErrors.format);
+            throw Error(WaveErrors.format);
         }
         let bigEndian = this.LEorBE();
         this.chunkSize = byteData.fromBytes(
@@ -67,7 +54,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             {"be": bigEndian, "single": true});
         this.format = byteData.unpackSequence(bytes.slice(8, 12), char);
         if (this.format != "WAVE") {
-            throw Error(this.WaveErrors.wave);
+            throw Error(WaveErrors.wave);
         }
     }
 
@@ -103,7 +90,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
                     chunk.chunkData.slice(14, 16), uInt16);
             this.readFmtExtension(chunk);
         } else {
-            throw Error(this.WaveErrors["fmt "]);
+            throw Error(WaveErrors["fmt "]);
         }
     }
 
@@ -135,7 +122,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             this.dwSampleLength = byteData.unpack(
                 chunk.chunkData.slice(0, 4), uInt32);
         } else if (this.enforceFact) {
-            throw Error(this.WaveErrors["fact"]);
+            throw Error(WaveErrors["fact"]);
         }
     }
 
@@ -179,7 +166,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             this.dataChunkSize = chunk.chunkSize;
             this.samplesFromBytes_(chunk.chunkData, options);
         } else {
-            throw Error(this.WaveErrors["data"]);
+            throw Error(WaveErrors["data"]);
         }
     }
 
@@ -287,7 +274,6 @@ class WaveFileReaderWriter extends WaveFileHeader {
 
     /**
      * Get the bytes of the validBitsPerSample field.
-     * @param options The options to write the bytes.
      * @return {!Array<number>} The validBitsPerSample bytes.
      */
     getValidBitsPerSampleBytes_() {
