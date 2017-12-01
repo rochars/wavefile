@@ -9,7 +9,7 @@
 /**
  * Wave file headers.
  */
-module.exports.WaveFileHeader = class {
+class WaveFileHeader {
 
     constructor() {
         /**
@@ -86,3 +86,5 @@ module.exports.WaveFileHeader = class {
         this.bextChunkData = [];
     }
 }
+
+module.exports = WaveFileHeader;

@@ -11,11 +11,11 @@ var assert = require('assert');
 
 describe('interleave', function() {
     
-    let wavefile = require('../index.js');    
+    let WaveFile = require('../index.js');    
 
     it('should interleave the samples of a 2-channel wave file',
             function() {
-        let wav = new wavefile.WaveFile();
+        let wav = new WaveFile();
         let stereoSamples = [
             [0, -2, 4, 3],
             [0, -1, 4, 3]
@@ -28,7 +28,7 @@ describe('interleave', function() {
 
     it('should de-interleave the samples of a 2-channel wave file',
             function() {
-        let wav = new wavefile.WaveFile();
+        let wav = new WaveFile();
         let samples = [0, 0, -2, -1, 4, 4, 3, 3];
         wav.fromScratch(1, 48000, '8', samples);
         wav.numChannels = 2;
@@ -42,7 +42,7 @@ describe('interleave', function() {
 
     it('should interleave the samples of a 3-channel wave file',
             function() {
-        let wav = new wavefile.WaveFile();
+        let wav = new WaveFile();
         let stereoSamples = [
             [0, -2, 4, 3],
             [0, -1, 4, 3],
@@ -56,7 +56,7 @@ describe('interleave', function() {
 
     it('should de-interleave the samples of a 3-channel wave file',
             function() {
-        let wav = new wavefile.WaveFile();
+        let wav = new WaveFile();
         let samples = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
         wav.fromScratch(1, 48000, '8', samples);
         wav.numChannels = 3;

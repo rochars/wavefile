@@ -8,11 +8,11 @@ let assert = require("assert");
 describe("32-bit PCM reading", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
-    let wav = new wavefile.WaveFile(wBytes);
+    let wav = new WaveFile(wBytes);
 
     it("chunkId should be 'RIFF'",
             function() {

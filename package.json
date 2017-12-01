@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "0.6.1",
+  "version": "1.0.0",
   "description": "Read & write wave files with 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -37,7 +37,7 @@
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "bundle": "webpack",
     "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js",
-    "doc": "./node_modules/.bin/jsdoc index.js -d docs",
+    "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "qa": "npm run lint && npm test",
     "pack": "npm run bundle && npm run compile && npm run doc",
     "build": "npm run qa && npm run pack"
@@ -45,6 +45,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "codecov": "^3.0.0",
+    "docdash": "^0.4.0",
     "google-closure-compiler-js": "^20170910.0.1",
     "jsdoc": "~3.5.5",
     "jshint": "^2.9.5",
@@ -55,9 +56,9 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "bitdepth": "1.0.3",
-    "byte-data": "0.5.1",
-    "riff-chunks": "1.0.1"
+    "bitdepth": "1.0.4",
+    "byte-data": "0.7.0",
+    "riff-chunks": "3.0.1"
   },
   "main": "index.js"
 }

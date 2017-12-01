@@ -9,7 +9,7 @@ let expect = chai.expect;
 describe('errors', function() {
     
     let fs = require("fs");
-    let wavefile = require("../index.js");
+    let WaveFile = require("../index.js");
     let path = "test/files/";
 
     let testFunc;
@@ -24,7 +24,7 @@ describe('errors', function() {
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "RF64-64-bit-8kHz--mono-bext.wav");
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.fromBuffer(wBytes);
         };
         expect(testFunc).to.throw(unsupportedFormatError);
@@ -35,7 +35,7 @@ describe('errors', function() {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
             wBytes[10] = 0;
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.fromBuffer(wBytes);
 
         };
@@ -47,7 +47,7 @@ describe('errors', function() {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
             wBytes[14] = 0;
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.fromBuffer(wBytes);
         };
         expect(testFunc).to.throw(noFmtChunkError);
@@ -58,7 +58,7 @@ describe('errors', function() {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
             wBytes[36] = 0;
-            let wav = new wavefile.WaveFile(wBytes);
+            let wav = new WaveFile(wBytes);
         };
         expect(testFunc).to.throw(noDataChunkError);
     });
@@ -67,7 +67,7 @@ describe('errors', function() {
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.fromBuffer(wBytes);
             wav.sampleRate = 0;
             wav.toBuffer();
@@ -79,7 +79,7 @@ describe('errors', function() {
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.fromBuffer(wBytes);
             wav.numChannels = 0;
             wav.toBuffer();
@@ -91,7 +91,7 @@ describe('errors', function() {
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.enforceFact = true;
             wav.fromBuffer(wBytes);
             wav.toBuffer();
@@ -103,7 +103,7 @@ describe('errors', function() {
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
-            let wav = new wavefile.WaveFile();
+            let wav = new WaveFile();
             wav.fromBuffer(wBytes);
             wav.bitDepth_ = 3;
             wav.toBuffer();

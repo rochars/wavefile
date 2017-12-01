@@ -8,15 +8,15 @@ var assert = require('assert');
 describe('read 16bit file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
-    let wav = new wavefile.WaveFile();
+    let wav = new WaveFile();
 
     wav.fromBuffer(wBytes);
 
-    let wav2 = new wavefile.WaveFile();
+    let wav2 = new WaveFile();
 
     let bytes3 = wav.toBuffer();
 

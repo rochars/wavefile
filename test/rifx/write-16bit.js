@@ -8,15 +8,15 @@ var assert = require('assert');
 describe('read 16bit RIFX file from disk and write to new RIFX file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "RIFX-16bit-mono.wav");
-    let wav = new wavefile.WaveFile();
+    let wav = new WaveFile();
 
     wav.fromBuffer(wBytes);
 
-    let wav2 = new wavefile.WaveFile();
+    let wav2 = new WaveFile();
 
     let bytes3 = wav.toBuffer();
 

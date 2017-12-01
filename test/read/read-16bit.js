@@ -8,11 +8,11 @@ let assert = require("assert");
 describe("16-bit reading", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
-    let wav = new wavefile.WaveFile(wBytes);
+    let wav = new WaveFile(wBytes);
 
     it("chunkId should be 'RIFF'",
             function() {

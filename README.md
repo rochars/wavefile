@@ -3,7 +3,7 @@ Read & write wave files with 8, 16, 24, 32 & 64-bit data.
 Copyright (c) 2017 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
-[![Travis](https://img.shields.io/travis/rochars/wavefile.svg?style=for-the-badge)](https://travis-ci.org/rochars/wavefile) [![AppVeyor](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=for-the-badge&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=for-the-badge)](https://codecov.io/gh/rochars/wavefile) [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile)
+[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/docs-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/index.html)
 
 ## Install
 ```
@@ -44,8 +44,7 @@ wav.interleave();
 fs.writeFileSync(path, wav.toBuffer());
 
 // Default is RIFF. To create RIFX files:
-wav.fromScratch(
-    1, 44100, '32', [0, -2147483648, 2147483647, 4], {"container": "RIFX"});
+wav.fromScratch(1, 44100, '32', samples, {"container": "RIFX"});
 fs.writeFileSync(path, wav.toBuffer());
 ```
 

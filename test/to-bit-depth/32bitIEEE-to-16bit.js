@@ -8,10 +8,10 @@ let assert = require("assert");
 describe("32-bit IEEE from file to 16-bit", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let wav = new wavefile.WaveFile(
+    let wav = new WaveFile(
         fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
     wav.toBitDepth("16");
     fs.writeFileSync(path + "/out/to-bit-depth/32IEEE-to-16.wav", wav.toBuffer());
@@ -73,10 +73,10 @@ describe("32-bit IEEE from file to 16-bit", function() {
 describe("32-bit IEEE mono from scratch to 16-bit (max range)", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let wav = new wavefile.WaveFile();
+    let wav = new WaveFile();
     let samples = [-1, 1];
     wav.fromScratch(1, 8000, "32f", samples);
     wav.toBitDepth("16");
@@ -138,10 +138,10 @@ describe("32-bit IEEE mono from scratch to 16-bit (max range)", function() {
 describe("32-bit IEEE mono from scratch to 16-bit (0)", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let wav = new wavefile.WaveFile();
+    let wav = new WaveFile();
     let samples = [0];
     wav.fromScratch(1, 8000, "32f", samples);
     wav.toBitDepth("16");

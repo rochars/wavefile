@@ -8,9 +8,9 @@ var assert = require("assert");
 
 describe("interface", function() {
 
-    let wavefile = require("../index.js");
+    let WaveFile = require("../index.js");
     
     it("Should create a WaveFile object", function() {
-        assert.ok(new wavefile.WaveFile());
+        assert.ok(new WaveFile());
     });
 });

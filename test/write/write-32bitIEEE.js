@@ -8,12 +8,12 @@ var assert = require('assert');
 describe('read 32bit IEEE from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav");
-    let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    let wav = new WaveFile(wBytes);
+    let wav2 = new WaveFile(wav.toBuffer());
     fs.writeFileSync(path + "/out/32bitIEEE-16kHz-bext-mono.wav", wav2.toBuffer());
     
     it("toBuffer should return a array of bytes",
@@ -86,12 +86,12 @@ describe('read 32bit IEEE from disk and write to new file', function() {
 describe('read 32bit IEEE with markers and regions and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "32IEEE-meta.wav");
-    let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    let wav = new WaveFile(wBytes);
+    let wav2 = new WaveFile(wav.toBuffer());
     fs.writeFileSync(path + "/out/32IEEE-meta.wav", wav2.toBuffer());
     
     it("toBuffer should return a array of bytes",

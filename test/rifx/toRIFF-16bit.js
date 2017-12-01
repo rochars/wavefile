@@ -8,19 +8,19 @@ let assert = require("assert");
 describe("16-bit RIFX to RIFF", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let rifxWav = new wavefile.WaveFile(
+    let rifxWav = new WaveFile(
         fs.readFileSync(path + "RIFX-16bit-mono.wav"));
     rifxWav.toRIFF();
     fs.writeFileSync(path + "/out/RIFX-to-RIFF-16bit-mono.wav", rifxWav.toBuffer());
 
-    let wav = new wavefile.WaveFile(
+    let wav = new WaveFile(
         fs.readFileSync(path + "/out/RIFX-to-RIFF-16bit-mono.wav"));
 
     // The same contents in the original RIFF file
-    let riffWav = new wavefile.WaveFile(
+    let riffWav = new WaveFile(
         fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
 
     it("chunkId should be 'RIFF'",

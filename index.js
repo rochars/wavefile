@@ -7,13 +7,13 @@
  */
 
 const bitDepthLib = require("bitdepth");
-const waveFileReaderWriter = require("./src/wavefile-reader-writer");
-const riff = require("riff-chunks");
+const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
+const riffChunks = require("riff-chunks");
 
 /**
  * WaveFile
  */
-class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
+class WaveFile extends WaveFileReaderWriter {
 
     /**
      * @param {Uint8Array} bytes A wave file buffer.
@@ -66,7 +66,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.chunkId == "RIFX";
-        let chunk = riff.getChunks(bytes, bigEndian);
+        let chunk = riffChunks.read(bytes, bigEndian);
         let options = {"be": bigEndian, "single": true};
         this.readFmtChunk_(chunk.subChunks, options);
         this.readFactChunk_(chunk.subChunks, options);
@@ -95,6 +95,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
      */
     toRIFF() {
         this.chunkId = "RIFF";
+        this.LEorBE();
     }
 
     /**
@@ -103,6 +104,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
      */
     toRIFX() {
         this.chunkId = "RIFX";
+        this.LEorBE();
     }
 
     /**
@@ -204,4 +206,4 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
     }
 }
 
-module.exports.WaveFile = WaveFile;
+module.exports = WaveFile;

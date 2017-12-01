@@ -8,12 +8,12 @@ var assert = require('assert');
 describe('read 4-bit file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "4bit-imaadpcm-8kHz-noBext-mono.wav");
-    let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    let wav = new WaveFile(wBytes);
+    let wav2 = new WaveFile(wav.toBuffer());
     fs.writeFileSync(path + "/out/4bit-imaadpcm-8kHz-noBext-mono.wav", wav2.toBuffer());
 
     it("chunkId should be 'RIFF'",
@@ -100,12 +100,12 @@ describe('read 4-bit file from disk and write to new file', function() {
 describe('read 4-bit 22050kHz file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "ima22m.wav");
-    let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    let wav = new WaveFile(wBytes);
+    let wav2 = new WaveFile(wav.toBuffer());
     fs.writeFileSync(path + "/out/ima22m.wav", wav2.toBuffer());
 
     it("chunkId should be 'RIFF'",

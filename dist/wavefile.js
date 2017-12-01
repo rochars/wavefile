@@ -135,7 +135,6 @@ function paddingCrumb(crumbs, base, index) {
  *      For 1 binary byte string it should be 8.
  */
 function lPadZeros(value, numZeros) {
-    let i = 0;
     while (value.length < numZeros) {
         value = '0' + value;
     }
@@ -169,7 +168,7 @@ function fixByteArraySize(byteArray, numZeros) {
  */
 function makeBigEndian(bytes, isBigEndian, bitDepth) {
     if (isBigEndian) {
-        endianness.endianness(bytes, bitDepths.BitDepthOffsets[bitDepth]);
+        endianness(bytes, bitDepths.BitDepthOffsets[bitDepth]);
     }
 }
 
@@ -346,37 +345,120 @@ function findString(bytes, chunk) {
     return -1;
 }
 
-module.exports.findString = findString;
+/**
+ * Turn a number or string into a byte buffer.
+ * @param {number|string} value The value.
+ * @param {Object} type One of the available types.
+ * @param {number} base The base of the input. Optional. Default is 10.
+ * @return {!Array<number>|!Array<string>}
+ */
+function pack(value, type, base=10) {
+    let theType = Object.assign({}, type);
+    theType.base = base;
+    theType.single = true;
+    value = theType.char ? value[0] : value;
+    return toBytes.toBytes(value, theType.bitDepth, theType);
+}
 
-module.exports.toBytes = toBytes.toBytes;
-module.exports.fromBytes = fromBytes.fromBytes;
+/**
+ * Turn a byte buffer into a readable value.
+ * @param {!Array<number>|!Array<string>|Uint8Array} buffer An array of bytes.
+ * @param {Object} type One of the available types.
+ * @param {number} base The base of the input. Optional. Default is 10.
+ * @return {number|string}
+ */
+function unpack(buffer, type, base=10) {
+    let theType = Object.assign({}, type);
+    theType.base = base;
+    theType.single = true;
+    return fromBytes.fromBytes(buffer, theType.bitDepth, theType);
+}
 
-module.exports.packBooleans = bitPacker.packBooleans;
-module.exports.unpackBooleans = bitPacker.unpackBooleans;
-module.exports.packCrumbs = bitPacker.packCrumbs;
-module.exports.unpackCrumbs = bitPacker.unpackCrumbs;
-module.exports.packNibbles = bitPacker.packNibbles;
-module.exports.unpackNibbles = bitPacker.unpackNibbles;
+/**
+ * Turn a array of numbers into a byte buffer.
+ * @param {!Array<number>} values The values.
+ * @param {Object} type One of the available types.
+ * @param {number} base The base of the input. Optional. Default is 10.
+ * @return {!Array<number>|!Array<string>}
+ */
+function packSequence(values, type, base=10) {
+    let theType = Object.assign({}, type);
+    theType.base = base;
+    theType.single = false;
+    return toBytes.toBytes(values, theType.bitDepth, theType);
+}
 
-module.exports.BitDepthOffsets = bitDepth.BitDepthOffsets;
-module.exports.BitDepthMaxValues = bitDepth.BitDepthMaxValues;
+/**
+ * Turn a byte array into a sequence of readable values.
+ * @param {!Array<number>|!Array<string>|Uint8Array} buffer The byte array.
+ * @param {Object} type One of the available types.
+ * @param {number} base The base of the input. Optional. Default is 10.
+ * @return {!Array<number>|string}
+ */
+function unpackSequence(buffer, type, base=10) {
+    let theType = Object.assign({}, type);
+    theType.base = base;
+    theType.single = false;
+    return fromBytes.fromBytes(buffer, theType.bitDepth, theType);
+}
+
+// interface
+module.exports.pack = pack;
+module.exports.unpack = unpack;
+module.exports.packSequence = packSequence;
+module.exports.unpackSequence = unpackSequence;
 
 // types
+module.exports.char = {"bitDepth": 8, "char": true, "single": true};
+module.exports.bool = {"bitDepth": 1, "single": true};
+module.exports.int2 = {"bitDepth": 2, "signed": true, "single": true};
+module.exports.uInt2 = {"bitDepth": 2, "single": true};
+module.exports.int4 = {"bitDepth": 4, "signed": true, "single": true};
+module.exports.uInt4 = {"bitDepth": 4, "single": true};
+module.exports.int8 = {"bitDepth": 8, "signed": true, "single": true};
+module.exports.uInt8 = {"bitDepth": 8, "single": true};
+module.exports.int16  = {"bitDepth": 16, "signed": true, "single": true};
+module.exports.uInt16 = {"bitDepth": 16, "single": true};
+module.exports.float16 = {"bitDepth": 16, "float": true, "single": true};
+module.exports.int24 = {"bitDepth": 24, "signed": true, "single": true};
+module.exports.uInt24 = {"bitDepth": 24, "single": true};
+module.exports.int32 = {"bitDepth": 32, "signed": true, "single": true};
+module.exports.uInt32 = {"bitDepth": 32, "single": true};
+module.exports.float32 = {"bitDepth": 32, "float": true, "single": true};
+module.exports.int40 = {"bitDepth": 40, "signed": true, "single": true};
+module.exports.uInt40 = {"bitDepth": 40, "single": true};
+module.exports.int48 = {"bitDepth": 48, "signed": true, "single": true};
+module.exports.uInt48 = {"bitDepth": 48, "single": true};
+module.exports.float64 = {"bitDepth": 64, "float": true, "single": true};
+
+// Legacy types
 module.exports.floatLE = {"float": true, "single": true};
 module.exports.intLE = {"signed": true, "single": true};
 module.exports.uIntLE = {"single": true};
 module.exports.floatBE = {"float": true, "single": true, "be": true};
 module.exports.intBE = {"signed": true, "single": true, "be": true};
 module.exports.uIntBE = {"single": true, "be": true};
-module.exports.char = {"char": true, "single": true};
 
 module.exports.floatArrayLE = {"float": true};
 module.exports.intArrayLE = {"signed": true};
-module.exports.uIntArrayLE = {};
+module.exports.uIntArrayLE = {"base": 10};
 module.exports.floatArrayBE = {"float": true, "be": true};
 module.exports.intArrayBE = {"signed": true, "be": true};
 module.exports.uIntArrayBE = {"be": true};
 module.exports.str = {"char": true};
+
+// Legacy interface
+module.exports.findString = findString;
+module.exports.toBytes = toBytes.toBytes;
+module.exports.fromBytes = fromBytes.fromBytes;
+module.exports.packBooleans = bitPacker.packBooleans;
+module.exports.unpackBooleans = bitPacker.unpackBooleans;
+module.exports.packCrumbs = bitPacker.packCrumbs;
+module.exports.unpackCrumbs = bitPacker.unpackCrumbs;
+module.exports.packNibbles = bitPacker.packNibbles;
+module.exports.unpackNibbles = bitPacker.unpackNibbles;
+module.exports.BitDepthOffsets = bitDepth.BitDepthOffsets;
+module.exports.BitDepthMaxValues = bitDepth.BitDepthMaxValues;
 
 
 /***/ }),
@@ -542,13 +624,13 @@ module.exports.unpack = unpack
  */
 
 const bitDepthLib = __webpack_require__(6);
-const waveFileReaderWriter = __webpack_require__(7);
-const riff = __webpack_require__(15);
+const WaveFileReaderWriter = __webpack_require__(7);
+const riffChunks = __webpack_require__(15);
 
 /**
  * WaveFile
  */
-class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
+class WaveFile extends WaveFileReaderWriter {
 
     /**
      * @param {Uint8Array} bytes A wave file buffer.
@@ -601,7 +683,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.chunkId == "RIFX";
-        let chunk = riff.getChunks(bytes, bigEndian);
+        let chunk = riffChunks.read(bytes, bigEndian);
         let options = {"be": bigEndian, "single": true};
         this.readFmtChunk_(chunk.subChunks, options);
         this.readFactChunk_(chunk.subChunks, options);
@@ -630,6 +712,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
      */
     toRIFF() {
         this.chunkId = "RIFF";
+        this.LEorBE();
     }
 
     /**
@@ -638,6 +721,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
      */
     toRIFX() {
         this.chunkId = "RIFX";
+        this.LEorBE();
     }
 
     /**
@@ -739,7 +823,7 @@ class WaveFile extends waveFileReaderWriter.WaveFileReaderWriter {
     }
 }
 
-window['WaveFile'] = WaveFile;
+module.exports = WaveFile;
 
 
 /***/ }),
@@ -782,9 +866,11 @@ const BitDepthFunctions = {
      */
     intToInt(sample, args) {
         if (sample > 0) {
-            sample = parseInt((sample / (args.old - 1)) * args.new - 1, 10);
+            sample = parseInt(
+                (sample / args.oldPositive) * args.newPositive, 10);
         } else {
-            sample = parseInt((sample / args.old) * args.new, 10);
+            sample = parseInt(
+                (sample / args.oldNegative) * args.newNegative, 10);
         }
         return sample;
     },
@@ -796,12 +882,8 @@ const BitDepthFunctions = {
      * @return {number}
      */
     floatToInt(sample, args) {
-        if (sample > 0) {
-            sample = sample * (args.new - 1);
-        } else {
-            sample = sample * args.new;
-        }
-        return sample;
+        return sample > 0 ?
+            sample * args.newPositive : sample * args.newNegative;
     },
 
     /**
@@ -811,12 +893,8 @@ const BitDepthFunctions = {
      * @return {number}
      */
     intToFloat(sample, args) {
-        if (sample > 0) {
-            sample = sample / (args.old - 1);
-        } else {
-            sample = sample / args.old;
-        }
-        return sample;
+        return sample > 0 ?
+            sample / args.oldPositive : sample / args.oldNegative;
     },
 
     /**
@@ -835,7 +913,7 @@ const BitDepthFunctions = {
 };
 
 /**
- * Change the bit depth of the data in a sample array.
+ * Change the bit depth of the data in a array.
  * The input array is modified in-place.
  * @param {!Array<number>} samples The samples.
  * @param {string} originalBitDepth The original bit depth of the data.
@@ -852,8 +930,10 @@ function toBitDepth(samples, originalBitDepth, targetBitDepth) {
         samples[i] = toFunction(
                 samples[i],
                 {
-                    "old": BitDepthMaxValues[originalBitDepth] / 2,
-                    "new": BitDepthMaxValues[targetBitDepth] / 2,
+                    "oldNegative": BitDepthMaxValues[originalBitDepth] / 2,
+                    "newNegative": BitDepthMaxValues[targetBitDepth] / 2,
+                    "oldPositive": BitDepthMaxValues[originalBitDepth] / 2 - 1,
+                    "newPositive": BitDepthMaxValues[targetBitDepth] / 2 - 1,
                     "original": originalBitDepth,
                     "target": targetBitDepth
                 }
@@ -948,12 +1028,16 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
  */
 
 const byteData = __webpack_require__(2);
-const waveFileHeader = __webpack_require__(14);
+let WaveFileHeader = __webpack_require__(14);
+const uInt8 = byteData.uInt8;
+const uInt16 = byteData.uInt16;
+const uInt32 = byteData.uInt32;
+const char = byteData.char;
 
 /**
  * Read and write wave files.
  */
-class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
+class WaveFileReaderWriter extends WaveFileHeader {
 
     constructor() {
         super();
@@ -994,20 +1078,27 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @throws {Error} If no "RIFF" chunk is found.
      */
     readRIFFChunk_(bytes) {
-        this.chunkId = byteData.fromBytes(bytes.slice(0, 4),
-            8, {"char": true});
+        this.chunkId = byteData.unpackSequence(bytes.slice(0, 4), char);
         if (this.chunkId != "RIFF" && this.chunkId != "RIFX") {
             throw Error(this.WaveErrors.format);
         }
+        let bigEndian = this.LEorBE();
         this.chunkSize = byteData.fromBytes(
             bytes.slice(4, 8),
             32,
-            {"be": this.chunkId == "RIFX", "single": true});
-        this.format = byteData.fromBytes(
-            bytes.slice(8, 12), 8, byteData.str);
+            {"be": bigEndian, "single": true});
+        this.format = byteData.unpackSequence(bytes.slice(8, 12), char);
         if (this.format != "WAVE") {
             throw Error(this.WaveErrors.wave);
         }
+    }
+
+    LEorBE() {
+        let bigEndian = this.chunkId == "RIFX";
+        uInt8.be = bigEndian;
+        uInt16.be = bigEndian;
+        uInt32.be = bigEndian;
+        return bigEndian;
     }
 
     /**
@@ -1020,19 +1111,19 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let chunk = this.findChunk(chunks, "fmt ");
         if (chunk) {
             this.fmtChunkId = "fmt ";
-            this.fmtChunkSize = chunk.subChunkSize;
-            this.audioFormat = byteData.fromBytes(
-                chunk.subChunkData.slice(0, 2), 16, options);
-            this.numChannels = byteData.fromBytes(
-                chunk.subChunkData.slice(2, 4), 16, options);
-            this.sampleRate = byteData.fromBytes(
-                chunk.subChunkData.slice(4, 8), 32, options);
-            this.byteRate = byteData.fromBytes(
-                chunk.subChunkData.slice(8, 12), 32, options);
-            this.blockAlign = byteData.fromBytes(
-                chunk.subChunkData.slice(12, 14), 16, options);
-            this.bitsPerSample = byteData.fromBytes(
-                    chunk.subChunkData.slice(14, 16), 16, options);
+            this.fmtChunkSize = chunk.chunkSize;
+            this.audioFormat = byteData.unpack(
+                chunk.chunkData.slice(0, 2), uInt16);
+            this.numChannels = byteData.unpack(
+                chunk.chunkData.slice(2, 4), uInt16);
+            this.sampleRate = byteData.unpack(
+                chunk.chunkData.slice(4, 8), uInt32);
+            this.byteRate = byteData.unpack(
+                chunk.chunkData.slice(8, 12), uInt32);
+            this.blockAlign = byteData.unpack(
+                chunk.chunkData.slice(12, 14), uInt16);
+            this.bitsPerSample = byteData.unpack(
+                    chunk.chunkData.slice(14, 16), uInt16);
             this.readFmtExtension(chunk, options);
         } else {
             throw Error(this.WaveErrors["fmt "]);
@@ -1046,11 +1137,11 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     readFmtExtension(chunk, options) {
         if (this.fmtChunkSize > 16) {
-            this.cbSize = byteData.fromBytes(
-                chunk.subChunkData.slice(16, 18), 16, options);
+            this.cbSize = byteData.unpack(
+                chunk.chunkData.slice(16, 18), uInt16);
             if (this.fmtChunkSize > 18) {
-                this.validBitsPerSample = byteData.fromBytes(
-                    chunk.subChunkData.slice(18, 20), 16, options);
+                this.validBitsPerSample = byteData.unpack(
+                    chunk.chunkData.slice(18, 20), uInt16);
             }
         }
     }
@@ -1065,9 +1156,9 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let chunk = this.findChunk(chunks, "fact");
         if (chunk) {
             this.factChunkId = "fact";
-            this.factChunkSize = chunk.subChunkSize;
-            this.dwSampleLength = byteData.fromBytes(
-                chunk.subChunkData.slice(0, 4), 32, options);
+            this.factChunkSize = chunk.chunkSize;
+            this.dwSampleLength = byteData.unpack(
+                chunk.chunkData.slice(0, 4), uInt32);
         } else if (this.enforceFact) {
             throw Error(this.WaveErrors["fact"]);
         }
@@ -1076,30 +1167,28 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
     /**
      * Read the "bext" chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
-     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "bext" chunk is found.
      */
     readBextChunk_(chunks) {
         let chunk = this.findChunk(chunks, "bext");
         if (chunk) {
             this.bextChunkId = "bext";
-            this.bextChunkSize = chunk.subChunkSize;
-            this.bextChunkData = byteData.fromBytes(chunk.subChunkData, 8);
+            this.bextChunkSize = chunk.chunkSize;
+            this.bextChunkData = chunk.chunkData;
         }
     }
 
     /**
      * Read the "cue " chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
-     * @param {Object} options The options to read the bytes.
      * @throws {Error} If no "cue" chunk is found.
      */
     readCueChunk_(chunks) {
         let chunk = this.findChunk(chunks, "cue ");
         if (chunk) {
             this.cueChunkId = "cue ";
-            this.cueChunkSize = chunk.subChunkSize;
-            this.cueChunkData = byteData.fromBytes(chunk.subChunkData, 8);
+            this.cueChunkSize = chunk.chunkSize;
+            this.cueChunkData = chunk.chunkData;
         }
     }
 
@@ -1112,8 +1201,8 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         let chunk = this.findChunk(chunks, "data");
         if (chunk) {
             this.dataChunkId = "data";
-            this.dataChunkSize = chunk.subChunkSize;
-            this.samplesFromBytes_(chunk.subChunkData, options);
+            this.dataChunkSize = chunk.chunkSize;
+            this.samplesFromBytes_(chunk.chunkData, options);
         } else {
             throw Error(this.WaveErrors["data"]);
         }
@@ -1130,7 +1219,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
         }
         options.single = false;
         if (this.bitsPerSample == 4) {
-            this.samples_ = byteData.fromBytes(bytes, 8, options);
+            this.samples_ = byteData.pack(bytes, uInt8);
         } else {
             this.samples_ = byteData.fromBytes(
                 bytes, this.bitsPerSample, options);
@@ -1143,7 +1232,7 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     findChunk(chunks, fourCC) {
         for (let i = 0; i<chunks.length; i++) {
-            if (chunks[i].subChunkId == fourCC) {
+            if (chunks[i].chunkId == fourCC) {
                 return chunks[i];
             }
         }
@@ -1154,7 +1243,6 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * Split each sample into bytes.
      */
     samplesToBytes_(options) {
-        //bytes = [];
         if (this.bitsPerSample == 32 && this.audioFormat == 3) {
             options.float = true;
         }
@@ -1172,15 +1260,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {!Array<number>} The "bext" chunk bytes.
      */
     getBextBytes_(options) {
-        let bext = [];
         if (this.bextChunkId) {
-            bext = bext.concat(
-                    byteData.toBytes(this.bextChunkId, 8, {"char": true}),
-                    byteData.toBytes(this.bextChunkSize, 32, options),
-                    byteData.toBytes(this.bextChunkData, 8)
+            return [].concat(
+                    byteData.packSequence(this.bextChunkId, char),
+                    byteData.pack(this.bextChunkSize, uInt32),
+                    this.bextChunkData
                 );
         }
-        return bext;
+        return [];
     }
 
     /**
@@ -1189,15 +1276,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {!Array<number>} The "cue " chunk bytes.
      */
     getCueBytes_(options) {
-        let cue = [];
         if (this.cueChunkId) {
-            cue = cue.concat(
-                    byteData.toBytes(this.cueChunkId, 8, {"char": true}),
-                    byteData.toBytes(this.cueChunkSize, 32, options),
-                    byteData.toBytes(this.cueChunkData, 8)
+            return [].concat(
+                    byteData.packSequence(this.cueChunkId, char),
+                    byteData.pack(this.cueChunkSize, uInt32),
+                    this.cueChunkData
                 );
         }
-        return cue;
+        return [];
     }
 
     /**
@@ -1206,15 +1292,14 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {!Array<number>} The "fact" chunk bytes.
      */
     getFactBytes_(options) {
-        let fact = []
         if (this.factChunkId) {
-            fact = fact.concat(
-                    byteData.toBytes(this.factChunkId, 8, {"char": true}),
-                    byteData.toBytes(this.factChunkSize, 32, options),
-                    byteData.toBytes(this.dwSampleLength, 32, options)
+            return [].concat(
+                    byteData.packSequence(this.factChunkId, char),
+                    byteData.pack(this.factChunkSize, uInt32),
+                    byteData.pack(this.dwSampleLength, uInt32)
                 );
         }
-        return fact;
+        return [];
     }
 
     /**
@@ -1223,12 +1308,10 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {!Array<number>} The cbSize bytes.
      */
     getCbSizeBytes_(options) {
-        let cbSize = [];
         if (this.fmtChunkSize > 16) {
-            cbSize = byteData.toBytes(this.cbSize, 16, options);
-            
+            return byteData.pack(this.cbSize, uInt16);
         }
-        return cbSize;
+        return [];
     }
 
     /**
@@ -1237,12 +1320,10 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      * @return {!Array<number>} The validBitsPerSample bytes.
      */
     getValidBitsPerSampleBytes_(options) {
-        let validBitsPerSample = [];
         if (this.fmtChunkSize > 18) {
-            validBitsPerSample = byteData.toBytes(
-                this.validBitsPerSample, 16, options);
+            return byteData.pack(this.validBitsPerSample, uInt16);
         }
-        return validBitsPerSample;
+        return [];
     }
 
     /**
@@ -1251,30 +1332,30 @@ class WaveFileReaderWriter extends waveFileHeader.WaveFileHeader {
      */
     createWaveFile_() {
         let options = {"be": this.chunkId == "RIFX"};
-        return byteData.toBytes(this.chunkId, 8, {"char": true}).concat(
-                byteData.toBytes(this.chunkSize, 32, options),
-                byteData.toBytes(this.format, 8, {"char": true}), 
+        return byteData.packSequence(this.chunkId, char).concat(
+                byteData.pack(this.chunkSize, uInt32),
+                byteData.packSequence(this.format, char),
                 this.getBextBytes_(options),
-                byteData.toBytes(this.fmtChunkId, 8, {"char": true}),
-                byteData.toBytes(this.fmtChunkSize, 32, options),
-                byteData.toBytes(this.audioFormat, 16, options),
-                byteData.toBytes(this.numChannels, 16, options),
-                byteData.toBytes(this.sampleRate, 32, options),
-                byteData.toBytes(this.byteRate, 32, options),
-                byteData.toBytes(this.blockAlign, 16, options),
-                byteData.toBytes(this.bitsPerSample, 16, options),
+                byteData.packSequence(this.fmtChunkId, char),
+                byteData.pack(this.fmtChunkSize, uInt32),
+                byteData.pack(this.audioFormat, uInt16),
+                byteData.pack(this.numChannels, uInt16),
+                byteData.pack(this.sampleRate, uInt32),
+                byteData.pack(this.byteRate, uInt32),
+                byteData.pack(this.blockAlign, uInt16),
+                byteData.pack(this.bitsPerSample, uInt16),
                 this.getCbSizeBytes_(options),
                 this.getValidBitsPerSampleBytes_(options),
                 this.getFactBytes_(options),
-                byteData.toBytes(this.dataChunkId, 8, {"char": true}),
-                byteData.toBytes(this.dataChunkSize, 32, options),
+                byteData.packSequence(this.dataChunkId, char),
+                byteData.pack(this.dataChunkSize, uInt32),
                 this.samplesToBytes_(options),
                 this.getCueBytes_(options)
             );
     }
 }
 
-module.exports.WaveFileReaderWriter = WaveFileReaderWriter;
+module.exports = WaveFileReaderWriter;
 
 
 /***/ }),
@@ -1303,7 +1384,7 @@ const helpers = __webpack_require__(0);
  *   - "be": If the values are big endian. Default is false (little endian).
  *   - "buffer": If the bytes should be returned as a Uint8Array.
  *       Default is false (bytes are returned as a regular array).
- * @return {!Array<number>|Uint8Array} the data as a byte buffer.
+ * @return {!Array<number>|!Array<string>|Uint8Array} the data as a byte buffer.
  */
 function toBytes(values, bitDepth, options={"base": 10}) {
     values = helpers.turnToArray(values);
@@ -1517,7 +1598,7 @@ function byteSwap(bytes, offset, index) {
     }
 }
 
-module.exports.endianness = endianness;
+module.exports = endianness;
 
 
 /***/ }),
@@ -1536,7 +1617,7 @@ const helpers = __webpack_require__(0);
 
 /**
  * Turn a byte buffer into what the bytes represent.
- * @param {!Array<number>|Uint8Array} buffer An array of bytes.
+ * @param {!Array<number>|!Array<string>|Uint8Array} buffer An array of bytes.
  * @param {number} bitDepth The bit depth of the data.
  *   Possible values are 1, 2, 4, 8, 16, 24, 32, 40, 48 or 64.
  * @param {Object} options The options. They are:
@@ -1570,7 +1651,7 @@ function fromBytes(buffer, bitDepth, options={"base": 10}) {
 
 /**
  * Turn a array of bytes into an array of what the bytes should represent.
- * @param {!Array<number>|Uint8Array} bytes An array of bytes.
+ * @param {!Array<number>|!Array<string>|Uint8Array} bytes An array of bytes.
  * @param {number} bitDepth The bitDepth. 1, 2, 4, 8, 16, 24, 32, 40, 48, 64.
  * @param {boolean} isSigned True if the values should be signed.
  * @param {Function} bitReader The function to read the bytes.
@@ -1872,7 +1953,6 @@ function unpackCrumbs(crumbs) {
     let j = 0;
     let len = crumbs.length;
     let bitCrumb;
-    console.log(len);
     while (i < len) {
         bitCrumb = helpers.lPadZeros(crumbs[i].toString(2), 8);
         unpacked[j++] = parseInt(bitCrumb[0] + bitCrumb[1], 2);
@@ -1959,7 +2039,7 @@ module.exports.unpackNibbles = unpackNibbles;
 /**
  * Wave file headers.
  */
-module.exports.WaveFileHeader = class {
+class WaveFileHeader {
 
     constructor() {
         /**
@@ -2037,6 +2117,8 @@ module.exports.WaveFileHeader = class {
     }
 }
 
+module.exports = WaveFileHeader;
+
 
 /***/ }),
 /* 15 */
@@ -2044,56 +2126,115 @@ module.exports.WaveFileHeader = class {
 
 /*!
  * riff-chunks
- * Get the chunks of RIFF and RIFX files.
+ * Read and write the chunks of RIFF and RIFX files.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/riff-chunks
  *
  */
 
 const byteData = __webpack_require__(2);
+const uInt32 = byteData.uInt32;
+const char = byteData.char;
 
 /**
- * Get the chunks of a RIFF file.
- * @param {Uint8Array|!Array<number>} buffer The RIFF file bytes.
- * @param {boolean} bigEndian true if its RIFX.
+ * Write the bytes of a RIFF/RIFX file.
+ * @param {Object} chunks A structure like the return of riffChunks.read().
+ * @param {boolean} bigEndian if the bytes should be big endian.
+ *      "RIFX" chunkId will always set bigEndian to true.
+ * @return {Array<number>|Uint8Array} The:
+ *      - file bytes as Uint8Array when chunkId is "RIFF" or "RIFX" or
+ *      - chunk bytes as Array<number> if chunkId is "LIST".
+ */
+function write(chunks, bigEndian=false) {
+    if (!bigEndian) {
+        uInt32.be = chunks.chunkId == "RIFX";
+    }
+    let bytes =
+        byteData.packSequence(chunks.chunkId, char).concat(
+                byteData.pack(chunks.chunkSize, uInt32),
+                byteData.packSequence(chunks.format, char),
+                writeSubChunks(chunks.subChunks, uInt32.be)
+            );
+    if (chunks.chunkId == "RIFF" || chunks.chunkId == "RIFX" ) {
+        bytes = new Uint8Array(bytes);
+    }
+    return bytes;
+}
+
+/**
+ * Get the chunks of a RIFF/RIFX file.
+ * @param {Uint8Array|!Array<number>} buffer The file bytes.
  * @return {Object}
  */
-function getChunks(buffer, bigEndian=false) {
+function read(buffer) {
+    buffer = [].slice.call(buffer);
+    let chunkId = getChunkId(buffer, 0);
+    uInt32.be = chunkId == "RIFX";
+    let chunkSize = getChunkSize(buffer, 0);
     return {
-        "chunkId": getChunkId(buffer, 0),
-        "chunkSize": getChunkSize(buffer, 0, bigEndian),
-        "format": byteData.fromBytes(buffer.slice(8, 12), 8, byteData.str),
-        "subChunks": getSubChunks(buffer, bigEndian)
+        "chunkId": chunkId,
+        "chunkSize": chunkSize,
+        "format": byteData.unpackSequence(buffer.slice(8, 12), char),
+        "subChunks": getSubChunks(buffer)
     };
+}
+
+/**
+ * Write the sub chunks of a RIFF file.
+ * @param {Array<Object>} chunks The chunks.
+ * @param {boolean} bigEndian true if its RIFX.
+ * @return {Array<number>}
+ */
+function writeSubChunks(chunks, bigEndian) {
+    let subChunks = [];
+    let i = 0;
+    while (i < chunks.length) {
+        if (chunks[i].chunkId == "LIST") {
+            subChunks = subChunks.concat(write(chunks[i], bigEndian));
+        } else {
+            subChunks = subChunks.concat(
+                byteData.packSequence(chunks[i].chunkId, char),
+                byteData.pack(chunks[i].chunkSize, uInt32),
+                chunks[i].chunkData
+            );
+        }
+        i++;
+    }
+    return subChunks;
 }
 
 /**
  * Get the sub chunks of a RIFF file.
  * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
- * @param {boolean} bigEndian true if its RIFX.
  * @return {Object}
  */
-function getSubChunks(buffer, bigEndian) {
+function getSubChunks(buffer) {
     let chunks = [];
     let i = 12;
     while(i < buffer.length) {
-        chunks.push(getSubChunk(buffer, i, bigEndian));
-        i += 8 + chunks[chunks.length - 1].subChunkSize;
+        chunks.push(getSubChunk(buffer, i));
+        i += 8 + chunks[chunks.length - 1].chunkSize;
     }
     return chunks;
 }
 
-function getSubChunk(buffer, index, bigEndian) {
+/**
+ * Get a sub chunk from a RIFF file.
+ * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {Object}
+ */
+function getSubChunk(buffer, index) {
     let chunk = {
-        "subChunkId": getChunkId(buffer, index),
-        "subChunkSize": getChunkSize(buffer, index, bigEndian)
+        "chunkId": getChunkId(buffer, index),
+        "chunkSize": getChunkSize(buffer, index)
     };
-    if (chunk.subChunkId == "LIST") {
+    if (chunk.chunkId == "LIST") {
+        chunk.format = byteData.unpackSequence(buffer.slice(8, 12), char);
         chunk.subChunks = getSubChunks(
-            buffer.slice(index, index + chunk.subChunkSize), bigEndian);
+            buffer.slice(index, index + chunk.chunkSize));
     } else {
-        chunk.subChunkData = buffer.slice(
-            index + 8, index + 8 + chunk.subChunkSize);
+        chunk.chunkData = buffer.slice(index + 8, index + 8 + chunk.chunkSize);
     }
     return chunk;
 }
@@ -2105,8 +2246,7 @@ function getSubChunk(buffer, index, bigEndian) {
  * @return {string}
  */
 function getChunkId(buffer, index) {
-    return byteData.fromBytes(
-        buffer.slice(index, index + 4), 8, {"char": true});
+    return byteData.unpackSequence(buffer.slice(index, index + 4), char);
 }
 
 /**
@@ -2115,14 +2255,12 @@ function getChunkId(buffer, index) {
  * @param {number} index The start index of the chunk.
  * @return {number}
  */
-function getChunkSize(buffer, index, bigEndian) {
-    return byteData.fromBytes(
-        buffer.slice(index + 4, index + 8),
-        32,
-        {'be': bigEndian, "single": true});
+function getChunkSize(buffer, index) {
+    return byteData.unpack(buffer.slice(index + 4, index + 8), uInt32);
 }
 
-module.exports.getChunks = getChunks;
+module.exports.read = read;
+module.exports.write = write;
 
 
 /***/ })

@@ -8,12 +8,12 @@ var assert = require('assert');
 describe('read 24bit file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");
-    let wav = new wavefile.WaveFile(wBytes);
-    let wav2 = new wavefile.WaveFile(wav.toBuffer());
+    let wav = new WaveFile(wBytes);
+    let wav2 = new WaveFile(wav.toBuffer());
     fs.writeFileSync(path + "/out/24bit-16kHz-bext-mono.wav", wav2.toBuffer());
     
     it("chunkId should be 'RIFF'",

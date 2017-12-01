@@ -8,14 +8,14 @@ let assert = require("assert");
 describe("16-bit RIFF to RIFX", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let riffWav = new wavefile.WaveFile(
+    let riffWav = new WaveFile(
         fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     riffWav.toRIFX();
     fs.writeFileSync(path + "/out/RIFF-to-RIFX-16bit-mono.wav", riffWav.toBuffer());
-    let wav = new wavefile.WaveFile(
+    let wav = new WaveFile(
         fs.readFileSync(path + "/out/RIFF-to-RIFX-16bit-mono.wav"));
 
     it("chunkId should be 'RIFX'",
@@ -79,14 +79,14 @@ describe("16-bit RIFF to RIFX", function() {
 describe("RIFX cbSize and validBitsPerSample", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let riffWav = new wavefile.WaveFile(
+    let riffWav = new WaveFile(
         fs.readFileSync(path + "4bit-imaadpcm-8kHz-noBext-mono.wav"));
     riffWav.toRIFX();
     fs.writeFileSync(path + "/out/RIFF-to-RIFX-4bit-imaadpcm-8kHz-noBext-mono.wav", riffWav.toBuffer());
-    let wav = new wavefile.WaveFile(
+    let wav = new WaveFile(
         fs.readFileSync(path + "/out/RIFF-to-RIFX-4bit-imaadpcm-8kHz-noBext-mono.wav"));
 
     it("cbSize should be 2 in the original file",

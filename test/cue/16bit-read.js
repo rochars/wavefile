@@ -8,14 +8,14 @@ let assert = require("assert");
 describe("16-bit cue reading", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let wav = new wavefile.WaveFile(
+    let wav = new WaveFile(
             fs.readFileSync(path + "16bit-16kHz-markers-mono.wav")
         );
     fs.writeFileSync(path + "/out/16bit-16kHz-markers-mono.wav", wav.toBuffer());
-    wav = new wavefile.WaveFile(
+    wav = new WaveFile(
             fs.readFileSync(path + "/out/16bit-16kHz-markers-mono.wav")
         );
 
@@ -80,14 +80,14 @@ describe("16-bit cue reading", function() {
 describe("16-bit cue reading (file with 2 markers)", function() {
 
     let fs = require("fs");
-    let wavefile = require("../../index.js");
+    let WaveFile = require("../../index.js");
     let path = "test/files/";
     
-    let wav = new wavefile.WaveFile(
+    let wav = new WaveFile(
             fs.readFileSync(path + "16bit-16kHz-2markers-mono.wav")
         );
     fs.writeFileSync(path + "/out/16bit-16kHz-2markers-mono.wav", wav.toBuffer());
-    wav = new wavefile.WaveFile(
+    wav = new WaveFile(
             fs.readFileSync(path + "/out/16bit-16kHz-2markers-mono.wav")
         );
 

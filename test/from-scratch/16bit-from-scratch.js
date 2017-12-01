@@ -8,8 +8,8 @@ var assert = require('assert');
 
 describe('create 16-bit wave files from scratch', function() {
     
-    let wavefile = require('../../index.js');
-    let wav = new wavefile.WaveFile();
+    let WaveFile = require('../../index.js');
+    let wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
 
     let fs = require('fs');

@@ -8,8 +8,8 @@ var assert = require('assert');
 
 describe('create 32-bit IEEE wave file from scratch', function() {
     
-    let wavefile = require('../../index.js');
-    let wav = new wavefile.WaveFile();
+    let WaveFile = require('../../index.js');
+    let wav = new WaveFile();
     wav.fromScratch(1, 44100, '32f', [0, 0.04029441, -0.04029440, 1]);
 
     let fs = require('fs');
