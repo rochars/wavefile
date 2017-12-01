@@ -430,7 +430,7 @@ function unpackSequence(buffer, type, base=10) {
 }
 
 // interface
-window['WaveFile'].pack = pack;
+module.exports.pack = pack;
 module.exports.unpack = unpack;
 module.exports.packSequence = packSequence;
 module.exports.unpackSequence = unpackSequence;
@@ -634,7 +634,7 @@ function unpack(f) {
     return int32[0]
 }
 
-window['WaveFile'] = pack
+module.exports = pack
 module.exports.pack = pack
 module.exports.unpack = unpack
 
@@ -1042,7 +1042,7 @@ function validateBitDepths(originalBitDepth, targetBitDepth) {
     return true;
 }
 
-window['WaveFile'].toBitDepth = toBitDepth;
+module.exports.toBitDepth = toBitDepth;
 module.exports.BitDepthMaxValues = BitDepthMaxValues;
 
 
@@ -1607,7 +1607,7 @@ function byteSwap(bytes, offset, index) {
     }
 }
 
-window['WaveFile'] = endianness;
+module.exports = endianness;
 
 
 /***/ }),
@@ -2268,7 +2268,7 @@ function getChunkSize(buffer, index) {
     return byteData.unpack(buffer.slice(index + 4, index + 8), uInt32);
 }
 
-window['WaveFile'].read = read;
+module.exports.read = read;
 module.exports.write = write;
 
 
