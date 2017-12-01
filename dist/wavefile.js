@@ -430,7 +430,7 @@ function unpackSequence(buffer, type, base=10) {
 }
 
 // interface
-module.exports.pack = pack;
+window['WaveFile'].pack = pack;
 module.exports.unpack = unpack;
 module.exports.packSequence = packSequence;
 module.exports.unpackSequence = unpackSequence;
@@ -634,7 +634,7 @@ function unpack(f) {
     return int32[0]
 }
 
-module.exports = pack
+window['WaveFile'] = pack
 module.exports.pack = pack
 module.exports.unpack = unpack
 
@@ -853,7 +853,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 }
 
-module.exports = WaveFile;
+window['WaveFile'] = WaveFile;
 
 
 /***/ }),
@@ -1042,7 +1042,7 @@ function validateBitDepths(originalBitDepth, targetBitDepth) {
     return true;
 }
 
-module.exports.toBitDepth = toBitDepth;
+window['WaveFile'].toBitDepth = toBitDepth;
 module.exports.BitDepthMaxValues = BitDepthMaxValues;
 
 
@@ -1340,7 +1340,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
      * @return {Uint8Array} The wav file bytes.
      */
     createWaveFile_() {
-        let options = {"be": this.chunkId == "RIFX"};
+        let options = {"be": this.LEorBE()};
         return byteData.packSequence(this.chunkId, char).concat(
                 byteData.pack(this.chunkSize, uInt32),
                 byteData.packSequence(this.format, char),
@@ -1607,7 +1607,7 @@ function byteSwap(bytes, offset, index) {
     }
 }
 
-module.exports = endianness;
+window['WaveFile'] = endianness;
 
 
 /***/ }),
@@ -2268,7 +2268,7 @@ function getChunkSize(buffer, index) {
     return byteData.unpack(buffer.slice(index + 4, index + 8), uInt32);
 }
 
-module.exports.read = read;
+window['WaveFile'].read = read;
 module.exports.write = write;
 
 

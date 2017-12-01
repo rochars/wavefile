@@ -288,7 +288,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
      * @return {Uint8Array} The wav file bytes.
      */
     createWaveFile_() {
-        let options = {"be": this.chunkId == "RIFX"};
+        let options = {"be": this.LEorBE()};
         return byteData.packSequence(this.chunkId, char).concat(
                 byteData.pack(this.chunkSize, uInt32),
                 byteData.packSequence(this.format, char),

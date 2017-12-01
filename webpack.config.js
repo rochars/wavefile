@@ -11,7 +11,7 @@ module.exports = {
         query: {
           multiple: [
             {
-              search: 'module.exports.WaveFile',
+              search: 'module.exports',
               replace: "window['WaveFile']",
             },
           ]
