@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefile
+ *
+ */
+
 module.exports = {
   entry: './index.js',
   output: {
