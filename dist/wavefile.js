@@ -1329,7 +1329,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         if (this.chunkId != "RIFF" && this.chunkId != "RIFX") {
             throw Error(WaveErrors.format);
         }
-        let bigEndian = this.LEorBE();
+        this.LEorBE();
         this.chunkSize = byteData.unpack(bytes.slice(4, 8), uInt32);
         this.format = byteData.unpackArray(bytes.slice(8, 12), chr);
         if (this.format != "WAVE") {
