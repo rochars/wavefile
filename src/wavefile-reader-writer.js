@@ -48,10 +48,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             throw Error(WaveErrors.format);
         }
         let bigEndian = this.LEorBE();
-        this.chunkSize = byteData.fromBytes(
-            bytes.slice(4, 8),
-            32,
-            {"be": bigEndian, "single": true});
+        this.chunkSize = byteData.unpack(bytes.slice(4, 8), uInt32);
         this.format = byteData.unpackArray(bytes.slice(8, 12), chr);
         if (this.format != "WAVE") {
             throw Error(WaveErrors.wave);
@@ -199,12 +196,10 @@ class WaveFileReaderWriter extends WaveFileHeader {
      * Turn samples to bytes.
      */
     samplesToBytes_(options) {
-        let bytes = [];
         options.bits = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
         options.signed = options.bits == 8 ? false : true;
         options.float = (this.audioFormat == 3  || this.bitsPerSample == 64) ? true : false;
-
-        bytes = byteData.packArray(this.samples_, options);
+        let bytes = byteData.packArray(this.samples_, options);
         if (bytes.length % 2) {
             bytes.push(0);
         }
