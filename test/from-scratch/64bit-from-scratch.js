@@ -63,12 +63,12 @@ describe('create 64-bit wave file from scratch', function() {
         assert.equal(wav.dataChunkSize, 32);
     });
 
-    it('samples_ should be the same as the args', function() {
-        assert.deepEqual(wav.samples_, [0.0, 0.04029440055111987, -0.04029440055111987, 1.0]);
+    it('samples should be the same as the args', function() {
+        assert.deepEqual(wav.samples, [0.0, 0.04029440055111987, -0.04029440055111987, 1.0]);
     });
 
-    it('bitDepth_ should be "24"', function() {
-        assert.equal(wav.bitDepth_, "64");
+    it('bitDepth should be "24"', function() {
+        assert.equal(wav.bitDepth, "64");
     });
 
     /*

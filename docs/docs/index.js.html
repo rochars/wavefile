@@ -95,7 +95,7 @@ class WaveFile extends WaveFileReaderWriter {
         this.bitsPerSample = parseInt(bitDepth, 10);
         this.dataChunkId = "data";
         this.dataChunkSize = samples.length * bytes;
-        this.samples_ = samples;
+        this.samples = samples;
         this.bitDepth_ = bitDepth;
     }
 
@@ -155,12 +155,12 @@ class WaveFile extends WaveFileReaderWriter {
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
-        bitDepthLib.toBitDepth(this.samples_, this.bitDepth_, bitDepth);
+        bitDepthLib.toBitDepth(this.samples, this.bitDepth_, bitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
             bitDepth,
-            this.samples_,
+            this.samples,
             {"container": this.chunkId}
         );
     }
@@ -172,13 +172,13 @@ class WaveFile extends WaveFileReaderWriter {
         let finalSamples = [];
         let i;
         let j;
-        let numChannels = this.samples_[0].length;
+        let numChannels = this.samples[0].length;
         for (i = 0; i &lt; numChannels; i++) {
-            for (j = 0; j &lt; this.samples_.length; j++) {
-                finalSamples.push(this.samples_[j][i]);
+            for (j = 0; j &lt; this.samples.length; j++) {
+                finalSamples.push(this.samples[j][i]);
             }
         }
-        this.samples_ = finalSamples;
+        this.samples = finalSamples;
     }
 
     /**
@@ -192,13 +192,13 @@ class WaveFile extends WaveFileReaderWriter {
         }
         i = 0;
         let j;
-        while (i &lt; this.samples_.length) {
+        while (i &lt; this.samples.length) {
             for (j = 0; j &lt; this.numChannels; j++) {
-                finalSamples[j].push(this.samples_[i+j]);
+                finalSamples[j].push(this.samples[i+j]);
             }
             i += j;
         }
-        this.samples_ = finalSamples;
+        this.samples = finalSamples;
     }
 
     /**

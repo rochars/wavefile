@@ -66,7 +66,7 @@ describe("16-bit from file to 8-bit", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
 });
 
@@ -129,9 +129,9 @@ describe("16-bit mono from scratch to 8-bit (max range)", function() {
             function() {
         assert.ok(wav.dataChunkSize > 0);
     });
-    it("samples_ should be [0, 255]",
+    it("samples should be [0, 255]",
             function() {
-        assert.deepEqual(wav.samples_, [0, 255]);
+        assert.deepEqual(wav.samples, [0, 255]);
     });
 });
 
@@ -146,8 +146,8 @@ describe("16-bit mono from scratch to 8-bit (0)", function() {
     wav.fromScratch(1, 8000, "16", samples);
     wav.toBitDepth("8");
 
-    it("samples_ should be [128]",
+    it("samples should be [128]",
             function() {
-        assert.deepEqual(wav.samples_, [128]);
+        assert.deepEqual(wav.samples, [128]);
     });
 });

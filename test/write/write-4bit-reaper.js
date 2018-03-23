@@ -80,14 +80,14 @@ describe('read 4-bit file from disk and write to new file (different APDCM sourc
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav2.samples_.length > 0);
+        assert.ok(wav2.samples.length > 0);
     });
-    it("samples_ on the new file should have the same length as in the original file",
+    it("samples on the new file should have the same length as in the original file",
             function() {
-        assert.equal(wav2.samples_.length, wav.samples_.length);
+        assert.equal(wav2.samples.length, wav.samples.length);
     });
-    it("samples_ on the new file should be same as the original file",
+    it("samples on the new file should be same as the original file",
             function() {
-        assert.deepEqual(wav2.samples_, wav.samples_);
+        assert.deepEqual(wav2.samples, wav.samples);
     });
 });

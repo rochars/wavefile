@@ -60,12 +60,12 @@ describe('create 16-bit wave files from scratch', function() {
         assert.equal(wav.dataChunkSize, 8);
     });
 
-    it('samples_ should be the same as the args', function() {
-        assert.deepEqual(wav.samples_, [0, 1, -32768, 32767]);
+    it('samples should be the same as the args', function() {
+        assert.deepEqual(wav.samples, [0, 1, -32768, 32767]);
     });
 
-    it('bitDepth_ should be "16"', function() {
-        assert.equal(wav.bitDepth_, "16");
+    it('bitDepth should be "16"', function() {
+        assert.equal(wav.bitDepth, "16");
     });
 });
 
@@ -129,11 +129,11 @@ describe('create 16-bit wave files from scratch, write and read the file', funct
         assert.equal(wav.dataChunkSize, 8);
     });
 
-    it('samples_ should be the same as the args', function() {
-        assert.deepEqual(wav.samples_, [0, 1, -32768, 32767]);
+    it('samples should be the same as the args', function() {
+        assert.deepEqual(wav.samples, [0, 1, -32768, 32767]);
     });
 
-    it('bitDepth_ should be "16"', function() {
-        assert.equal(wav.bitDepth_, "16");
+    it('bitDepth should be "16"', function() {
+        assert.equal(wav.bitDepth, "16");
     });
 });

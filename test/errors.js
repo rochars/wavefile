@@ -105,7 +105,7 @@ describe('errors', function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
             let wav = new WaveFile();
             wav.fromBuffer(wBytes);
-            wav.bitDepth_ = 3;
+            wav.bitDepth = 3;
             wav.toBuffer();
         };
         expect(testFunc).to.throw("Invalid bit depth.");

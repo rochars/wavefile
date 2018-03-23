@@ -63,12 +63,12 @@ describe('create 32-bit PCM wave files from scratch', function() {
         assert.equal(wav.dataChunkSize, 16);
     });
 
-    it('samples_ should be the same as the args', function() {
-        assert.deepEqual(wav.samples_, [0, -2147483648, 2147483647, 4]);
+    it('samples should be the same as the args', function() {
+        assert.deepEqual(wav.samples, [0, -2147483648, 2147483647, 4]);
     });
 
-    it('bitDepth_ should be "24"', function() {
-        assert.equal(wav.bitDepth_, "32");
+    it('bitDepth should be "24"', function() {
+        assert.equal(wav.bitDepth, "32");
     });
 
     /*

@@ -63,12 +63,12 @@ describe('create 8-bit wave files from scratch', function() {
         assert.equal(wav.dataChunkSize, 4);
     });
 
-    it('samples_ should be the same as the args', function() {
-        assert.deepEqual(wav.samples_, [0, 255, 2, 3]);
+    it('samples should be the same as the args', function() {
+        assert.deepEqual(wav.samples, [0, 255, 2, 3]);
     });
 
-    it('bitDepth_ should be "8"', function() {
-        assert.equal(wav.bitDepth_, "8");
+    it('bitDepth should be "8"', function() {
+        assert.equal(wav.bitDepth, "8");
     });
 
     /*

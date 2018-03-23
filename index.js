@@ -1,7 +1,7 @@
 /*!
  * wavefile
  * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
- * Copyright (c) 2017 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
  */
@@ -56,8 +56,8 @@ class WaveFile extends WaveFileReaderWriter {
         this.bitsPerSample = parseInt(bitDepth, 10);
         this.dataChunkId = "data";
         this.dataChunkSize = samples.length * bytes;
-        this.samples_ = samples;
-        this.bitDepth_ = bitDepth;
+        this.samples = samples;
+        this.bitDepth = bitDepth;
     }
 
     /**
@@ -77,9 +77,9 @@ class WaveFile extends WaveFileReaderWriter {
                 {"be": bigEndian, "single": true}
             );
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
-            this.bitDepth_ = "32f";
+            this.bitDepth = "32f";
         }else {
-            this.bitDepth_ = this.bitsPerSample.toString();
+            this.bitDepth = this.bitsPerSample.toString();
         }
     }
     
@@ -116,12 +116,12 @@ class WaveFile extends WaveFileReaderWriter {
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
-        bitDepthLib.toBitDepth(this.samples_, this.bitDepth_, bitDepth);
+        bitDepthLib.toBitDepth(this.samples, this.bitDepth, bitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
             bitDepth,
-            this.samples_,
+            this.samples,
             {"container": this.chunkId}
         );
     }
@@ -133,13 +133,13 @@ class WaveFile extends WaveFileReaderWriter {
         let finalSamples = [];
         let i;
         let j;
-        let numChannels = this.samples_[0].length;
+        let numChannels = this.samples[0].length;
         for (i = 0; i < numChannels; i++) {
-            for (j = 0; j < this.samples_.length; j++) {
-                finalSamples.push(this.samples_[j][i]);
+            for (j = 0; j < this.samples.length; j++) {
+                finalSamples.push(this.samples[j][i]);
             }
         }
-        this.samples_ = finalSamples;
+        this.samples = finalSamples;
     }
 
     /**
@@ -153,13 +153,13 @@ class WaveFile extends WaveFileReaderWriter {
         }
         i = 0;
         let j;
-        while (i < this.samples_.length) {
+        while (i < this.samples.length) {
             for (j = 0; j < this.numChannels; j++) {
-                finalSamples[j].push(this.samples_[i+j]);
+                finalSamples[j].push(this.samples[i+j]);
             }
             i += j;
         }
-        this.samples_ = finalSamples;
+        this.samples = finalSamples;
     }
 
     /**
@@ -177,7 +177,7 @@ class WaveFile extends WaveFileReaderWriter {
      * @throws {Error} If any argument does not meet the criteria.
      */
     validateBitDepth_() {
-        if (!this.headerFormats_[this.bitDepth_]) {
+        if (!this.headerFormats_[this.bitDepth]) {
             throw new Error(WaveErrors.bitDepth);
         }
         return true;

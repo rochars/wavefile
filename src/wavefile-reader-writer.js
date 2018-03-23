@@ -1,6 +1,6 @@
 /*
  * WaveFileReaderWriter
- * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
  */
@@ -34,7 +34,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             "64": 3
         };
         /** @type {!Array<number>} */
-        this.samples_ = [];
+        this.samples = [];
     }
 
     /**
@@ -176,7 +176,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         options.signed = options.bits == 8 ? false : true;
         options.float = (this.audioFormat == 3 || this.bitsPerSample == 64) ? true : false;
         options.single = false;
-        this.samples_ = byteData.unpackArray(bytes, options);
+        this.samples = byteData.unpackArray(bytes, options);
     }
 
     /**
@@ -199,7 +199,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         options.bits = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
         options.signed = options.bits == 8 ? false : true;
         options.float = (this.audioFormat == 3  || this.bitsPerSample == 64) ? true : false;
-        let bytes = byteData.packArray(this.samples_, options);
+        let bytes = byteData.packArray(this.samples, options);
         if (bytes.length % 2) {
             bytes.push(0);
         }

@@ -66,7 +66,7 @@ describe("32-bit IEEE from file to 16-bit", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
 });
 
@@ -129,9 +129,9 @@ describe("32-bit IEEE mono from scratch to 16-bit (max range)", function() {
             function() {
         assert.ok(wav.dataChunkSize > 0);
     });
-    it("samples_ should be [-32768, 32767]",
+    it("samples should be [-32768, 32767]",
             function() {
-        assert.deepEqual(wav.samples_, [-32768, 32767]);
+        assert.deepEqual(wav.samples, [-32768, 32767]);
     });
 });
 
@@ -146,8 +146,8 @@ describe("32-bit IEEE mono from scratch to 16-bit (0)", function() {
     wav.fromScratch(1, 8000, "32f", samples);
     wav.toBitDepth("16");
 
-    it("samples_ should be [0]",
+    it("samples should be [0]",
             function() {
-        assert.deepEqual(wav.samples_, [0]);
+        assert.deepEqual(wav.samples, [0]);
     });
 });

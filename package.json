@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Read & write wave files with 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",

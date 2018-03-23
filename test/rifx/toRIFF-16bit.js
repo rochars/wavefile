@@ -73,14 +73,14 @@ describe("16-bit RIFX to RIFF", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
-    it("samples_ in RIFF-from-RIFX file should be the same as in the RIFF file",
+    it("samples in RIFF-from-RIFX file should be the same as in the RIFF file",
             function() {
-        assert.deepEqual(wav.samples_, riffWav.samples_);
+        assert.deepEqual(wav.samples, riffWav.samples);
     });
-    it("samples_ in RIFF-from-RIFX file should be the same as in the RIFX file",
+    it("samples in RIFF-from-RIFX file should be the same as in the RIFX file",
             function() {
-        assert.deepEqual(wav.samples_, rifxWav.samples_);
+        assert.deepEqual(wav.samples, rifxWav.samples);
     });
 });

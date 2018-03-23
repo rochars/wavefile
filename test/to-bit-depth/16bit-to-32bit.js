@@ -66,7 +66,7 @@ describe("16-bit from file to 32-bit", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
 });
 
@@ -125,9 +125,9 @@ describe("16-bit mono from scratch to 32-bit (max range)", function() {
             function() {
         assert.equal(wav.dataChunkId, 'data');
     });
-    it("samples_ should be [-2147483648, 2147483647]",
+    it("samples should be [-2147483648, 2147483647]",
             function() {
-        assert.deepEqual(wav.samples_, [-2147483648, 2147483647]);
+        assert.deepEqual(wav.samples, [-2147483648, 2147483647]);
     });
 });
 
@@ -143,8 +143,8 @@ describe("16-bit mono from scratch to 32-bit (0)", function() {
     wav.fromScratch(1, 8000, "16", samples);
     wav.toBitDepth("32");
 
-    it("samples_ should be [0]",
+    it("samples should be [0]",
             function() {
-        assert.deepEqual(wav.samples_, [0]);
+        assert.deepEqual(wav.samples, [0]);
     });
 });

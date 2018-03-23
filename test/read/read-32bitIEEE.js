@@ -64,6 +64,6 @@ describe("32-bit IEEE (with bwf) reading", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
 });

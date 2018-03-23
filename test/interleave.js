@@ -23,7 +23,7 @@ describe('interleave', function() {
         wav.fromScratch(2, 48000, '8', stereoSamples);
         wav.interleave();
         let expected = [0, 0, -2, -1, 4, 4, 3, 3];
-        assert.deepEqual(wav.samples_, expected);
+        assert.deepEqual(wav.samples, expected);
     });
 
     it('should de-interleave the samples of a 2-channel wave file',
@@ -37,7 +37,7 @@ describe('interleave', function() {
             [0, -2, 4, 3],
             [0, -1, 4, 3]
         ];
-        assert.deepEqual(wav.samples_, expected);
+        assert.deepEqual(wav.samples, expected);
     });
 
     it('should interleave the samples of a 3-channel wave file',
@@ -51,7 +51,7 @@ describe('interleave', function() {
         wav.fromScratch(2, 48000, '8', stereoSamples);
         wav.interleave();
         let expected = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
-        assert.deepEqual(wav.samples_, expected);
+        assert.deepEqual(wav.samples, expected);
     });
 
     it('should de-interleave the samples of a 3-channel wave file',
@@ -66,7 +66,7 @@ describe('interleave', function() {
             [0, -1, 4, 3],
             [0, -1, 5, 3]
         ];
-        assert.deepEqual(wav.samples_, expected);
+        assert.deepEqual(wav.samples, expected);
     });
 
     /*

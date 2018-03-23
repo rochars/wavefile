@@ -61,6 +61,6 @@ describe("4-bit IMA ADPCM reading", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
 });

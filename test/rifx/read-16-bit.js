@@ -67,10 +67,10 @@ describe("16-bit RIFX reading", function() {
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav.samples_.length > 0);
+        assert.ok(wav.samples.length > 0);
     });
-    it("samples_ in RIFX file should be the same as in the RIFF file",
+    it("samples in RIFX file should be the same as in the RIFF file",
             function() {
-        assert.deepEqual(wav.samples_, riffWav.samples_);
+        assert.deepEqual(wav.samples, riffWav.samples);
     });
 });
