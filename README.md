@@ -83,6 +83,31 @@ wav.toRIFX();
 wav.toRIFF();
 ```
 
+## IMA-ADPCM
+16-bit wave files can be compressed as IMA-ADPCM:
+```javascript
+let wav = new Wavefile(fs.readFileSync("file.wav"));
+
+// Encode a 16-bit wave file as 4-bit IMA-ADPCM:
+wav.toIMAADPCM();
+```
+
+To decode 4-bit IMA-ADPCM as 16-bit:
+```javascript
+let wav = new Wavefile(fs.readFileSync("file.wav"));
+
+// Decode 4-bit IMA-ADPCM as 16-bit:
+wav.fromIMAADPCM();
+```
+
+When decoding, a 256 block align is assumed by default. To use a different block align:
+```javascript
+let wav = new Wavefile(fs.readFileSync("file.wav"));
+
+// Decode 4-bit IMA-ADPCM, 1024 blockalign:
+wav.fromIMAADPCM(1024);
+```
+
 ### The properties
 ```javascript
 let wav = new Wavefile(fs.readFileSync("file.wav"));

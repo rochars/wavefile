@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#checkWriteInput_">checkWriteInput_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#validateBitDepth_">validateBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#validateNumChannels_">validateNumChannels_</a></li><li data-type='method'><a href="WaveFile.html#validateSampleRate_">validateSampleRate_</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#checkWriteInput_">checkWriteInput_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#validateBitDepth_">validateBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#validateNumChannels_">validateNumChannels_</a></li><li data-type='method'><a href="WaveFile.html#validateSampleRate_">validateSampleRate_</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -45,10 +45,13 @@
  *
  */
 
+const byteData = require("byte-data");
+const uInt8 = byteData.uInt8;
 const bitDepthLib = require("bitdepth");
 const WaveErrors = require("./src/wave-errors");
 const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
+const adpcm = require("imaadpcm");
 
 /**
  * WaveFile
@@ -78,6 +81,14 @@ class WaveFile extends WaveFileReaderWriter {
      *     Samples of multi-channel data .
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
+        
+        this.cbSize = 0;
+        this.validBitsPerSample = 0;
+        this.factChunkId = "";
+        this.factChunkSize = 0;
+        this.factChunkData = [];
+        this.dwSampleLength = 0;
+
         if (!options.container) {
             options.container = "RIFF";
         }
@@ -97,6 +108,31 @@ class WaveFile extends WaveFileReaderWriter {
         this.dataChunkSize = samples.length * bytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
+
+        if (bitDepth == "4") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.byteRate = 4055;
+            this.blockAlign = 256;
+            this.chunkId = options.container;
+            this.format = "WAVE";
+            this.fmtChunkId = "fmt ";
+            this.audioFormat = this.headerFormats_[bitDepth];
+            this.numChannels = numChannels;
+            this.sampleRate = sampleRate;
+            this.bitsPerSample = 4;
+            this.dataChunkId = "data";
+            this.dataChunkSize = samples.length;
+            this.samples = samples;
+            this.bitDepth = bitDepth;
+
+            this.cbSize = 2;
+            this.validBitsPerSample = 505;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length * 2;
+        }
+
     }
 
     /**
@@ -121,7 +157,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.bitDepth = this.bitsPerSample.toString();
         }
     }
-    
+
     /**
      * Turn the WaveFile object into a byte buffer.
      * @return {Uint8Array}
@@ -160,7 +196,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             bitDepth,
-            this.samples,
+            byteData.unpackArray(this.samples, uInt8),
             {"container": this.chunkId}
         );
     }
@@ -199,6 +235,32 @@ class WaveFile extends WaveFileReaderWriter {
             i += j;
         }
         this.samples = finalSamples;
+    }
+
+    /**
+     * Encode the samples as IMA ADPCM.
+     */
+    toIMAADPCM() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "4",
+            adpcm.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode IMA ADPCM samples to the desired bit depth.
+     */
+    fromIMAADPCM(blockAlign=256) {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            adpcm.decode(this.samples, blockAlign),
+            {"container": this.chunkId}
+        );
     }
 
     /**
@@ -261,7 +323,7 @@ module.exports = WaveFile;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 23 2018 09:43:43 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Apr 16 2018 20:12:39 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

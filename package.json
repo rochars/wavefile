@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Read & write wave files with 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -24,6 +24,8 @@
     "32-bit",
     "64-bit",
     "PCM",
+    "IMA",
+    "ADPCM",
     "resample"
   ],
   "repository": {
@@ -58,6 +60,7 @@
   "dependencies": {
     "bitdepth": "^1.0.4",
     "byte-data": "^2.1.0",
+    "imaadpcm": "^1.0.1",
     "riff-chunks": "^3.0.3"
   },
   "main": "index.js"

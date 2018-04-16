@@ -6,10 +6,13 @@
  *
  */
 
+const byteData = require("byte-data");
+const uInt8 = byteData.uInt8;
 const bitDepthLib = require("bitdepth");
 const WaveErrors = require("./src/wave-errors");
 const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
+const adpcm = require("imaadpcm");
 
 /**
  * WaveFile
@@ -39,6 +42,14 @@ class WaveFile extends WaveFileReaderWriter {
      *     Samples of multi-channel data .
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
+        
+        this.cbSize = 0;
+        this.validBitsPerSample = 0;
+        this.factChunkId = "";
+        this.factChunkSize = 0;
+        this.factChunkData = [];
+        this.dwSampleLength = 0;
+
         if (!options.container) {
             options.container = "RIFF";
         }
@@ -58,6 +69,31 @@ class WaveFile extends WaveFileReaderWriter {
         this.dataChunkSize = samples.length * bytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
+
+        if (bitDepth == "4") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.byteRate = 4055;
+            this.blockAlign = 256;
+            this.chunkId = options.container;
+            this.format = "WAVE";
+            this.fmtChunkId = "fmt ";
+            this.audioFormat = this.headerFormats_[bitDepth];
+            this.numChannels = numChannels;
+            this.sampleRate = sampleRate;
+            this.bitsPerSample = 4;
+            this.dataChunkId = "data";
+            this.dataChunkSize = samples.length;
+            this.samples = samples;
+            this.bitDepth = bitDepth;
+
+            this.cbSize = 2;
+            this.validBitsPerSample = 505;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length * 2;
+        }
+
     }
 
     /**
@@ -82,7 +118,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.bitDepth = this.bitsPerSample.toString();
         }
     }
-    
+
     /**
      * Turn the WaveFile object into a byte buffer.
      * @return {Uint8Array}
@@ -121,7 +157,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             bitDepth,
-            this.samples,
+            byteData.unpackArray(this.samples, uInt8),
             {"container": this.chunkId}
         );
     }
@@ -160,6 +196,32 @@ class WaveFile extends WaveFileReaderWriter {
             i += j;
         }
         this.samples = finalSamples;
+    }
+
+    /**
+     * Encode the samples as IMA ADPCM.
+     */
+    toIMAADPCM() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "4",
+            adpcm.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode IMA ADPCM samples to the desired bit depth.
+     */
+    fromIMAADPCM(blockAlign=256) {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            adpcm.decode(this.samples, blockAlign),
+            {"container": this.chunkId}
+        );
     }
 
     /**
