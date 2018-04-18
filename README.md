@@ -1,5 +1,5 @@
 # wavefile
-Read & write wave files with 8, 16, 24, 32 & 64-bit data.  
+Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.  
 Copyright (c) 2017 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
@@ -63,8 +63,6 @@ wav.toBitDepth("24");
 
 ## Interleave and de-interleave stereo samples
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-
 // Interleave stereo samples
 wav.interleave();
 
@@ -74,8 +72,6 @@ wav.deInterleave();
 
 ## RIFF to RIFX and RIFX to RIFF
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-
 // Turn a RIFF file to a RIFX file
 wav.toRIFX();
 
@@ -84,26 +80,20 @@ wav.toRIFF();
 ```
 
 ## IMA-ADPCM
-16-bit wave files can be compressed as IMA-ADPCM:
+16-bit 8000 Hz wave files can be compressed as IMA-ADPCM:
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-
 // Encode a 16-bit wave file as 4-bit IMA-ADPCM:
 wav.toIMAADPCM();
 ```
 
 To decode 4-bit IMA-ADPCM as 16-bit:
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-
 // Decode 4-bit IMA-ADPCM as 16-bit:
 wav.fromIMAADPCM();
 ```
 
-When decoding, a 256 block align is assumed by default. To use a different block align:
+The decoder assumes a 256 block align. To use a different block align:
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-
 // Decode 4-bit IMA-ADPCM, 1024 blockalign:
 wav.fromIMAADPCM(1024);
 ```

@@ -10,7 +10,7 @@
  https://github.com/rochars/byte-data
 
  wavefile
- Read & write wave files with 8, 16, 24, 32 & 64-bit data.
+ Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.
  Copyright (c) 2017-2018 Rafael da Silva Rocha.
  https://github.com/rochars/wavefile
 
@@ -33,6 +33,7 @@
  http://www.cs.columbia.edu/~hgs/audio/dvi/
  https://github.com/acida/pyima
  https://wiki.multimedia.cx/index.php/IMA_ADPCM
+
 */
 var $jscomp=$jscomp||{};$jscomp.scope={};$jscomp.ASSUME_ES5=!1;$jscomp.ASSUME_NO_NATIVE_MAP=!1;$jscomp.ASSUME_NO_NATIVE_SET=!1;$jscomp.objectCreate=$jscomp.ASSUME_ES5||"function"==typeof Object.create?Object.create:function(f){var a=function(){};a.prototype=f;return new a};$jscomp.underscoreProtoCanBeSet=function(){var f={a:!0},a={};try{return a.__proto__=f,a.a}catch(k){}return!1};
 $jscomp.setPrototypeOf="function"==typeof Object.setPrototypeOf?Object.setPrototypeOf:$jscomp.underscoreProtoCanBeSet()?function(f,a){f.__proto__=a;if(f.__proto__!==a)throw new TypeError(f+" is not extensible");return f}:null;

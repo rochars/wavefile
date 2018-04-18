@@ -1,6 +1,6 @@
 /*!
  * wavefile
- * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
+ * Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
