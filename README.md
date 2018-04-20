@@ -1,6 +1,6 @@
 # wavefile
 Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.  
-Copyright (c) 2017 Rafael da Silva Rocha.  
+Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/docs-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/index.html)
@@ -168,7 +168,7 @@ Range:
 - -1.0 to 1.0 for 64-bit (float)
 
 ## LICENSE
-Copyright (c) 2017 Rafael da Silva Rocha.
+Copyright (c) 2017-2018 Rafael da Silva Rocha.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
