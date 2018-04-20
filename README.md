@@ -111,6 +111,19 @@ To decode 8-bit A-Law as 16-bit PCM:
 wav.fromALaw();
 ```
 
+## mu-Law
+16-bit wave files can be encoded as mu-Law:
+```javascript
+// Encode a 16-bit wave file as 8-bit mu-law:
+wav.toMuLaw();
+```
+
+To decode 8-bit mu-Law as 16-bit PCM:
+```javascript
+// Decode 8-bit mu-Law as 16-bit:
+wav.fromMuLaw();
+```
+
 ### The properties
 ```javascript
 let wav = new Wavefile(fs.readFileSync("file.wav"));

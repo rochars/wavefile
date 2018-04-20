@@ -5,7 +5,7 @@
 
 var assert = require('assert');
 
-describe('16-bit to 8-bit a-law', function() {
+describe('16-bit to 8-bit mu-law', function() {
     let fs = require("fs");
     let WaveFile = require("../../index.js");
     let path = "test/files/";
@@ -13,10 +13,10 @@ describe('16-bit to 8-bit a-law', function() {
     let wav = new WaveFile(
         fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     
-    wav.toALaw();
+    wav.toMuLaw();
 
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/8bit-alaw-8kHz-noBext-mono-encoded.wav", wav2.toBuffer());
+    fs.writeFileSync(path + "/out/8bit-mulaw-8kHz-noBext-mono-encoded.wav", wav2.toBuffer());
 
     it("chunkId should be 'RIFF'",
             function() {
@@ -34,9 +34,9 @@ describe('16-bit to 8-bit a-law', function() {
             function() {
         assert.equal(wav2.fmtChunkSize, 20);
     });
-    it("audioFormat should be 6 (a-law)",
+    it("audioFormat should be 7 (mu-law)",
             function() {
-        assert.equal(wav2.audioFormat, 6);
+        assert.equal(wav2.audioFormat, 7);
     });
     it("numChannels should be 1",
             function() {
@@ -69,18 +69,18 @@ describe('16-bit to 8-bit a-law', function() {
     });
 });
 
-describe('8-bit a-law to 16-bit (a-law encoded with WaveFile)', function() {
+describe('8-bit mu-Law to 16-bit (mu-Law encoded with WaveFile)', function() {
     let fs = require("fs");
     let WaveFile = require("../../index.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
-        fs.readFileSync(path + "/8bit-alaw-8kHz-noBext-mono-encoded.wav"));
+        fs.readFileSync(path + "/8bit-mulaw-8kHz-noBext-mono-encoded.wav"));
 
-    wav.fromALaw();
+    wav.fromMuLaw();
 
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/16bit-8kHz-noBext-mono-decoded-alaw.wav",
+    fs.writeFileSync(path + "/out/16bit-8kHz-noBext-mono-decoded-mulaw.wav",
         wav2.toBuffer());
 
     it("chunkId should be 'RIFF'",

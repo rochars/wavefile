@@ -14,6 +14,7 @@ const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
 const adpcm = require("imaadpcm");
 const alaw = require("alaw");
+const mulaw = require("mulaw-js");
 
 /**
  * WaveFile
@@ -84,6 +85,16 @@ class WaveFile extends WaveFileReaderWriter {
         }
         // a-law
         if (bitDepth == "8a") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.cbSize = 2;
+            this.validBitsPerSample = 8;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length;
+        }
+        // mu-law
+        if (bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
             this.cbSize = 2;
@@ -223,7 +234,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Encode 16-bit wave file as 8-bit a-law.
+     * Encode 16-bit wave file as 8-bit A-Law.
      */
     toALaw() {
         this.fromScratch(
@@ -244,6 +255,32 @@ class WaveFile extends WaveFileReaderWriter {
             this.sampleRate,
             "16",
             alaw.decode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Encode 16-bit wave file as 8-bit mu-Law.
+     */
+    toMuLaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "8m",
+            mulaw.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+     */
+    fromMuLaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            mulaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }

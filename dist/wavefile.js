@@ -1305,6 +1305,7 @@ const WaveFileReaderWriter = __webpack_require__(17);
 const riffChunks = __webpack_require__(19);
 const adpcm = __webpack_require__(23);
 const alaw = __webpack_require__(27);
+const mulaw = __webpack_require__(28);
 
 /**
  * WaveFile
@@ -1375,6 +1376,16 @@ class WaveFile extends WaveFileReaderWriter {
         }
         // a-law
         if (bitDepth == "8a") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.cbSize = 2;
+            this.validBitsPerSample = 8;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length;
+        }
+        // mu-law
+        if (bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
             this.cbSize = 2;
@@ -1514,7 +1525,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Encode 16-bit wave file as 8-bit a-law.
+     * Encode 16-bit wave file as 8-bit A-Law.
      */
     toALaw() {
         this.fromScratch(
@@ -1535,6 +1546,32 @@ class WaveFile extends WaveFileReaderWriter {
             this.sampleRate,
             "16",
             alaw.decode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Encode 16-bit wave file as 8-bit mu-Law.
+     */
+    toMuLaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "8m",
+            mulaw.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+     */
+    fromMuLaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            mulaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -2405,6 +2442,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             "4": 17,
             "8": 1,
             "8a": 6,
+            "8m": 7,
             "16": 1,
             "24": 1,
             "32": 1,
@@ -4918,6 +4956,112 @@ function encode(samples) {
         aLawSamples.push(encodeSample(samples[i]));
     }
     return aLawSamples;
+}
+
+/**
+ * Decode 8-bit A-Law samples into 16-bit PCM samples.
+ * @param {!Array<number>} samples A array of 8-bit A-Law samples.
+ * @return {!Array<number>}
+ */
+function decode(samples) {
+    let pcmSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        pcmSamples.push(decodeSample(samples[i]));
+    }
+    return pcmSamples;
+}
+
+module.exports.encodeSample = encodeSample;
+module.exports.decodeSample = decodeSample;
+module.exports.encode = encode;
+module.exports.decode = decode;
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+/*!
+ * mulaw-js
+ * JavaScript mu-Law codec.
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/mulaw-js
+ *
+ * Reference:
+ * https://github.com/torvalds/linux/blob/master/sound/core/oss/mulaw.c
+ * 
+ */
+
+let BIAS = 0x84;
+let SIGN_BIT = 0x80;
+let QUANT_MASK = 0xf;
+let SEG_MASK = 0x70;
+let SEG_SHIFT = 4;
+
+function val_seg(val) {
+  let r = 0;
+  val >>= 7;
+  if (val & 0xf0) {
+    val >>= 4;
+    r += 4;
+  }
+  if (val & 0x0c) {
+    val >>= 2;
+    r += 2;
+  }
+  if (val & 0x02)
+    r += 1;
+  return r;
+}
+
+/**
+ * Encode a 16-bit sample as 8-bit mu-Law.
+ * @param {number} sample A 16-bit sample
+ * @return {number}
+ */
+function encodeSample(pcmSample) {
+  let mask;
+  let seg;
+  let uval;
+  if (pcmSample < 0) {
+    pcmSample = BIAS - pcmSample;
+    mask = 0x7F;
+  } else {
+    pcmSample += BIAS;
+    mask = 0xFF;
+  }
+  if (pcmSample > 0x7FFF) {
+    pcmSample = 0x7FFF;
+  }
+  seg = val_seg(pcmSample);
+  uval = (seg << 4) | ((pcmSample >> (seg + 3)) & 0xF);
+  return uval ^ mask;
+}
+
+/**
+ * Decode a 8-bit A-Law sample as 16-bit PCM.
+ * @param {number} number The 8-bit A-Law sample
+ * @return {number}
+ */
+function decodeSample(muLawSample) {
+  let t;
+  muLawSample = ~muLawSample;
+  t = ((muLawSample & QUANT_MASK) << 3) + BIAS;
+  t <<= (muLawSample & SEG_MASK) >> SEG_SHIFT;
+  return ((muLawSample & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
+}
+
+/**
+ * Encode 16-bit PCM samples into 8-bit A-Law samples.
+ * @param {!Array<number>} samples A array of 16-bit PCM samples.
+ * @return {!Array<number>}
+ */
+function encode(samples) {
+    let muLawSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        muLawSamples.push(encodeSample(samples[i]));
+    }
+    return muLawSamples;
 }
 
 /**

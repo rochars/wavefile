@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#checkWriteInput_">checkWriteInput_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#validateBitDepth_">validateBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#validateNumChannels_">validateNumChannels_</a></li><li data-type='method'><a href="WaveFile.html#validateSampleRate_">validateSampleRate_</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#checkWriteInput_">checkWriteInput_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#validateBitDepth_">validateBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#validateNumChannels_">validateNumChannels_</a></li><li data-type='method'><a href="WaveFile.html#validateSampleRate_">validateSampleRate_</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -53,6 +53,7 @@ const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
 const adpcm = require("imaadpcm");
 const alaw = require("alaw");
+const mulaw = require("mulaw-js");
 
 /**
  * WaveFile
@@ -123,6 +124,16 @@ class WaveFile extends WaveFileReaderWriter {
         }
         // a-law
         if (bitDepth == "8a") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.cbSize = 2;
+            this.validBitsPerSample = 8;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length;
+        }
+        // mu-law
+        if (bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
             this.cbSize = 2;
@@ -262,7 +273,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Encode 16-bit wave file as 8-bit a-law.
+     * Encode 16-bit wave file as 8-bit A-Law.
      */
     toALaw() {
         this.fromScratch(
@@ -283,6 +294,32 @@ class WaveFile extends WaveFileReaderWriter {
             this.sampleRate,
             "16",
             alaw.decode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Encode 16-bit wave file as 8-bit mu-Law.
+     */
+    toMuLaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "8m",
+            mulaw.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+     */
+    fromMuLaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            mulaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -347,7 +384,7 @@ module.exports = WaveFile;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Apr 20 2018 15:20:02 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Apr 20 2018 17:43:28 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

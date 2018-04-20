@@ -28,6 +28,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             "4": 17,
             "8": 1,
             "8a": 6,
+            "8m": 7,
             "16": 1,
             "24": 1,
             "32": 1,
