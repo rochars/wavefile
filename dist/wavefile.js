@@ -1304,6 +1304,7 @@ const WaveErrors = __webpack_require__(8);
 const WaveFileReaderWriter = __webpack_require__(17);
 const riffChunks = __webpack_require__(19);
 const adpcm = __webpack_require__(23);
+const alaw = __webpack_require__(27);
 
 /**
  * WaveFile
@@ -1358,6 +1359,7 @@ class WaveFile extends WaveFileReaderWriter {
         this.dataChunkSize = samples.length * bytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
+        // adpcm
         if (bitDepth == "4") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
@@ -1370,6 +1372,16 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkId = "fact";
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
+        }
+        // a-law
+        if (bitDepth == "8a") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.cbSize = 2;
+            this.validBitsPerSample = 8;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length;
         }
     }
 
@@ -1476,7 +1488,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Encode the samples as IMA ADPCM.
+     * Encode a 16-bit wave file as 4-bit IMA ADPCM.
      */
     toIMAADPCM() {
         this.fromScratch(
@@ -1489,7 +1501,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Decode IMA ADPCM samples to the desired bit depth.
+     * Decode a IMA ADPCM wave file as a 16-bit wave file.
      */
     fromIMAADPCM(blockAlign=256) {
         this.fromScratch(
@@ -1497,6 +1509,32 @@ class WaveFile extends WaveFileReaderWriter {
             this.sampleRate,
             "16",
             adpcm.decode(this.samples, blockAlign),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Encode 16-bit wave file as 8-bit a-law.
+     */
+    toALaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "8a",
+            alaw.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+     */
+    fromALaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            alaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -2366,6 +2404,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         this.headerFormats_ = {
             "4": 17,
             "8": 1,
+            "8a": 6,
             "16": 1,
             "24": 1,
             "32": 1,
@@ -4788,6 +4827,116 @@ class GInt {
 }
 
 module.exports = GInt;
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+/*!
+ * alaw
+ * JavaScript A-Law codec.
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/alaw
+ *
+ * References:
+ * https://github.com/deftio/companders
+ * http://dystopiancode.blogspot.com.br/2012/02/pcm-law-and-u-law-companding-algorithms.html
+ * 
+ */
+
+/**
+ * Encode a 16-bit sample as 8-bit A-Law.
+ * @param {number} sample A 16-bit sample
+ * @return {number}
+ */
+function  encodeSample(sample) {
+    let clip = 32635;
+    let LogTable = [
+        1,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, 
+        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6, 
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, 
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7 
+    ];
+    let sign;
+    let exponent;
+    let mantissa; 
+    let compandedValue; 
+    sample = (sample ==-32768) ? -32767 : sample;
+    sign = ((~sample) >> 8) & 0x80; 
+    if (!sign) {
+        sample = sample * -1; 
+    }
+    if (sample > clip) {
+        sample = clip; 
+    }
+    if (sample >= 256)  { 
+        exponent = LogTable[(sample >> 8) & 0x7F]; 
+        mantissa = (sample >> (exponent + 3) ) & 0x0F; 
+        compandedValue = ((exponent << 4) | mantissa); 
+    } else {
+        compandedValue = sample >> 4; 
+    } 
+    compandedValue ^= (sign ^ 0x55); 
+    return compandedValue; 
+}
+
+/**
+ * Decode a 9-bit A-Law sample as 16-bit PCM.
+ * @param {number} number The 8-bit A-Law sample
+ * @return {number}
+ */
+function decodeSample(aLawSample) {
+   let sign = 0x00;
+   let position = 0;
+   let decoded = 0;
+   aLawSample ^= 0x55;
+   if(aLawSample & 0x80) {
+      aLawSample &= ~(1 << 7);
+      sign = -1;
+   }
+   position = ((aLawSample & 0xF0) >> 4) + 4;
+   if(position!=4) {
+      decoded = ((1 << position) |
+                ((aLawSample & 0x0F) << (position - 4)) |
+                (1 << (position - 5)));
+   } else {
+      decoded = (aLawSample << 1)|1;
+   }
+   decoded = (sign == 0) ? (decoded) : (-decoded);
+   return (decoded * 8) * -1;
+}
+
+/**
+ * Encode 16-bit PCM samples into 8-bit A-Law samples.
+ * @param {!Array<number>} samples A array of 16-bit PCM samples.
+ * @return {!Array<number>}
+ */
+function encode(samples) {
+    let aLawSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        aLawSamples.push(encodeSample(samples[i]));
+    }
+    return aLawSamples;
+}
+
+/**
+ * Decode 8-bit A-Law samples into 16-bit PCM samples.
+ * @param {!Array<number>} samples A array of 8-bit A-Law samples.
+ * @return {!Array<number>}
+ */
+function decode(samples) {
+    let pcmSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        pcmSamples.push(decodeSample(samples[i]));
+    }
+    return pcmSamples;
+}
+
+module.exports.encodeSample = encodeSample;
+module.exports.decodeSample = decodeSample;
+module.exports.encode = encode;
+module.exports.decode = decode;
 
 
 /***/ })

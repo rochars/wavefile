@@ -27,6 +27,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         this.headerFormats_ = {
             "4": 17,
             "8": 1,
+            "8a": 6,
             "16": 1,
             "24": 1,
             "32": 1,

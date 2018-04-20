@@ -105,7 +105,7 @@ describe('4-bit to 16-bit (4-bit encoded with wavefile.js)', function() {
             function() {
         assert.equal(wav2.fmtChunkSize, 16);
     });
-    it("audioFormat should be 17 (IMA ADPCM)",
+    it("audioFormat should be 17 (PCM)",
             function() {
         assert.equal(wav2.audioFormat, 1);
     });
@@ -118,11 +118,11 @@ describe('4-bit to 16-bit (4-bit encoded with wavefile.js)', function() {
         assert.equal(wav2.sampleRate, 8000);
     });
 
-    it("blockAlign should be 256",
+    it("blockAlign should be 2",
             function() {
         assert.equal(wav2.blockAlign, 2);
     });
-    it("bitsPerSample should be 4",
+    it("bitsPerSample should be 16",
             function() {
         assert.equal(wav2.bitsPerSample, 16);
     });

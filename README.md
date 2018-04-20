@@ -86,7 +86,7 @@ wav.toRIFF();
 wav.toIMAADPCM();
 ```
 
-To decode 4-bit IMA-ADPCM as 16-bit:
+To decode 4-bit IMA-ADPCM as 16-bit PCM:
 ```javascript
 // Decode 4-bit IMA-ADPCM as 16-bit:
 wav.fromIMAADPCM();
@@ -96,6 +96,19 @@ The decoder assumes a 256 block align. To use a different block align:
 ```javascript
 // Decode 4-bit IMA-ADPCM, 1024 blockalign:
 wav.fromIMAADPCM(1024);
+```
+
+## A-Law
+16-bit wave files can be encoded as A-Law:
+```javascript
+// Encode a 16-bit wave file as 8-bit A-law:
+wav.toALaw();
+```
+
+To decode 8-bit A-Law as 16-bit PCM:
+```javascript
+// Decode 8-bit A-Law as 16-bit:
+wav.fromALaw();
 ```
 
 ### The properties

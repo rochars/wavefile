@@ -13,6 +13,7 @@ const WaveErrors = require("./src/wave-errors");
 const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
 const adpcm = require("imaadpcm");
+const alaw = require("alaw");
 
 /**
  * WaveFile
@@ -67,6 +68,7 @@ class WaveFile extends WaveFileReaderWriter {
         this.dataChunkSize = samples.length * bytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
+        // adpcm
         if (bitDepth == "4") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
@@ -79,6 +81,16 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkId = "fact";
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
+        }
+        // a-law
+        if (bitDepth == "8a") {
+            this.chunkSize = 44 + samples.length;
+            this.fmtChunkSize = 20;
+            this.cbSize = 2;
+            this.validBitsPerSample = 8;
+            this.factChunkId = "fact";
+            this.factChunkSize = 4;
+            this.dwSampleLength = samples.length;
         }
     }
 
@@ -185,7 +197,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Encode the samples as IMA ADPCM.
+     * Encode a 16-bit wave file as 4-bit IMA ADPCM.
      */
     toIMAADPCM() {
         this.fromScratch(
@@ -198,7 +210,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Decode IMA ADPCM samples to the desired bit depth.
+     * Decode a IMA ADPCM wave file as a 16-bit wave file.
      */
     fromIMAADPCM(blockAlign=256) {
         this.fromScratch(
@@ -206,6 +218,32 @@ class WaveFile extends WaveFileReaderWriter {
             this.sampleRate,
             "16",
             adpcm.decode(this.samples, blockAlign),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Encode 16-bit wave file as 8-bit a-law.
+     */
+    toALaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "8a",
+            alaw.encode(this.samples),
+            {"container": this.chunkId}
+        );
+    }
+
+    /**
+     * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+     */
+    fromALaw() {
+        this.fromScratch(
+            this.numChannels,
+            this.sampleRate,
+            "16",
+            alaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
