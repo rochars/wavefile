@@ -1333,14 +1333,12 @@ class WaveFile extends WaveFileReaderWriter {
      *     Samples of multi-channel data .
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
-        
         this.cbSize = 0;
         this.validBitsPerSample = 0;
         this.factChunkId = "";
         this.factChunkSize = 0;
         this.factChunkData = [];
         this.dwSampleLength = 0;
-
         if (!options.container) {
             options.container = "RIFF";
         }
@@ -1360,31 +1358,19 @@ class WaveFile extends WaveFileReaderWriter {
         this.dataChunkSize = samples.length * bytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
-
         if (bitDepth == "4") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
             this.byteRate = 4055;
             this.blockAlign = 256;
-            this.chunkId = options.container;
-            this.format = "WAVE";
-            this.fmtChunkId = "fmt ";
-            this.audioFormat = this.headerFormats_[bitDepth];
-            this.numChannels = numChannels;
-            this.sampleRate = sampleRate;
             this.bitsPerSample = 4;
-            this.dataChunkId = "data";
             this.dataChunkSize = samples.length;
-            this.samples = samples;
-            this.bitDepth = bitDepth;
-
             this.cbSize = 2;
             this.validBitsPerSample = 505;
             this.factChunkId = "fact";
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
         }
-
     }
 
     /**
@@ -3888,57 +3874,16 @@ function encodeSample(sample) {
     }
     if (encoderPredicted < -0x8000) {
         encoderPredicted = -0x8000;
-    }
-    else if (encoderPredicted > 0x7fff) {
+    } else if (encoderPredicted > 0x7fff) {
         encoderPredicted = 0x7fff;
     }
     encoderIndex += indexTable[value & 7];
     if (encoderIndex < 0) {
         encoderIndex = 0;
-    }
-    else if (encoderIndex > 88) {
+    } else if (encoderIndex > 88) {
         encoderIndex = 88;
     }
     return value;
-}
-
-/**
- * Return the head of a ADPCM sample block.
- * @param {number} sample The first sample of the block.
- * @return {!Array<number>}
- */
-function blockHead(sample) {
-    encodeSample(sample);
-    let adpcmSamples = [];
-    adpcmSamples.push(byteData.pack(sample, int16)[0]);
-    adpcmSamples.push(byteData.pack(sample, int16)[1]);
-    adpcmSamples.push(encoderIndex);
-    adpcmSamples.push(0);
-    return adpcmSamples;
-}
-
-/**
- * Encode a block of 505 16-bit samples as 4-bit ADPCM samples.
- * @param {!Array<number>} block A sample block of 505 samples.
- * @return {!Array<number>}
- */
-function encodeBlock(block) {
-    let adpcmSamples = blockHead(block[0]);
-    let x = 0;
-    for (let i=1; i<block.length; i++) {
-        x++;
-        if (x == 1) {
-            let sample2 = encodeSample(block[i]);
-            let sample = encodeSample(block[i + 1]);
-            adpcmSamples.push((sample << 4) | sample2);
-        } else {
-            x = 0;
-        }
-    }
-    while (adpcmSamples.length < 256) {
-        adpcmSamples.push(0);
-    }
-    return adpcmSamples;
 }
 
 /**
@@ -3978,6 +3923,39 @@ function decodeSample(nibble) {
 }
 
 /**
+ * Return the head of a ADPCM sample block.
+ * @param {number} sample The first sample of the block.
+ * @return {!Array<number>}
+ */
+function blockHead(sample) {
+    encodeSample(sample);
+    let adpcmSamples = [];
+    adpcmSamples.push(byteData.pack(sample, int16)[0]);
+    adpcmSamples.push(byteData.pack(sample, int16)[1]);
+    adpcmSamples.push(encoderIndex);
+    adpcmSamples.push(0);
+    return adpcmSamples;
+}
+
+/**
+ * Encode a block of 505 16-bit samples as 4-bit ADPCM samples.
+ * @param {!Array<number>} block A sample block of 505 samples.
+ * @return {!Array<number>}
+ */
+function encodeBlock(block) {
+    let adpcmSamples = blockHead(block[0]);
+    for (let i=3; i<block.length; i+=2) {
+        let sample2 = encodeSample(block[i]);
+        let sample = encodeSample(block[i + 1]);
+        adpcmSamples.push((sample << 4) | sample2);
+    }
+    while (adpcmSamples.length < 256) {
+        adpcmSamples.push(0);
+    }
+    return adpcmSamples;
+}
+
+/**
  * Decode a block of 256 ADPCM samples into 16-bit PCM samples.
  * @param {!Array<number>} block A adpcm sample block of 256 samples.
  * @return {!Array<number>}
@@ -3986,7 +3964,10 @@ function decodeBlock(block) {
     decoderPredicted = byteData.unpack([block[0], block[1]], int16);
     decoderIndex = block[2];
     decoderStep = stepTable[decoderIndex];
-    let result = [decoderPredicted];
+    let result = [
+            decoderPredicted,
+            byteData.unpack([block[2], block[3]], int16)
+        ];
     for (let i=4; i<block.length; i++) {
         let original_sample = block[i];
         let second_sample = original_sample >> 4;
@@ -4005,15 +3986,11 @@ function decodeBlock(block) {
 function encode(samples) {
     let adpcmSamples = [];
     let block = [];
-    let x = 0;
-    for (let i=0;i<samples.length;i++) {
-        if (x < 505) {
-            block.push(samples[i]);
-            x++;
-        } else {
+    for (let i=0; i<samples.length; i++) {
+        block.push(samples[i]);
+        if ((i % 505 == 0 && i != 0) || i == samples.length - 1) {
             adpcmSamples = adpcmSamples.concat(encodeBlock(block));
             block = [];
-            x = 0;
         }
     }
     return adpcmSamples;
@@ -4028,16 +4005,12 @@ function encode(samples) {
 function decode(adpcmSamples, blockAlign=256) {
     let samples = [];
     let block = [];
-    let x = 0;
     for (let i=0; i<adpcmSamples.length; i++) {
-        if (x < blockAlign - 1) {
-            block.push(adpcmSamples[i]);
-            x++;
-        } else {
+        if (i % blockAlign == 0 && i != 0) {            
             samples = samples.concat(decodeBlock(block));
             block = [];
-            x = 0;
         }
+        block.push(adpcmSamples[i]);
     }
     return samples;
 }
