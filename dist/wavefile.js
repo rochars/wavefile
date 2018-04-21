@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -372,8 +372,8 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 
 let toBytes = __webpack_require__(4);
 let fromBytes = __webpack_require__(7);
-let bitPacker = __webpack_require__(14);
-let api = __webpack_require__(15);
+let bitPacker = __webpack_require__(15);
+let api = __webpack_require__(16);
 
 // interface
 module.exports.pack = api.pack;
@@ -456,7 +456,7 @@ module.exports.unpackNibbles = bitPacker.unpackNibbles;
  * https://github.com/rochars/byte-data
  */
 
-const writer = __webpack_require__(12);
+const writer = __webpack_require__(13);
 const helpers = __webpack_require__(0);
 const bitDepthLib = __webpack_require__(2);
 
@@ -699,7 +699,7 @@ module.exports.unpack = unpack
  * https://github.com/rochars/byte-data
  */
 
-const reader = __webpack_require__(13);
+const reader = __webpack_require__(14);
 const bitDepths = __webpack_require__(2);
 const helpers = __webpack_require__(0);
 
@@ -855,7 +855,7 @@ module.exports =  {
  */
 
 
-const bitParser = __webpack_require__(22);
+const bitParser = __webpack_require__(23);
 
 /**
  * A class to represent byte-data types.
@@ -1068,7 +1068,7 @@ let f64 = new Float64Array(1);
 /** @private */
 let ui32 = new Uint32Array(f64.buffer);
 /** @private */
-let GInt = __webpack_require__(26);
+let GInt = __webpack_require__(27);
 
 /**
  * A class to represent byte-data types.
@@ -1290,6 +1290,22 @@ module.exports = Type;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
+ * alawmulaw
+ * JavaScript A-Law and mu-Law codecs.
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/alawmulaw
+ * 
+ */
+
+module.exports.alaw = __webpack_require__(28);
+module.exports.mulaw = __webpack_require__(29);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*!
  * wavefile
  * Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
@@ -1299,13 +1315,13 @@ module.exports = Type;
 
 const byteData = __webpack_require__(3);
 const uInt8 = byteData.uInt8;
-const bitDepthLib = __webpack_require__(16);
+const bitDepthLib = __webpack_require__(17);
 const WaveErrors = __webpack_require__(8);
-const WaveFileReaderWriter = __webpack_require__(17);
-const riffChunks = __webpack_require__(19);
-const adpcm = __webpack_require__(23);
-const alaw = __webpack_require__(27);
-const mulaw = __webpack_require__(28);
+const WaveFileReaderWriter = __webpack_require__(18);
+const riffChunks = __webpack_require__(20);
+const adpcm = __webpack_require__(24);
+const alaw = __webpack_require__(11).alaw;
+const mulaw = __webpack_require__(11).mulaw;
 
 /**
  * WaveFile
@@ -1374,18 +1390,8 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
         }
-        // a-law
-        if (bitDepth == "8a") {
-            this.chunkSize = 44 + samples.length;
-            this.fmtChunkSize = 20;
-            this.cbSize = 2;
-            this.validBitsPerSample = 8;
-            this.factChunkId = "fact";
-            this.factChunkSize = 4;
-            this.dwSampleLength = samples.length;
-        }
-        // mu-law
-        if (bitDepth == "8m") {
+        // A-Law or mu-Law
+        if (bitDepth == "8a" || bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
             this.cbSize = 2;
@@ -1430,7 +1436,6 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Turn the file to RIFF.
-     * All values will be little-endian when writing.
      */
     toRIFF() {
         this.chunkId = "RIFF";
@@ -1439,7 +1444,6 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Turn the file to RIFX.
-     * All values but FourCCs will be big-endian when writing.
      */
     toRIFX() {
         this.chunkId = "RIFX";
@@ -1447,8 +1451,8 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Change the bit depth of the data.
-     * @param {string} bitDepth The new bit depth of the data.
+     * Change the bit depth of the samples.
+     * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
@@ -1627,7 +1631,7 @@ window['WaveFile'] = WaveFile;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1744,7 +1748,7 @@ module.exports.writeString = writeString;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1901,7 +1905,7 @@ module.exports.read64BitFloat = read64BitFloat;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -2075,7 +2079,7 @@ module.exports.unpackNibbles = unpackNibbles;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -2219,7 +2223,7 @@ module.exports.packStruct = packStruct;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /*!
@@ -2409,7 +2413,7 @@ module.exports.BitDepthMaxValues = BitDepthMaxValues;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -2425,7 +2429,7 @@ const uInt8 = byteData.uInt8;
 const uInt16 = byteData.uInt16;
 const uInt32 = byteData.uInt32;
 const chr = byteData.chr;
-let WaveFileHeader = __webpack_require__(18);
+let WaveFileHeader = __webpack_require__(19);
 
 /**
  * Read and write wave files.
@@ -2722,7 +2726,7 @@ module.exports = WaveFileReaderWriter;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 /*
@@ -2818,7 +2822,7 @@ module.exports = WaveFileHeader;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -2829,7 +2833,7 @@ module.exports = WaveFileHeader;
  *
  */
 
-const byteData = __webpack_require__(20);
+const byteData = __webpack_require__(21);
 const uInt32 = byteData.uInt32;
 const chr = byteData.chr;
 
@@ -2960,7 +2964,7 @@ module.exports.write = write;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -2972,7 +2976,7 @@ module.exports.write = write;
  */
 
 /** @private */
-const rw = __webpack_require__(21);
+const rw = __webpack_require__(22);
 let Type = __webpack_require__(9);
 
 /**
@@ -3312,7 +3316,7 @@ exports.float64BE = new Type({"bits": 64, "float": true, "be": true});
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -3472,7 +3476,7 @@ exports.fromBytes = fromBytes;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 /**
@@ -3866,7 +3870,7 @@ exports.BitReader = BitReader;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -3882,7 +3886,7 @@ exports.BitReader = BitReader;
  * 
  */
 
-const byteData = __webpack_require__(24);
+const byteData = __webpack_require__(25);
 const int16 = byteData.int16;
 
 var indexTable = [
@@ -4099,7 +4103,7 @@ module.exports.decodeBlock = decodeBlock;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -4111,7 +4115,7 @@ module.exports.decodeBlock = decodeBlock;
  */
 
 /** @private */
-const rw = __webpack_require__(25);
+const rw = __webpack_require__(26);
 let Type = __webpack_require__(10);
 
 /**
@@ -4449,7 +4453,7 @@ exports.float64BE = new Type({"bits": 64, "float": true, "be": true});
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -4593,7 +4597,7 @@ exports.fromBytes = fromBytes;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 /**
@@ -4868,14 +4872,13 @@ module.exports = GInt;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
-/*!
- * alaw
- * JavaScript A-Law codec.
+/*
+ * alaw.js
  * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/alaw
+ * https://github.com/rochars/alawmulaw
  *
  * References:
  * https://github.com/deftio/companders
@@ -4888,9 +4891,9 @@ module.exports = GInt;
  * @param {number} sample A 16-bit sample
  * @return {number}
  */
-function  encodeSample(sample) {
+function  encodeSampleALaw(sample) {
     let clip = 32635;
-    let LogTable = [
+    let logTable = [
         1,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, 
         6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6, 
         7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, 
@@ -4909,7 +4912,7 @@ function  encodeSample(sample) {
         sample = clip; 
     }
     if (sample >= 256)  { 
-        exponent = LogTable[(sample >> 8) & 0x7F]; 
+        exponent = logTable[(sample >> 8) & 0x7F]; 
         mantissa = (sample >> (exponent + 3) ) & 0x0F; 
         compandedValue = ((exponent << 4) | mantissa); 
     } else {
@@ -4920,11 +4923,11 @@ function  encodeSample(sample) {
 }
 
 /**
- * Decode a 9-bit A-Law sample as 16-bit PCM.
+ * Decode a 8-bit A-Law sample as 16-bit PCM.
  * @param {number} number The 8-bit A-Law sample
  * @return {number}
  */
-function decodeSample(aLawSample) {
+function decodeSampleALaw(aLawSample) {
    let sign = 0x00;
    let position = 0;
    let decoded = 0;
@@ -4950,10 +4953,10 @@ function decodeSample(aLawSample) {
  * @param {!Array<number>} samples A array of 16-bit PCM samples.
  * @return {!Array<number>}
  */
-function encode(samples) {
+function encodeALaw(samples) {
     let aLawSamples = [];
     for (let i=0; i<samples.length; i++) {
-        aLawSamples.push(encodeSample(samples[i]));
+        aLawSamples.push(encodeSampleALaw(samples[i]));
     }
     return aLawSamples;
 }
@@ -4963,29 +4966,28 @@ function encode(samples) {
  * @param {!Array<number>} samples A array of 8-bit A-Law samples.
  * @return {!Array<number>}
  */
-function decode(samples) {
+function decodeALaw(samples) {
     let pcmSamples = [];
     for (let i=0; i<samples.length; i++) {
-        pcmSamples.push(decodeSample(samples[i]));
+        pcmSamples.push(decodeSampleALaw(samples[i]));
     }
     return pcmSamples;
 }
 
-module.exports.encodeSample = encodeSample;
-module.exports.decodeSample = decodeSample;
-module.exports.encode = encode;
-module.exports.decode = decode;
+module.exports.encodeSample = encodeSampleALaw;
+module.exports.decodeSample = decodeSampleALaw;
+module.exports.encode = encodeALaw;
+module.exports.decode = decodeALaw;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
-/*!
- * mulaw-js
- * JavaScript mu-Law codec.
+/*
+ * mulaw.js
  * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/mulaw-js
+ * https://github.com/rochars/alawmulaw
  *
  * Reference:
  * https://github.com/torvalds/linux/blob/master/sound/core/oss/mulaw.c
@@ -4998,7 +5000,7 @@ let QUANT_MASK = 0xf;
 let SEG_MASK = 0x70;
 let SEG_SHIFT = 4;
 
-function val_seg(val) {
+function valSeg(val) {
   let r = 0;
   val >>= 7;
   if (val & 0xf0) {
@@ -5019,7 +5021,7 @@ function val_seg(val) {
  * @param {number} sample A 16-bit sample
  * @return {number}
  */
-function encodeSample(pcmSample) {
+function encodeSampleMuLaw(pcmSample) {
   let mask;
   let seg;
   let uval;
@@ -5033,7 +5035,7 @@ function encodeSample(pcmSample) {
   if (pcmSample > 0x7FFF) {
     pcmSample = 0x7FFF;
   }
-  seg = val_seg(pcmSample);
+  seg = valSeg(pcmSample);
   uval = (seg << 4) | ((pcmSample >> (seg + 3)) & 0xF);
   return uval ^ mask;
 }
@@ -5043,7 +5045,7 @@ function encodeSample(pcmSample) {
  * @param {number} number The 8-bit A-Law sample
  * @return {number}
  */
-function decodeSample(muLawSample) {
+function decodeSampleMuLaw(muLawSample) {
   let t;
   muLawSample = ~muLawSample;
   t = ((muLawSample & QUANT_MASK) << 3) + BIAS;
@@ -5056,10 +5058,10 @@ function decodeSample(muLawSample) {
  * @param {!Array<number>} samples A array of 16-bit PCM samples.
  * @return {!Array<number>}
  */
-function encode(samples) {
+function encodeMuLaw(samples) {
     let muLawSamples = [];
     for (let i=0; i<samples.length; i++) {
-        muLawSamples.push(encodeSample(samples[i]));
+        muLawSamples.push(encodeSampleMuLaw(samples[i]));
     }
     return muLawSamples;
 }
@@ -5069,18 +5071,18 @@ function encode(samples) {
  * @param {!Array<number>} samples A array of 8-bit A-Law samples.
  * @return {!Array<number>}
  */
-function decode(samples) {
+function decodeMuLaw(samples) {
     let pcmSamples = [];
     for (let i=0; i<samples.length; i++) {
-        pcmSamples.push(decodeSample(samples[i]));
+        pcmSamples.push(decodeSampleMuLaw(samples[i]));
     }
     return pcmSamples;
 }
 
-module.exports.encodeSample = encodeSample;
-module.exports.decodeSample = decodeSample;
-module.exports.encode = encode;
-module.exports.decode = decode;
+module.exports.encodeSample = encodeSampleMuLaw;
+module.exports.decodeSample = decodeSampleMuLaw;
+module.exports.encode = encodeMuLaw;
+module.exports.decode = decodeMuLaw;
 
 
 /***/ })

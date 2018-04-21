@@ -13,8 +13,8 @@ const WaveErrors = require("./src/wave-errors");
 const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
 const riffChunks = require("riff-chunks");
 const adpcm = require("imaadpcm");
-const alaw = require("alaw");
-const mulaw = require("mulaw-js");
+const alaw = require("alawmulaw").alaw;
+const mulaw = require("alawmulaw").mulaw;
 
 /**
  * WaveFile
@@ -83,18 +83,8 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
         }
-        // a-law
-        if (bitDepth == "8a") {
-            this.chunkSize = 44 + samples.length;
-            this.fmtChunkSize = 20;
-            this.cbSize = 2;
-            this.validBitsPerSample = 8;
-            this.factChunkId = "fact";
-            this.factChunkSize = 4;
-            this.dwSampleLength = samples.length;
-        }
-        // mu-law
-        if (bitDepth == "8m") {
+        // A-Law or mu-Law
+        if (bitDepth == "8a" || bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
             this.cbSize = 2;
@@ -139,7 +129,6 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Turn the file to RIFF.
-     * All values will be little-endian when writing.
      */
     toRIFF() {
         this.chunkId = "RIFF";
@@ -148,7 +137,6 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Turn the file to RIFX.
-     * All values but FourCCs will be big-endian when writing.
      */
     toRIFX() {
         this.chunkId = "RIFX";
@@ -156,8 +144,8 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Change the bit depth of the data.
-     * @param {string} bitDepth The new bit depth of the data.
+     * Change the bit depth of the samples.
+     * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {

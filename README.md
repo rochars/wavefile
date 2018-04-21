@@ -28,37 +28,39 @@ fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ## Create wave files from scratch
+You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples are arrays of numbers, and may be multi-dimensional if the there is more than one channel.
+
+Possible values for the bit depth are:
+"4" - 4-bit IMA-ADPCM
+"8" - 8-bit
+"8a" - 8-bit A-Law
+"8m" - 8-bit mu-Law
+"16" - 16-bit
+"24" - 24-bit
+"32" - 32-bit
+"32f" - 32-bit floating point
+"64" - 64-bit floating point
+
 ```javascript
 let wav = new WaveFile();
 
-// mono
+// Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 fs.writeFileSync(path, wav.toBuffer());
 
-// stereo
+// stereo, 48 kHz, 8-bit
+// samples are de-interleaved
 wav.fromScratch(2, 48000, '8', [
     [0, -2, 4, 3],
     [0, -1, 4, 3]
 ]);
+// Interleaving the samples
 wav.interleave();
 fs.writeFileSync(path, wav.toBuffer());
 
 // Default is RIFF. To create RIFX files:
 wav.fromScratch(1, 44100, '32', samples, {"container": "RIFX"});
 fs.writeFileSync(path, wav.toBuffer());
-```
-
-## Change the bit depth
-Currently there is **no dithering** when changing the bit depth.
-
-If the samples are stereo they need to be interleaved before changing the bit depth.
-
-```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-
-// Possible values are:
-//  "8", "16", "24", "32", "32f", "64"
-wav.toBitDepth("24");
 ```
 
 ## Interleave and de-interleave stereo samples
@@ -122,6 +124,21 @@ To decode 8-bit mu-Law as 16-bit PCM:
 ```javascript
 // Decode 8-bit mu-Law as 16-bit:
 wav.fromMuLaw();
+```
+
+## Change the bit depth
+Currently there is **no dithering** when changing the bit depth.
+
+If the samples are stereo they need to be interleaved before changing the bit depth.
+
+Notice that you **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.
+
+```javascript
+let wav = new Wavefile(fs.readFileSync("file.wav"));
+
+// Possible values are:
+//  "8", "16", "24", "32", "32f", "64"
+wav.toBitDepth("24");
 ```
 
 ### The properties
