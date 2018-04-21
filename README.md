@@ -28,17 +28,17 @@ fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ## Create wave files from scratch
-You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples are arrays of numbers, and may be multi-dimensional if the there is more than one channel.
+You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples are an array of numbers. The array may be multidimensional if there is more than one channel.
 
-Possible values for the bit depth are:
-"4" - 4-bit IMA-ADPCM
-"8" - 8-bit
-"8a" - 8-bit A-Law
-"8m" - 8-bit mu-Law
-"16" - 16-bit
-"24" - 24-bit
-"32" - 32-bit
-"32f" - 32-bit floating point
+Possible values for the bit depth are:  
+"4" - 4-bit IMA-ADPCM  
+"8" - 8-bit  
+"8a" - 8-bit A-Law  
+"8m" - 8-bit mu-Law  
+"16" - 16-bit  
+"24" - 24-bit  
+"32" - 32-bit  
+"32f" - 32-bit floating point  
 "64" - 64-bit floating point
 
 ```javascript
