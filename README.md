@@ -3,7 +3,24 @@ Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.
 Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
-[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/docs-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/index.html)
+[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/docs-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/index.html)  
+[![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/)
+
+
+## About
+
+**wavefile** is a module to work with wav files. It is partly inspired by SoX, and intended to run both in Node.js and in the browser.
+
+With **wavefile** you can:
+- Create wav files from scratch
+- Read existing wav files
+- Encode/decode files as ADPCM, A-Law and mu-Law
+- Read/write the data in a wav file header
+- Turn RIFF files to RIFX and RIFX files to RIFF
+
+And more.
+
+**wavefile** is extensively tested, and the test folder contains samples of all supported formats. Please note that some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in every player.
 
 ## Install
 ```
@@ -13,7 +30,11 @@ npm install wavefile
 ## See it in action
 https://tr2099.github.io/
 
-Hit "Load in player" to generate wave files.
+Hit **"Load in player"** to generate wave files.
+
+This website uses **wavefile** to create the files. The effects are provided by other libraries.
+
+Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point.
 
 ## Use
 ```javascript
