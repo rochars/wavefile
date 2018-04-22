@@ -9,7 +9,7 @@ https://github.com/rochars/wavefile
 
 ## About
 
-**wavefile** is a module to work with wav files. It is partly inspired by SoX, and intended to run both in Node.js and in the browser.
+**wavefile** is a module to work with wav files. It is partly inspired by SoX, and intended to run in both Node.js and the browser.
 
 With **wavefile** you can:
 - Create wav files from scratch
@@ -109,15 +109,17 @@ wav.toRIFF();
 wav.toIMAADPCM();
 ```
 
-To decode 4-bit IMA-ADPCM as 16-bit PCM:
+To decode 4-bit IMA-ADPCM as 16-bit linear PCM:
 ```javascript
 // Decode 4-bit IMA-ADPCM as 16-bit:
 wav.fromIMAADPCM();
 ```
 
-The decoder assumes a 256 block align. To use a different block align:
+IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
+
+**wavefile** also assumes a block align of 256 bytes when decoding IMA-ADPCM files, but you can also decode files with a different block align:
 ```javascript
-// Decode 4-bit IMA-ADPCM, 1024 blockalign:
+// Decode a 4-bit IMA-ADPCM with block align of 1024 bytes:
 wav.fromIMAADPCM(1024);
 ```
 
@@ -128,7 +130,7 @@ wav.fromIMAADPCM(1024);
 wav.toALaw();
 ```
 
-To decode 8-bit A-Law as 16-bit PCM:
+To decode 8-bit A-Law as 16-bit linear PCM:
 ```javascript
 // Decode 8-bit A-Law as 16-bit:
 wav.fromALaw();
@@ -141,7 +143,7 @@ wav.fromALaw();
 wav.toMuLaw();
 ```
 
-To decode 8-bit mu-Law as 16-bit PCM:
+To decode 8-bit mu-Law as 16-bit linear PCM:
 ```javascript
 // Decode 8-bit mu-Law as 16-bit:
 wav.fromMuLaw();
