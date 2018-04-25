@@ -88,18 +88,16 @@ class WaveFileHeader {
         this.bextChunkSize = 0;
         /** @type {!Array<number>} */
         this.bextChunkData = [];
-        /** @type {!Object} */
+        /** @type {Object} */
         this.bextChunkFields = {
             "description": "", //256
             "originator": "", //32
             "originatorReference": "", //32
             "originationDate": "", //10
             "originationTime": "", //8
-            "timeReferenceLow": "", //DWORD
-            "timeReferenceHigh": "", //DWORD
+            "timeReference": "", //64-bit value
             "version": "", //WORD
-            "UMID_0 ": "", //byte
-            "UMID_63 ": "", //byte
+            "UMID": "", // 64
             "loudnessValue": "", //WORD
             "loudnessRange": "", //WORD
             "maxTruePeakLevel": "", //WORD

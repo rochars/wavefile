@@ -69,15 +69,15 @@
 
 /*!
  * byte-data
- * Readable data to and from byte buffers.
- * Copyright (c) 2017 Rafael da Silva Rocha.
+ * Read and write data to and from byte buffers.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
  *
  */
 
 /** @private */
 const rw = __webpack_require__(7);
-let Type = __webpack_require__(1);
+const Type = __webpack_require__(1);
 
 /**
  * Turn a number or fixed-length string into a byte buffer.
@@ -226,198 +226,198 @@ function getStructDefSize(def) {
 }
 
 // interface
-exports.pack = pack;
-exports.unpack = unpack;
-exports.packArray = packArray;
-exports.unpackArray = unpackArray;
-exports.unpackStruct = unpackStruct;
-exports.packStruct = packStruct;
-exports.findString = findString;
-exports.Type = Type;
+module.exports.pack = pack;
+module.exports.unpack = unpack;
+module.exports.packArray = packArray;
+module.exports.unpackArray = unpackArray;
+module.exports.unpackStruct = unpackStruct;
+module.exports.packStruct = packStruct;
+module.exports.findString = findString;
+module.exports.Type = Type;
 /** 
  * A char.
  * @type {Object}
  */
-exports.chr = new Type({"bits": 8, "char": true});
+module.exports.chr = new Type({"bits": 8, "char": true});
 /**
  * A 4-char string
  * @type {Object}
  */
-exports.fourCC = new Type({"bits": 32, "char": true});
+module.exports.fourCC = new Type({"bits": 32, "char": true});
 /**
  * Booleans
  * @type {Object}
  */
-exports.bool = new Type({"bits": 1});
+module.exports.bool = new Type({"bits": 1});
 /**
  * Signed 2-bit integers
  * @type {Object}
  */
-exports.int2 = new Type({"bits": 2, "signed": true});
+module.exports.int2 = new Type({"bits": 2, "signed": true});
 /**
  * Unsigned 2-bit integers
  * @type {Object}
  */
-exports.uInt2 = new Type({"bits": 2});
+module.exports.uInt2 = new Type({"bits": 2});
 /**
  * Signed 4-bit integers
  * @type {Object}
  */
-exports.int4 = new Type({"bits": 4, "signed": true});
+module.exports.int4 = new Type({"bits": 4, "signed": true});
 /**
  * Unsigned 4-bit integers
  * @type {Object}
  */
-exports.uInt4 = new Type({"bits": 4});
+module.exports.uInt4 = new Type({"bits": 4});
 /**
  * Signed 8-bit integers
  * @type {Object}
  */
-exports.int8 = new Type({"bits": 8, "signed": true});
+module.exports.int8 = new Type({"bits": 8, "signed": true});
 /**
  * Unsigned 4-bit integers
  * @type {Object}
  */
-exports.uInt8 = new Type({"bits": 8});
+module.exports.uInt8 = new Type({"bits": 8});
 // LE
 /**
  * Signed 16-bit integers little-endian
  * @type {Object}
  */
-exports.int16  = new Type({"bits": 16, "signed": true});
+module.exports.int16  = new Type({"bits": 16, "signed": true});
 /**
  * Unsigned 16-bit integers little-endian
  * @type {Object}
  */
-exports.uInt16 = new Type({"bits": 16});
+module.exports.uInt16 = new Type({"bits": 16});
 /**
  * Half-precision floating-point numbers little-endian
  * @type {Object}
  */
-exports.float16 = new Type({"bits": 16, "float": true});
+module.exports.float16 = new Type({"bits": 16, "float": true});
 /**
  * Signed 24-bit integers little-endian
  * @type {Object}
  */
-exports.int24 = new Type({"bits": 24, "signed": true});
+module.exports.int24 = new Type({"bits": 24, "signed": true});
 /**
  * Unsigned 24-bit integers little-endian
  * @type {Object}
  */
-exports.uInt24 = new Type({"bits": 24});
+module.exports.uInt24 = new Type({"bits": 24});
 /**
  * Signed 32-bit integers little-endian
  * @type {Object}
  */
-exports.int32 = new Type({"bits": 32, "signed": true});
+module.exports.int32 = new Type({"bits": 32, "signed": true});
 /**
  * Unsigned 32-bit integers little-endian
  * @type {Object}
  */
-exports.uInt32 = new Type({"bits": 32});
+module.exports.uInt32 = new Type({"bits": 32});
 /**
  * Single-precision floating-point numbers little-endian
  * @type {Object}
  */
-exports.float32 = new Type({"bits": 32, "float": true});
+module.exports.float32 = new Type({"bits": 32, "float": true});
 /**
  * Signed 40-bit integers little-endian
  * @type {Object}
  */
-exports.int40 = new Type({"bits": 40, "signed": true});
+module.exports.int40 = new Type({"bits": 40, "signed": true});
 /**
  * Unsigned 40-bit integers little-endian
  * @type {Object}
  */
-exports.uInt40 = new Type({"bits": 40});
+module.exports.uInt40 = new Type({"bits": 40});
 /**
  * Signed 48-bit integers little-endian
  * @type {Object}
  */
-exports.int48 = new Type({"bits": 48, "signed": true});
+module.exports.int48 = new Type({"bits": 48, "signed": true});
 /**
  * Unsigned 48-bit integers little-endian
  * @type {Object}
  */
-exports.uInt48 = new Type({"bits": 48});
+module.exports.uInt48 = new Type({"bits": 48});
 /**
  * Double-precision floating-point numbers little-endian
  * @type {Object}
  */
-exports.float64 = new Type({"bits": 64, "float": true});
+module.exports.float64 = new Type({"bits": 64, "float": true});
 // BE
 /**
  * Signed 16-bit integers big-endian
  * @type {Object}
  */
-exports.int16BE  = new Type({"bits": 16, "signed": true, "be": true});
+module.exports.int16BE  = new Type({"bits": 16, "signed": true, "be": true});
 /**
  * Unsigned 16-bit integers big-endian
  * @type {Object}
  */
-exports.uInt16BE = new Type({"bits": 16, "be": true});
+module.exports.uInt16BE = new Type({"bits": 16, "be": true});
 /**
  * Half-precision floating-point numbers big-endian
  * @type {Object}
  */
-exports.float16BE = new Type({"bits": 16, "float": true, "be": true});
+module.exports.float16BE = new Type({"bits": 16, "float": true, "be": true});
 /**
  * Signed 24-bit integers big-endian
  * @type {Object}
  */
-exports.int24BE = new Type({"bits": 24, "signed": true, "be": true});
+module.exports.int24BE = new Type({"bits": 24, "signed": true, "be": true});
 /**
  * Unsigned 24-bit integers big-endian
  * @type {Object}
  */
-exports.uInt24BE = new Type({"bits": 24, "be": true});
+module.exports.uInt24BE = new Type({"bits": 24, "be": true});
 /**
  * Signed 32-bit integers big-endian
  * @type {Object}
  */
-exports.int32BE = new Type({"bits": 32, "signed": true, "be": true});
+module.exports.int32BE = new Type({"bits": 32, "signed": true, "be": true});
 /**
  * Unsigned 32-bit integers big-endian
  * @type {Object}
  */
-exports.uInt32BE = new Type({"bits": 32, "be": true});
+module.exports.uInt32BE = new Type({"bits": 32, "be": true});
 /**
  * Single-precision floating-point numbers big-endian
  * @type {Object}
  */
-exports.float32BE = new Type({"bits": 32, "float": true, "be": true});
+module.exports.float32BE = new Type({"bits": 32, "float": true, "be": true});
 /**
  * Signed 40-bit integers big-endian
  * @type {Object}
  */
-exports.int40BE = new Type({"bits": 40, "signed": true, "be": true});
+module.exports.int40BE = new Type({"bits": 40, "signed": true, "be": true});
 /**
  * Unsigned 40-bit integers big-endian
  * @type {Object}
  */
-exports.uInt40BE = new Type({"bits": 40, "be": true});
+module.exports.uInt40BE = new Type({"bits": 40, "be": true});
 /**
  * Signed 48-bit integers big-endian
  * @type {Object}
  */
-exports.int48BE = new Type({"bits": 48, "signed": true, "be": true});
+module.exports.int48BE = new Type({"bits": 48, "signed": true, "be": true});
 /**
  * Unsigned 48-bit integers big-endian
  * @type {Object}
  */
-exports.uInt48BE = new Type({"bits": 48, "be": true});
+module.exports.uInt48BE = new Type({"bits": 48, "be": true});
 /**
  * Double-precision floating-point numbers big-endian
  * @type {Object}
  */
-exports.float64BE = new Type({"bits": 64, "float": true, "be": true});
+module.exports.float64BE = new Type({"bits": 64, "float": true, "be": true});
 
 
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/**
+/*
  * type: The Type class.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
@@ -432,7 +432,7 @@ let f64 = new Float64Array(1);
 /** @private */
 let ui32 = new Uint32Array(f64.buffer);
 /** @private */
-let GInt = __webpack_require__(8);
+const GInt = __webpack_require__(8);
 
 /**
  * A class to represent byte-data types.
@@ -1280,8 +1280,7 @@ window['WaveFile'] = WaveFile;
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/**
- * from-bytes: Numbers and strings from bytes.
+/*
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
  */
@@ -1415,16 +1414,16 @@ function bytesToBase(bytes, base) {
     }
 }
 
-exports.getType = getType;
-exports.toBytes = toBytes;
-exports.fromBytes = fromBytes;
+module.exports.getType = getType;
+module.exports.toBytes = toBytes;
+module.exports.fromBytes = fromBytes;
 
 
 /***/ }),
 /* 8 */
 /***/ (function(module, exports) {
 
-/**
+/*
  * gint: Generic integer.
  * A class to represent any integer from 1 to 53-Bit.
  * Copyright (c) 2017 Rafael da Silva Rocha.
@@ -2433,18 +2432,16 @@ class WaveFileHeader {
         this.bextChunkSize = 0;
         /** @type {!Array<number>} */
         this.bextChunkData = [];
-        /** @type {!Object} */
+        /** @type {Object} */
         this.bextChunkFields = {
             "description": "", //256
             "originator": "", //32
             "originatorReference": "", //32
             "originationDate": "", //10
             "originationTime": "", //8
-            "timeReferenceLow": "", //DWORD
-            "timeReferenceHigh": "", //DWORD
+            "timeReference": "", //64-bit value
             "version": "", //WORD
-            "UMID_0 ": "", //byte
-            "UMID_63 ": "", //byte
+            "UMID": "", // 64
             "loudnessValue": "", //WORD
             "loudnessRange": "", //WORD
             "maxTruePeakLevel": "", //WORD

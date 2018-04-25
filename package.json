@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -68,7 +68,7 @@
   "dependencies": {
     "alawmulaw": "^2.0.1",
     "bitdepth": "^1.0.4",
-    "byte-data": "^4.0.2",
+    "byte-data": "^4.0.3",
     "imaadpcm": "^1.1.0",
     "riff-chunks": "^3.0.3"
   },

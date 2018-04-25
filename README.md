@@ -17,6 +17,7 @@ With **wavefile** you can:
 - Encode/decode files as ADPCM, A-Law and mu-Law
 - Read/write the data in a wav file header
 - Turn RIFF files to RIFX and RIFX files to RIFF
+- Edit BWF metada ("bext" chunk)
 
 And more.
 
@@ -203,7 +204,6 @@ console.log(wav.samples);
 
 ### BWF data
 BWF data ("bext" chunk) is stored in the *bextChunkFields* property in human-readable form.
-You may edit the data in the "bext" chunk by editing the *bextChunkFields* property on a WaveFile object.
 ```javascript
 wav.bextChunkFields = {
     "description": "", // 256 chars
