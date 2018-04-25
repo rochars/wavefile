@@ -15,12 +15,12 @@ const uInt8 = byteData.uInt8;
 const uInt16 = byteData.uInt16;
 const uInt32 = byteData.uInt32;
 const chr = byteData.chr;
-let WaveFileHeader = require("../src/wavefile-header");
+const BWFHeader = require("../src/bwf-header");
 
 /**
  * Read and write wave files.
  */
-class WaveFileReaderWriter extends WaveFileHeader {
+class WaveFileReaderWriter extends BWFHeader {
 
     constructor() {
         super();

@@ -688,8 +688,8 @@ module.exports =  {
  * 
  */
 
-module.exports.alaw = __webpack_require__(13);
-module.exports.mulaw = __webpack_require__(14);
+module.exports.alaw = __webpack_require__(14);
+module.exports.mulaw = __webpack_require__(15);
 
 
 /***/ }),
@@ -709,8 +709,8 @@ const uInt8 = byteData.uInt8;
 const bitDepthLib = __webpack_require__(8);
 const WaveErrors = __webpack_require__(2);
 const WaveFileReaderWriter = __webpack_require__(9);
-const riffChunks = __webpack_require__(11);
-const adpcm = __webpack_require__(12);
+const riffChunks = __webpack_require__(12);
+const adpcm = __webpack_require__(13);
 const alaw = __webpack_require__(3).alaw;
 const mulaw = __webpack_require__(3).mulaw;
 
@@ -1700,12 +1700,12 @@ const uInt8 = byteData.uInt8;
 const uInt16 = byteData.uInt16;
 const uInt32 = byteData.uInt32;
 const chr = byteData.chr;
-let WaveFileHeader = __webpack_require__(10);
+const BWFHeader = __webpack_require__(10);
 
 /**
  * Read and write wave files.
  */
-class WaveFileReaderWriter extends WaveFileHeader {
+class WaveFileReaderWriter extends BWFHeader {
 
     constructor() {
         super();
@@ -2135,6 +2135,59 @@ module.exports = WaveFileReaderWriter;
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+ * BWFHeader class
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefile
+ *
+ */
+
+const WaveFileHeader = __webpack_require__(11);
+
+/**
+ * Wave file headers.
+ */
+class BWFHeader extends WaveFileHeader {
+
+    constructor() {
+        super();
+        /**
+         * "bext"
+         * @type {string}
+         */
+        this.bextChunkId = "";
+        /** @type {number} */
+        this.bextChunkSize = 0;
+        /** @type {!Array<number>} */
+        this.bextChunkData = [];
+        /** @type {Object} */
+        this.bextChunkFields = {
+            "description": "", //256
+            "originator": "", //32
+            "originatorReference": "", //32
+            "originationDate": "", //10
+            "originationTime": "", //8
+            "timeReference": "", //64-bit value
+            "version": "", //WORD
+            "UMID": "", // 64
+            "loudnessValue": "", //WORD
+            "loudnessRange": "", //WORD
+            "maxTruePeakLevel": "", //WORD
+            "maxMomentaryLoudness": "", //WORD
+            "maxShortTermLoudness": "", //WORD
+            "reserved": "", //180
+            "codingHistory": "" // string, unlimited
+        };
+    }
+}
+
+module.exports = BWFHeader;
+
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports) {
 
 /*
@@ -2218,33 +2271,6 @@ class WaveFileHeader {
         this.dataChunkId = "";
         /** @type {number} */
         this.dataChunkSize = 0;
-        /**
-         * "bext"
-         * @type {string}
-         */
-        this.bextChunkId = "";
-        /** @type {number} */
-        this.bextChunkSize = 0;
-        /** @type {!Array<number>} */
-        this.bextChunkData = [];
-        /** @type {Object} */
-        this.bextChunkFields = {
-            "description": "", //256
-            "originator": "", //32
-            "originatorReference": "", //32
-            "originationDate": "", //10
-            "originationTime": "", //8
-            "timeReference": "", //64-bit value
-            "version": "", //WORD
-            "UMID": "", // 64
-            "loudnessValue": "", //WORD
-            "loudnessRange": "", //WORD
-            "maxTruePeakLevel": "", //WORD
-            "maxMomentaryLoudness": "", //WORD
-            "maxShortTermLoudness": "", //WORD
-            "reserved": "", //180
-            "codingHistory": "" // string, unlimited
-        };
     }
 }
 
@@ -2252,7 +2278,7 @@ module.exports = WaveFileHeader;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -2394,7 +2420,7 @@ module.exports.write = write;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -2627,7 +2653,7 @@ module.exports.decodeBlock = decodeBlock;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /*
@@ -2736,7 +2762,7 @@ module.exports.decode = decode;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /*
