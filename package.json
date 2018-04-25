@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -42,17 +42,16 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive",
-    "test_a": "nyc ./node_modules/mocha/bin/_mocha test/write",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test --src --recursive",
+    "test-dist": "nyc ./node_modules/mocha/bin/_mocha test --dist --recursive",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
-    "bundle": "webpack",
     "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
-    "qa": "npm run lint && npm test",
-    "pack": "npm run bundle && npm run compile && npm run doc",
-    "build": "npm run qa && npm run pack"
+    "pack": "webpack && npm run compile && npm run doc",
+    "build": "npm run lint && npm run pack && npm run test-dist && npm test"
   },
   "devDependencies": {
+    "browser-env": "^3.2.5",
     "chai": "^4.1.2",
     "codecov": "^3.0.0",
     "docdash": "^0.4.0",
