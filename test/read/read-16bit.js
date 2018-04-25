@@ -8,7 +8,7 @@ let assert = require("assert");
 describe("16-bit reading", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");

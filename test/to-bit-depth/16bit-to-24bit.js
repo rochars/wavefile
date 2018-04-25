@@ -8,7 +8,8 @@ let assert = require("assert");
 describe("16-bit from file to 24-bit", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
+    
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -73,7 +74,7 @@ describe("16-bit from file to 24-bit", function() {
 describe("16-bit mono from scratch to 24-bit (max range)", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile();
@@ -139,7 +140,7 @@ describe("16-bit mono from scratch to 24-bit (max range)", function() {
 describe("16-bit mono from scratch to 24-bit (0)", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile();

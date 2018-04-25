@@ -8,7 +8,7 @@ let assert = require("assert");
 describe("32-bit PCM reading", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");

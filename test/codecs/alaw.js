@@ -7,7 +7,7 @@ var assert = require('assert');
 
 describe('16-bit to 8-bit a-law', function() {
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -71,7 +71,7 @@ describe('16-bit to 8-bit a-law', function() {
 
 describe('8-bit a-law to 16-bit (a-law encoded with WaveFile)', function() {
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(

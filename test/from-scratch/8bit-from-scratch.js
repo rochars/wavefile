@@ -8,7 +8,7 @@ var assert = require('assert');
 
 describe('create 8-bit wave files from scratch', function() {
     
-    let WaveFile = require('../../index.js');
+    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '8', [0, 255, 2, 3]);
 

@@ -8,7 +8,7 @@ var assert = require('assert');
 
 describe('create 64-bit wave file from scratch', function() {
     
-    let WaveFile = require('../../index.js');
+    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     wav.fromScratch(1, 44100, '64', [0.0, 0.04029440055111987, -0.04029440055111987, 1.0]);
 

@@ -8,7 +8,7 @@ var assert = require('assert');
 describe('read 4-bit file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "4bit-imaadpcm-8kHz-noBext-mono.wav");
@@ -98,7 +98,7 @@ describe('read 4-bit file from disk and write to new file', function() {
 describe('read 4-bit 22050kHz file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "ima22m.wav");

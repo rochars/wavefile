@@ -8,7 +8,7 @@ var assert = require('assert');
 describe('read 16bit RIFX file from disk and write to new RIFX file', function() {
     
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "RIFX-16bit-mono.wav");

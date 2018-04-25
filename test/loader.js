@@ -9,7 +9,7 @@ let wavefile = require('../index.js');
 if (process.argv[3] == '--dist') {
     require('browser-env')();let assert = require('assert');
     require('../dist/wavefile-min.js');
-    wavefile = window.wavefile;
+    wavefile = window.WaveFile;
 }
 
 module.exports = wavefile;

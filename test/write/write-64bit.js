@@ -8,7 +8,7 @@ var assert = require('assert');
 describe('read 64-bit file from disk and write to new file', function() {
     
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "64bit-48kHz-noBext-mono.wav");

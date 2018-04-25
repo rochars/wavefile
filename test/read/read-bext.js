@@ -8,7 +8,7 @@ let assert = require("assert");
 describe("BWF data reading", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");

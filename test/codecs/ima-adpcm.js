@@ -7,7 +7,7 @@ var assert = require('assert');
 
 describe('16-bit to 4-bit', function() {
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -77,7 +77,7 @@ describe('16-bit to 4-bit', function() {
 
 describe('4-bit to 16-bit (4-bit encoded with wavefile.js)', function() {
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -143,7 +143,7 @@ describe('4-bit to 16-bit (4-bit encoded with wavefile.js)', function() {
 
 describe('4-bit to 16-bit (existing 4-bit wave file)', function() {
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -209,7 +209,7 @@ describe('4-bit to 16-bit (existing 4-bit wave file)', function() {
 
 describe('4-bit to 16-bit (1024 blockalign)', function() {
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(

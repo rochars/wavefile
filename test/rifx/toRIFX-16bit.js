@@ -8,7 +8,7 @@ let assert = require("assert");
 describe("16-bit RIFF to RIFX", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let riffWav = new WaveFile(
@@ -79,7 +79,7 @@ describe("16-bit RIFF to RIFX", function() {
 describe("RIFX cbSize and validBitsPerSample", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let riffWav = new WaveFile(

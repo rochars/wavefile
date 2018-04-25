@@ -9,7 +9,7 @@ let expect = chai.expect;
 describe('errors', function() {
     
     let fs = require("fs");
-    let WaveFile = require("../index.js");
+    const WaveFile = require("../test/loader.js");
     let path = "test/files/";
 
     let testFunc;

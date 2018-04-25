@@ -8,7 +8,7 @@ let assert = require("assert");
 describe("8-bit from file to 32-bit IEEE", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -73,7 +73,7 @@ describe("8-bit from file to 32-bit IEEE", function() {
 describe("8-bit mono from scratch to 32-bit IEEE (max range)", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile();
@@ -138,7 +138,7 @@ describe("8-bit mono from scratch to 32-bit IEEE (max range)", function() {
 describe("8-bit mono from scratch to 32-bit IEEE (128)", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile();

@@ -11,7 +11,7 @@ var assert = require('assert');
 
 describe('interleave', function() {
     
-    let WaveFile = require('../index.js');    
+    const WaveFile = require("../test/loader.js");   
 
     it('should interleave the samples of a 2-channel wave file',
             function() {

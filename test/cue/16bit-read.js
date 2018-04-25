@@ -8,7 +8,7 @@ let assert = require("assert");
 describe("16-bit cue reading", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(
@@ -80,7 +80,7 @@ describe("16-bit cue reading", function() {
 describe("16-bit cue reading (file with 2 markers)", function() {
 
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
     let wav = new WaveFile(

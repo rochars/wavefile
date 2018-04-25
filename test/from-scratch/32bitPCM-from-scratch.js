@@ -8,7 +8,7 @@ var assert = require('assert');
 
 describe('create 32-bit PCM wave files from scratch', function() {
     
-    let WaveFile = require('../../index.js');
+    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 

@@ -9,7 +9,7 @@ describe('read a file with bext from disk and write to new file',
     function() {
     
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     let wav = new WaveFile(
         fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
@@ -27,7 +27,7 @@ describe('bext field with less bytes than the field size ' +
     function() {
     
     let fs = require("fs");
-    let WaveFile = require("../../index.js");
+    const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     let wav = new WaveFile(
         fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));

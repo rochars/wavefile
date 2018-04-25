@@ -8,7 +8,7 @@ var assert = require('assert');
 
 describe('create 16-bit wave files from scratch', function() {
     
-    let WaveFile = require('../../index.js');
+    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
 
