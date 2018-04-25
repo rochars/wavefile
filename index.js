@@ -154,7 +154,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             bitDepth,
-            byteData.unpackArray(this.samples, uInt8),
+            this.samples,
             {"container": this.chunkId}
         );
     }

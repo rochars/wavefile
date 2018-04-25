@@ -1,7 +1,11 @@
 /*
  * WaveFileReaderWriter
- * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
+ *
+ * References:
+ * http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+ * https://tech.ebu.ch/docs/tech/tech3285.pdf
  *
  */
 
@@ -37,6 +41,8 @@ class WaveFileReaderWriter extends WaveFileHeader {
         };
         /** @type {!Array<number>} */
         this.samples = [];
+        /** @type {number} */
+        this.head_ = 0;
     }
 
     /**
@@ -57,6 +63,11 @@ class WaveFileReaderWriter extends WaveFileHeader {
         }
     }
 
+    /**
+     * Set up to work wih big-endian or little-endian files.
+     * The types used are changed from LE or BE. If the
+     * the file is big-endian (RIFX), true is returned.
+     */
     LEorBE() {
         let bigEndian = this.chunkId == "RIFX";
         uInt8.be = bigEndian;
@@ -136,7 +147,101 @@ class WaveFileReaderWriter extends WaveFileHeader {
             this.bextChunkId = "bext";
             this.bextChunkSize = chunk.chunkSize;
             this.bextChunkData = chunk.chunkData;
+            this.readBextChunkFields_();
         }
+    }
+
+    /**
+     * Read the fields of the "bext" chunk.
+     */
+    readBextChunkFields_() {
+        this.head_ = 0;
+        this.bextChunkFields =  {
+            "description": this.readVariableSizeString_(
+                this.bextChunkData, 256),
+            "originator": this.readVariableSizeString_(
+                this.bextChunkData, 32),
+            "originatorReference": this.readVariableSizeString_(
+                this.bextChunkData, 32),
+            "originationDate": this.readVariableSizeString_(
+                this.bextChunkData, 10),
+            "originationTime": this.readVariableSizeString_(
+                this.bextChunkData, 8),
+            // timeReference is a 64-bit value
+            "timeReference": this.readBytes(
+                this.bextChunkData, 8), 
+            "version": this.readFromChunk_(
+                this.bextChunkData, uInt16),
+            "UMID": this.readVariableSizeString_(
+                this.bextChunkData, 64), 
+            "loudnessValue": this.readFromChunk_(
+                this.bextChunkData, uInt16),
+            "loudnessRange": this.readFromChunk_(
+                this.bextChunkData, uInt16),
+            "maxTruePeakLevel": this.readFromChunk_(
+                this.bextChunkData, uInt16),
+            "maxMomentaryLoudness": this.readFromChunk_(
+                this.bextChunkData, uInt16),
+            "maxShortTermLoudness": this.readFromChunk_(
+                this.bextChunkData, uInt16),
+            "reserved": this.readVariableSizeString_(
+                this.bextChunkData, 180),
+            "codingHistory": this.readVariableSizeString_(
+                this.bextChunkData, this.bextChunkData.length - 602),
+        }
+    }
+
+    /**
+     * Return a slice of the byte array while moving the reading head.
+     * @param {!Array<number>} bytes The bytes.
+     * @param {number} size the number of bytes to read.
+     */
+    readBytes(bytes, size) {
+        let v = this.head_;
+        this.head_ += size;
+        return bytes.slice(v, this.head_);
+    }
+
+    /**
+     * Read bytes as a string from a RIFF chunk.
+     * @param {!Array<number>} bytes The bytes.
+     * @param {number} maxSize the max size of the string.
+     */
+    readVariableSizeString_(bytes, maxSize) {
+        let str = "";
+        for (let i=0; i<maxSize; i++) {
+            str += byteData.unpack([bytes[this.head_]], chr);
+            this.head_++;
+        }
+        return str;
+    }
+
+    /**
+     * Read a number from a chunk.
+     * @param {!Array<number>} bytes The bytes.
+     * @param {Object} bdType The byte-data corresponding type.
+     */
+    readFromChunk_(bytes, bdType) {
+        let size = bdType.bits / 8;
+        let value = byteData.unpack(
+            bytes.slice(this.head_, this.head_ + size), bdType);
+        this.head_ += size;
+        return value;
+    }
+
+    /**
+     * Write a variable size string as bytes.
+     * If the string is smaller than the max size it 
+     * is filled with 0s.
+     * @param {string} str The string to be written as bytes.
+     * @param {number} maxSize the max size of the string.
+     */
+    writeVariableSizeString_(str, maxSize) {
+        let bytes = byteData.packArray(str, chr);
+        for (let i=bytes.length; i<maxSize; i++) {
+            bytes.push(0);
+        }
+        return bytes;
     }
 
     /**
@@ -176,9 +281,11 @@ class WaveFileReaderWriter extends WaveFileHeader {
     samplesFromBytes_(bytes, options) {
         options.bits = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
         options.signed = options.bits == 8 ? false : true;
-        options.float = (this.audioFormat == 3 || this.bitsPerSample == 64) ? true : false;
+        options.float = (this.audioFormat == 3 || 
+            this.bitsPerSample == 64) ? true : false;
         options.single = false;
-        this.samples = byteData.unpackArray(bytes, options);
+        this.samples = byteData.unpackArray(
+            bytes, new byteData.Type(options));
     }
 
     /**
@@ -200,8 +307,10 @@ class WaveFileReaderWriter extends WaveFileHeader {
     samplesToBytes_(options) {
         options.bits = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
         options.signed = options.bits == 8 ? false : true;
-        options.float = (this.audioFormat == 3  || this.bitsPerSample == 64) ? true : false;
-        let bytes = byteData.packArray(this.samples, options);
+        options.float = (this.audioFormat == 3  ||
+                this.bitsPerSample == 64) ? true : false;
+        let bytes = byteData.packArray(
+            this.samples, new byteData.Type(options));
         if (bytes.length % 2) {
             bytes.push(0);
         }
@@ -214,10 +323,42 @@ class WaveFileReaderWriter extends WaveFileHeader {
      */
     getBextBytes_() {
         if (this.bextChunkId) {
+            let bextBytes = [].concat(this.writeVariableSizeString_(
+                this.bextChunkFields["description"], 256));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["originator"], 32));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["originatorReference"], 32));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["originationDate"], 10));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["originationTime"], 8));
+            // 64-bit value rw as bytes
+            bextBytes = bextBytes.concat(
+                this.bextChunkFields["timeReference"]);
+            bextBytes = bextBytes.concat(byteData.pack(
+                this.bextChunkFields["version"], uInt16));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["UMID"], 64));
+            bextBytes = bextBytes.concat(byteData.pack(
+                this.bextChunkFields["loudnessValue"], uInt16));
+            bextBytes = bextBytes.concat(byteData.pack(
+                this.bextChunkFields["loudnessRange"], uInt16));
+            bextBytes = bextBytes.concat(byteData.pack(
+                this.bextChunkFields["maxTruePeakLevel"], uInt16));
+            bextBytes = bextBytes.concat(byteData.pack(
+                this.bextChunkFields["maxMomentaryLoudness"], uInt16));
+            bextBytes = bextBytes.concat(byteData.pack(
+                this.bextChunkFields["maxShortTermLoudness"], uInt16));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["reserved"], 180));
+            bextBytes = bextBytes.concat(this.writeVariableSizeString_(
+                this.bextChunkFields["codingHistory"],
+                this.bextChunkData.length - 602));
             return [].concat(
                     byteData.packArray(this.bextChunkId, chr),
-                    byteData.pack(this.bextChunkSize, uInt32),
-                    this.bextChunkData
+                    byteData.pack(bextBytes.length, uInt32),
+                    bextBytes
                 );
         }
         return [];

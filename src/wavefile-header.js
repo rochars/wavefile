@@ -1,7 +1,7 @@
 /*
  * WaveFileHeader class
  * A structure representing a WAVE file header.
- * Copyright (c) 2017 Rafael da Silva Rocha. MIT License.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
  */
@@ -67,7 +67,9 @@ class WaveFileHeader {
          * @type {string}
          */
         this.cueChunkId = "";
+        /** @type {number} */
         this.cueChunkSize = -1;
+        /** @type {!Array<number>} */
         this.cueChunkData = [];
 
         /**
@@ -82,8 +84,30 @@ class WaveFileHeader {
          * @type {string}
          */
         this.bextChunkId = "";
+        /** @type {number} */
         this.bextChunkSize = 0;
+        /** @type {!Array<number>} */
         this.bextChunkData = [];
+        /** @type {!Object} */
+        this.bextChunkFields = {
+            "description": "", //256
+            "originator": "", //32
+            "originatorReference": "", //32
+            "originationDate": "", //10
+            "originationTime": "", //8
+            "timeReferenceLow": "", //DWORD
+            "timeReferenceHigh": "", //DWORD
+            "version": "", //WORD
+            "UMID_0 ": "", //byte
+            "UMID_63 ": "", //byte
+            "loudnessValue": "", //WORD
+            "loudnessRange": "", //WORD
+            "maxTruePeakLevel": "", //WORD
+            "maxMomentaryLoudness": "", //WORD
+            "maxShortTermLoudness": "", //WORD
+            "reserved": "", //180
+            "codingHistory": "" // string, unlimited
+        };
     }
 }
 

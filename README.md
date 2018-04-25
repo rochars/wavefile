@@ -20,7 +20,7 @@ With **wavefile** you can:
 
 And more.
 
-**wavefile** is extensively tested, and the test folder contains samples of all supported formats. Please note that some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in every player.
+**wavefile** is extensively tested and contains samples of all supported formats. Please note that some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in every player.
 
 ## Install
 ```
@@ -190,12 +190,38 @@ console.log(wav.factChunkId);
 console.log(wav.factChunkSize);
 console.log(wav.dwSampleLength);
 
+// "bext"
+console.log(wav.bextChunkFields);
+
 // "data"
 console.log(wav.dataChunkId);
 console.log(wav.dataChunkSize);
 
 // array of numbers
 console.log(wav.samples);
+```
+
+### BWF data
+BWF data ("bext" chunk) is stored in the *bextChunkFields* property in human-readable form.
+You may edit the data in the "bext" chunk by editing the *bextChunkFields* property on a WaveFile object.
+```javascript
+wav.bextChunkFields = {
+    "description": "", // 256 chars
+    "originator": "", // 32 chars
+    "originatorReference": "", // 32 chars
+    "originationDate": "", // 10 chars
+    "originationTime": "", // 8 chars
+    "timeReference": "", // 64-bit value kept as an array of 8 bytes
+    "version": "", // 16-bit number
+    "UMID": "", // 64 chars
+    "loudnessValue": "", // 16-bit number
+    "loudnessRange": "", // 16-bit number
+    "maxTruePeakLevel": "", // 16-bit number
+    "maxMomentaryLoudness": "", // 16-bit number
+    "maxShortTermLoudness": "", // 16-bit number
+    "reserved": "", // 180 chars
+    "codingHistory": "" // string, unlimited size
+};
 ```
 
 ### The samples
