@@ -48,7 +48,7 @@ fs.writeFileSync(path, wav.toBuffer());
 ```
 
 ## Create wave files from scratch
-You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples are an array of numbers. The array may be multidimensional if there is more than one channel.
+You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.
 
 Possible values for the bit depth are:  
 "4" - 4-bit IMA-ADPCM  
@@ -116,12 +116,6 @@ wav.fromIMAADPCM();
 
 IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
 
-**wavefile** also assumes a block align of 256 bytes when decoding IMA-ADPCM files, but you can also decode files with a different block align:
-```javascript
-// Decode a 4-bit IMA-ADPCM with block align of 1024 bytes:
-wav.fromIMAADPCM(1024);
-```
-
 ## A-Law
 16-bit wave files can be encoded as A-Law:
 ```javascript
@@ -149,8 +143,6 @@ wav.fromMuLaw();
 ```
 
 ## Change the bit depth
-Currently there is **no dithering** when changing the bit depth.
-
 If the samples are stereo they need to be interleaved before changing the bit depth.
 
 Notice that you **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.

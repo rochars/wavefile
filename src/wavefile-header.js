@@ -1,13 +1,13 @@
 /*
- * WaveFileHeader class
- * A structure representing a WAVE file header.
+ * WaveFileHeader
+ * Class representing a wav file header.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
  */
 
 /**
- * Wave file headers.
+ * Class representing a wav file header.
  */
 class WaveFileHeader {
 
@@ -57,7 +57,7 @@ class WaveFileHeader {
         this.factChunkId = "";
         /** @type {number} */
         this.factChunkSize = 0;
-        /** @type {!Array<number>} */
+        /** @type {Array<number>} */
         this.factChunkData = [];
         /** @type {number} */
         this.dwSampleLength = 0;
@@ -69,8 +69,36 @@ class WaveFileHeader {
         this.cueChunkId = "";
         /** @type {number} */
         this.cueChunkSize = -1;
-        /** @type {!Array<number>} */
+        /** @type {Array<number>} */
         this.cueChunkData = [];
+
+        /**
+         * "bext"
+         * @type {string}
+         */
+        this.bextChunkId = "";
+        /** @type {number} */
+        this.bextChunkSize = 0;
+        /** @type {Array<number>} */
+        this.bextChunkData = [];
+        /** @type {Object} */
+        this.bextChunkFields = {
+            "description": "", //256
+            "originator": "", //32
+            "originatorReference": "", //32
+            "originationDate": "", //10
+            "originationTime": "", //8
+            "timeReference": "", //64-bit value
+            "version": "", //WORD
+            "UMID": "", // 64
+            "loudnessValue": "", //WORD
+            "loudnessRange": "", //WORD
+            "maxTruePeakLevel": "", //WORD
+            "maxMomentaryLoudness": "", //WORD
+            "maxShortTermLoudness": "", //WORD
+            "reserved": "", //180
+            "codingHistory": "" // string, unlimited
+        };
 
         /**
          * "data"

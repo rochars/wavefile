@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#checkWriteInput_">checkWriteInput_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#validateBitDepth_">validateBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#validateNumChannels_">validateNumChannels_</a></li><li data-type='method'><a href="WaveFile.html#validateSampleRate_">validateSampleRate_</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#clearFactChunk_">clearFactChunk_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -71,7 +71,7 @@ let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
 console.log(wav.chunkId);
 console.log(wav.chunkSize);
 console.log(wav.fmtChunkId);
-fs.writeFileSync(path, wav.toBuffer());</code></pre><h2>Create wave files from scratch</h2><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples are an array of numbers. The array may be multidimensional if there is more than one channel.</p>
+fs.writeFileSync(path, wav.toBuffer());</code></pre><h2>Create wave files from scratch</h2><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.</p>
 <p>Possible values for the bit depth are:<br>&quot;4&quot; - 4-bit IMA-ADPCM<br>&quot;8&quot; - 8-bit<br>&quot;8a&quot; - 8-bit A-Law<br>&quot;8m&quot; - 8-bit mu-Law<br>&quot;16&quot; - 16-bit<br>&quot;24&quot; - 24-bit<br>&quot;32&quot; - 32-bit<br>&quot;32f&quot; - 32-bit floating point<br>&quot;64&quot; - 64-bit floating point</p>
 <pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
 
@@ -104,9 +104,7 @@ wav.toRIFF();</code></pre><h2>IMA-ADPCM</h2><p>16-bit 8000 Hz wave files can be 
 wav.toIMAADPCM();</code></pre><p>To decode 4-bit IMA-ADPCM as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 4-bit IMA-ADPCM as 16-bit:
 wav.fromIMAADPCM();</code></pre><p>IMA-ADPCM files compressed with <strong>wavefile</strong> will have a block align of 256 bytes.</p>
-<p><strong>wavefile</strong> also assumes a block align of 256 bytes when decoding IMA-ADPCM files, but you can also decode files with a different block align:</p>
-<pre class="prettyprint source lang-javascript"><code>// Decode a 4-bit IMA-ADPCM with block align of 1024 bytes:
-wav.fromIMAADPCM(1024);</code></pre><h2>A-Law</h2><p>16-bit wave files can be encoded as A-Law:</p>
+<h2>A-Law</h2><p>16-bit wave files can be encoded as A-Law:</p>
 <pre class="prettyprint source lang-javascript"><code>// Encode a 16-bit wave file as 8-bit A-law:
 wav.toALaw();</code></pre><p>To decode 8-bit A-Law as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit A-Law as 16-bit:
@@ -114,8 +112,7 @@ wav.fromALaw();</code></pre><h2>mu-Law</h2><p>16-bit wave files can be encoded a
 <pre class="prettyprint source lang-javascript"><code>// Encode a 16-bit wave file as 8-bit mu-law:
 wav.toMuLaw();</code></pre><p>To decode 8-bit mu-Law as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 16-bit:
-wav.fromMuLaw();</code></pre><h2>Change the bit depth</h2><p>Currently there is <strong>no dithering</strong> when changing the bit depth.</p>
-<p>If the samples are stereo they need to be interleaved before changing the bit depth.</p>
+wav.fromMuLaw();</code></pre><h2>Change the bit depth</h2><p>If the samples are stereo they need to be interleaved before changing the bit depth.</p>
 <p>Notice that you <strong>can't</strong> change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the <em>toIMAADPCM()</em>, <em>fromIMAADPCM()</em>, <em>toALaw()</em>, <em>fromALaw()</em>, <em>toMuLaw()</em> and <em>fromMuLaw()</em> methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.</p>
 <pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
 
@@ -208,7 +205,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Apr 25 2018 03:23:57 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Apr 26 2018 22:38:15 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

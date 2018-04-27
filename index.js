@@ -4,25 +4,33 @@
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
+ * References:
+ * http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+ * https://tech.ebu.ch/docs/tech/tech3285.pdf
+ *
  */
 
-const byteData = require("byte-data");
-const uInt8 = byteData.uInt8;
-const bitDepthLib = require("bitdepth");
-const WaveErrors = require("./src/wave-errors");
+/** @private */
+const WAVE_ERRORS = require("./src/wave-errors");
+/** @private */
+const bitDepth_ = require("bitdepth");
+/** @private */
+const riffChunks_ = require("riff-chunks");
+/** @private */
+const imaadpcm_ = require("imaadpcm");
+/** @private */
+const alawmulaw_ = require("alawmulaw");
+/** @private */
 const WaveFileReaderWriter = require("./src/wavefile-reader-writer");
-const riffChunks = require("riff-chunks");
-const adpcm = require("imaadpcm");
-const alaw = require("alawmulaw").alaw;
-const mulaw = require("alawmulaw").mulaw;
 
 /**
- * WaveFile
+ * Class representing a wav file.
+ * @extends WaveFileReaderWriter
  */
 class WaveFile extends WaveFileReaderWriter {
 
     /**
-     * @param {Uint8Array} bytes A wave file buffer.
+     * @param {Uint8Array|Array<number>} bytes A wave file buffer.
      */
     constructor(bytes) {
         super();
@@ -34,30 +42,27 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Create a WaveFile object based on the arguments passed.
      * @param {number} numChannels The number of channels
-     *     (Ints like 1 for mono, 2 stereo and so on).
+     *     (Integer numbers: 1 for mono, 2 stereo and so on).
      * @param {number} sampleRate The sample rate.
      *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
      * @param {string} bitDepth The audio bit depth.
      *     One of "8", "16", "24", "32", "32f", "64".
-     * @param {!Array<number>} samples Array of samples to be written.
-     *     Samples must be in the correct range according to the bit depth.
-     *     Samples of multi-channel data .
+     * @param {Array<number>} samples Array of samples to be written.
+     *     The samples must be in the correct range according to the
+     *     bit depth.
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
-        this.cbSize = 0;
-        this.validBitsPerSample = 0;
-        this.factChunkId = "";
-        this.factChunkSize = 0;
-        this.factChunkData = [];
-        this.dwSampleLength = 0;
         if (!options.container) {
             options.container = "RIFF";
         }
-        let bytes = parseInt(bitDepth, 10) / 8;
-        this.chunkSize = 36 + samples.length * bytes;
+        let numBytes = parseInt(bitDepth, 10) / 8;
+        // Clear the fact chunk
+        this.clearFactChunk_();
+        // Normal PCM file header
+        this.chunkSize = 36 + samples.length * numBytes;
         this.fmtChunkSize = 16;
-        this.byteRate = (numChannels * bytes) * sampleRate;
-        this.blockAlign = numChannels * bytes;
+        this.byteRate = (numChannels * numBytes) * sampleRate;
+        this.blockAlign = numChannels * numBytes;
         this.chunkId = options.container;
         this.format = "WAVE";
         this.fmtChunkId = "fmt ";
@@ -66,10 +71,10 @@ class WaveFile extends WaveFileReaderWriter {
         this.sampleRate = sampleRate;
         this.bitsPerSample = parseInt(bitDepth, 10);
         this.dataChunkId = "data";
-        this.dataChunkSize = samples.length * bytes;
+        this.dataChunkSize = samples.length * numBytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
-        // adpcm
+        // IMA ADPCM header
         if (bitDepth == "4") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
@@ -83,7 +88,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
         }
-        // A-Law or mu-Law
+        // A-Law and mu-Law header
         if (bitDepth == "8a" || bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
@@ -97,12 +102,12 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Init a WaveFile object from a byte buffer.
-     * @param {Uint8Array} bytes The buffer.
+     * @param {Uint8Array|Array<number>} bytes The buffer.
      */
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.chunkId == "RIFX";
-        let chunk = riffChunks.read(bytes, bigEndian);
+        let chunk = riffChunks_.read(bytes, bigEndian);
         this.readFmtChunk_(chunk.subChunks);
         this.readFactChunk_(chunk.subChunks);
         this.readBextChunk_(chunk.subChunks);
@@ -132,7 +137,7 @@ class WaveFile extends WaveFileReaderWriter {
      */
     toRIFF() {
         this.chunkId = "RIFF";
-        this.LEorBE();
+        this.LEorBE_();
     }
 
     /**
@@ -140,7 +145,7 @@ class WaveFile extends WaveFileReaderWriter {
      */
     toRIFX() {
         this.chunkId = "RIFX";
-        this.LEorBE();
+        this.LEorBE_();
     }
 
     /**
@@ -149,7 +154,7 @@ class WaveFile extends WaveFileReaderWriter {
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
-        bitDepthLib.toBitDepth(this.samples, this.bitDepth, bitDepth);
+        bitDepth_.toBitDepth(this.samples, this.bitDepth, bitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
@@ -203,20 +208,20 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "4",
-            adpcm.encode(this.samples),
+            imaadpcm_.encode(this.samples),
             {"container": this.chunkId}
         );
     }
 
     /**
-     * Decode a IMA ADPCM wave file as a 16-bit wave file.
+     * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
      */
-    fromIMAADPCM(blockAlign=256) {
+    fromIMAADPCM() {
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
             "16",
-            adpcm.decode(this.samples, blockAlign),
+            imaadpcm_.decode(this.samples, this.blockAlign),
             {"container": this.chunkId}
         );
     }
@@ -229,7 +234,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "8a",
-            alaw.encode(this.samples),
+            alawmulaw_.alaw.encode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -242,7 +247,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "16",
-            alaw.decode(this.samples),
+            alawmulaw_.alaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -255,7 +260,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "8m",
-            mulaw.encode(this.samples),
+            alawmulaw_.mulaw.encode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -268,7 +273,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "16",
-            mulaw.decode(this.samples),
+            alawmulaw_.mulaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -276,6 +281,7 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the input for wav writing.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     checkWriteInput_() {
         this.validateBitDepth_();
@@ -286,10 +292,11 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the bit depth.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth]) {
-            throw new Error(WaveErrors.bitDepth);
+            throw new Error(WAVE_ERRORS.bitDepth);
         }
         return true;
     }
@@ -297,11 +304,12 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the sample rate value.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     validateNumChannels_() {
         let blockAlign = this.numChannels * this.bitsPerSample / 8;
         if (this.numChannels < 1 || blockAlign > 65535) {
-            throw new Error(WaveErrors.numChannels);
+            throw new Error(WAVE_ERRORS.numChannels);
         }
         return true;
     }
@@ -309,14 +317,27 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the sample rate value.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     validateSampleRate_() {
         let byteRate = this.numChannels *
             (this.bitsPerSample / 8) * this.sampleRate;
         if (this.sampleRate < 1 || byteRate > 4294967295) {
-            throw new Error(WaveErrors.sampleRate);
+            throw new Error(WAVE_ERRORS.sampleRate);
         }
         return true;
+    }
+
+    /**
+     * Reset the attributes related to the "fact" chunk.
+     */
+    clearFactChunk_() {
+        this.cbSize = 0;
+        this.validBitsPerSample = 0;
+        this.factChunkId = "";
+        this.factChunkSize = 0;
+        this.factChunkData = [];
+        this.dwSampleLength = 0;
     }
 }
 

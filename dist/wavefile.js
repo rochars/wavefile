@@ -60,24 +60,51 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+/*
+ * WAVE_ERRORS
+ * Error messages.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefile
+ *
+ */
+
+/**
+ * Error messages.
+ * @enum {string}
+ */
+module.exports =  {
+    "format": "Not a supported format.",
+    "wave": "Could not find the 'WAVE' format identifier",
+    "fmt ": "Could not find the 'fmt ' chunk",
+    "data": "Could not find the 'data' chunk",
+    "fact": "Could not find the 'fact' chunk",
+    "bitDepth": "Invalid bit depth.",
+    "numChannels": "Invalid number of channels.",
+    "sampleRate": "Invalid sample rate."
+};
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
  * byte-data
- * Read and write data to and from byte buffers.
+ * Pack and unpack binary data.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
  *
  */
 
 /** @private */
-const rw = __webpack_require__(5);
-const Type = __webpack_require__(1);
+const rw = __webpack_require__(6);
+const Type = __webpack_require__(2);
 
 /**
  * Turn a number or fixed-length string into a byte buffer.
@@ -90,7 +117,7 @@ const Type = __webpack_require__(1);
 function pack(value, type, base=10) {
     let values = [];
     if (type.char) {
-        values = type.char ? value.slice(0, type.realBits / 8) : value;
+        values = type.char ? value.slice(0, type.offset) : value;
     } else if (!Array.isArray(value)) {
         values = [value];
     }
@@ -106,9 +133,8 @@ function pack(value, type, base=10) {
  * @return {number|string}
  */
 function unpack(buffer, type, base=10) {
-    let offset = type.bits < 8 ? type.bits : type.realBits / 8;
     let values = rw.fromBytes(
-            buffer.slice(0, offset),
+            buffer.slice(0, type.offset),
             rw.getType(type, base)
         );
     if (type.char) {
@@ -201,11 +227,10 @@ function unpackStruct(buffer, def, base=10) {
     let i = 0;
     let j = 0;
     while (i < def.length) {
-        let bits = def[i].bits < 8 ? 1 : def[i].realBits / 8;
         struct = struct.concat(
-                unpack(buffer.slice(j, j + bits), def[i], base)
+                unpack(buffer.slice(j, j + def[i].offset), def[i], base)
             );
-        j += bits;
+        j += def[i].offset;
         i++;
     }
     return struct;
@@ -220,7 +245,7 @@ function unpackStruct(buffer, def, base=10) {
 function getStructDefSize(def) {
     let bits = 0;
     for (let i = 0; i < def.length; i++) {
-        bits += def[i].realBits / 8;
+        bits += def[i].offset;
     }
     return bits;
 }
@@ -414,7 +439,7 @@ module.exports.float64BE = new Type({"bits": 64, "float": true, "be": true});
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -431,13 +456,12 @@ let i32 = new Int32Array(f32.buffer);
 let f64 = new Float64Array(1);
 /** @private */
 let ui32 = new Uint32Array(f64.buffer);
-/** @private */
-const GInt = __webpack_require__(6);
+let GenericInteger = __webpack_require__(7);
 
 /**
  * A class to represent byte-data types.
  */
-class Type extends GInt {
+class Type extends GenericInteger {
 
     /**
      * @param {Object} options The type definition.
@@ -445,6 +469,7 @@ class Type extends GInt {
      * @param {boolean} options.char True for string/char types.
      * @param {boolean} options.float True for float types.
      *    Available only for 16, 32 and 64-bit data.
+     * @param {boolean} options.base The base: 2, 10 or 16.
      * @param {boolean} options.be True for big-endian.
      * @param {boolean} options.signed True for signed types.
      */
@@ -460,6 +485,12 @@ class Type extends GInt {
          * @type {boolean}
          */
         this.float = options["float"];
+        /**
+         * The base used to represent data of this type.
+         * Default is 10.
+         * @type {number}
+         */
+        this.base = options["base"] ? options["base"] : 10;
         this.buildType_();
     }
 
@@ -472,7 +503,7 @@ class Type extends GInt {
      * @private
      */
     read16F_(bytes, i) {
-        let int = this.read_(bytes, i, {"bits": 16, "offset": 2});
+        let int = this.read(bytes, i, {"bits": 16, "offset": 2});
         let exponent = (int & 0x7C00) >> 10;
         let fraction = int & 0x03FF;
         let floatValue;
@@ -492,7 +523,7 @@ class Type extends GInt {
      * @private
      */
     read32F_(bytes, i) {
-        i32[0] = this.read_(bytes, i, {"bits": 32, "offset": 4});
+        i32[0] = this.read(bytes, i, {"bits": 32, "offset": 4});
         return f32[0];
     }
 
@@ -505,8 +536,9 @@ class Type extends GInt {
      * @private
      */
     read64F_(bytes, i) {
-        ui32[0] = this.read_(bytes, i, {"bits": 32, "offset": 4});
-        ui32[1] = this.read_(bytes, i + 4, {"bits": 32, "offset": 4});
+        let type32 = new Type({"bits": 32, "offset": 4});
+        ui32[0] = type32.read(bytes, i, {"bits": 32, "offset": 4});
+        ui32[1] = type32.read(bytes, i + 4, {"bits": 32, "offset": 4});
         return f64[0];
     }
 
@@ -537,9 +569,9 @@ class Type extends GInt {
      */
     write64F_(bytes, number, j) {
         f64[0] = number;
-        let type = {bits: 32, offset: 4, lastByteMask:255};
-        j = this.write_(bytes, ui32[0], j, type);
-        return this.write_(bytes, ui32[1], j, type);
+        let type = new Type({"bits": 32, "offset": 4, "lastByteMask":255});
+        j = type.write(bytes, ui32[0], j);
+        return type.write(bytes, ui32[1], j);
     }
 
     /**
@@ -547,13 +579,12 @@ class Type extends GInt {
      * @param {!Array<number>} bytes An array of bytes.
      * @param {number} number The number to write as bytes.
      * @param {number} j The index being written in the byte buffer.
-     * @param {Object} type The type.
      * @return {number} The next index to write on the byte buffer.
      * @private
      */
-    write32F_(bytes, number, j, type) {
+    write32F_(bytes, number, j) {
         f32[0] = number;
-        j = this.write_(bytes, i32[0], j, type);
+        j = this.write(bytes, i32[0], j);
         return j;
     }
 
@@ -621,9 +652,6 @@ class Type extends GInt {
             }
         } else if (this.char) {
             this.reader = this.readChar_;
-        } else if (this.bits > 32) {
-            //this.reader = this.read_;
-            this.reader = this.readBits_;
         }
     }
 
@@ -650,50 +678,7 @@ module.exports = Type;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-/*
- * wavefile
- * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/wavefile
- *
- */
-
-/**
- * Error messages.
- * @enum {string}
- */
-module.exports =  {
-    "format": "Not a supported format.",
-    "wave": "Could not find the 'WAVE' format identifier",
-    "fmt ": "Could not find the 'fmt ' chunk",
-    "data": "Could not find the 'data' chunk",
-    "fact": "Could not find the 'fact' chunk",
-    "bitDepth": "Invalid bit depth.",
-    "numChannels": "Invalid number of channels.",
-    "sampleRate": "Invalid sample rate."
-};
-
-/***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*!
- * alawmulaw
- * JavaScript A-Law and mu-Law codecs.
- * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/alawmulaw
- * 
- */
-
-module.exports.alaw = __webpack_require__(14);
-module.exports.mulaw = __webpack_require__(15);
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -702,25 +687,33 @@ module.exports.mulaw = __webpack_require__(15);
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
+ * References:
+ * http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+ * https://tech.ebu.ch/docs/tech/tech3285.pdf
+ *
  */
 
-const byteData = __webpack_require__(0);
-const uInt8 = byteData.uInt8;
-const bitDepthLib = __webpack_require__(8);
-const WaveErrors = __webpack_require__(2);
-const WaveFileReaderWriter = __webpack_require__(9);
-const riffChunks = __webpack_require__(12);
-const adpcm = __webpack_require__(13);
-const alaw = __webpack_require__(3).alaw;
-const mulaw = __webpack_require__(3).mulaw;
+/** @private */
+const WAVE_ERRORS = __webpack_require__(0);
+/** @private */
+const bitDepth_ = __webpack_require__(4);
+/** @private */
+const riffChunks_ = __webpack_require__(5);
+/** @private */
+const imaadpcm_ = __webpack_require__(9);
+/** @private */
+const alawmulaw_ = __webpack_require__(10);
+/** @private */
+const WaveFileReaderWriter = __webpack_require__(13);
 
 /**
- * WaveFile
+ * Class representing a wav file.
+ * @extends WaveFileReaderWriter
  */
 class WaveFile extends WaveFileReaderWriter {
 
     /**
-     * @param {Uint8Array} bytes A wave file buffer.
+     * @param {Uint8Array|Array<number>} bytes A wave file buffer.
      */
     constructor(bytes) {
         super();
@@ -732,30 +725,27 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Create a WaveFile object based on the arguments passed.
      * @param {number} numChannels The number of channels
-     *     (Ints like 1 for mono, 2 stereo and so on).
+     *     (Integer numbers: 1 for mono, 2 stereo and so on).
      * @param {number} sampleRate The sample rate.
      *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
      * @param {string} bitDepth The audio bit depth.
      *     One of "8", "16", "24", "32", "32f", "64".
-     * @param {!Array<number>} samples Array of samples to be written.
-     *     Samples must be in the correct range according to the bit depth.
-     *     Samples of multi-channel data .
+     * @param {Array<number>} samples Array of samples to be written.
+     *     The samples must be in the correct range according to the
+     *     bit depth.
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
-        this.cbSize = 0;
-        this.validBitsPerSample = 0;
-        this.factChunkId = "";
-        this.factChunkSize = 0;
-        this.factChunkData = [];
-        this.dwSampleLength = 0;
         if (!options.container) {
             options.container = "RIFF";
         }
-        let bytes = parseInt(bitDepth, 10) / 8;
-        this.chunkSize = 36 + samples.length * bytes;
+        let numBytes = parseInt(bitDepth, 10) / 8;
+        // Clear the fact chunk
+        this.clearFactChunk_();
+        // Normal PCM file header
+        this.chunkSize = 36 + samples.length * numBytes;
         this.fmtChunkSize = 16;
-        this.byteRate = (numChannels * bytes) * sampleRate;
-        this.blockAlign = numChannels * bytes;
+        this.byteRate = (numChannels * numBytes) * sampleRate;
+        this.blockAlign = numChannels * numBytes;
         this.chunkId = options.container;
         this.format = "WAVE";
         this.fmtChunkId = "fmt ";
@@ -764,10 +754,10 @@ class WaveFile extends WaveFileReaderWriter {
         this.sampleRate = sampleRate;
         this.bitsPerSample = parseInt(bitDepth, 10);
         this.dataChunkId = "data";
-        this.dataChunkSize = samples.length * bytes;
+        this.dataChunkSize = samples.length * numBytes;
         this.samples = samples;
         this.bitDepth = bitDepth;
-        // adpcm
+        // IMA ADPCM header
         if (bitDepth == "4") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
@@ -781,7 +771,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length * 2;
         }
-        // A-Law or mu-Law
+        // A-Law and mu-Law header
         if (bitDepth == "8a" || bitDepth == "8m") {
             this.chunkSize = 44 + samples.length;
             this.fmtChunkSize = 20;
@@ -795,12 +785,12 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Init a WaveFile object from a byte buffer.
-     * @param {Uint8Array} bytes The buffer.
+     * @param {Uint8Array|Array<number>} bytes The buffer.
      */
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.chunkId == "RIFX";
-        let chunk = riffChunks.read(bytes, bigEndian);
+        let chunk = riffChunks_.read(bytes, bigEndian);
         this.readFmtChunk_(chunk.subChunks);
         this.readFactChunk_(chunk.subChunks);
         this.readBextChunk_(chunk.subChunks);
@@ -830,7 +820,7 @@ class WaveFile extends WaveFileReaderWriter {
      */
     toRIFF() {
         this.chunkId = "RIFF";
-        this.LEorBE();
+        this.LEorBE_();
     }
 
     /**
@@ -838,7 +828,7 @@ class WaveFile extends WaveFileReaderWriter {
      */
     toRIFX() {
         this.chunkId = "RIFX";
-        this.LEorBE();
+        this.LEorBE_();
     }
 
     /**
@@ -847,7 +837,7 @@ class WaveFile extends WaveFileReaderWriter {
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
-        bitDepthLib.toBitDepth(this.samples, this.bitDepth, bitDepth);
+        bitDepth_.toBitDepth(this.samples, this.bitDepth, bitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
@@ -901,20 +891,20 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "4",
-            adpcm.encode(this.samples),
+            imaadpcm_.encode(this.samples),
             {"container": this.chunkId}
         );
     }
 
     /**
-     * Decode a IMA ADPCM wave file as a 16-bit wave file.
+     * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
      */
-    fromIMAADPCM(blockAlign=256) {
+    fromIMAADPCM() {
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
             "16",
-            adpcm.decode(this.samples, blockAlign),
+            imaadpcm_.decode(this.samples, this.blockAlign),
             {"container": this.chunkId}
         );
     }
@@ -927,7 +917,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "8a",
-            alaw.encode(this.samples),
+            alawmulaw_.alaw.encode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -940,7 +930,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "16",
-            alaw.decode(this.samples),
+            alawmulaw_.alaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -953,7 +943,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "8m",
-            mulaw.encode(this.samples),
+            alawmulaw_.mulaw.encode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -966,7 +956,7 @@ class WaveFile extends WaveFileReaderWriter {
             this.numChannels,
             this.sampleRate,
             "16",
-            mulaw.decode(this.samples),
+            alawmulaw_.mulaw.decode(this.samples),
             {"container": this.chunkId}
         );
     }
@@ -974,6 +964,7 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the input for wav writing.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     checkWriteInput_() {
         this.validateBitDepth_();
@@ -984,10 +975,11 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the bit depth.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth]) {
-            throw new Error(WaveErrors.bitDepth);
+            throw new Error(WAVE_ERRORS.bitDepth);
         }
         return true;
     }
@@ -995,11 +987,12 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the sample rate value.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     validateNumChannels_() {
         let blockAlign = this.numChannels * this.bitsPerSample / 8;
         if (this.numChannels < 1 || blockAlign > 65535) {
-            throw new Error(WaveErrors.numChannels);
+            throw new Error(WAVE_ERRORS.numChannels);
         }
         return true;
     }
@@ -1007,14 +1000,27 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Validate the sample rate value.
      * @throws {Error} If any argument does not meet the criteria.
+     * @private
      */
     validateSampleRate_() {
         let byteRate = this.numChannels *
             (this.bitsPerSample / 8) * this.sampleRate;
         if (this.sampleRate < 1 || byteRate > 4294967295) {
-            throw new Error(WaveErrors.sampleRate);
+            throw new Error(WAVE_ERRORS.sampleRate);
         }
         return true;
+    }
+
+    /**
+     * Reset the attributes related to the "fact" chunk.
+     */
+    clearFactChunk_() {
+        this.cbSize = 0;
+        this.validBitsPerSample = 0;
+        this.factChunkId = "";
+        this.factChunkSize = 0;
+        this.factChunkData = [];
+        this.dwSampleLength = 0;
     }
 }
 
@@ -1022,7 +1028,351 @@ window['WaveFile'] = WaveFile;
 
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+/*!
+ * bitdepth
+ * Change the bit depth of samples to and from 8, 16, 24, 32 & 64-bit.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/bitdepth
+ *
+ */
+
+/** @private */
+const f64f32_ = new Float32Array(1);
+
+/**
+ * Max number of different values for each bit depth.
+ * @enum {number}
+ * @private
+ */
+const MAX_VALUES = {
+    "8": 256,
+    "16": 65536,
+    "24": 16777216,
+    "32": 4294967296,
+    "32f": 1,
+    "64": 1
+};
+
+/**
+ * Functions to change the bit depth of a sample.
+ * @enum {Function}
+ * @private
+ */
+const CODECS = {
+
+    /**
+     * Change the bit depth from int to int.
+     * @param {number} sample The sample.
+     * @param {Object} args Data about the original and target bit depths.
+     * @return {number}
+     */
+    "intToInt": function(sample, args) {
+        if (sample > 0) {
+            sample = parseInt(
+                (sample / args["oldPositive"]) * args["newPositive"], 10);
+        } else {
+            sample = parseInt(
+                (sample / args["oldNegative"]) * args["newNegative"], 10);
+        }
+        return sample;
+    },
+
+    /**
+     * Change the bit depth from float to int.
+     * @param {number} sample The sample.
+     * @param {Object} args Data about the original and target bit depths.
+     * @return {number}
+     */
+    "floatToInt": function(sample, args) {
+        return sample > 0 ?
+            sample * args["newPositive"] : sample * args["newNegative"];
+    },
+
+    /**
+     * Change the bit depth from int to float.
+     * @param {number} sample The sample.
+     * @param {Object} args Data about the original and target bit depths.
+     * @return {number}
+     */
+    "intToFloat": function(sample, args) {
+        return sample > 0 ?
+            sample / args["oldPositive"] : sample / args["oldNegative"];
+    },
+
+    /**
+     * Change the bit depth from float to float.
+     * @param {number} sample The sample.
+     * @param {Object} args Data about the original and target bit depths.
+     * @return {number}
+     */
+    "floatToFloat": function(sample, args) {
+        if (args["original"] == "64" && args["target"] == "32f") {
+            f64f32_[0] = sample;
+            sample = f64f32_[0];
+        }
+        return sample;
+    }
+};
+
+/**
+ * Change the bit depth of the data in a array.
+ * The input array is modified in-place.
+ * @param {Array<number>} samples The samples.
+ * @param {string} originalBitDepth The original bit depth of the data.
+ *      One of "8", "16", "24", "32", "32f", "64"
+ * @param {string} targetBitDepth The new bit depth of the data.
+ *      One of "8", "16", "24", "32", "32f", "64"
+ */
+function toBitDepth(samples, originalBitDepth, targetBitDepth) {
+    validateBitDepths_(originalBitDepth, targetBitDepth);
+    let toFunction = getBitDepthFunction_(originalBitDepth, targetBitDepth);
+    let len = samples.length;
+    for (let i=0; i<len; i++) {        
+        samples[i] = sign8Bit_(samples[i], originalBitDepth);
+        samples[i] = toFunction(
+                samples[i],
+                {
+                    "oldNegative": MAX_VALUES[originalBitDepth] / 2,
+                    "newNegative": MAX_VALUES[targetBitDepth] / 2,
+                    "oldPositive": MAX_VALUES[originalBitDepth] / 2 - 1,
+                    "newPositive": MAX_VALUES[targetBitDepth] / 2 - 1,
+                    "original": originalBitDepth,
+                    "target": targetBitDepth
+                }
+            );
+        samples[i] = unsign8Bit_(samples[i], targetBitDepth);
+    }
+}
+
+/**
+ * Get the function to change the bit depth of a sample.
+ * @param {string} originalBitDepth The original bit depth of the data.
+ *      One of "8", "16", "24", "32", "32f", "64"
+ * @param {string} targetBitDepth The new bit depth of the data.
+ *      One of "8", "16", "24", "32", "32f", "64"
+ * @return {Function}
+ * @private
+ */
+function getBitDepthFunction_(originalBitDepth, targetBitDepth) {
+    let prefix;
+    let suffix;
+    if (["32f", "64"].includes(originalBitDepth)) {
+        prefix = "float";
+    } else {
+        prefix = "int";
+    }
+    if (["32f", "64"].includes(targetBitDepth)) {
+        suffix = "Float";
+    } else {
+        suffix = "Int";
+    }
+    return CODECS[prefix + "To" + suffix];
+}
+
+/**
+ * Sign unsigned 8-bit data.
+ * @param {number} sample The sample.
+ * @param {string} originalBitDepth The original bit depth of the data.
+ *      One of "8", "16", "24", "32", "32f", "64"
+ * @return {number}
+ * @private
+ */
+function sign8Bit_(sample, originalBitDepth) {
+    if (originalBitDepth == "8") {
+        sample -= 128;
+    }
+    return sample;
+}
+
+/**
+ * Unsign signed 8-bit data.
+ * @param {number} sample The sample.
+ * @param {string} targetBitDepth The target bit depth of the data.
+ *      One of "8", "16", "24", "32", "32f", "64"
+ * @return {number}
+ * @private
+ */
+function unsign8Bit_(sample, targetBitDepth) {
+    if (targetBitDepth == "8") {
+        sample += 128;
+    }
+    return sample;
+}
+
+/**
+ * Validate the bit depth.
+ * @param {string} originalBitDepth The original bit depth.
+ *     Should be one of "8", "16", "24", "32", "32f", "64".
+ * @param {string} targetBitDepth The target bit depth.
+ *     Should be one of "8", "16", "24", "32", "32f", "64".
+ * @throws {Error} If any argument does not meet the criteria.
+ * @return {boolean}
+ * @private
+ */
+function validateBitDepths_(originalBitDepth, targetBitDepth) {
+    let validBitDepths = ["8", "16", "24", "32", "32f", "64"];
+    if (validBitDepths.indexOf(originalBitDepth) == -1 ||
+        validBitDepths.indexOf(targetBitDepth) == -1) {
+        throw new Error("Invalid bit depth.");
+    }
+    return true;
+}
+
+module.exports.toBitDepth = toBitDepth;
+
+
+/***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*!
+ * riff-chunks
+ * Read and write the chunks of RIFF and RIFX files.
+ * Copyright (c) 2017 Rafael da Silva Rocha.
+ * https://github.com/rochars/riff-chunks
+ *
+ */
+
+/** @private */
+const byteData = __webpack_require__(1);
+/** @private */
+const chr = byteData.chr;
+/** @private */
+let uInt32 = byteData.uInt32;
+
+
+/**
+ * Write the bytes of a RIFF/RIFX file.
+ * @param {Object} chunks A structure like the return of riffChunks.read().
+ * @return {Uint8Array} The file bytes as Uint8Array when
+ *      chunkId is "RIFF" or "RIFX" or the chunk bytes as Array<number>
+ *      when chunkId is "LIST".
+ */
+function write(chunks) {
+    uInt32.be = chunks["chunkId"] === "RIFX";
+    let bytes =
+        byteData.packArray(chunks["chunkId"], chr).concat(
+                byteData.pack(chunks["chunkSize"], uInt32),
+                byteData.packArray(chunks["format"], chr),
+                writeSubChunks_(chunks["subChunks"])
+            );
+    if (chunks["chunkId"] === "RIFF" || chunks["chunkId"] === "RIFX" ) {
+        bytes = new Uint8Array(bytes);
+    }
+    return bytes;
+}
+
+/**
+ * Get the chunks of a RIFF/RIFX file.
+ * @param {Uint8Array|Array<number>} buffer The file bytes.
+ * @return {Object} The chunk.
+ */
+function read(buffer) {
+    buffer = [].slice.call(buffer);
+    let chunkId = getChunkId_(buffer, 0);
+    uInt32.be = chunkId === "RIFX";
+    return {
+        "chunkId": chunkId,
+        "chunkSize": getChunkSize_(buffer, 0),
+        "format": byteData.unpackArray(buffer.slice(8, 12), chr),
+        "subChunks": getSubChunks_(buffer)
+    };
+}
+
+/**
+ * Write the sub chunks of a RIFF file.
+ * @param {Array<Object>} chunks The chunks.
+ * @return {Array<number>} The chunk bytes.
+ * @private
+ */
+function writeSubChunks_(chunks) {
+    let subChunks = [];
+    let i = 0;
+    while (i < chunks.length) {
+        if (chunks[i]["chunkId"] === "LIST") {
+            subChunks = subChunks.concat(write(chunks[i]));
+        } else {
+            subChunks = subChunks.concat(
+                byteData.packArray(chunks[i]["chunkId"], chr),
+                byteData.pack(chunks[i]["chunkSize"], uInt32),
+                chunks[i]["chunkData"]
+            );
+        }
+        i++;
+    }
+    return subChunks;
+}
+
+/**
+ * Get the sub chunks of a RIFF file.
+ * @param {Uint8Array|Array<number>} buffer the RIFF file bytes.
+ * @return {Object} The subchunks of a RIFF/RIFX or LIST chunk.
+ * @private
+ */
+function getSubChunks_(buffer) {
+    let chunks = [];
+    let i = 12;
+    while(i < buffer.length) {
+        chunks.push(getSubChunk_(buffer, i));
+        i += 8 + chunks[chunks.length - 1]["chunkSize"];
+    }
+    return chunks;
+}
+
+/**
+ * Get a sub chunk from a RIFF file.
+ * @param {Uint8Array|Array<number>} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {Object} A subchunk of a RIFF/RIFX or LIST chunk.
+ * @private
+ */
+function getSubChunk_(buffer, index) {
+    let chunk = {
+        "chunkId": getChunkId_(buffer, index),
+        "chunkSize": getChunkSize_(buffer, index)
+    };
+    if (chunk["chunkId"] === "LIST") {
+        chunk["format"] = byteData.unpackArray(buffer.slice(8, 12), chr);
+        chunk["subChunks"] = getSubChunks_(
+            buffer.slice(index, index + chunk["chunkSize"]));
+    } else {
+        chunk["chunkData"] = buffer.slice(
+            index + 8, index + 8 + chunk["chunkSize"]);
+    }
+    return chunk;
+}
+
+/**
+ * Return the FourCC of a chunk.
+ * @param {Uint8Array|Array<number>} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {string} The id of the chunk.
+ * @private
+ */
+function getChunkId_(buffer, index) {
+    return byteData.unpackArray(buffer.slice(index, index + 4), chr);
+}
+
+/**
+ * Return the size of a chunk.
+ * @param {Uint8Array|Array<number>} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {number} The size of the chunk without the id and size fields.
+ * @private
+ */
+function getChunkSize_(buffer, index) {
+    return byteData.unpack(buffer.slice(index + 4, index + 8), uInt32);
+}
+
+module.exports.read = read;
+module.exports.write = write;
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1030,8 +1380,8 @@ window['WaveFile'] = WaveFile;
  * https://github.com/rochars/byte-data
  */
 
-const Type = __webpack_require__(1);
-const endianness = __webpack_require__(7);
+const Type = __webpack_require__(2);
+const endianness = __webpack_require__(8);
 
 /**
  * Turn a byte buffer into what the bytes represent.
@@ -1165,30 +1515,31 @@ module.exports.fromBytes = fromBytes;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
-/*
- * gint: Generic integer.
- * A class to represent any integer from 1 to 53-Bit.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/byte-data
+/*!
+ * generic-integer
+ * Pack and unpack any integer from 1 to 53-Bit.
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/generic-integer
+ * 
  */
 
 /**
- * A class to represent any integer from 1 to 53-Bit.
+ * A class to read and write any integer from 1 to 53-Bit.
  */
-class GInt {
+class GenericInteger {
 
     /**
      * @param {Object} options The type definition.
-     * @param {number} options.bits Number of bits used by data of this type.
+     * @param {number} options.bits Number of bits used by the data.
      * @param {boolean} options.be True for big-endian.
      * @param {boolean} options.signed True for signed types.
      */
     constructor(options) {
         /**
-         * The max number of bits used by data of this type.
+         * The max number of bits used by the data.
          * @type {number}
          */
         this.bits = options["bits"];
@@ -1203,122 +1554,63 @@ class GInt {
          */
         this.signed = options["signed"];
         /**
-         * The base used to represent data of this type.
-         * Default is 10.
-         * @type {number}
-         */
-        this.base = options["base"] ? options["base"] : 10;
-        /**
-         * The function to read values of this type from buffers.
+         * The function to read values from buffers.
          * @type {Function}
-         * @ignore
          */
-        this.reader = this.read_;
+        this.reader = this.read;
         /**
-         * The function to write values of this type to buffers.
+         * The function to write values to buffers.
          * @type {Function}
-         * @ignore
          */
-        this.writer = this.write_;
+        this.writer = this.write;
         /**
-         * The number of bytes used by data of this type.
+         * The number of bytes used by the data.
          * @type {number}
-         * @ignore
          */
         this.offset = 0;
         /**
          * Min value for numbers of this type.
          * @type {number}
-         * @ignore
          */
         this.min = -Infinity;
         /**
          * Max value for numbers of this type.
          * @type {number}
-         * @ignore
          */
         this.max = Infinity;
         /**
-         * The word size.
+         * The practical number of bits used by the data.
          * @type {number}
-         * @ignore
+         * @private
          */
-        this.realBits = this.bits;
+        this.realBits_ = this.bits;
         /**
-         * The mask to be used in the last byte of this type.
+         * The mask to be used in the last byte.
          * @type {number}
-         * @ignore
+         * @private
          */
-        this.lastByteMask = 255;
+        this.lastByteMask_ = 255;
         this.build_();
     }
 
     /**
-     * Sign a number according to the type.
-     * @param {number} num The number.
-     * @return {number}
-     * @ignore
-     */
-    sign(num) {
-        if (num > this.max) {
-            num -= (this.max * 2) + 2;
-        }
-        return num;
-    }
-
-    /**
-     * Limit the value according to the bit depth in case of
-     * overflow or underflow.
-     * @param {number} value The data.
-     * @return {number}
-     * @ignore
-     */
-    overflow(value) {
-        if (value > this.max) {
-            value = this.max;
-        } else if (value < this.min) {
-            value = this.min;
-        }
-        return value;
-    }
-
-    /**
-     * Read a integer number from a byte buffer.
+     * Read one integer number from a byte buffer.
      * @param {!Array<number>|Uint8Array} bytes An array of bytes.
      * @param {number} i The index to read.
-     * @param {Object} type The type if other than this.
      * @return {number}
-     * @private
      */
-    read_(bytes, i, type=this) {
+    read(bytes, i=0) {
+        if (this.bits > 32) {
+            return this.readBits_(bytes, i);
+        }
         let num = 0;
-        let x = type.offset - 1;
+        let x = this.offset - 1;
         while (x > 0) {
             num = (bytes[x + i] << x * 8) | num;
             x--;
         }
         num = (bytes[i] | num) >>> 0;
-        return this.overflow(this.sign(num));
-    }
-
-    /**
-     * Read a integer number from a byte buffer by turning the bytes
-     * to a string of bits.
-     * @param {!Array<number>|Uint8Array} bytes An array of bytes.
-     * @param {number} i The index to read.
-     * @param {Object} type The type if other than this.
-     * @return {number}
-     * @private
-     */
-    readBits_(bytes, i, type=this) {
-        let binary = "";
-        let j = 0;
-        while(j < type.offset) {
-            let bits = bytes[i + j].toString(2);
-            binary = Array(9 - bits.length).join("0") + bits + binary;
-            j++;
-        }
-        return this.overflow(this.sign(parseInt(binary, 2)));
+        return this.overflow_(this.sign_(num));
     }
 
     /**
@@ -1326,22 +1618,38 @@ class GInt {
      * @param {!Array<number>} bytes An array of bytes.
      * @param {number} number The number.
      * @param {number} j The index being written in the byte buffer.
-     * @param {Object} type The type.
      * @return {number} The next index to write on the byte buffer.
-     * @private
      */
-    write_(bytes, number, j, type=this) {
-        number = this.overflow(number);
+    write(bytes, number, j=0) {
+        number = this.overflow_(number);
         let mask = 255;
-        let len = type.offset;
-        j = this.writeFirstByte_(bytes, number, j, type);
-        for (let i = 2; i <= len; i++) {
-            if (i == len) {
-                mask = type.lastByteMask;
+        j = this.writeFirstByte_(bytes, number, j);
+        for (let i = 2; i <= this.offset; i++) {
+            if (i == this.offset) {
+                mask = this.lastByteMask_;
             }
             bytes[j++] = Math.floor(number / Math.pow(2, ((i - 1) * 8))) & mask;
         }
         return j;
+    }
+
+    /**
+     * Read a integer number from a byte buffer by turning int bytes
+     * to a string of bits. Used for data with more than 32 bits.
+     * @param {!Array<number>|Uint8Array} bytes An array of bytes.
+     * @param {number} i The index to read.
+     * @return {number}
+     * @private
+     */
+    readBits_(bytes, i=0) {
+        let binary = "";
+        let j = 0;
+        while(j < this.offset) {
+            let bits = bytes[i + j].toString(2);
+            binary = Array(9 - bits.length).join("0") + bits + binary;
+            j++;
+        }
+        return this.overflow_(this.sign_(parseInt(binary, 2)));
     }
 
     /**
@@ -1353,7 +1661,36 @@ class GInt {
         this.setRealBits_();
         this.setLastByteMask_();
         this.setMinMax_();
-        this.offset = this.bits < 8 ? 1 : Math.ceil(this.realBits / 8);
+        this.offset = this.bits < 8 ? 1 : Math.ceil(this.realBits_ / 8);
+    }
+
+    /**
+     * Sign a number.
+     * @param {number} num The number.
+     * @return {number}
+     * @private
+     */
+    sign_(num) {
+        if (num > this.max) {
+            num -= (this.max * 2) + 2;
+        }
+        return num;
+    }
+
+    /**
+     * Limit the value according to the bit depth in case of
+     * overflow or underflow.
+     * @param {number} value The data.
+     * @return {number}
+     * @private
+     */
+    overflow_(value) {
+        if (value > this.max) {
+            value = this.max;
+        } else if (value < this.min) {
+            value = this.min;
+        }
+        return value;
     }
 
     /**
@@ -1371,6 +1708,10 @@ class GInt {
         }
     }
 
+    /**
+     * Validate the number of bits.
+     * @private
+     */
     validateWordSize_() {
         if (this.bits < 1 || this.bits > 64) {
             throw Error("Not a supported type.");
@@ -1378,43 +1719,23 @@ class GInt {
     }
 
     /**
-     * Set the real bit depth for data with bit count different from the
-     * standard types (1, 2, 4, 8, 16, 32, 40, 48, 64): the closest bigger
-     * standard number of bits. The data is then treated as data of the
-     * standard type on all aspects except for the min and max values.
-     * Ex: a 11-bit uInt is treated as 16-bit uInt with a max value of 2048.
+     * Set the practical bit number for data with bit count different
+     * from the standard types (8, 16, 32, 40, 48, 64) and more than 8 bits.
      * @private
      */
     setRealBits_() {
         if (this.bits > 8) {
-            if (this.bits <= 16) {
-                this.realBits = 16;
-            } else if (this.bits <= 24) {
-                this.realBits = 24;
-            } else if (this.bits <= 32) {
-                this.realBits = 32;
-            } else if (this.bits <= 40) {
-                this.realBits = 40;
-            } else if (this.bits <= 48) {
-                this.realBits = 48;
-            } else if (this.bits <= 56) {
-                this.realBits = 56;
-            } else {
-                this.realBits = 64;
-            }
-        } else {
-            this.realBits = this.bits;
+            this.realBits_ = ((this.bits - 1) | 7) + 1;
         }
     }
 
     /**
-     * Set the mask that should be used when writing the last byte of
-     * data of the type.
+     * Set the mask that should be used when writing the last byte.
      * @private
      */
     setLastByteMask_() {
-        let r = 8 - (this.realBits - this.bits);
-        this.lastByteMask = Math.pow(2, r > 0 ? r : 8) -1;
+        let r = 8 - (this.realBits_ - this.bits);
+        this.lastByteMask_ = Math.pow(2, r > 0 ? r : 8) -1;
     }
 
     /**
@@ -1422,13 +1743,12 @@ class GInt {
      * @param {!Array<number>} bytes An array of bytes.
      * @param {number} number The number.
      * @param {number} j The index being written in the byte buffer.
-     * @param {Object} type The type.
      * @return {number} The next index to write on the byte buffer.
      * @private
      */
-    writeFirstByte_(bytes, number, j, type=this) {
-        if (type.bits < 8) {
-            bytes[j++] = number < 0 ? number + Math.pow(2, type.bits) : number;
+    writeFirstByte_(bytes, number, j) {
+        if (this.bits < 8) {
+            bytes[j++] = number < 0 ? number + Math.pow(2, this.bits) : number;
         } else {
             bytes[j++] = number & 255;
         }
@@ -1436,11 +1756,11 @@ class GInt {
     }
 }
 
-module.exports = GInt;
+module.exports = GenericInteger;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1490,228 +1810,543 @@ module.exports = endianness;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /*!
- * bitdepth
- * Change the bit depth of samples to and from 8, 16, 24, 32 & 64-bit.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/bitdepth
+ * imaadpcm
+ * JavaScript IMA ADPCM codec.
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/imaadpcm
  *
+ * References:
+ * http://www.cs.columbia.edu/~hgs/audio/dvi/
+ * https://github.com/acida/pyima
+ * https://wiki.multimedia.cx/index.php/IMA_ADPCM
+ * 
  */
 
-const f64f32 = new Float32Array(1);
+/** @private */
+const INDEX_TABLE = [
+    -1, -1, -1, -1, 2, 4, 6, 8,
+    -1, -1, -1, -1, 2, 4, 6, 8];
+/** @private */
+const STEP_TABLE = [
+    7, 8, 9, 10, 11, 12, 13, 14,
+    16, 17, 19, 21, 23, 25, 28, 31,
+    34, 37, 41, 45, 50, 55, 60, 66,
+    73, 80, 88, 97, 107, 118, 130, 143,
+    157, 173, 190, 209, 230, 253, 279, 307,
+    337, 371, 408, 449, 494, 544, 598, 658,
+    724, 796, 876, 963, 1060, 1166, 1282, 1411,
+    1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024,
+    3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484,
+    7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
+    15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
+    32767];
+/** @private */
+var encoderPredicted_ = 0;
+/** @private */
+var encoderIndex_ = 0;
+/** @private */
+var encoderStep_ = 7;
+/** @private */
+var decoderPredicted_ = 0;
+/** @private */
+var decoderIndex_ = 0;
+/** @private */
+var decoderStep_ = 7;
 
 /**
- * Max number of different values for each bit depth.
- * @enum {number}
- */
-const BitDepthMaxValues = {
-    "8": 256,
-    "16": 65536,
-    "24": 16777216,
-    "32": 4294967296,
-    "32f": 1,
-    "64": 1
-};
-
-/**
- * Functions to change the bit depth of a sample.
- */
-const BitDepthFunctions = {
-
-    /**
-     * Change the bit depth from int to int.
-     * @param {number} sample The sample.
-     * @param {Object} args Data about the original and target bit depths.
-     * @return {number}
-     */
-    "intToInt": function(sample, args) {
-        if (sample > 0) {
-            sample = parseInt(
-                (sample / args["oldPositive"]) * args["newPositive"], 10);
-        } else {
-            sample = parseInt(
-                (sample / args["oldNegative"]) * args["newNegative"], 10);
-        }
-        return sample;
-    },
-
-    /**
-     * Change the bit depth from float to int.
-     * @param {number} sample The sample.
-     * @param {Object} args Data about the original and target bit depths.
-     * @return {number}
-     */
-    "floatToInt": function(sample, args) {
-        return sample > 0 ?
-            sample * args["newPositive"] : sample * args["newNegative"];
-    },
-
-    /**
-     * Change the bit depth from int to float.
-     * @param {number} sample The sample.
-     * @param {Object} args Data about the original and target bit depths.
-     * @return {number}
-     */
-    "intToFloat": function(sample, args) {
-        return sample > 0 ?
-            sample / args["oldPositive"] : sample / args["oldNegative"];
-    },
-
-    /**
-     * Change the bit depth from float to float.
-     * @param {number} sample The sample.
-     * @param {Object} args Data about the original and target bit depths.
-     * @return {number}
-     */
-    "floatToFloat": function(sample, args) {
-        if (args["original"] == "64" && args["target"] == "32f") {
-            f64f32[0] = sample;
-            sample = f64f32[0];
-        }
-        return sample;
-    }
-};
-
-/**
- * Change the bit depth of the data in a array.
- * The input array is modified in-place.
- * @param {!Array<number>} samples The samples.
- * @param {string} originalBitDepth The original bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
- * @param {string} targetBitDepth The new bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
- */
-function toBitDepth(samples, originalBitDepth, targetBitDepth) {
-    validateBitDepths(originalBitDepth, targetBitDepth);
-    let toFunction = getBitDepthFunction(originalBitDepth, targetBitDepth);
-    let len = samples.length;
-    for (let i=0; i<len; i++) {        
-        samples[i] = sign8Bit(samples[i], originalBitDepth);
-        samples[i] = toFunction(
-                samples[i],
-                {
-                    "oldNegative": BitDepthMaxValues[originalBitDepth] / 2,
-                    "newNegative": BitDepthMaxValues[targetBitDepth] / 2,
-                    "oldPositive": BitDepthMaxValues[originalBitDepth] / 2 - 1,
-                    "newPositive": BitDepthMaxValues[targetBitDepth] / 2 - 1,
-                    "original": originalBitDepth,
-                    "target": targetBitDepth
-                }
-            );
-        samples[i] = unsign8Bit(samples[i], targetBitDepth);
-    }
-}
-
-/**
- * Get the function to change the bit depth of a sample.
- * @param {string} originalBitDepth The original bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
- * @param {string} targetBitDepth The new bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
- * @return {Function}
- */
-function getBitDepthFunction(originalBitDepth, targetBitDepth) {
-    let prefix;
-    let suffix;
-    if (["32f", "64"].includes(originalBitDepth)) {
-        prefix = "float";
-    } else {
-        prefix = "int";
-    }
-    if (["32f", "64"].includes(targetBitDepth)) {
-        suffix = "Float";
-    } else {
-        suffix = "Int";
-    }
-    return BitDepthFunctions[prefix + "To" + suffix];
-}
-
-/**
- * Sign unsigned 8-bit data.
- * @param {number} sample The sample.
- * @param {string} originalBitDepth The original bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ * Sign a 16-bit integer.
+ * @param {number} num A 16-bit integer.
  * @return {number}
+ * @private
  */
-function sign8Bit(sample, originalBitDepth) {
-    if (originalBitDepth == "8") {
-        sample -= 128;
-    }
-    return sample;
+function sign_(num) {
+    return num > 32768 ? num - 65536 : num;
 }
 
 /**
- * Unsign signed 8-bit data.
+ * Set the value for encoderPredicted_ and encoderIndex_
+ * after each sample is compressed.
+ * @param {number} value The compressed ADPCM sample
+ * @param {number} diff The calculated difference
+ * @private
+ */
+function setEncoderInfo_(value, diff) {
+    if (value & 8) {
+        encoderPredicted_ -= diff;
+    } else {
+        encoderPredicted_ += diff;
+    }
+    if (encoderPredicted_ < -0x8000) {
+        encoderPredicted_ = -0x8000;
+    } else if (encoderPredicted_ > 0x7fff) {
+        encoderPredicted_ = 0x7fff;
+    }
+    encoderIndex_ += INDEX_TABLE[value & 7];
+    if (encoderIndex_ < 0) {
+        encoderIndex_ = 0;
+    } else if (encoderIndex_ > 88) {
+        encoderIndex_ = 88;
+    }
+}
+
+/**
+ * Compress a 16-bit PCM sample into a 4-bit ADPCM sample.
  * @param {number} sample The sample.
- * @param {string} targetBitDepth The target bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
  * @return {number}
+ * @private
  */
-function unsign8Bit(sample, targetBitDepth) {
-    if (targetBitDepth == "8") {
-        sample += 128;
+function encodeSample_(sample) {
+    let delta = sample - encoderPredicted_;
+    let value = 0;
+    if (delta >= 0) {
+        value = 0;
+    } else {
+        value = 8;
+        delta = -delta;
     }
-    return sample;
+    let step = STEP_TABLE[encoderIndex_];
+    let diff = step >> 3;
+    if (delta > step) {
+        value |= 4;
+        delta -= step;
+        diff += step;
+    }
+    step >>= 1;
+    if (delta > step) {
+        value |= 2;
+        delta -= step;
+        diff += step;
+    }
+    step >>= 1;
+    if (delta > step) {
+        value |= 1;
+        diff += step;
+    }
+    setEncoderInfo_(value, diff);
+    return value;
 }
 
 /**
- * Validate the bit depth.
- * @param {string} originalBitDepth The original bit depth.
- *     Should be one of "8", "16", "24", "32", "32f", "64".
- * @param {string} targetBitDepth The target bit depth.
- *     Should be one of "8", "16", "24", "32", "32f", "64".
- * @throws {Error} If any argument does not meet the criteria.
- * @return {boolean}
+ * Decode a 4-bit ADPCM sample into a 16-bit PCM sample.
+ * @param {number} nibble A 4-bit adpcm sample.
+ * @return {number}
+ * @private
  */
-function validateBitDepths(originalBitDepth, targetBitDepth) {
-    let validBitDepths = ["8", "16", "24", "32", "32f", "64"];
-    if (validBitDepths.indexOf(originalBitDepth) == -1 ||
-        validBitDepths.indexOf(targetBitDepth) == -1) {
-        throw new Error("Invalid bit depth.");
+function decodeSample_(nibble) {
+    let difference = 0;
+    if (nibble & 4) {
+        difference += decoderStep_;
     }
-    return true;
+    if (nibble & 2) {
+        difference += decoderStep_ >> 1;
+    }
+    if (nibble & 1) {
+        difference += decoderStep_ >> 2;
+    }
+    difference += decoderStep_ >> 3;
+    if (nibble & 8) {
+        difference = -difference;
+    }
+    decoderPredicted_ += difference;
+    if (decoderPredicted_ > 32767) {
+        decoderPredicted_ = 32767;
+    } else if (decoderPredicted_ < -32767) {
+        decoderPredicted_ = -32767;
+    }
+    decoderIndex_ += INDEX_TABLE[nibble];
+    if (decoderIndex_ < 0) {
+        decoderIndex_ = 0;
+    } else if (decoderIndex_ > 88) {
+        decoderIndex_ = 88;
+    }
+    decoderStep_ = STEP_TABLE[decoderIndex_];
+    return decoderPredicted_;
 }
 
-module.exports.toBitDepth = toBitDepth;
-module.exports.BitDepthMaxValues = BitDepthMaxValues;
+/**
+ * Return the head of a ADPCM sample block.
+ * @param {number} sample The first sample of the block.
+ * @return {!Array<number>}
+ * @private
+ */
+function blockHead_(sample) {
+    encodeSample_(sample);
+    let adpcmSamples = [];
+    adpcmSamples.push(sample & 0xFF);
+    adpcmSamples.push((sample >> 8) & 0xFF);
+    adpcmSamples.push(encoderIndex_);
+    adpcmSamples.push(0);
+    return adpcmSamples;
+}
+
+/**
+ * Encode a block of 505 16-bit samples as 4-bit ADPCM samples.
+ * @param {!Array<number>} block A sample block of 505 samples.
+ * @return {!Array<number>}
+ */
+function encodeBlock(block) {
+    let adpcmSamples = blockHead_(block[0]);
+    for (let i=3; i<block.length; i+=2) {
+        let sample2 = encodeSample_(block[i]);
+        let sample = encodeSample_(block[i + 1]);
+        adpcmSamples.push((sample << 4) | sample2);
+    }
+    while (adpcmSamples.length < 256) {
+        adpcmSamples.push(0);
+    }
+    return adpcmSamples;
+}
+
+/**
+ * Decode a block of 256 ADPCM samples into 16-bit PCM samples.
+ * @param {!Array<number>} block A adpcm sample block of 256 samples.
+ * @return {!Array<number>}
+ */
+function decodeBlock(block) {
+    decoderPredicted_ = sign_((block[1] << 8) | block[0]);
+    decoderIndex_ = block[2];
+    decoderStep_ = STEP_TABLE[decoderIndex_];
+    let result = [
+            decoderPredicted_,
+            sign_((block[3] << 8) | block[2])
+        ];
+    for (let i=4; i<block.length; i++) {
+        let original_sample = block[i];
+        let second_sample = original_sample >> 4;
+        let first_sample = (second_sample << 4) ^ original_sample;
+        result.push(decodeSample_(first_sample));
+        result.push(decodeSample_(second_sample));
+    }
+    return result;
+}
+
+/**
+ * Encode 16-bit PCM samples into 4-bit IMA ADPCM samples.
+ * @param {!Array<number>} samples A array of samples.
+ * @return {!Array<number>}
+ */
+function encode(samples) {
+    let adpcmSamples = [];
+    let block = [];
+    for (let i=0; i<samples.length; i++) {
+        block.push(samples[i]);
+        if ((i % 505 == 0 && i != 0) || i == samples.length - 1) {
+            adpcmSamples = adpcmSamples.concat(encodeBlock(block));
+            block = [];
+        }
+    }
+    return adpcmSamples;
+}
+
+/**
+ * Decode IMA ADPCM samples into 16-bit PCM samples.
+ * @param {!Array<number>} adpcmSamples A array of ADPCM samples.
+ * @param {number} blockAlign The block size.
+ * @return {!Array<number>}
+ */
+function decode(adpcmSamples, blockAlign=256) {
+    let samples = [];
+    let block = [];
+    for (let i=0; i<adpcmSamples.length; i++) {
+        if (i % blockAlign == 0 && i != 0) {            
+            samples = samples.concat(decodeBlock(block));
+            block = [];
+        }
+        block.push(adpcmSamples[i]);
+    }
+    return samples;
+}
+
+module.exports.encode = encode;
+module.exports.decode = decode;
+module.exports.encodeBlock = encodeBlock;
+module.exports.decodeBlock = decodeBlock;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*!
+ * alawmulaw
+ * JavaScript A-Law and mu-Law codecs.
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/alawmulaw
+ * 
+ */
+
+module.exports.alaw = __webpack_require__(11);
+module.exports.mulaw = __webpack_require__(12);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+/*
+ * alaw.js
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/alawmulaw
+ *
+ * References:
+ * https://github.com/deftio/companders
+ * http://dystopiancode.blogspot.com.br/2012/02/pcm-law-and-u-law-companding-algorithms.html
+ * 
+ */
+
+/**
+ * Encode a 16-bit linear PCM sample as 8-bit A-Law.
+ * @param {number} sample A 16-bit linear PCM sample
+ * @return {number}
+ */
+function encodeSample(sample) {
+    let clip = 32635;
+    let logTable = [
+        1,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, 
+        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6, 
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, 
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7 
+    ];
+    let sign;
+    let exponent;
+    let mantissa; 
+    let compandedValue; 
+    sample = (sample ==-32768) ? -32767 : sample;
+    sign = ((~sample) >> 8) & 0x80; 
+    if (!sign) {
+        sample = sample * -1; 
+    }
+    if (sample > clip) {
+        sample = clip; 
+    }
+    if (sample >= 256)  { 
+        exponent = logTable[(sample >> 8) & 0x7F]; 
+        mantissa = (sample >> (exponent + 3) ) & 0x0F; 
+        compandedValue = ((exponent << 4) | mantissa); 
+    } else {
+        compandedValue = sample >> 4; 
+    } 
+    compandedValue ^= (sign ^ 0x55); 
+    return compandedValue; 
+}
+
+/**
+ * Decode a 8-bit A-Law sample as 16-bit linear PCM.
+ * @param {number} aLawSample The 8-bit A-Law sample
+ * @return {number}
+ */
+function decodeSample(aLawSample) {
+   let sign = 0x00;
+   let position = 0;
+   let decoded = 0;
+   aLawSample ^= 0x55;
+   if (aLawSample & 0x80) {
+      aLawSample &= ~(1 << 7);
+      sign = -1;
+   }
+   position = ((aLawSample & 0xF0) >> 4) + 4;
+   if (position != 4) {
+      decoded = ((1 << position) |
+                ((aLawSample & 0x0F) << (position - 4)) |
+                (1 << (position - 5)));
+   } else {
+      decoded = (aLawSample << 1)|1;
+   }
+   decoded = (sign === 0) ? (decoded) : (-decoded);
+   return (decoded * 8) * -1;
+}
+
+/**
+ * Encode 16-bit linear PCM samples into 8-bit A-Law samples.
+ * @param {!Array<number>} samples A array of 16-bit PCM samples.
+ * @return {!Array<number>}
+ */
+function encode(samples) {
+    let aLawSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        aLawSamples.push(encodeSample(samples[i]));
+    }
+    return aLawSamples;
+}
+
+/**
+ * Decode 8-bit A-Law samples into 16-bit linear PCM samples.
+ * @param {!Array<number>} samples A array of 8-bit A-Law samples.
+ * @return {!Array<number>}
+ */
+function decode(samples) {
+    let pcmSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        pcmSamples.push(decodeSample(samples[i]));
+    }
+    return pcmSamples;
+}
+
+module.exports.encodeSample = encodeSample;
+module.exports.decodeSample = decodeSample;
+module.exports.encode = encode;
+module.exports.decode = decode;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+/*
+ * mulaw.js
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/alawmulaw
+ *
+ * Reference:
+ * https://github.com/torvalds/linux/blob/master/sound/core/oss/mulaw.c
+ * 
+ */
+
+/** @private */
+const BIAS = 0x84;
+/** @private */
+const SIGN_BIT = 0x80;
+/** @private */
+const QUANT_MASK = 0xf;
+/** @private */
+const SEG_MASK = 0x70;
+/** @private */
+const SEG_SHIFT = 4;
+
+/** @private */
+function valSeg_(val) {
+  let r = 0;
+  val >>= 7;
+  if (val & 0xf0) {
+    val >>= 4;
+    r += 4;
+  }
+  if (val & 0x0c) {
+    val >>= 2;
+    r += 2;
+  }
+  if (val & 0x02) {
+    r += 1;
+  }
+  return r;
+}
+
+/**
+ * Encode a 16-bit linear PCM sample as 8-bit mu-Law.
+ * @param {number} pcmSample A 16-bit sample
+ * @return {number}
+ */
+function encodeSample(pcmSample) {
+  let mask;
+  let seg;
+  let uval;
+  if (pcmSample < 0) {
+    pcmSample = BIAS - pcmSample;
+    mask = 0x7F;
+  } else {
+    pcmSample += BIAS;
+    mask = 0xFF;
+  }
+  if (pcmSample > 0x7FFF) {
+    pcmSample = 0x7FFF;
+  }
+  seg = valSeg_(pcmSample);
+  uval = (seg << 4) | ((pcmSample >> (seg + 3)) & 0xF);
+  return uval ^ mask;
+}
+
+/**
+ * Decode a 8-bit mu-Law sample as 16-bit linear PCM.
+ * @param {number} muLawSample The 8-bit mu-Law sample
+ * @return {number}
+ */
+function decodeSample(muLawSample) {
+  let t;
+  muLawSample = ~muLawSample;
+  t = ((muLawSample & QUANT_MASK) << 3) + BIAS;
+  t <<= (muLawSample & SEG_MASK) >> SEG_SHIFT;
+  return ((muLawSample & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
+}
+
+/**
+ * Encode 16-bit linear PCM samples into 8-bit mu-Law samples.
+ * @param {!Array<number>} samples A array of 16-bit linear PCM samples.
+ * @return {!Array<number>}
+ */
+function encode(samples) {
+    let muLawSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        muLawSamples.push(encodeSample(samples[i]));
+    }
+    return muLawSamples;
+}
+
+/**
+ * Decode 8-bit mu-Law samples into 16-bit linear PCM samples.
+ * @param {!Array<number>} samples A array of 8-bit mu-Law samples.
+ * @return {!Array<number>}
+ */
+function decode(samples) {
+    let pcmSamples = [];
+    for (let i=0; i<samples.length; i++) {
+        pcmSamples.push(decodeSample(samples[i]));
+    }
+    return pcmSamples;
+}
+
+module.exports.encodeSample = encodeSample;
+module.exports.decodeSample = decodeSample;
+module.exports.encode = encode;
+module.exports.decode = decode;
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
  * WaveFileReaderWriter
+ * Class to read and write wav files to and from buffers.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
- * References:
- * http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
- * https://tech.ebu.ch/docs/tech/tech3285.pdf
- *
  */
 
-const byteData = __webpack_require__(0);
-const WaveErrors = __webpack_require__(2);
-const uInt8 = byteData.uInt8;
-const uInt16 = byteData.uInt16;
-const uInt32 = byteData.uInt32;
-const chr = byteData.chr;
-const BWFHeader = __webpack_require__(10);
+/** @private */
+const WAVE_ERRORS = __webpack_require__(0);
+/** @private */
+const WaveFileHeader = __webpack_require__(14);
+/** @private */
+const byteData_ = __webpack_require__(1);
+/** @private */
+let uInt8_ = byteData_.uInt8;
+/** @private */
+let uInt16_ = byteData_.uInt16;
+/** @private */
+let uInt32_ = byteData_.uInt32;
+/** @private */
+const chr_ = byteData_.chr;
 
 /**
- * Read and write wave files.
+ * Class to read and write wav files to and from buffers.
+ * @extends WaveFileHeader
  */
-class WaveFileReaderWriter extends BWFHeader {
+class WaveFileReaderWriter extends WaveFileHeader {
 
     constructor() {
         super();
         /**
+         * @type {Array<number>}
+         */
+        this.samples = [];
+        /**
          * Header formats.
          * @enum {number}
+         * @private
          */
         this.headerFormats_ = {
             "4": 17,
@@ -1724,27 +2359,29 @@ class WaveFileReaderWriter extends BWFHeader {
             "32f": 3,
             "64": 3
         };
-        /** @type {!Array<number>} */
-        this.samples = [];
-        /** @type {number} */
+        /**
+         * @type {number} 
+         * @private
+         */
         this.head_ = 0;
     }
 
     /**
      * Read the RIFF chunk a wave file.
-     * @param {Uint8Array} bytes an array representing the wave file.
+     * @param {Uint8Array} bytes A wav buffer.
      * @throws {Error} If no "RIFF" chunk is found.
+     * @private
      */
     readRIFFChunk_(bytes) {
-        this.chunkId = byteData.unpackArray(bytes.slice(0, 4), chr);
+        this.chunkId = byteData_.unpackArray(bytes.slice(0, 4), chr_);
         if (this.chunkId != "RIFF" && this.chunkId != "RIFX") {
-            throw Error(WaveErrors.format);
+            throw Error(WAVE_ERRORS.format);
         }
-        this.LEorBE();
-        this.chunkSize = byteData.unpack(bytes.slice(4, 8), uInt32);
-        this.format = byteData.unpackArray(bytes.slice(8, 12), chr);
+        this.LEorBE_();
+        this.chunkSize = byteData_.unpack(bytes.slice(4, 8), uInt32_);
+        this.format = byteData_.unpackArray(bytes.slice(8, 12), chr_);
         if (this.format != "WAVE") {
-            throw Error(WaveErrors.wave);
+            throw Error(WAVE_ERRORS.wave);
         }
     }
 
@@ -1752,82 +2389,87 @@ class WaveFileReaderWriter extends BWFHeader {
      * Set up to work wih big-endian or little-endian files.
      * The types used are changed from LE or BE. If the
      * the file is big-endian (RIFX), true is returned.
+     * @private
      */
-    LEorBE() {
+    LEorBE_() {
         let bigEndian = this.chunkId == "RIFX";
-        uInt8.be = bigEndian;
-        uInt16.be = bigEndian;
-        uInt32.be = bigEndian;
+        uInt8_.be = bigEndian;
+        uInt16_.be = bigEndian;
+        uInt32_.be = bigEndian;
         return bigEndian;
     }
 
     /**
      * Read the "fmt " chunk of a wave file.
-     * @param {Object} chunks The RIFF file chunks.
+     * @param {Object} chunks The wav file chunks.
      * @throws {Error} If no "fmt " chunk is found.
+     * @private
      */
     readFmtChunk_(chunks) {
-        let chunk = this.findChunk(chunks, "fmt ");
+        let chunk = this.findChunk_(chunks, "fmt ");
         if (chunk) {
             this.fmtChunkId = "fmt ";
             this.fmtChunkSize = chunk.chunkSize;
-            this.audioFormat = byteData.unpack(
-                chunk.chunkData.slice(0, 2), uInt16);
-            this.numChannels = byteData.unpack(
-                chunk.chunkData.slice(2, 4), uInt16);
-            this.sampleRate = byteData.unpack(
-                chunk.chunkData.slice(4, 8), uInt32);
-            this.byteRate = byteData.unpack(
-                chunk.chunkData.slice(8, 12), uInt32);
-            this.blockAlign = byteData.unpack(
-                chunk.chunkData.slice(12, 14), uInt16);
-            this.bitsPerSample = byteData.unpack(
-                    chunk.chunkData.slice(14, 16), uInt16);
-            this.readFmtExtension(chunk);
+            this.audioFormat = byteData_.unpack(
+                chunk.chunkData.slice(0, 2), uInt16_);
+            this.numChannels = byteData_.unpack(
+                chunk.chunkData.slice(2, 4), uInt16_);
+            this.sampleRate = byteData_.unpack(
+                chunk.chunkData.slice(4, 8), uInt32_);
+            this.byteRate = byteData_.unpack(
+                chunk.chunkData.slice(8, 12), uInt32_);
+            this.blockAlign = byteData_.unpack(
+                chunk.chunkData.slice(12, 14), uInt16_);
+            this.bitsPerSample = byteData_.unpack(
+                    chunk.chunkData.slice(14, 16), uInt16_);
+            this.readFmtExtension_(chunk);
         } else {
-            throw Error(WaveErrors["fmt "]);
+            throw Error(WAVE_ERRORS["fmt "]);
         }
     }
 
     /**
      * Read the "fmt " chunk extension.
      * @param {Object} chunk The "fmt " chunk.
+     * @private
      */
-    readFmtExtension(chunk) {
+    readFmtExtension_(chunk) {
         if (this.fmtChunkSize > 16) {
-            this.cbSize = byteData.unpack(
-                chunk.chunkData.slice(16, 18), uInt16);
+            this.cbSize = byteData_.unpack(
+                chunk.chunkData.slice(16, 18), uInt16_);
             if (this.fmtChunkSize > 18) {
-                this.validBitsPerSample = byteData.unpack(
-                    chunk.chunkData.slice(18, 20), uInt16);
+                this.validBitsPerSample = byteData_.unpack(
+                    chunk.chunkData.slice(18, 20), uInt16_);
             }
         }
     }
 
     /**
-     * Read the "fact" chunk of a wave file.
-     * @param {Object} chunks The RIFF file chunks.
+     * Read the "fact" chunk of a wav file.
+     * @param {Object} chunks The wav file chunks.
      * @throws {Error} If no "fact" chunk is found.
+     * @private
      */
     readFactChunk_(chunks) {
-        let chunk = this.findChunk(chunks, "fact");
+        let chunk = this.findChunk_(chunks, "fact");
         if (chunk) {
             this.factChunkId = "fact";
             this.factChunkSize = chunk.chunkSize;
-            this.dwSampleLength = byteData.unpack(
-                chunk.chunkData.slice(0, 4), uInt32);
+            this.dwSampleLength = byteData_.unpack(
+                chunk.chunkData.slice(0, 4), uInt32_);
         } else if (this.enforceFact) {
-            throw Error(WaveErrors["fact"]);
+            throw Error(WAVE_ERRORS["fact"]);
         }
     }
 
     /**
-     * Read the "bext" chunk of a wave file.
-     * @param {Object} chunks The RIFF file chunks.
+     * Read the "bext" chunk of a wav file.
+     * @param {Object} chunks The wav file chunks.
      * @throws {Error} If no "bext" chunk is found.
+     * @private
      */
     readBextChunk_(chunks) {
-        let chunk = this.findChunk(chunks, "bext");
+        let chunk = this.findChunk_(chunks, "bext");
         if (chunk) {
             this.bextChunkId = "bext";
             this.bextChunkSize = chunk.chunkSize;
@@ -1838,6 +2480,7 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Read the fields of the "bext" chunk.
+     * @private
      */
     readBextChunkFields_() {
         this.head_ = 0;
@@ -1853,22 +2496,22 @@ class WaveFileReaderWriter extends BWFHeader {
             "originationTime": this.readVariableSizeString_(
                 this.bextChunkData, 8),
             // timeReference is a 64-bit value
-            "timeReference": this.readBytes(
+            "timeReference": this.readBytes_(
                 this.bextChunkData, 8), 
             "version": this.readFromChunk_(
-                this.bextChunkData, uInt16),
+                this.bextChunkData, uInt16_),
             "UMID": this.readVariableSizeString_(
                 this.bextChunkData, 64), 
             "loudnessValue": this.readFromChunk_(
-                this.bextChunkData, uInt16),
+                this.bextChunkData, uInt16_),
             "loudnessRange": this.readFromChunk_(
-                this.bextChunkData, uInt16),
+                this.bextChunkData, uInt16_),
             "maxTruePeakLevel": this.readFromChunk_(
-                this.bextChunkData, uInt16),
+                this.bextChunkData, uInt16_),
             "maxMomentaryLoudness": this.readFromChunk_(
-                this.bextChunkData, uInt16),
+                this.bextChunkData, uInt16_),
             "maxShortTermLoudness": this.readFromChunk_(
-                this.bextChunkData, uInt16),
+                this.bextChunkData, uInt16_),
             "reserved": this.readVariableSizeString_(
                 this.bextChunkData, 180),
             "codingHistory": this.readVariableSizeString_(
@@ -1878,10 +2521,11 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Return a slice of the byte array while moving the reading head.
-     * @param {!Array<number>} bytes The bytes.
+     * @param {Array<number>|Uint8Array} bytes The bytes.
      * @param {number} size the number of bytes to read.
+     * @private
      */
-    readBytes(bytes, size) {
+    readBytes_(bytes, size) {
         let v = this.head_;
         this.head_ += size;
         return bytes.slice(v, this.head_);
@@ -1889,13 +2533,14 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Read bytes as a string from a RIFF chunk.
-     * @param {!Array<number>} bytes The bytes.
+     * @param {Array<number>|Uint8Array} bytes The bytes.
      * @param {number} maxSize the max size of the string.
+     * @private
      */
     readVariableSizeString_(bytes, maxSize) {
         let str = "";
         for (let i=0; i<maxSize; i++) {
-            str += byteData.unpack([bytes[this.head_]], chr);
+            str += byteData_.unpack([bytes[this.head_]], chr_);
             this.head_++;
         }
         return str;
@@ -1903,12 +2548,13 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Read a number from a chunk.
-     * @param {!Array<number>} bytes The bytes.
+     * @param {Array<number>|Uint8Array} bytes The chunk bytes.
      * @param {Object} bdType The byte-data corresponding type.
+     * @private
      */
     readFromChunk_(bytes, bdType) {
         let size = bdType.bits / 8;
-        let value = byteData.unpack(
+        let value = byteData_.unpack(
             bytes.slice(this.head_, this.head_ + size), bdType);
         this.head_ += size;
         return value;
@@ -1920,9 +2566,10 @@ class WaveFileReaderWriter extends BWFHeader {
      * is filled with 0s.
      * @param {string} str The string to be written as bytes.
      * @param {number} maxSize the max size of the string.
+     * @private
      */
     writeVariableSizeString_(str, maxSize) {
-        let bytes = byteData.packArray(str, chr);
+        let bytes = byteData_.packArray(str, chr_);
         for (let i=bytes.length; i<maxSize; i++) {
             bytes.push(0);
         }
@@ -1933,9 +2580,10 @@ class WaveFileReaderWriter extends BWFHeader {
      * Read the "cue " chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
      * @throws {Error} If no "cue" chunk is found.
+     * @private
      */
     readCueChunk_(chunks) {
-        let chunk = this.findChunk(chunks, "cue ");
+        let chunk = this.findChunk_(chunks, "cue ");
         if (chunk) {
             this.cueChunkId = "cue ";
             this.cueChunkSize = chunk.chunkSize;
@@ -1946,22 +2594,26 @@ class WaveFileReaderWriter extends BWFHeader {
     /**
      * Read the "data" chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
+     * @param {Object} options Type options.
      * @throws {Error} If no "data" chunk is found.
+     * @private
      */
     readDataChunk_(chunks, options) {
-        let chunk = this.findChunk(chunks, "data");
+        let chunk = this.findChunk_(chunks, "data");
         if (chunk) {
             this.dataChunkId = "data";
             this.dataChunkSize = chunk.chunkSize;
             this.samplesFromBytes_(chunk.chunkData, options);
         } else {
-            throw Error(WaveErrors["data"]);
+            throw Error(WAVE_ERRORS["data"]);
         }
     }
 
     /**
      * Find and return the start offset of the data chunk on a wave file.
-     * @param {Uint8Array} bytes Array of bytes representing the wave file.
+     * @param {Array<number>|Uint8Array} bytes A wav file buffer.
+     * @param {Object} options Type options.
+     * @private
      */
     samplesFromBytes_(bytes, options) {
         options.bits = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
@@ -1969,15 +2621,18 @@ class WaveFileReaderWriter extends BWFHeader {
         options.float = (this.audioFormat == 3 || 
             this.bitsPerSample == 64) ? true : false;
         options.single = false;
-        this.samples = byteData.unpackArray(
-            bytes, new byteData.Type(options));
+        this.samples = byteData_.unpackArray(
+            bytes, new byteData_.Type(options));
     }
 
     /**
      * Find a chunk by its FourCC in a array of RIFF chunks.
+     * @param {Object} chunks The wav file chunks.
+     * @param {string} fourCC The chunk fourCC.
      * @return {Object|null}
+     * @private
      */
-    findChunk(chunks, fourCC) {
+    findChunk_(chunks, fourCC) {
         for (let i = 0; i<chunks.length; i++) {
             if (chunks[i].chunkId == fourCC) {
                 return chunks[i];
@@ -1988,14 +2643,16 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Turn samples to bytes.
+     * @param {Object} options Type options.
+     * @private
      */
     samplesToBytes_(options) {
         options.bits = this.bitsPerSample == 4 ? 8 : this.bitsPerSample;
         options.signed = options.bits == 8 ? false : true;
         options.float = (this.audioFormat == 3  ||
                 this.bitsPerSample == 64) ? true : false;
-        let bytes = byteData.packArray(
-            this.samples, new byteData.Type(options));
+        let bytes = byteData_.packArray(
+            this.samples, new byteData_.Type(options));
         if (bytes.length % 2) {
             bytes.push(0);
         }
@@ -2004,7 +2661,8 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Get the bytes of the "bext" chunk.
-     * @return {!Array<number>} The "bext" chunk bytes.
+     * @return {Array<number>} The "bext" chunk bytes.
+     * @private
      */
     getBextBytes_() {
         if (this.bextChunkId) {
@@ -2021,28 +2679,28 @@ class WaveFileReaderWriter extends BWFHeader {
             // 64-bit value rw as bytes
             bextBytes = bextBytes.concat(
                 this.bextChunkFields["timeReference"]);
-            bextBytes = bextBytes.concat(byteData.pack(
-                this.bextChunkFields["version"], uInt16));
+            bextBytes = bextBytes.concat(byteData_.pack(
+                this.bextChunkFields["version"], uInt16_));
             bextBytes = bextBytes.concat(this.writeVariableSizeString_(
                 this.bextChunkFields["UMID"], 64));
-            bextBytes = bextBytes.concat(byteData.pack(
-                this.bextChunkFields["loudnessValue"], uInt16));
-            bextBytes = bextBytes.concat(byteData.pack(
-                this.bextChunkFields["loudnessRange"], uInt16));
-            bextBytes = bextBytes.concat(byteData.pack(
-                this.bextChunkFields["maxTruePeakLevel"], uInt16));
-            bextBytes = bextBytes.concat(byteData.pack(
-                this.bextChunkFields["maxMomentaryLoudness"], uInt16));
-            bextBytes = bextBytes.concat(byteData.pack(
-                this.bextChunkFields["maxShortTermLoudness"], uInt16));
+            bextBytes = bextBytes.concat(byteData_.pack(
+                this.bextChunkFields["loudnessValue"], uInt16_));
+            bextBytes = bextBytes.concat(byteData_.pack(
+                this.bextChunkFields["loudnessRange"], uInt16_));
+            bextBytes = bextBytes.concat(byteData_.pack(
+                this.bextChunkFields["maxTruePeakLevel"], uInt16_));
+            bextBytes = bextBytes.concat(byteData_.pack(
+                this.bextChunkFields["maxMomentaryLoudness"], uInt16_));
+            bextBytes = bextBytes.concat(byteData_.pack(
+                this.bextChunkFields["maxShortTermLoudness"], uInt16_));
             bextBytes = bextBytes.concat(this.writeVariableSizeString_(
                 this.bextChunkFields["reserved"], 180));
             bextBytes = bextBytes.concat(this.writeVariableSizeString_(
                 this.bextChunkFields["codingHistory"],
                 this.bextChunkData.length - 602));
             return [].concat(
-                    byteData.packArray(this.bextChunkId, chr),
-                    byteData.pack(bextBytes.length, uInt32),
+                    byteData_.packArray(this.bextChunkId, chr_),
+                    byteData_.pack(bextBytes.length, uInt32_),
                     bextBytes
                 );
         }
@@ -2051,13 +2709,14 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Get the bytes of the "cue " chunk.
-     * @return {!Array<number>} The "cue " chunk bytes.
+     * @return {Array<number>} The "cue " chunk bytes.
+     * @private
      */
     getCueBytes_() {
         if (this.cueChunkId) {
             return [].concat(
-                    byteData.packArray(this.cueChunkId, chr),
-                    byteData.pack(this.cueChunkSize, uInt32),
+                    byteData_.packArray(this.cueChunkId, chr_),
+                    byteData_.pack(this.cueChunkSize, uInt32_),
                     this.cueChunkData
                 );
         }
@@ -2066,14 +2725,15 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Get the bytes of the "fact" chunk.
-     * @return {!Array<number>} The "fact" chunk bytes.
+     * @return {Array<number>} The "fact" chunk bytes.
+     * @private
      */
     getFactBytes_() {
         if (this.factChunkId) {
             return [].concat(
-                    byteData.packArray(this.factChunkId, chr),
-                    byteData.pack(this.factChunkSize, uInt32),
-                    byteData.pack(this.dwSampleLength, uInt32)
+                    byteData_.packArray(this.factChunkId, chr_),
+                    byteData_.pack(this.factChunkSize, uInt32_),
+                    byteData_.pack(this.dwSampleLength, uInt32_)
                 );
         }
         return [];
@@ -2081,49 +2741,52 @@ class WaveFileReaderWriter extends BWFHeader {
 
     /**
      * Get the bytes of the cbSize field.
-     * @return {!Array<number>} The cbSize bytes.
+     * @return {Array<number>} The cbSize bytes.
+     * @private
      */
     getCbSizeBytes_() {
         if (this.fmtChunkSize > 16) {
-            return byteData.pack(this.cbSize, uInt16);
+            return byteData_.pack(this.cbSize, uInt16_);
         }
         return [];
     }
 
     /**
      * Get the bytes of the validBitsPerSample field.
-     * @return {!Array<number>} The validBitsPerSample bytes.
+     * @return {Array<number>} The validBitsPerSample bytes.
+     * @private
      */
     getValidBitsPerSampleBytes_() {
         if (this.fmtChunkSize > 18) {
-            return byteData.pack(this.validBitsPerSample, uInt16);
+            return byteData_.pack(this.validBitsPerSample, uInt16_);
         }
         return [];
     }
 
     /**
      * Turn a WaveFile object into a file.
-     * @return {Uint8Array} The wav file bytes.
+     * @return {Array<number>} The wav file bytes.
+     * @private
      */
     createWaveFile_() {
-        let options = {"be": this.LEorBE()};
-        return byteData.packArray(this.chunkId, chr).concat(
-                byteData.pack(this.chunkSize, uInt32),
-                byteData.packArray(this.format, chr),
+        let options = {"be": this.LEorBE_()};
+        return byteData_.packArray(this.chunkId, chr_).concat(
+                byteData_.pack(this.chunkSize, uInt32_),
+                byteData_.packArray(this.format, chr_),
                 this.getBextBytes_(),
-                byteData.packArray(this.fmtChunkId, chr),
-                byteData.pack(this.fmtChunkSize, uInt32),
-                byteData.pack(this.audioFormat, uInt16),
-                byteData.pack(this.numChannels, uInt16),
-                byteData.pack(this.sampleRate, uInt32),
-                byteData.pack(this.byteRate, uInt32),
-                byteData.pack(this.blockAlign, uInt16),
-                byteData.pack(this.bitsPerSample, uInt16),
+                byteData_.packArray(this.fmtChunkId, chr_),
+                byteData_.pack(this.fmtChunkSize, uInt32_),
+                byteData_.pack(this.audioFormat, uInt16_),
+                byteData_.pack(this.numChannels, uInt16_),
+                byteData_.pack(this.sampleRate, uInt32_),
+                byteData_.pack(this.byteRate, uInt32_),
+                byteData_.pack(this.blockAlign, uInt16_),
+                byteData_.pack(this.bitsPerSample, uInt16_),
                 this.getCbSizeBytes_(),
                 this.getValidBitsPerSampleBytes_(),
                 this.getFactBytes_(),
-                byteData.packArray(this.dataChunkId, chr),
-                byteData.pack(this.dataChunkSize, uInt32),
+                byteData_.packArray(this.dataChunkId, chr_),
+                byteData_.pack(this.dataChunkSize, uInt32_),
                 this.samplesToBytes_(options),
                 this.getCueBytes_()
             );
@@ -2134,72 +2797,19 @@ module.exports = WaveFileReaderWriter;
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
- * BWFHeader class
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
- * https://github.com/rochars/wavefile
- *
- */
-
-const WaveFileHeader = __webpack_require__(11);
-
-/**
- * Wave file headers.
- */
-class BWFHeader extends WaveFileHeader {
-
-    constructor() {
-        super();
-        /**
-         * "bext"
-         * @type {string}
-         */
-        this.bextChunkId = "";
-        /** @type {number} */
-        this.bextChunkSize = 0;
-        /** @type {!Array<number>} */
-        this.bextChunkData = [];
-        /** @type {Object} */
-        this.bextChunkFields = {
-            "description": "", //256
-            "originator": "", //32
-            "originatorReference": "", //32
-            "originationDate": "", //10
-            "originationTime": "", //8
-            "timeReference": "", //64-bit value
-            "version": "", //WORD
-            "UMID": "", // 64
-            "loudnessValue": "", //WORD
-            "loudnessRange": "", //WORD
-            "maxTruePeakLevel": "", //WORD
-            "maxMomentaryLoudness": "", //WORD
-            "maxShortTermLoudness": "", //WORD
-            "reserved": "", //180
-            "codingHistory": "" // string, unlimited
-        };
-    }
-}
-
-module.exports = BWFHeader;
-
-
-/***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /*
- * WaveFileHeader class
- * A structure representing a WAVE file header.
+ * WaveFileHeader
+ * Class representing a wav file header.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
  */
 
 /**
- * Wave file headers.
+ * Class representing a wav file header.
  */
 class WaveFileHeader {
 
@@ -2249,7 +2859,7 @@ class WaveFileHeader {
         this.factChunkId = "";
         /** @type {number} */
         this.factChunkSize = 0;
-        /** @type {!Array<number>} */
+        /** @type {Array<number>} */
         this.factChunkData = [];
         /** @type {number} */
         this.dwSampleLength = 0;
@@ -2261,8 +2871,36 @@ class WaveFileHeader {
         this.cueChunkId = "";
         /** @type {number} */
         this.cueChunkSize = -1;
-        /** @type {!Array<number>} */
+        /** @type {Array<number>} */
         this.cueChunkData = [];
+
+        /**
+         * "bext"
+         * @type {string}
+         */
+        this.bextChunkId = "";
+        /** @type {number} */
+        this.bextChunkSize = 0;
+        /** @type {Array<number>} */
+        this.bextChunkData = [];
+        /** @type {Object} */
+        this.bextChunkFields = {
+            "description": "", //256
+            "originator": "", //32
+            "originatorReference": "", //32
+            "originationDate": "", //10
+            "originationTime": "", //8
+            "timeReference": "", //64-bit value
+            "version": "", //WORD
+            "UMID": "", // 64
+            "loudnessValue": "", //WORD
+            "loudnessRange": "", //WORD
+            "maxTruePeakLevel": "", //WORD
+            "maxMomentaryLoudness": "", //WORD
+            "maxShortTermLoudness": "", //WORD
+            "reserved": "", //180
+            "codingHistory": "" // string, unlimited
+        };
 
         /**
          * "data"
@@ -2275,595 +2913,6 @@ class WaveFileHeader {
 }
 
 module.exports = WaveFileHeader;
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*!
- * riff-chunks
- * Read and write the chunks of RIFF and RIFX files.
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * https://github.com/rochars/riff-chunks
- *
- */
-
-const byteData = __webpack_require__(0);
-const uInt32 = byteData.uInt32;
-const chr = byteData.chr;
-
-/**
- * Write the bytes of a RIFF/RIFX file.
- * @param {Object} chunks A structure like the return of riffChunks.read().
- * @param {boolean} bigEndian if the bytes should be big endian.
- *      "RIFX" chunkId will always set bigEndian to true.
- * @return {Array<number>|Uint8Array} The file bytes as Uint8Array when
- *      chunkId is "RIFF" or "RIFX" or the chunk bytes as Array<number>
- *      when chunkId is "LIST".
- */
-function write(chunks, bigEndian=false) {
-    if (!bigEndian) {
-        uInt32["be"] = chunks["chunkId"] == "RIFX";
-    }
-    let bytes =
-        byteData.packArray(chunks["chunkId"], chr).concat(
-                byteData.pack(chunks["chunkSize"], uInt32),
-                byteData.packArray(chunks["format"], chr),
-                writeSubChunks(chunks["subChunks"], uInt32.be)
-            );
-    if (chunks["chunkId"] == "RIFF" || chunks["chunkId"] == "RIFX" ) {
-        bytes = new Uint8Array(bytes);
-    }
-    return bytes;
-}
-
-/**
- * Get the chunks of a RIFF/RIFX file.
- * @param {Uint8Array|!Array<number>} buffer The file bytes.
- * @return {Object} The chunk.
- */
-function read(buffer) {
-    buffer = [].slice.call(buffer);
-    let chunkId = getChunkId(buffer, 0);
-    uInt32["be"] = chunkId == "RIFX";
-    return {
-        "chunkId": chunkId,
-        "chunkSize": getChunkSize(buffer, 0),
-        "format": byteData.unpackArray(buffer.slice(8, 12), chr),
-        "subChunks": getSubChunks(buffer)
-    };
-}
-
-/**
- * Write the sub chunks of a RIFF file.
- * @param {Array<Object>} chunks The chunks.
- * @param {boolean} bigEndian true if its RIFX.
- * @return {Array<number>} The chunk bytes.
- */
-function writeSubChunks(chunks, bigEndian) {
-    let subChunks = [];
-    let i = 0;
-    while (i < chunks.length) {
-        if (chunks[i]["chunkId"] == "LIST") {
-            subChunks = subChunks.concat(write(chunks[i], bigEndian));
-        } else {
-            subChunks = subChunks.concat(
-                byteData.packArray(chunks[i]["chunkId"], chr),
-                byteData.pack(chunks[i]["chunkSize"], uInt32),
-                chunks[i]["chunkData"]
-            );
-        }
-        i++;
-    }
-    return subChunks;
-}
-
-/**
- * Get the sub chunks of a RIFF file.
- * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
- * @return {Object} The subchunks of a RIFF/RIFX or LIST chunk.
- */
-function getSubChunks(buffer) {
-    let chunks = [];
-    let i = 12;
-    while(i < buffer.length) {
-        chunks.push(getSubChunk(buffer, i));
-        i += 8 + chunks[chunks.length - 1].chunkSize;
-    }
-    return chunks;
-}
-
-/**
- * Get a sub chunk from a RIFF file.
- * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
- * @param {number} index The start index of the chunk.
- * @return {Object} A subchunk of a RIFF/RIFX or LIST chunk.
- */
-function getSubChunk(buffer, index) {
-    let chunk = {
-        "chunkId": getChunkId(buffer, index),
-        "chunkSize": getChunkSize(buffer, index)
-    };
-    if (chunk.chunkId == "LIST") {
-        chunk.format = byteData.unpackArray(buffer.slice(8, 12), chr);
-        chunk.subChunks = getSubChunks(
-            buffer.slice(index, index + chunk.chunkSize));
-    } else {
-        chunk.chunkData = buffer.slice(index + 8, index + 8 + chunk.chunkSize);
-    }
-    return chunk;
-}
-
-/**
- * Return the FourCC of a chunk.
- * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
- * @param {number} index The start index of the chunk.
- * @return {string} The id of the chunk.
- */
-function getChunkId(buffer, index) {
-    return byteData.unpackArray(buffer.slice(index, index + 4), chr);
-}
-
-/**
- * Return the size of a chunk.
- * @param {Uint8Array|!Array<number>} buffer the RIFF file bytes.
- * @param {number} index The start index of the chunk.
- * @return {number} The size of the chunk without the id and size fields.
- */
-function getChunkSize(buffer, index) {
-    return byteData.unpack(buffer.slice(index + 4, index + 8), uInt32);
-}
-
-module.exports.read = read;
-module.exports.write = write;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*!
- * imaadpcm
- * JavaScript IMA ADPCM codec.
- * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/imaadpcm
- *
- * References:
- * http://www.cs.columbia.edu/~hgs/audio/dvi/
- * https://github.com/acida/pyima
- * https://wiki.multimedia.cx/index.php/IMA_ADPCM
- * 
- */
-
-const byteData = __webpack_require__(0);
-const int16 = byteData.int16;
-
-var indexTable = [
-    -1, -1, -1, -1, 2, 4, 6, 8,
-    -1, -1, -1, -1, 2, 4, 6, 8];
-
-var stepTable = [
-    7, 8, 9, 10, 11, 12, 13, 14,
-    16, 17, 19, 21, 23, 25, 28, 31,
-    34, 37, 41, 45, 50, 55, 60, 66,
-    73, 80, 88, 97, 107, 118, 130, 143,
-    157, 173, 190, 209, 230, 253, 279, 307,
-    337, 371, 408, 449, 494, 544, 598, 658,
-    724, 796, 876, 963, 1060, 1166, 1282, 1411,
-    1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024,
-    3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484,
-    7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
-    15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
-    32767];
-
-var encoderPredicted = 0;
-var encoderIndex = 0;
-var encoderStep = 7;
-var decoderPredicted = 0;
-var decoderIndex = 0;
-var decoderStep = 7;
-
-/**
- * Compress a 16-bit PCM sample into a 4-bit ADPCM sample.
- * @param {number} sample The sample.
- * @return {number}
- */
-function encodeSample(sample) {
-    let delta = sample - encoderPredicted;
-    let value = 0;
-    if (delta >= 0) {
-        value = 0;
-    }
-    else {
-        value = 8;
-        delta = -delta;
-    }
-    let step = stepTable[encoderIndex];
-    let diff = step >> 3;
-    if (delta > step) {
-        value |= 4;
-        delta -= step;
-        diff += step;
-    }
-    step >>= 1;
-    if (delta > step) {
-        value |= 2;
-        delta -= step;
-        diff += step;
-    }
-    step >>= 1;
-    if (delta > step) {
-        value |= 1;
-        diff += step;
-    }
-    if (value & 8) {
-        encoderPredicted -= diff;
-    }
-    else {
-        encoderPredicted += diff;
-    }
-    if (encoderPredicted < -0x8000) {
-        encoderPredicted = -0x8000;
-    } else if (encoderPredicted > 0x7fff) {
-        encoderPredicted = 0x7fff;
-    }
-    encoderIndex += indexTable[value & 7];
-    if (encoderIndex < 0) {
-        encoderIndex = 0;
-    } else if (encoderIndex > 88) {
-        encoderIndex = 88;
-    }
-    return value;
-}
-
-/**
- * Decode a 4-bit ADPCM sample into a 16-bit PCM sample.
- * @param {number} nibble A 4-bit adpcm sample.
- * @return {number}
- */
-function decodeSample(nibble) {
-    let difference = 0;
-    if (nibble & 4) {
-        difference += decoderStep;
-    }
-    if (nibble & 2) {
-        difference += decoderStep >> 1;
-    }
-    if (nibble & 1) {
-        difference += decoderStep >> 2;
-    }
-    difference += decoderStep >> 3;
-    if (nibble & 8) {
-        difference = -difference;
-    }
-    decoderPredicted += difference;
-    if (decoderPredicted > 32767) {
-        decoderPredicted = 32767;
-    } else if (decoderPredicted < -32767) {
-        decoderPredicted = -32767;
-    }
-    decoderIndex += indexTable[nibble];
-    if (decoderIndex < 0) {
-        decoderIndex = 0;
-    } else if (decoderIndex > 88) {
-        decoderIndex = 88;
-    }
-    decoderStep = stepTable[decoderIndex];
-    return decoderPredicted;
-}
-
-/**
- * Return the head of a ADPCM sample block.
- * @param {number} sample The first sample of the block.
- * @return {!Array<number>}
- */
-function blockHead(sample) {
-    encodeSample(sample);
-    let adpcmSamples = [];
-    adpcmSamples.push(byteData.pack(sample, int16)[0]);
-    adpcmSamples.push(byteData.pack(sample, int16)[1]);
-    adpcmSamples.push(encoderIndex);
-    adpcmSamples.push(0);
-    return adpcmSamples;
-}
-
-/**
- * Encode a block of 505 16-bit samples as 4-bit ADPCM samples.
- * @param {!Array<number>} block A sample block of 505 samples.
- * @return {!Array<number>}
- */
-function encodeBlock(block) {
-    let adpcmSamples = blockHead(block[0]);
-    for (let i=3; i<block.length; i+=2) {
-        let sample2 = encodeSample(block[i]);
-        let sample = encodeSample(block[i + 1]);
-        adpcmSamples.push((sample << 4) | sample2);
-    }
-    while (adpcmSamples.length < 256) {
-        adpcmSamples.push(0);
-    }
-    return adpcmSamples;
-}
-
-/**
- * Decode a block of 256 ADPCM samples into 16-bit PCM samples.
- * @param {!Array<number>} block A adpcm sample block of 256 samples.
- * @return {!Array<number>}
- */
-function decodeBlock(block) {
-    decoderPredicted = byteData.unpack([block[0], block[1]], int16);
-    decoderIndex = block[2];
-    decoderStep = stepTable[decoderIndex];
-    let result = [
-            decoderPredicted,
-            byteData.unpack([block[2], block[3]], int16)
-        ];
-    for (let i=4; i<block.length; i++) {
-        let original_sample = block[i];
-        let second_sample = original_sample >> 4;
-        let first_sample = (second_sample << 4) ^ original_sample;
-        result.push(decodeSample(first_sample));
-        result.push(decodeSample(second_sample));
-    }
-    return result;
-}
-
-/**
- * Encode 16-bit PCM samples into 4-bit IMA ADPCM samples.
- * @param {!Array<number>} samples A array of samples.
- * @return {!Array<number>}
- */
-function encode(samples) {
-    let adpcmSamples = [];
-    let block = [];
-    for (let i=0; i<samples.length; i++) {
-        block.push(samples[i]);
-        if ((i % 505 == 0 && i != 0) || i == samples.length - 1) {
-            adpcmSamples = adpcmSamples.concat(encodeBlock(block));
-            block = [];
-        }
-    }
-    return adpcmSamples;
-}
-
-/**
- * Decode IMA ADPCM samples into 16-bit PCM samples.
- * @param {!Array<number>} adpcmSamples A array of ADPCM samples.
- * @param {number} blockAlign The block size.
- * @return {!Array<number>}
- */
-function decode(adpcmSamples, blockAlign=256) {
-    let samples = [];
-    let block = [];
-    for (let i=0; i<adpcmSamples.length; i++) {
-        if (i % blockAlign == 0 && i != 0) {            
-            samples = samples.concat(decodeBlock(block));
-            block = [];
-        }
-        block.push(adpcmSamples[i]);
-    }
-    return samples;
-}
-
-module.exports.encode = encode;
-module.exports.decode = decode;
-module.exports.encodeBlock = encodeBlock;
-module.exports.decodeBlock = decodeBlock;
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports) {
-
-/*
- * alaw.js
- * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/alawmulaw
- *
- * References:
- * https://github.com/deftio/companders
- * http://dystopiancode.blogspot.com.br/2012/02/pcm-law-and-u-law-companding-algorithms.html
- * 
- */
-
-/**
- * Encode a 16-bit linear PCM sample as 8-bit A-Law.
- * @param {number} sample A 16-bit linear PCM sample
- * @return {number}
- */
-function  encodeSample(sample) {
-    let clip = 32635;
-    let logTable = [
-        1,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, 
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6, 
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, 
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7 
-    ];
-    let sign;
-    let exponent;
-    let mantissa; 
-    let compandedValue; 
-    sample = (sample ==-32768) ? -32767 : sample;
-    sign = ((~sample) >> 8) & 0x80; 
-    if (!sign) {
-        sample = sample * -1; 
-    }
-    if (sample > clip) {
-        sample = clip; 
-    }
-    if (sample >= 256)  { 
-        exponent = logTable[(sample >> 8) & 0x7F]; 
-        mantissa = (sample >> (exponent + 3) ) & 0x0F; 
-        compandedValue = ((exponent << 4) | mantissa); 
-    } else {
-        compandedValue = sample >> 4; 
-    } 
-    compandedValue ^= (sign ^ 0x55); 
-    return compandedValue; 
-}
-
-/**
- * Decode a 8-bit A-Law sample as 16-bit linear PCM.
- * @param {number} aLawSample The 8-bit A-Law sample
- * @return {number}
- */
-function decodeSample(aLawSample) {
-   let sign = 0x00;
-   let position = 0;
-   let decoded = 0;
-   aLawSample ^= 0x55;
-   if(aLawSample & 0x80) {
-      aLawSample &= ~(1 << 7);
-      sign = -1;
-   }
-   position = ((aLawSample & 0xF0) >> 4) + 4;
-   if(position!=4) {
-      decoded = ((1 << position) |
-                ((aLawSample & 0x0F) << (position - 4)) |
-                (1 << (position - 5)));
-   } else {
-      decoded = (aLawSample << 1)|1;
-   }
-   decoded = (sign == 0) ? (decoded) : (-decoded);
-   return (decoded * 8) * -1;
-}
-
-/**
- * Encode 16-bit linear PCM samples into 8-bit A-Law samples.
- * @param {!Array<number>} samples A array of 16-bit PCM samples.
- * @return {!Array<number>}
- */
-function encode(samples) {
-    let aLawSamples = [];
-    for (let i=0; i<samples.length; i++) {
-        aLawSamples.push(encodeSample(samples[i]));
-    }
-    return aLawSamples;
-}
-
-/**
- * Decode 8-bit A-Law samples into 16-bit linear PCM samples.
- * @param {!Array<number>} samples A array of 8-bit A-Law samples.
- * @return {!Array<number>}
- */
-function decode(samples) {
-    let pcmSamples = [];
-    for (let i=0; i<samples.length; i++) {
-        pcmSamples.push(decodeSample(samples[i]));
-    }
-    return pcmSamples;
-}
-
-module.exports.encodeSample = encodeSample;
-module.exports.decodeSample = decodeSample;
-module.exports.encode = encode;
-module.exports.decode = decode;
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports) {
-
-/*
- * mulaw.js
- * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/alawmulaw
- *
- * Reference:
- * https://github.com/torvalds/linux/blob/master/sound/core/oss/mulaw.c
- * 
- */
-
-const BIAS = 0x84;
-const SIGN_BIT = 0x80;
-const QUANT_MASK = 0xf;
-const SEG_MASK = 0x70;
-const SEG_SHIFT = 4;
-
-function valSeg(val) {
-  let r = 0;
-  val >>= 7;
-  if (val & 0xf0) {
-    val >>= 4;
-    r += 4;
-  }
-  if (val & 0x0c) {
-    val >>= 2;
-    r += 2;
-  }
-  if (val & 0x02)
-    r += 1;
-  return r;
-}
-
-/**
- * Encode a 16-bit linear PCM sample as 8-bit mu-Law.
- * @param {number} pcmSample A 16-bit sample
- * @return {number}
- */
-function encodeSample(pcmSample) {
-  let mask;
-  let seg;
-  let uval;
-  if (pcmSample < 0) {
-    pcmSample = BIAS - pcmSample;
-    mask = 0x7F;
-  } else {
-    pcmSample += BIAS;
-    mask = 0xFF;
-  }
-  if (pcmSample > 0x7FFF) {
-    pcmSample = 0x7FFF;
-  }
-  seg = valSeg(pcmSample);
-  uval = (seg << 4) | ((pcmSample >> (seg + 3)) & 0xF);
-  return uval ^ mask;
-}
-
-/**
- * Decode a 8-bit mu-Law sample as 16-bit linear PCM.
- * @param {number} muLawSample The 8-bit mu-Law sample
- * @return {number}
- */
-function decodeSample(muLawSample) {
-  let t;
-  muLawSample = ~muLawSample;
-  t = ((muLawSample & QUANT_MASK) << 3) + BIAS;
-  t <<= (muLawSample & SEG_MASK) >> SEG_SHIFT;
-  return ((muLawSample & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
-}
-
-/**
- * Encode 16-bit linear PCM samples into 8-bit mu-Law samples.
- * @param {!Array<number>} samples A array of 16-bit linear PCM samples.
- * @return {!Array<number>}
- */
-function encode(samples) {
-    let muLawSamples = [];
-    for (let i=0; i<samples.length; i++) {
-        muLawSamples.push(encodeSample(samples[i]));
-    }
-    return muLawSamples;
-}
-
-/**
- * Decode 8-bit mu-Law samples into 16-bit linear PCM samples.
- * @param {!Array<number>} samples A array of 8-bit mu-Law samples.
- * @return {!Array<number>}
- */
-function decode(samples) {
-    let pcmSamples = [];
-    for (let i=0; i<samples.length; i++) {
-        pcmSamples.push(decodeSample(samples[i]));
-    }
-    return pcmSamples;
-}
-
-module.exports.encodeSample = encodeSample;
-module.exports.decodeSample = decodeSample;
-module.exports.encode = encode;
-module.exports.decode = decode;
 
 
 /***/ })

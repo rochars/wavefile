@@ -1,6 +1,6 @@
 /*
- * wavefile
- * Read & write wave files with 8, 16, 24, 32 & 64-bit data.
+ * WAVE_ERRORS
+ * Error messages.
  * Copyright (c) 2017 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
