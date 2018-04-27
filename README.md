@@ -63,6 +63,9 @@ Possible values for the bit depth are:
 
 You can also use any bit depth between "8" and "32", like **"11", "12", "17", "20" and so on**.
 
+WAVE_FORMAT_EXTENSIBLE (**11-bit, 12-bit** so on) based on files found here:  
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html
+
 ```javascript
 let wav = new WaveFile();
 

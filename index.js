@@ -1,6 +1,6 @@
 /*!
  * wavefile
- * Read & write wave files with 4, 8, 12, 16, 24, 32 & 64-bit data.
+ * Read & write wave files with 4, 8, 11, 12, 20, 16, 24, 32 & 64-bit data.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
@@ -166,21 +166,17 @@ class WaveFile extends WaveFileReaderWriter {
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
-        let bitDepthArg = bitDepth;
-        if (bitDepthArg > 8 && (bitDepthArg % 8)) {
-            bitDepthArg = (((parseInt(bitDepth, 10) - 1) | 7) + 1);
-            bitDepthArg = bitDepthArg.toString();
+        let toBitDepth = bitDepth;
+        if (toBitDepth != "32f" && toBitDepth != "64") {
+            toBitDepth = (((parseInt(toBitDepth, 10) - 1) | 7) + 1)
+                .toString();
         }
-
-        let thisBitDepth = parseInt(this.bitDepth, 10);
-        if (thisBitDepth > 8 && (thisBitDepth % 8)) {
-            thisBitDepth = (((parseInt(thisBitDepth, 10) - 1) | 7) + 1);
-            thisBitDepth = thisBitDepth.toString();
-        } else {
-            thisBitDepth = this.bitDepth;
+        let thisBitDepth = this.bitDepth;
+        if (thisBitDepth != "32f" && thisBitDepth != "64") {
+            thisBitDepth = (((parseInt(thisBitDepth, 10) - 1) | 7) + 1)
+                .toString();
         }
-
-        bitDepth_.toBitDepth(this.samples, thisBitDepth, bitDepthArg);
+        bitDepth_.toBitDepth(this.samples, thisBitDepth, toBitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,

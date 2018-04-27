@@ -13,9 +13,7 @@ describe('create 13-bit wave files from scratch', function() {
 
     let samples = [];
     for (let i=0; i<9000; i++) {
-        let num = (Math.floor(Math.random() * (32767 / 2)) + 1) *
-            (Math.floor(Math.random()*2) == 1 ? 1 : -1);
-        samples.push(num);
+        samples.push(0);
     }
 
     wav.fromScratch(1, 8000, '13', samples);
