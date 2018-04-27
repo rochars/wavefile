@@ -1,5 +1,5 @@
 # wavefile
-Read & write wav files with 4, 8, 11, 12, 20, 16, 24, 32 & 64-bit data.  
+Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.  
 Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
@@ -186,8 +186,15 @@ console.log(wav.sampleRate);
 console.log(wav.byteRate);
 console.log(wav.blockAlign);
 console.log(wav.bitsPerSample);
+// "fmt " extension
 console.log(wav.cbSize);
 console.log(wav.validBitsPerSample);
+console.log(this.dwChannelMask);
+// subformat is a 128-bit GUID split into 4 32-bit values.
+console.log(this.subformat1); 
+console.log(this.subformat2); 
+console.log(this.subformat3);
+console.log(this.subformat4);
 
 // "fact"
 console.log(wav.factChunkId);
@@ -195,6 +202,8 @@ console.log(wav.factChunkSize);
 console.log(wav.dwSampleLength);
 
 // "bext"
+console.log(wav.bextChunkId);
+console.log(wav.bextChunkSize);
 console.log(wav.bextChunkFields);
 
 // "data"
@@ -206,7 +215,7 @@ console.log(wav.samples);
 ```
 
 ### BWF data
-BWF data ("bext" chunk) is stored in the *bextChunkFields* property in human-readable form.
+BWF data ("bext" chunk) is stored in the *bextChunkFields* property.
 ```javascript
 wav.bextChunkFields = {
     "description": "", // 256 chars

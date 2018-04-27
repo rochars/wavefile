@@ -1,7 +1,7 @@
 {
   "name": "wavefile",
-  "version": "4.0.0",
-  "description": "Read & write wav files with 4, 8, 11, 12, 20, 16, 24, 32 & 64-bit data.",
+  "version": "5.0.0",
+  "description": "Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
@@ -24,6 +24,7 @@
     "8-bit",
     "11-bit",
     "12-bit",
+    "20-bit",
     "16-bit",
     "24-bit",
     "32-bit",

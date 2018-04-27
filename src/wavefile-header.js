@@ -31,29 +31,63 @@ class WaveFileHeader {
         this.fmtChunkId = "";
         /** @type {number} */
         this.fmtChunkSize = 0;
-        /** @type {number} */
+        /**
+         * The audio format.
+         *  - 00001: PCM
+         *  - 00003: IEEE Floating Point
+         *  - 00006: A-Law
+         *  - 00007: mu-Law
+         *  - 00017: IMA-ADPCM
+         *  - 65534: WAVE_FORMAT_EXTENSIBLE
+         * @type {number}
+         */
         this.audioFormat = 0;
-        /** @type {number} */
+        /** 
+         * The number of channels. 1 for mono, 2 for stereo
+         * @type {number}
+         */
         this.numChannels = 0;
-        /** @type {number} */
+        /**
+         * The sample rate in Herz.
+         * Values like 8000, 44100, 96000 and so on.
+         * @type {number}
+         */
         this.sampleRate = 0;
-        /** @type {number} */
+        /**
+         * The byte rate. For non-compressed samples it is always:
+         * (nummber of channels * number of bytes used by each sample) * sample rate
+         * @type {number}
+         */
         this.byteRate = 0;
-        /** @type {number} */
+        /**
+         * The block align. For non-compressed samples it is always:
+         * nummber of channels * number of bytes used by each sample
+         * @type {number}
+         */
         this.blockAlign = 0;
         /** @type {number} */
         this.bitsPerSample = 0;
 
-        /** @type {number} */
+        /**
+         * The size of the extension of the "fmt " chunk.
+         * @type {number}
+         */
         this.cbSize = 0;
         /** @type {number} */
         this.validBitsPerSample = 0;
         /** @type {number} */
-        this.dwChannelMask = 0; // 4 bytes
-        /** @type {string} */ // ??
+        this.dwChannelMask = 0;
+        /** 
+         * First value of the subformat.
+         * Subformat is a 128-bit GUID split into 4 32-bit values.
+         * @type {number}
+         */
         this.subformat1 = 0;
+        /** @type {number} */
         this.subformat2 = 0;
+        /** @type {number} */
         this.subformat3 = 0;
+        /** @type {number} */
         this.subformat4 = 0;
 
         /**
@@ -63,8 +97,6 @@ class WaveFileHeader {
         this.factChunkId = "";
         /** @type {number} */
         this.factChunkSize = 0;
-        /** @type {Array<number>} */
-        this.factChunkData = [];
         /** @type {number} */
         this.dwSampleLength = 0;
 
@@ -75,8 +107,12 @@ class WaveFileHeader {
         this.cueChunkId = "";
         /** @type {number} */
         this.cueChunkSize = -1;
-        /** @type {Array<number>} */
-        this.cueChunkData = [];
+        /**
+         * The raw bytes of the "cue " chunk.
+         * @type {Array<number>}
+         * @private
+         */
+        this.cueChunkData_ = [];
 
         /**
          * "bext"
@@ -85,16 +121,17 @@ class WaveFileHeader {
         this.bextChunkId = "";
         /** @type {number} */
         this.bextChunkSize = 0;
-        /** @type {Array<number>} */
-        this.bextChunkData = [];
-        /** @type {Object} */
+        /**
+         * The data of the "bext" chunk.
+         * @type {Object}
+         */
         this.bextChunkFields = {
             "description": "", //256
             "originator": "", //32
             "originatorReference": "", //32
             "originationDate": "", //10
             "originationTime": "", //8
-            "timeReference": "", //64-bit value
+            "timeReference": [], //64-bit value kept as bytes
             "version": "", //WORD
             "UMID": "", // 64
             "loudnessValue": "", //WORD
@@ -113,6 +150,13 @@ class WaveFileHeader {
         this.dataChunkId = "";
         /** @type {number} */
         this.dataChunkSize = 0;
+
+        /**
+         * The raw bytes of the "bext" chunk.
+         * @type {Array<number>}
+         * @private
+         */
+        this.bextChunkData_ = [];
     }
 }
 

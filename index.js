@@ -1,6 +1,6 @@
 /*!
  * wavefile
- * Read & write wave files with 4, 8, 11, 12, 20, 16, 24, 32 & 64-bit data.
+ * Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
@@ -27,6 +27,10 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * @param {Uint8Array|Array<number>} bytes A wave file buffer.
+     * @throws {Error} If no "RIFF" chunk is found.
+     * @throws {Error} If no "fmt " chunk is found.
+     * @throws {Error} If no "fact" chunk is found and "fact" is needed.
+     * @throws {Error} If no "data" chunk is found.
      */
     constructor(bytes) {
         super();
@@ -36,16 +40,18 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Create a WaveFile object based on the arguments passed.
+     * Set up a WaveFile object based on the arguments passed.
      * @param {number} numChannels The number of channels
      *     (Integer numbers: 1 for mono, 2 stereo and so on).
      * @param {number} sampleRate The sample rate.
      *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
      * @param {string} bitDepth The audio bit depth.
-     *     One of "8", "16", "24", "32", "32f", "64".
+     *     One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
+     *     or any value between "8" and "32".
      * @param {Array<number>} samples Array of samples to be written.
      *     The samples must be in the correct range according to the
      *     bit depth.
+     * @throws {Error} If any argument does not meet the criteria.
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
         if (!options.container) {
@@ -115,6 +121,10 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Init a WaveFile object from a byte buffer.
      * @param {Uint8Array|Array<number>} bytes The buffer.
+     * @throws {Error} If no "RIFF" chunk is found.
+     * @throws {Error} If no "fmt " chunk is found.
+     * @throws {Error} If no "fact" chunk is found and "fact" is needed.
+     * @throws {Error} If no "data" chunk is found.
      */
     fromBuffer(bytes) {
         this.readRIFFChunk_(bytes);
@@ -138,6 +148,7 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Turn the WaveFile object into a byte buffer.
      * @return {Uint8Array}
+     * @throws {Error} If any property of the object appears invalid.
      */
     toBuffer() {
         this.checkWriteInput_();
@@ -163,7 +174,8 @@ class WaveFile extends WaveFileReaderWriter {
     /**
      * Change the bit depth of the samples.
      * @param {string} bitDepth The new bit depth of the samples.
-     *      One of "8", "16", "24", "32", "32f", "64"
+     *      One of "8" ... "32" (integers), "32f" or "64" (floats)
+     * @throws {Error} If bit depth is invalid.
      */
     toBitDepth(bitDepth) {
         let toBitDepth = bitDepth;
@@ -191,11 +203,9 @@ class WaveFile extends WaveFileReaderWriter {
      */
     interleave() {
         let finalSamples = [];
-        let i;
-        let j;
         let numChannels = this.samples[0].length;
-        for (i = 0; i < numChannels; i++) {
-            for (j = 0; j < this.samples.length; j++) {
+        for (let i = 0; i < numChannels; i++) {
+            for (let j = 0; j < this.samples.length; j++) {
                 finalSamples.push(this.samples[j][i]);
             }
         }
@@ -302,7 +312,7 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Validate the input for wav writing.
-     * @throws {Error} If any argument does not meet the criteria.
+     * @throws {Error} If any property of the object appears invalid.
      * @private
      */
     checkWriteInput_() {
@@ -313,7 +323,7 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Validate the bit depth.
-     * @throws {Error} If any argument does not meet the criteria.
+     * @throws {Error} If bit depth is invalid.
      * @private
      */
     validateBitDepth_() {
@@ -328,8 +338,8 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Validate the sample rate value.
-     * @throws {Error} If any argument does not meet the criteria.
+     * Validate the number of channels.
+     * @throws {Error} If the number of channels is invalid.
      * @private
      */
     validateNumChannels_() {
@@ -342,7 +352,7 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Validate the sample rate value.
-     * @throws {Error} If any argument does not meet the criteria.
+     * @throws {Error} If the sample rate is invalid.
      * @private
      */
     validateSampleRate_() {
@@ -356,13 +366,13 @@ class WaveFile extends WaveFileReaderWriter {
 
     /**
      * Reset the attributes related to the "fact" chunk.
+     * @private
      */
     clearFactChunk_() {
         this.cbSize = 0;
         this.validBitsPerSample = 0;
         this.factChunkId = "";
         this.factChunkSize = 0;
-        this.factChunkData = [];
         this.dwSampleLength = 0;
     }
 }

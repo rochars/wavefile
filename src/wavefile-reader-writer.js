@@ -169,7 +169,6 @@ class WaveFileReaderWriter extends WaveFileHeader {
     /**
      * Read the "bext" chunk of a wav file.
      * @param {Object} chunks The wav file chunks.
-     * @throws {Error} If no "bext" chunk is found.
      * @private
      */
     readBextChunk_(chunks) {
@@ -177,7 +176,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         if (chunk) {
             this.bextChunkId = "bext";
             this.bextChunkSize = chunk.chunkSize;
-            this.bextChunkData = chunk.chunkData;
+            this.bextChunkData_ = chunk.chunkData;
             this.readBextChunkFields_();
         }
     }
@@ -190,36 +189,36 @@ class WaveFileReaderWriter extends WaveFileHeader {
         this.head_ = 0;
         this.bextChunkFields =  {
             "description": this.readVariableSizeString_(
-                this.bextChunkData, 256),
+                this.bextChunkData_, 256),
             "originator": this.readVariableSizeString_(
-                this.bextChunkData, 32),
+                this.bextChunkData_, 32),
             "originatorReference": this.readVariableSizeString_(
-                this.bextChunkData, 32),
+                this.bextChunkData_, 32),
             "originationDate": this.readVariableSizeString_(
-                this.bextChunkData, 10),
+                this.bextChunkData_, 10),
             "originationTime": this.readVariableSizeString_(
-                this.bextChunkData, 8),
+                this.bextChunkData_, 8),
             // timeReference is a 64-bit value
             "timeReference": this.readBytes_(
-                this.bextChunkData, 8), 
+                this.bextChunkData_, 8), 
             "version": this.readFromChunk_(
-                this.bextChunkData, uInt16_),
+                this.bextChunkData_, uInt16_),
             "UMID": this.readVariableSizeString_(
-                this.bextChunkData, 64), 
+                this.bextChunkData_, 64), 
             "loudnessValue": this.readFromChunk_(
-                this.bextChunkData, uInt16_),
+                this.bextChunkData_, uInt16_),
             "loudnessRange": this.readFromChunk_(
-                this.bextChunkData, uInt16_),
+                this.bextChunkData_, uInt16_),
             "maxTruePeakLevel": this.readFromChunk_(
-                this.bextChunkData, uInt16_),
+                this.bextChunkData_, uInt16_),
             "maxMomentaryLoudness": this.readFromChunk_(
-                this.bextChunkData, uInt16_),
+                this.bextChunkData_, uInt16_),
             "maxShortTermLoudness": this.readFromChunk_(
-                this.bextChunkData, uInt16_),
+                this.bextChunkData_, uInt16_),
             "reserved": this.readVariableSizeString_(
-                this.bextChunkData, 180),
+                this.bextChunkData_, 180),
             "codingHistory": this.readVariableSizeString_(
-                this.bextChunkData, this.bextChunkData.length - 602),
+                this.bextChunkData_, this.bextChunkData_.length - 602),
         }
     }
 
@@ -283,7 +282,6 @@ class WaveFileReaderWriter extends WaveFileHeader {
     /**
      * Read the "cue " chunk of a wave file.
      * @param {Object} chunks The RIFF file chunks.
-     * @throws {Error} If no "cue" chunk is found.
      * @private
      */
     readCueChunk_(chunks) {
@@ -291,7 +289,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         if (chunk) {
             this.cueChunkId = "cue ";
             this.cueChunkSize = chunk.chunkSize;
-            this.cueChunkData = chunk.chunkData;
+            this.cueChunkData_ = chunk.chunkData;
         }
     }
 
@@ -401,7 +399,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
                 this.bextChunkFields["reserved"], 180));
             bextBytes = bextBytes.concat(this.writeVariableSizeString_(
                 this.bextChunkFields["codingHistory"],
-                this.bextChunkData.length - 602));
+                this.bextChunkData_.length - 602));
             return [].concat(
                     byteData_.packArray(this.bextChunkId, chr_),
                     byteData_.pack(bextBytes.length, uInt32_),
@@ -421,7 +419,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
             return [].concat(
                     byteData_.packArray(this.cueChunkId, chr_),
                     byteData_.pack(this.cueChunkSize, uInt32_),
-                    this.cueChunkData
+                    this.cueChunkData_
                 );
         }
         return [];
