@@ -683,13 +683,9 @@ module.exports = Type;
 
 /*!
  * wavefile
- * Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.
+ * Read & write wave files with 4, 8, 12, 16, 24, 32 & 64-bit data.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
- *
- * References:
- * http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
- * https://tech.ebu.ch/docs/tech/tech3285.pdf
  *
  */
 
@@ -738,7 +734,8 @@ class WaveFile extends WaveFileReaderWriter {
         if (!options.container) {
             options.container = "RIFF";
         }
-        let numBytes = parseInt(bitDepth, 10) / 8;
+        // closest nuber of bytes if not / 8
+        let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
         // Clear the fact chunk
         this.clearFactChunk_();
         // Normal PCM file header
@@ -749,7 +746,7 @@ class WaveFile extends WaveFileReaderWriter {
         this.chunkId = options.container;
         this.format = "WAVE";
         this.fmtChunkId = "fmt ";
-        this.audioFormat = this.headerFormats_[bitDepth];
+        this.audioFormat = this.headerFormats_[bitDepth] ? this.headerFormats_[bitDepth] : 65534;
         this.numChannels = numChannels;
         this.sampleRate = sampleRate;
         this.bitsPerSample = parseInt(bitDepth, 10);
@@ -780,6 +777,21 @@ class WaveFile extends WaveFileReaderWriter {
             this.factChunkId = "fact";
             this.factChunkSize = 4;
             this.dwSampleLength = samples.length;
+        }
+        // WAVE_FORMAT_EXTENSIBLE
+        if (parseInt(bitDepth, 10) > 8 && (parseInt(bitDepth, 10) % 8)) {
+            this.chunkSize = 36 + 24 + samples.length * numBytes;
+            this.fmtChunkSize = 40;
+            this.bitsPerSample = (((parseInt(bitDepth, 10) - 1) | 7) + 1);
+            this.cbSize = 22;
+            this.validBitsPerSample = parseInt(bitDepth, 10);
+            this.dwChannelMask = 0;
+            // subformat 128-bit GUID as 4 32-bit values
+            // only supports uncompressed integer PCM samples
+            this.subformat1 = 1;
+            this.subformat2 = 1048576;
+            this.subformat3 = 2852126848;
+            this.subformat4 = 1905997824;
         }
     }
 
@@ -837,7 +849,21 @@ class WaveFile extends WaveFileReaderWriter {
      *      One of "8", "16", "24", "32", "32f", "64"
      */
     toBitDepth(bitDepth) {
-        bitDepth_.toBitDepth(this.samples, this.bitDepth, bitDepth);
+        let bitDepthArg = bitDepth;
+        if (bitDepthArg > 8 && (bitDepthArg % 8)) {
+            bitDepthArg = (((parseInt(bitDepth, 10) - 1) | 7) + 1);
+            bitDepthArg = bitDepthArg.toString();
+        }
+
+        let thisBitDepth = parseInt(this.bitDepth, 10);
+        if (thisBitDepth > 8 && (thisBitDepth % 8)) {
+            thisBitDepth = (((parseInt(thisBitDepth, 10) - 1) | 7) + 1);
+            thisBitDepth = thisBitDepth.toString();
+        } else {
+            thisBitDepth = this.bitDepth;
+        }
+
+        bitDepth_.toBitDepth(this.samples, thisBitDepth, bitDepthArg);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
@@ -979,6 +1005,10 @@ class WaveFile extends WaveFileReaderWriter {
      */
     validateBitDepth_() {
         if (!this.headerFormats_[this.bitDepth]) {
+            if (parseInt(this.bitDepth, 10) > 8 &&
+                    parseInt(this.bitDepth, 10) < 32) {
+                return true;
+            }
             throw new Error(WAVE_ERRORS.bitDepth);
         }
         return true;
@@ -2345,6 +2375,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         this.samples = [];
         /**
          * Header formats.
+         * Formats not listed here will be 65534.
          * @enum {number}
          * @private
          */
@@ -2440,6 +2471,19 @@ class WaveFileReaderWriter extends WaveFileHeader {
             if (this.fmtChunkSize > 18) {
                 this.validBitsPerSample = byteData_.unpack(
                     chunk.chunkData.slice(18, 20), uInt16_);
+                if (this.fmtChunkSize > 20) {
+                    this.dwChannelMask = byteData_.unpack(
+                        chunk.chunkData.slice(20, 24), uInt32_);
+                    // 128-bit GUID read as 4 32-bit unsigned integer
+                    this.subformat1 = byteData_.unpack(
+                        chunk.chunkData.slice(24, 28), uInt32_);
+                    this.subformat2 = byteData_.unpack(
+                        chunk.chunkData.slice(28, 32), uInt32_);
+                    this.subformat3 = byteData_.unpack(
+                        chunk.chunkData.slice(32, 36), uInt32_);
+                    this.subformat4 = byteData_.unpack(
+                        chunk.chunkData.slice(36, 40), uInt32_);
+                }
             }
         }
     }
@@ -2764,6 +2808,24 @@ class WaveFileReaderWriter extends WaveFileHeader {
     }
 
     /**
+     * Get the bytes of the validBitsPerSample field.
+     * @return {Array<number>} The validBitsPerSample bytes.
+     * @private
+     */
+    getFmtExtensionBytes_() {
+        if (this.fmtChunkSize > 20) {
+            return byteData_.pack(this.dwChannelMask, uInt32_).concat(
+                    byteData_.pack(this.subformat1, uInt32_),
+                    byteData_.pack(this.subformat2, uInt32_),
+                    byteData_.pack(this.subformat3, uInt32_),
+                    byteData_.pack(this.subformat4, uInt32_)
+                );
+
+        }
+        return [];
+    }
+    
+    /**
      * Turn a WaveFile object into a file.
      * @return {Array<number>} The wav file bytes.
      * @private
@@ -2784,6 +2846,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
                 byteData_.pack(this.bitsPerSample, uInt16_),
                 this.getCbSizeBytes_(),
                 this.getValidBitsPerSampleBytes_(),
+                this.getFmtExtensionBytes_(),
                 this.getFactBytes_(),
                 byteData_.packArray(this.dataChunkId, chr_),
                 byteData_.pack(this.dataChunkSize, uInt32_),
@@ -2848,9 +2911,15 @@ class WaveFileHeader {
 
         /** @type {number} */
         this.cbSize = 0;
-
         /** @type {number} */
         this.validBitsPerSample = 0;
+        /** @type {number} */
+        this.dwChannelMask = 0; // 4 bytes
+        /** @type {string} */ // ??
+        this.subformat1 = 0;
+        this.subformat2 = 0;
+        this.subformat3 = 0;
+        this.subformat4 = 0;
 
         /**
          * "fact" 

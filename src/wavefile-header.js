@@ -46,9 +46,15 @@ class WaveFileHeader {
 
         /** @type {number} */
         this.cbSize = 0;
-
         /** @type {number} */
         this.validBitsPerSample = 0;
+        /** @type {number} */
+        this.dwChannelMask = 0; // 4 bytes
+        /** @type {string} */ // ??
+        this.subformat1 = 0;
+        this.subformat2 = 0;
+        this.subformat3 = 0;
+        this.subformat4 = 0;
 
         /**
          * "fact" 

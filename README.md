@@ -1,5 +1,5 @@
 # wavefile
-Read & write wave files with 4, 8, 16, 24, 32 & 64-bit data.  
+Read & write wav files with 4, 8, 11, 12, 20, 16, 24, 32 & 64-bit data.  
 Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
@@ -60,6 +60,8 @@ Possible values for the bit depth are:
 "32" - 32-bit  
 "32f" - 32-bit floating point  
 "64" - 64-bit floating point
+
+You can also use any bit depth between "8" and "32", like **"11", "12", "17", "20" and so on**.
 
 ```javascript
 let wav = new WaveFile();
@@ -148,11 +150,19 @@ If the samples are stereo they need to be interleaved before changing the bit de
 Notice that you **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.
 
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
 
-// Possible values are:
-//  "8", "16", "24", "32", "32f", "64"
+// Load a wav file with 32-bit audio
+let wav = new Wavefile(fs.readFileSync("32bit-file.wav"));
+
+// Change the bit depth to 24-bit
 wav.toBitDepth("24");
+
+// Write the new 24-bit file
+fs.writeFileSync("24bit-file.wav", wav.toBuffer());
+
+// You can use any supported bit depth:
+wav.toBitDepth("11");
+fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
 
 ### The properties

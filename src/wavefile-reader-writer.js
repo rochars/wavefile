@@ -35,6 +35,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
         this.samples = [];
         /**
          * Header formats.
+         * Formats not listed here will be 65534.
          * @enum {number}
          * @private
          */
@@ -130,6 +131,19 @@ class WaveFileReaderWriter extends WaveFileHeader {
             if (this.fmtChunkSize > 18) {
                 this.validBitsPerSample = byteData_.unpack(
                     chunk.chunkData.slice(18, 20), uInt16_);
+                if (this.fmtChunkSize > 20) {
+                    this.dwChannelMask = byteData_.unpack(
+                        chunk.chunkData.slice(20, 24), uInt32_);
+                    // 128-bit GUID read as 4 32-bit unsigned integer
+                    this.subformat1 = byteData_.unpack(
+                        chunk.chunkData.slice(24, 28), uInt32_);
+                    this.subformat2 = byteData_.unpack(
+                        chunk.chunkData.slice(28, 32), uInt32_);
+                    this.subformat3 = byteData_.unpack(
+                        chunk.chunkData.slice(32, 36), uInt32_);
+                    this.subformat4 = byteData_.unpack(
+                        chunk.chunkData.slice(36, 40), uInt32_);
+                }
             }
         }
     }
@@ -454,6 +468,24 @@ class WaveFileReaderWriter extends WaveFileHeader {
     }
 
     /**
+     * Get the bytes of the validBitsPerSample field.
+     * @return {Array<number>} The validBitsPerSample bytes.
+     * @private
+     */
+    getFmtExtensionBytes_() {
+        if (this.fmtChunkSize > 20) {
+            return byteData_.pack(this.dwChannelMask, uInt32_).concat(
+                    byteData_.pack(this.subformat1, uInt32_),
+                    byteData_.pack(this.subformat2, uInt32_),
+                    byteData_.pack(this.subformat3, uInt32_),
+                    byteData_.pack(this.subformat4, uInt32_)
+                );
+
+        }
+        return [];
+    }
+    
+    /**
      * Turn a WaveFile object into a file.
      * @return {Array<number>} The wav file bytes.
      * @private
@@ -474,6 +506,7 @@ class WaveFileReaderWriter extends WaveFileHeader {
                 byteData_.pack(this.bitsPerSample, uInt16_),
                 this.getCbSizeBytes_(),
                 this.getValidBitsPerSampleBytes_(),
+                this.getFmtExtensionBytes_(),
                 this.getFactBytes_(),
                 byteData_.packArray(this.dataChunkId, chr_),
                 byteData_.pack(this.dataChunkSize, uInt32_),
