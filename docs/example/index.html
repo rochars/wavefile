@@ -48,6 +48,9 @@
             } else if (wav.bitDepth == "4") {
                 wav.fromIMAADPCM();
             }
+            if (wav.chunkId == "RIFX") {
+              wav.toRIFF();
+            }
             wav.toBitDepth("16");
             wavesurfer.load(
                     "data:audio/wav;base64," + encode(wav.toBuffer())
