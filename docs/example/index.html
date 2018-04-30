@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>wavefile &copy; 2018 Rafael da Silva Rocha. MIT License.</title>
-  <script src="../dist/wavefile-min.js"></script>
+  <script src="../../dist/wavefile-min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.5/wavesurfer.min.js"></script>
   <style>
   .waveform {
@@ -40,10 +40,7 @@
         
         var reader = new FileReader();
         reader.onload = function() {
-            var arrayBuffer = this.result;
-            let array = new Uint8Array(arrayBuffer);
-            let wav = new WaveFile(array);
-            //console.log(wav.fmtChunkId);
+            let wav = new WaveFile(new Uint8Array(this.result));
             if (wav.bitDepth == "8m") {
                 wav.fromMuLaw();
             } else if (wav.bitDepth == "8a") {
@@ -52,7 +49,6 @@
                 wav.fromIMAADPCM();
             }
             wav.toBitDepth("16");
-            
             wavesurfer.load(
                     "data:audio/wav;base64," + encode(wav.toBuffer())
                 );
@@ -71,32 +67,26 @@
       dropZone.addEventListener('dragover', handleDragOver, false);
       dropZone.addEventListener('drop', handleFileSelect, false);
 
-
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
+      var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
       // Use a lookup table to find the index.
       var lookup = new Uint8Array(256);
       for (var i = 0; i < chars.length; i++) {
         lookup[chars.charCodeAt(i)] = i;
       }
-
       encode = function(arraybuffer) {
         var bytes = new Uint8Array(arraybuffer),
         i, len = bytes.length, base64 = "";
-
         for (i = 0; i < len; i+=3) {
           base64 += chars[bytes[i] >> 2];
           base64 += chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
           base64 += chars[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
           base64 += chars[bytes[i + 2] & 63];
         }
-
         if ((len % 3) === 2) {
           base64 = base64.substring(0, base64.length - 1) + "=";
         } else if (len % 3 === 1) {
           base64 = base64.substring(0, base64.length - 2) + "==";
         }
-
         return base64;
     }
     </script>
