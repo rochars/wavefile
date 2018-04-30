@@ -74,9 +74,9 @@ like the next greater bit depth that fill a full sequence of bytes:
 So even if wave files with those bit depth are valid (and playable in most players), they allow their samples to be greater than the actual limit of their bit depth. So:
 - 11-bit files can contain 16-bit samples
 - 17-bit files can contain 24-bit samples
-- 32-bit files can contain 32-bit samples
+- 29-bit files can contain 32-bit samples
 
-Most players will deal with this by adjusting the level to the next greater bit depth, so **most of the times a true 14-bit wave file will actually play like a 16-bit wave file with a low volume**.
+Most players will deal with this by adjusting the level to the next greater bit depth, so **most times a true 14-bit wave file will actually play like a 16-bit wave file with a low volume**.
 
 **wavefile** do not limit the range of the samples for those cases, so you should know what you are doing when dealing with uncommon bit depths to avoid unexpected results.
 

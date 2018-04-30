@@ -863,11 +863,13 @@ class WaveFile extends WaveFileReaderWriter {
      * @throws {Error} If the bit depth is invalid.
      */
     toBitDepth(bitDepth, changeResolution=true) {
+        let toBitDepth = bitDepth;
+        let thisBitDepth = this.bitDepth;
         if (!changeResolution) {
-            let toBitDepth = this.realBitDepth_(bitDepth);
-            let thisBitDepth = this.realBitDepth_(this.bitDepth);
+            toBitDepth = this.realBitDepth_(bitDepth);
+            thisBitDepth = this.realBitDepth_(this.bitDepth);
         }
-        bitDepth_.toBitDepth(this.samples, this.bitDepth, bitDepth);
+        bitDepth_.toBitDepth(this.samples, thisBitDepth, toBitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
