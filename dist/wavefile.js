@@ -823,7 +823,11 @@ class WaveFile extends WaveFileReaderWriter {
             );
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
             this.bitDepth = "32f";
-        }else {
+        } else if (this.audioFormat == 6) {
+            this.bitDepth = "8a";
+        } else if (this.audioFormat == 7) {
+            this.bitDepth = "8m";
+        } else {
             this.bitDepth = this.bitsPerSample.toString();
         }
     }
@@ -3015,6 +3019,22 @@ class WaveFileHeader {
             "maxShortTermLoudness": "", //WORD
             "reserved": "", //180
             "codingHistory": "" // string, unlimited
+        };
+
+        /**
+         * The data of the "ds64" chunk.
+         * @type {Object}
+         */
+        this.ds64 = {
+            "riffSizeHigh": 0, // DWORD
+            "riffSizeLow": 0, // DWORD
+            "dataSizeHigh": 0, // DWORD
+            "dataSizeLow": 0, // DWORD
+            "originationTime": 0, // DWORD
+            "sampleCountHigh": 0, // DWORD
+            "sampleCountLow": 0, // DWORD
+            "tableLength": 0, // DWORD
+            "table": []
         };
 
         /**

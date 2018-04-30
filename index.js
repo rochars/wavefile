@@ -140,7 +140,11 @@ class WaveFile extends WaveFileReaderWriter {
             );
         if (this.audioFormat == 3 && this.bitsPerSample == 32) {
             this.bitDepth = "32f";
-        }else {
+        } else if (this.audioFormat == 6) {
+            this.bitDepth = "8a";
+        } else if (this.audioFormat == 7) {
+            this.bitDepth = "8m";
+        } else {
             this.bitDepth = this.bitsPerSample.toString();
         }
     }

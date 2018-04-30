@@ -212,7 +212,7 @@ wav.toBitDepth("11");
 fs.writeFileSync("11bit-file-new.wav", wav.toBuffer());
 ```
 
-The **changeResolution** option only works when dealing with bit depths that to not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.
+The **changeResolution** option only works when dealing with bit depths that do not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.
 
 ### The properties
 ```javascript

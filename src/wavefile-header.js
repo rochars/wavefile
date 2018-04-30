@@ -144,6 +144,22 @@ class WaveFileHeader {
         };
 
         /**
+         * The data of the "ds64" chunk.
+         * @type {Object}
+         */
+        this.ds64 = {
+            "riffSizeHigh": 0, // DWORD
+            "riffSizeLow": 0, // DWORD
+            "dataSizeHigh": 0, // DWORD
+            "dataSizeLow": 0, // DWORD
+            "originationTime": 0, // DWORD
+            "sampleCountHigh": 0, // DWORD
+            "sampleCountLow": 0, // DWORD
+            "tableLength": 0, // DWORD
+            "table": []
+        };
+
+        /**
          * "data"
          * @type {string}
          */
