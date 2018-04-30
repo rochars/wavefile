@@ -47,6 +47,24 @@ console.log(wav.fmtChunkId);
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
+## Using wavefile to extend the browser audio playing capabilities
+Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With **wavefile** you can extended this by changing the bit depth of wav files on the fly, then loading them into your player:
+```javascript
+// Load a wav file that is encoded as 4-bit IMA ADPCM:
+let wav = new Wavefile(ADPCMFileBuffer);
+
+// Change the bit depth to 16-bit, supported by most browsers:
+wav.toBitDepth("16");
+
+// Get the byte buffer of your new, browser-friendly wav file:
+let buffer = wav.toBuffer();
+
+// Load your new wav file into your player
+// ...
+```
+
+With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice.
+
 ## Create wave files from scratch
 You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.
 
