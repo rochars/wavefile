@@ -19,11 +19,10 @@
 
     <!-- drop file -->
     <div id="drop_zone">
-        <h2>Drop files here</h2>
+        <h2>Drop files here then click on "play"</h2>
         <div id="waveform" class="waveform"></div>
         <input type="button"
             value="Play"
-            class="btn btn-default"
             onclick="wavesurfer.playPause()">
     </div>
     <script>
@@ -94,6 +93,31 @@
     }
     </script>
     <!--/drop file -->
+
+    <h3>Supported bit depths:</h3>
+    <ul>
+      <li>4-bit (encoded as IMA-ADPCM)</li>
+      <li>8-bit</li>
+      <li>16-bit</li>
+      <li>24-bit</li>
+      <li>32-bit integer</li>
+      <li>Anything between 8-bit and 32-bit (11-bit, 12-bit, etc)</li>
+      <li>32-bit floating-point</li>
+      <li>64-bit floating-point</li>
+    </ul>
+
+    <h3>Supported containers:</h3>
+    <ul>
+      <li>RIFF</li>
+      <li>RIFX</li>
+    </ul>
+
+    <h3>Supported compression types:</h3>
+    <ul>
+      <li>IMA ADPCM</li>
+      <li>mu-Law</li>
+      <li>A-Law</li>
+    </ul>
 
     <p>Copyright &copy; 2017-2018 Rafael da Silva Rocha.<br>
         <a href="https://github.com/rochars/wavefile">https://github.com/rochars/wavefile</a></p>
