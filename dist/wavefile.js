@@ -444,18 +444,24 @@ module.exports.float64BE = new Type({"bits": 64, "float": true, "be": true});
 
 /*
  * type: The Type class.
- * Copyright (c) 2017 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/byte-data
  */
 
 /** @private */
-let f32 = new Float32Array(1);
+var int8 = new Int8Array(4);
 /** @private */
-let i32 = new Int32Array(f32.buffer);
+var i32 = new Int32Array(int8.buffer, 0, 1);
 /** @private */
-let f64 = new Float64Array(1);
+var f32 = new Float32Array(int8.buffer, 0, 1);
+
 /** @private */
-let ui32 = new Uint32Array(f64.buffer);
+var int8f64 = new Int8Array(8);
+/** @private */
+let f64 = new Float64Array(int8f64.buffer);
+/** @private */
+let ui32 = new Uint32Array(int8f64.buffer);
+/** @private */
 let GenericInteger = __webpack_require__(7);
 
 /**
@@ -517,7 +523,7 @@ class Type extends GenericInteger {
 
     /**
      * Read 1 32-bit float from bytes.
-     * @param {!Array<number>|Uint8Array} bytes An array of bytes.
+     * @param {Array<number>|Uint8Array} bytes An array of bytes.
      * @param {number} i The index to read.
      * @return {number}
      * @private
@@ -530,7 +536,7 @@ class Type extends GenericInteger {
     /**
      * Read 1 64-bit double from bytes.
      * Thanks https://gist.github.com/kg/2192799
-     * @param {!Array<number>|Uint8Array} bytes An array of bytes.
+     * @param {Array<number>|Uint8Array} bytes An array of bytes.
      * @param {number} i The index to read.
      * @return {number}
      * @private
@@ -1125,7 +1131,8 @@ const CODECS = {
      */
     "floatToInt": function(sample, args) {
         return sample > 0 ?
-            sample * args["newPositive"] : sample * args["newNegative"];
+            parseInt(sample * args["newPositive"], 10) :
+            parseInt(sample * args["newNegative"], 10);
     },
 
     /**
