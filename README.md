@@ -71,7 +71,7 @@ like the next greater bit depth that fill a full sequence of bytes:
 - 17-bit is stored like 24-bit (3 bytes)
 - 27-bit is stored like 32-bit (4 bytes)
 
-So even if wave files with those bit depth are valid (and playable in most players), they allow their samples to be greater than the actual limit of their bit depth. So:
+So even if files like this are valid (and playable in most players), they allow their samples to be greater than the actual limit of their audio bit depth. So:
 - 11-bit files can contain 16-bit samples
 - 17-bit files can contain 24-bit samples
 - 29-bit files can contain 32-bit samples
@@ -182,7 +182,7 @@ fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
 
 ### Change the bit depth of a file without re-scaling the samples
-This may be needed when dealing with files whose bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in files with clipping audio.
+This may be needed when dealing with files whose bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in clipping.
 
 You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to **false**.
 
