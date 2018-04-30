@@ -29,7 +29,7 @@ npm install wavefile
 ## See it in action
 
 ### Using wavefile to extend the support of audio files in the browser:
-https://rochars.github.io/wavefile/example/index.html
+https://rochars.github.io/wavefile/example
 
 Drag and drop .wav files and play them. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM, 64-bit wav files and more.
 
