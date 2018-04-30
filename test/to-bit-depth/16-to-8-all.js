@@ -1,0 +1,95 @@
+/*!
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * 
+ */
+
+let assert = require("assert");
+
+describe("16-bit mono from file to 15-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("15");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-15.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 14-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("14");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-14.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 13-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("13");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-13.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 12-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("12");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-12.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 11-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("11");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-11.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 10-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("10");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-10.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 9-bit", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("9");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-9.wav", wav.toBuffer());
+});
+
+describe("16-bit mono from file to 9-bit without re-scaling", function() {
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toBitDepth("9");
+    fs.writeFileSync(path + "/out/to-bit-depth/16-to-9.wav", wav.toBuffer());
+});
+

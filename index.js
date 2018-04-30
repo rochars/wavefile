@@ -146,7 +146,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Turn the WaveFile object into a byte buffer.
+     * Return a byte buffer representig the WaveFile object as a wav file.
      * @return {Uint8Array}
      * @throws {Error} If any property of the object appears invalid.
      */
@@ -175,20 +175,16 @@ class WaveFile extends WaveFileReaderWriter {
      * Change the bit depth of the samples.
      * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8" ... "32" (integers), "32f" or "64" (floats)
-     * @throws {Error} If bit depth is invalid.
+     * @param {boolean} changeResolution A boolean indicating if the
+     *      resolution of samples should be actually changed or not.
+     * @throws {Error} If the bit depth is invalid.
      */
-    toBitDepth(bitDepth) {
-        let toBitDepth = bitDepth;
-        if (toBitDepth != "32f" && toBitDepth != "64") {
-            toBitDepth = (((parseInt(toBitDepth, 10) - 1) | 7) + 1)
-                .toString();
+    toBitDepth(bitDepth, changeResolution=true) {
+        if (!changeResolution) {
+            let toBitDepth = this.realBitDepth_(bitDepth);
+            let thisBitDepth = this.realBitDepth_(this.bitDepth);
         }
-        let thisBitDepth = this.bitDepth;
-        if (thisBitDepth != "32f" && thisBitDepth != "64") {
-            thisBitDepth = (((parseInt(thisBitDepth, 10) - 1) | 7) + 1)
-                .toString();
-        }
-        bitDepth_.toBitDepth(this.samples, thisBitDepth, toBitDepth);
+        bitDepth_.toBitDepth(this.samples, this.bitDepth, bitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
@@ -308,6 +304,20 @@ class WaveFile extends WaveFileReaderWriter {
             alawmulaw_.mulaw.decode(this.samples),
             {"container": this.chunkId}
         );
+    }
+
+    /**
+     * Get the closest greater number of bits for a number of bits that
+     * do not fill a full sequence of bytes.
+     * @param {string} bitDepth The bit depth.
+     * @return {string}
+     */
+    realBitDepth_(bitDepth) {
+        if (bitDepth != "32f") {
+            bitDepth = (((parseInt(bitDepth, 10) - 1) | 7) + 1)
+                .toString();
+        }
+        return bitDepth;
     }
 
     /**

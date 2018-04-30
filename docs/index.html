@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -74,7 +74,22 @@ console.log(wav.fmtChunkId);
 fs.writeFileSync(path, wav.toBuffer());</code></pre><h2>Create wave files from scratch</h2><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.</p>
 <p>Possible values for the bit depth are:<br>&quot;4&quot; - 4-bit IMA-ADPCM<br>&quot;8&quot; - 8-bit<br>&quot;8a&quot; - 8-bit A-Law<br>&quot;8m&quot; - 8-bit mu-Law<br>&quot;16&quot; - 16-bit<br>&quot;24&quot; - 24-bit<br>&quot;32&quot; - 32-bit<br>&quot;32f&quot; - 32-bit floating point<br>&quot;64&quot; - 64-bit floating point</p>
 <p>You can also use any bit depth between &quot;8&quot; and &quot;32&quot;, like <strong>&quot;11&quot;, &quot;12&quot;, &quot;17&quot;, &quot;20&quot; and so on</strong>.</p>
-<p>WAVE_FORMAT_EXTENSIBLE (<strong>11-bit, 12-bit</strong> so on) based on files found here:<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html</p>
+<h3>A word on bit depths</h3><p>Bit depths that do not fill full bytes (like 11-bit, 21-bit and so son) are actually stored
+like the next greater bit depth that fill a full sequence of bytes:</p>
+<ul>
+<li>11-bit is stored like 16-bit (2 bytes)</li>
+<li>14-bit is stored like 16-bit (2 bytes)</li>
+<li>17-bit is stored like 24-bit (3 bytes)</li>
+<li>27-bit is stored like 32-bit (4 bytes)</li>
+</ul>
+<p>So even if wave files with those bit depth are valid (and playable in most players), they allow their samples to be greater than the actual limit of their bit depth. So:</p>
+<ul>
+<li>11-bit files can contain 16-bit samples</li>
+<li>17-bit files can contain 24-bit samples</li>
+<li>32-bit files can contain 32-bit samples</li>
+</ul>
+<p>Most players will deal with this by adjusting the level to the next greater bit depth, so <strong>most of the times a true 14-bit wave file will actually play like a 16-bit wave file with a low volume</strong>.</p>
+<p><strong>wavefile</strong> do not limit the range of the samples for those cases, so you should know what you are doing when dealing with uncommon bit depths to avoid unexpected results.</p>
 <pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
@@ -116,8 +131,7 @@ wav.toMuLaw();</code></pre><p>To decode 8-bit mu-Law as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 16-bit:
 wav.fromMuLaw();</code></pre><h2>Change the bit depth</h2><p>If the samples are stereo they need to be interleaved before changing the bit depth.</p>
 <p>Notice that you <strong>can't</strong> change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the <em>toIMAADPCM()</em>, <em>fromIMAADPCM()</em>, <em>toALaw()</em>, <em>fromALaw()</em>, <em>toMuLaw()</em> and <em>fromMuLaw()</em> methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.</p>
-<pre class="prettyprint source lang-javascript"><code>
-// Load a wav file with 32-bit audio
+<pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
 let wav = new Wavefile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
 // Change the bit depth to 24-bit
@@ -128,7 +142,27 @@ fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
 
 // You can use any supported bit depth:
 wav.toBitDepth(&quot;11&quot;);
-fs.writeFileSync(&quot;11bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>The properties</h3><pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
+fs.writeFileSync(&quot;11bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>Change the bit depth of a file without re-scaling the samples</h3><p>This may be needed when dealing with files whose bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in files with clipping audio.</p>
+<p>You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to <strong>false</strong>.</p>
+<pre class="prettyprint source lang-javascript"><code>// Load a wav file that say it has 11-bit audio, but has samples
+// in the 16-bit range:
+let wav = new Wavefile(fs.readFileSync(&quot;11bit-file.wav&quot;));
+
+// Change the bit depth of the file to 16-bit without actually
+// modifying the samples so the output file will have the same
+// leve as the original one:
+wav.toBitDepth(&quot;16&quot;, false);
+
+// Write the new 16-bit file to disk
+fs.writeFileSync(&quot;16bit-file.wav&quot;, wav.toBuffer());</code></pre><p>Now that your samples are in the correct range you may change again to
+11-bit, but this time actually scaling down the samples:</p>
+<pre class="prettyprint source lang-javascript"><code>// Change the bit depth of the file to 11-bit, but now actually
+// scaling down the samples to 11-bit:
+wav.toBitDepth(&quot;11&quot;);
+
+// write the new 11-bit file to disk:
+fs.writeFileSync(&quot;11bit-file-new.wav&quot;, wav.toBuffer());</code></pre><p>The <strong>changeResolution</strong> option only works when dealing with bit depths that to not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.</p>
+<h3>The properties</h3><pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
 
 // The container, &quot;RIFF&quot; or &quot;RIFX&quot;
 console.log(wav.chunkId);
@@ -224,7 +258,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Apr 27 2018 13:55:18 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Apr 30 2018 13:59:23 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

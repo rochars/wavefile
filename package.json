@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "alawmulaw": "^2.0.3",
-    "bitdepth": "^2.0.0",
+    "bitdepth": "^3.0.0",
     "byte-data": "^5.0.1",
     "imaadpcm": "^1.1.3",
     "riff-chunks": "^4.0.0"

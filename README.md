@@ -63,8 +63,22 @@ Possible values for the bit depth are:
 
 You can also use any bit depth between "8" and "32", like **"11", "12", "17", "20" and so on**.
 
-WAVE_FORMAT_EXTENSIBLE (**11-bit, 12-bit** so on) based on files found here:  
-http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html
+### A word on bit depths
+Bit depths that do not fill full bytes (like 11-bit, 21-bit and so son) are actually stored
+like the next greater bit depth that fill a full sequence of bytes:
+- 11-bit is stored like 16-bit (2 bytes)
+- 14-bit is stored like 16-bit (2 bytes)
+- 17-bit is stored like 24-bit (3 bytes)
+- 27-bit is stored like 32-bit (4 bytes)
+
+So even if wave files with those bit depth are valid (and playable in most players), they allow their samples to be greater than the actual limit of their bit depth. So:
+- 11-bit files can contain 16-bit samples
+- 17-bit files can contain 24-bit samples
+- 32-bit files can contain 32-bit samples
+
+Most players will deal with this by adjusting the level to the next greater bit depth, so **most of the times a true 14-bit wave file will actually play like a 16-bit wave file with a low volume**.
+
+**wavefile** do not limit the range of the samples for those cases, so you should know what you are doing when dealing with uncommon bit depths to avoid unexpected results.
 
 ```javascript
 let wav = new WaveFile();
@@ -153,7 +167,6 @@ If the samples are stereo they need to be interleaved before changing the bit de
 Notice that you **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.
 
 ```javascript
-
 // Load a wav file with 32-bit audio
 let wav = new Wavefile(fs.readFileSync("32bit-file.wav"));
 
@@ -167,6 +180,39 @@ fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 wav.toBitDepth("11");
 fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
+
+### Change the bit depth of a file without re-scaling the samples
+This may be needed when dealing with files whose bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in files with clipping audio.
+
+You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to **false**.
+
+```javascript
+// Load a wav file that say it has 11-bit audio, but has samples
+// in the 16-bit range:
+let wav = new Wavefile(fs.readFileSync("11bit-file.wav"));
+
+// Change the bit depth of the file to 16-bit without actually
+// modifying the samples so the output file will have the same
+// leve as the original one:
+wav.toBitDepth("16", false);
+
+// Write the new 16-bit file to disk
+fs.writeFileSync("16bit-file.wav", wav.toBuffer());
+```
+
+Now that your samples are in the correct range you may change again to
+11-bit, but this time actually scaling down the samples:
+
+```javascript
+// Change the bit depth of the file to 11-bit, but now actually
+// scaling down the samples to 11-bit:
+wav.toBitDepth("11");
+
+// write the new 11-bit file to disk:
+fs.writeFileSync("11bit-file-new.wav", wav.toBuffer());
+```
+
+The **changeResolution** option only works when dealing with bit depths that to not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.
 
 ### The properties
 ```javascript

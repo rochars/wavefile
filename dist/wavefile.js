@@ -829,7 +829,7 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
-     * Turn the WaveFile object into a byte buffer.
+     * Return a byte buffer representig the WaveFile object as a wav file.
      * @return {Uint8Array}
      * @throws {Error} If any property of the object appears invalid.
      */
@@ -858,20 +858,16 @@ class WaveFile extends WaveFileReaderWriter {
      * Change the bit depth of the samples.
      * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8" ... "32" (integers), "32f" or "64" (floats)
-     * @throws {Error} If bit depth is invalid.
+     * @param {boolean} changeResolution A boolean indicating if the
+     *      resolution of samples should be actually changed or not.
+     * @throws {Error} If the bit depth is invalid.
      */
-    toBitDepth(bitDepth) {
-        let toBitDepth = bitDepth;
-        if (toBitDepth != "32f" && toBitDepth != "64") {
-            toBitDepth = (((parseInt(toBitDepth, 10) - 1) | 7) + 1)
-                .toString();
+    toBitDepth(bitDepth, changeResolution=true) {
+        if (!changeResolution) {
+            let toBitDepth = this.realBitDepth_(bitDepth);
+            let thisBitDepth = this.realBitDepth_(this.bitDepth);
         }
-        let thisBitDepth = this.bitDepth;
-        if (thisBitDepth != "32f" && thisBitDepth != "64") {
-            thisBitDepth = (((parseInt(thisBitDepth, 10) - 1) | 7) + 1)
-                .toString();
-        }
-        bitDepth_.toBitDepth(this.samples, thisBitDepth, toBitDepth);
+        bitDepth_.toBitDepth(this.samples, this.bitDepth, bitDepth);
         this.fromScratch(
             this.numChannels,
             this.sampleRate,
@@ -994,6 +990,20 @@ class WaveFile extends WaveFileReaderWriter {
     }
 
     /**
+     * Get the closest greater number of bits for a number of bits that
+     * do not fill a full sequence of bytes.
+     * @param {string} bitDepth The bit depth.
+     * @return {string}
+     */
+    realBitDepth_(bitDepth) {
+        if (bitDepth != "32f") {
+            bitDepth = (((parseInt(bitDepth, 10) - 1) | 7) + 1)
+                .toString();
+        }
+        return bitDepth;
+    }
+
+    /**
      * Validate the input for wav writing.
      * @throws {Error} If any property of the object appears invalid.
      * @private
@@ -1069,7 +1079,7 @@ window['WaveFile'] = WaveFile;
 
 /*!
  * bitdepth
- * Change the bit depth of samples to and from 8, 16, 24, 32 & 64-bit.
+ * Change the resolution of samples to and from 8, 11, 12, 16, 20, 24, 32, 48 & 64-bit.
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/bitdepth
  *
@@ -1079,26 +1089,11 @@ window['WaveFile'] = WaveFile;
 const f64f32_ = new Float32Array(1);
 
 /**
- * Max number of different values for each bit depth.
- * @enum {number}
- * @private
- */
-const MAX_VALUES = {
-    "8": 256,
-    "16": 65536,
-    "24": 16777216,
-    "32": 4294967296,
-    "32f": 1,
-    "64": 1
-};
-
-/**
- * Functions to change the bit depth of a sample.
+ * Functions to change the resolution of a sample.
  * @enum {Function}
  * @private
  */
 const CODECS = {
-
     /**
      * Change the bit depth from int to int.
      * @param {number} sample The sample.
@@ -1158,9 +1153,9 @@ const CODECS = {
  * The input array is modified in-place.
  * @param {Array<number>} samples The samples.
  * @param {string} originalBitDepth The original bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ *      One of "8" ... "48", "32f", "64"
  * @param {string} targetBitDepth The new bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ *      One of "8" ... "48", "32f", "64"
  */
 function toBitDepth(samples, originalBitDepth, targetBitDepth) {
     validateBitDepths_(originalBitDepth, targetBitDepth);
@@ -1169,16 +1164,19 @@ function toBitDepth(samples, originalBitDepth, targetBitDepth) {
     for (let i=0; i<len; i++) {        
         samples[i] = sign8Bit_(samples[i], originalBitDepth);
         samples[i] = toFunction(
-                samples[i],
-                {
-                    "oldNegative": MAX_VALUES[originalBitDepth] / 2,
-                    "newNegative": MAX_VALUES[targetBitDepth] / 2,
-                    "oldPositive": MAX_VALUES[originalBitDepth] / 2 - 1,
-                    "newPositive": MAX_VALUES[targetBitDepth] / 2 - 1,
-                    "original": originalBitDepth,
-                    "target": targetBitDepth
-                }
-            );
+            samples[i],
+            {
+                "oldNegative": parseInt(
+                    Math.pow(2, parseInt(originalBitDepth, 10)) / 2, 10),
+                "newNegative": parseInt(
+                    Math.pow(2, parseInt(targetBitDepth, 10)) / 2, 10),
+                "oldPositive": parseInt(
+                    Math.pow(2, parseInt(originalBitDepth, 10)) / 2 - 1, 10),
+                "newPositive": parseInt(
+                    Math.pow(2, parseInt(targetBitDepth, 10)) / 2 - 1, 10),
+                "original": originalBitDepth,
+                "target": targetBitDepth
+            });
         samples[i] = unsign8Bit_(samples[i], targetBitDepth);
     }
 }
@@ -1186,9 +1184,9 @@ function toBitDepth(samples, originalBitDepth, targetBitDepth) {
 /**
  * Get the function to change the bit depth of a sample.
  * @param {string} originalBitDepth The original bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ *      One of "8" ... "48", "32f", "64"
  * @param {string} targetBitDepth The new bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ *      One of "8" ... "48", "32f", "64"
  * @return {Function}
  * @private
  */
@@ -1212,7 +1210,7 @@ function getBitDepthFunction_(originalBitDepth, targetBitDepth) {
  * Sign unsigned 8-bit data.
  * @param {number} sample The sample.
  * @param {string} originalBitDepth The original bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ *      One of "8" ... "48", "32f", "64"
  * @return {number}
  * @private
  */
@@ -1227,7 +1225,7 @@ function sign8Bit_(sample, originalBitDepth) {
  * Unsign signed 8-bit data.
  * @param {number} sample The sample.
  * @param {string} targetBitDepth The target bit depth of the data.
- *      One of "8", "16", "24", "32", "32f", "64"
+ *      One of "8" ... "48", "32f", "64"
  * @return {number}
  * @private
  */
@@ -1241,15 +1239,20 @@ function unsign8Bit_(sample, targetBitDepth) {
 /**
  * Validate the bit depth.
  * @param {string} originalBitDepth The original bit depth.
- *     Should be one of "8", "16", "24", "32", "32f", "64".
+ *     Should be one of "8" ... "48", "32f", "64".
  * @param {string} targetBitDepth The target bit depth.
- *     Should be one of "8", "16", "24", "32", "32f", "64".
+ *     Should be one of "8" ... "48", "32f", "64".
  * @throws {Error} If any argument does not meet the criteria.
  * @return {boolean}
  * @private
  */
 function validateBitDepths_(originalBitDepth, targetBitDepth) {
-    let validBitDepths = ["8", "16", "24", "32", "32f", "64"];
+    let validBitDepths = [];
+    for (let i=8; i<49; i++) {
+        validBitDepths.push(i.toString());
+    }
+    validBitDepths.push("32f");
+    validBitDepths.push("64");
     if (validBitDepths.indexOf(originalBitDepth) == -1 ||
         validBitDepths.indexOf(targetBitDepth) == -1) {
         throw new Error("Invalid bit depth.");
