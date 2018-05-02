@@ -110,8 +110,10 @@ class WaveFile {
             "chunkId": "",
             /** @type {!number} */
             "chunkSize": 0,
-            /** @type {!Array<number>} */
-            "chunkData_": []
+            /** @type {!number} */
+            "dwCuePoints": 0,
+            /** @type {!Object<string, string|number>} */
+            "points": [],
         };
 
         /**
@@ -208,12 +210,13 @@ class WaveFile {
         this.bitDepth = "0";
 
         /**
-         * Header formats.
-         * Formats not listed here will be 65534.
-         * @enum {number}
+         * Audio formats.
+         * Formats not listed here will be set to 65534
+         * and treated as WAVE_FORMAT_EXTENSIBLE
+         * @enum {!number}
          * @const
          */
-        this.headerFormats_ = {
+        this.audioFormats_ = {
             "4": 17,
             "8": 1,
             "8a": 6,
@@ -234,6 +237,7 @@ class WaveFile {
         /**
          * If the "fact" chunk should be enforced or not.
          * @type {!boolean}
+         * @private
          */
         this.enforceFact_ = false;
         /**
@@ -279,8 +283,8 @@ class WaveFile {
         this.fmt.chunkSize = 16;
         this.fmt.byteRate = (numChannels * numBytes) * sampleRate;
         this.fmt.blockAlign = numChannels * numBytes;
-        this.fmt.audioFormat = this.headerFormats_[bitDepth] ?
-            this.headerFormats_[bitDepth] : 65534;
+        this.fmt.audioFormat = this.audioFormats_[bitDepth] ?
+            this.audioFormats_[bitDepth] : 65534;
         this.fmt.numChannels = numChannels;
         this.fmt.sampleRate = sampleRate;
         this.fmt.bitsPerSample = parseInt(bitDepth, 10);
@@ -350,8 +354,7 @@ class WaveFile {
         this.readBextChunk_(chunk["subChunks"]);
         this.readCueChunk_(chunk["subChunks"]);
         this.readDataChunk_(
-                chunk["subChunks"],
-                {"be": bigEndian, "single": true});
+            chunk["subChunks"], {"be": bigEndian, "single": true});
         if (this.fmt.audioFormat == 3 && this.fmt.bitsPerSample == 32) {
             this.bitDepth = "32f";
         } else if (this.fmt.audioFormat == 6) {
@@ -365,13 +368,14 @@ class WaveFile {
 
     /**
      * Return a byte buffer representig the WaveFile object as a wav file.
-     * @return {Uint8Array}
+     * The return value of this method can be written straight to disk.
+     * @return {!Uint8Array} A .wav file.
      * @throws {Error} If any property of the object appears invalid.
      */
     toBuffer() {
         this.checkWriteInput_();
         this.assureInterleaved_();
-        return new Uint8Array(this.createWaveFile_());
+        return this.createWaveFile_();
     }
 
     /**
@@ -550,10 +554,10 @@ class WaveFile {
     }
 
     /**
-     * Get the closest greater number of bits for a number of bits that
+     * Return the closest greater number of bits for a number of bits that
      * do not fill a full sequence of bytes.
      * @param {!string} bitDepth The bit depth.
-     * @return {string}
+     * @return {!string}
      */
     realBitDepth_(bitDepth) {
         if (bitDepth != "32f") {
@@ -575,11 +579,12 @@ class WaveFile {
 
     /**
      * Validate the bit depth.
+     * @return {!boolean} True is the bit depth is valid.
      * @throws {Error} If bit depth is invalid.
      * @private
      */
     validateBitDepth_() {
-        if (!this.headerFormats_[this.bitDepth]) {
+        if (!this.audioFormats_[this.bitDepth]) {
             if (parseInt(this.bitDepth, 10) > 8 &&
                     parseInt(this.bitDepth, 10) < 54) {
                 return true;
@@ -591,6 +596,7 @@ class WaveFile {
 
     /**
      * Validate the number of channels.
+     * @return {!boolean} True is the number of channels is valid.
      * @throws {Error} If the number of channels is invalid.
      * @private
      */
@@ -604,6 +610,7 @@ class WaveFile {
 
     /**
      * Validate the sample rate value.
+     * @return {!boolean} True is the sample rate is valid.
      * @throws {Error} If the sample rate is invalid.
      * @private
      */
@@ -664,6 +671,37 @@ class WaveFile {
     }
 
     /**
+     * Set up to work wih big-endian or little-endian files.
+     * The types used are changed to LE or BE. If the
+     * the file is big-endian (RIFX), true is returned.
+     * @return {boolean} True if the file is RIFX.
+     * @private
+     */
+    LEorBE_() {
+        let bigEndian = this.container == "RIFX";
+        uInt8_.be = bigEndian;
+        uInt16_.be = bigEndian;
+        uInt32_.be = bigEndian;
+        return bigEndian;
+    }
+
+    /**
+     * Find a chunk by its FourCC in a array of RIFF chunks.
+     * @param {!Object<string, Object>} chunks The wav file chunks.
+     * @param {!string} fourCC The chunk fourCC.
+     * @return {Object|null}
+     * @private
+     */
+    findChunk_(chunks, fourCC) {
+        for (let i = 0; i<chunks.length; i++) {
+            if (chunks[i]["chunkId"] == fourCC) {
+                return chunks[i];
+            }
+        }
+        return null;
+    }
+
+    /**
      * Read the RIFF chunk a wave file.
      * @param {!Uint8Array|!Array<number>} bytes A wav buffer.
      * @throws {Error} If no "RIFF" chunk is found.
@@ -682,20 +720,6 @@ class WaveFile {
         if (this.format != "WAVE") {
             throw Error("Could not find the 'WAVE' format identifier");
         }
-    }
-
-    /**
-     * Set up to work wih big-endian or little-endian files.
-     * The types used are changed from LE or BE. If the
-     * the file is big-endian (RIFX), true is returned.
-     * @private
-     */
-    LEorBE_() {
-        let bigEndian = this.container == "RIFX";
-        uInt8_.be = bigEndian;
-        uInt16_.be = bigEndian;
-        uInt32_.be = bigEndian;
-        return bigEndian;
     }
 
     /**
@@ -776,6 +800,58 @@ class WaveFile {
     }
 
     /**
+     * Read the "cue " chunk of a wave file.
+     * @param {!Object<string, *>} chunks The RIFF file chunks.
+     * @private
+     */
+    readCueChunk_(chunks) {
+        let chunk = this.findChunk_(chunks, "cue ");
+        if (chunk) {
+            let chunkData = chunk["chunkData"];
+            this.cue.chunkId = "cue ";
+            this.cue.chunkSize = chunk["chunkSize"];
+            this.cue.dwCuePoints = byteData_.unpack(
+                chunkData.slice(0, 4), uInt32_);
+            for (let i=0; i<this.cue.dwCuePoints; i++) {
+                let offset = 4 + (i * 24);
+                this.cue.points.push(
+                    {
+                        "dwName": byteData_.unpack(
+                            chunkData.slice(offset, offset + 4), uInt32_),
+                        "dwPosition": byteData_.unpack(
+                            chunkData.slice(offset + 4, offset + 8), uInt32_),
+                        "fccChunk": byteData_.unpack(
+                            chunkData.slice(offset + 8, offset + 12), byteData_.fourCC),
+                        "dwChunkStart": byteData_.unpack(
+                            chunkData.slice(offset + 12, offset + 16), uInt32_),
+                        "dwBlockStart": byteData_.unpack(
+                            chunkData.slice(offset + 16, offset + 20), uInt32_),
+                        "dwSampleOffset": byteData_.unpack(
+                            chunkData.slice(offset + 20, offset + 24), uInt32_),
+                    });
+            }
+        }
+    }
+
+    /**
+     * Read the "data" chunk of a wave file.
+     * @param {!Object<string, *>} chunks The RIFF file chunks.
+     * @param {!Object<string, *>} options Type options.
+     * @throws {Error} If no "data" chunk is found.
+     * @private
+     */
+    readDataChunk_(chunks, options) {
+        let chunk = this.findChunk_(chunks, "data");
+        if (chunk) {
+            this.data.chunkId = "data";
+            this.data.chunkSize = chunk["chunkSize"];
+            this.samplesFromBytes_(chunk["chunkData"], options);
+        } else {
+            throw Error("Could not find the 'data' chunk");
+        }
+    }
+
+    /**
      * Read the "bext" chunk of a wav file.
      * @param {!Object<string, *>} chunks The wav file chunks.
      * @private
@@ -820,6 +896,7 @@ class WaveFile {
      * Read bytes as a string from a RIFF chunk.
      * @param {!Array<number>|!Uint8Array} bytes The bytes.
      * @param {!number} maxSize the max size of the string.
+     * @return {!string} The string.
      * @private
      */
     readString_(bytes, maxSize) {
@@ -835,6 +912,7 @@ class WaveFile {
      * Read a number from a chunk.
      * @param {!Array<number>|!Uint8Array} bytes The chunk bytes.
      * @param {!Object<string, *>} bdType The byte-data corresponding type.
+     * @return {!number} The number.
      * @private
      */
     readFromChunk_(bytes, bdType) {
@@ -851,6 +929,7 @@ class WaveFile {
      * is filled with 0s.
      * @param {!string} str The string to be written as bytes.
      * @param {!number} maxSize the max size of the string.
+     * @return {!Array<number>} The bytes.
      * @private
      */
     writeString_(str, maxSize) {
@@ -862,73 +941,9 @@ class WaveFile {
     }
 
     /**
-     * Read the "cue " chunk of a wave file.
-     * @param {!Object<string, *>} chunks The RIFF file chunks.
-     * @private
-     */
-    readCueChunk_(chunks) {
-        let chunk = this.findChunk_(chunks, "cue ");
-        if (chunk) {
-            this.cue.chunkId = "cue ";
-            this.cue.chunkSize = chunk["chunkSize"];
-            this.cue.chunkData_ = chunk["chunkData"];
-        }
-    }
-
-    /**
-     * Read the "data" chunk of a wave file.
-     * @param {!Object<string, *>} chunks The RIFF file chunks.
+     * Turn the samples to bytes.
      * @param {!Object<string, *>} options Type options.
-     * @throws {Error} If no "data" chunk is found.
-     * @private
-     */
-    readDataChunk_(chunks, options) {
-        let chunk = this.findChunk_(chunks, "data");
-        if (chunk) {
-            this.data.chunkId = "data";
-            this.data.chunkSize = chunk["chunkSize"];
-            this.samplesFromBytes_(chunk["chunkData"], options);
-        } else {
-            throw Error("Could not find the 'data' chunk");
-        }
-    }
-
-    /**
-     * Find and return the start offset of the data chunk on a wave file.
-     * @param {!Array<number>|!Uint8Array} bytes A wav file buffer.
-     * @param {!Object<string, *>} options Type options.
-     * @private
-     */
-    samplesFromBytes_(bytes, options) {
-        options.bits = this.fmt.bitsPerSample == 4 ?
-            8 : this.fmt.bitsPerSample;
-        options.signed = options.bits == 8 ? false : true;
-        options.float = (this.fmt.audioFormat == 3 || 
-            this.fmt.bitsPerSample == 64) ? true : false;
-        options.single = false;
-        this.data.samples = byteData_.unpackArray(
-            bytes, new byteData_.Type(options));
-    }
-
-    /**
-     * Find a chunk by its FourCC in a array of RIFF chunks.
-     * @param {!Object<string, Object>} chunks The wav file chunks.
-     * @param {!string} fourCC The chunk fourCC.
-     * @return {Object|null}
-     * @private
-     */
-    findChunk_(chunks, fourCC) {
-        for (let i = 0; i<chunks.length; i++) {
-            if (chunks[i]["chunkId"] == fourCC) {
-                return chunks[i];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Turn samples to bytes.
-     * @param {!Object<string, *>} options Type options.
+     * @return {!Array<number>} The bytes.
      * @private
      */
     samplesToBytes_(options) {
@@ -946,7 +961,24 @@ class WaveFile {
     }
 
     /**
-     * Get the bytes of the "bext" chunk.
+     * Turn bytes to samples and load them in the data.samples property.
+     * @param {!Array<number>|!Uint8Array} bytes The bytes.
+     * @param {!Object<string, *>} options Type options.
+     * @private
+     */
+    samplesFromBytes_(bytes, options) {
+        options.bits = this.fmt.bitsPerSample == 4 ?
+            8 : this.fmt.bitsPerSample;
+        options.signed = options.bits == 8 ? false : true;
+        options.float = (this.fmt.audioFormat == 3 || 
+            this.fmt.bitsPerSample == 64) ? true : false;
+        options.single = false;
+        this.data.samples = byteData_.unpackArray(
+            bytes, new byteData_.Type(options));
+    }
+
+    /**
+     * Return the bytes of the "bext" chunk.
      * @return {!Array<number>} The "bext" chunk bytes.
      * @private
      */
@@ -978,7 +1010,7 @@ class WaveFile {
     }
 
     /**
-     * Get the bytes of the "cue " chunk.
+     * Return the bytes of the "cue " chunk.
      * @return {!Array<number>} The "cue " chunk bytes.
      * @private
      */
@@ -987,13 +1019,34 @@ class WaveFile {
             return [].concat(
                 byteData_.packArray(this.cue.chunkId, byteData_.chr),
                 byteData_.pack(this.cue.chunkSize, uInt32_),
-                this.cue.chunkData_);
+                byteData_.pack(this.cue.dwCuePoints, uInt32_),
+                this.getCuePointsBytes_());
         }
         return [];
     }
 
     /**
-     * Get the bytes of the "fact" chunk.
+     * Return the bytes of the "cue " points.
+     * @return {!Array<number>} The "cue " points as an array of bytes.
+     * @private
+     */
+    getCuePointsBytes_() {
+        let points = [];
+        for (let i=0; i<this.cue.dwCuePoints; i++) {
+            points = points.concat(
+                    byteData_.pack(this.cue.points[i].dwName, uInt32_),
+                    byteData_.pack(this.cue.points[i].dwPosition, uInt32_),
+                    byteData_.pack(this.cue.points[i].fccChunk, byteData_.fourCC),
+                    byteData_.pack(this.cue.points[i].dwChunkStart, uInt32_),
+                    byteData_.pack(this.cue.points[i].dwBlockStart, uInt32_),
+                    byteData_.pack(this.cue.points[i].dwSampleOffset, uInt32_)
+                );
+        }
+        return points;
+    }
+
+    /**
+     * Return the bytes of the "fact" chunk.
      * @return {!Array<number>} The "fact" chunk bytes.
      * @private
      */
@@ -1008,7 +1061,31 @@ class WaveFile {
     }
 
     /**
-     * Get the bytes of the fmt extension fields.
+     * Return the bytes of the "fmt " chunk.
+     * @return {!Array<number>} The "fmt" chunk bytes.
+     * @private
+     * @throws {Error} if no "fmt " chunk is present.
+     */
+    getFmtBytes_() {
+        if (this.fmt.chunkId) {
+            return [].concat(
+                byteData_.packArray(this.fmt.chunkId, byteData_.chr),
+                byteData_.pack(this.fmt.chunkSize, uInt32_),
+                byteData_.pack(this.fmt.audioFormat, uInt16_),
+                byteData_.pack(this.fmt.numChannels, uInt16_),
+                byteData_.pack(this.fmt.sampleRate, uInt32_),
+                byteData_.pack(this.fmt.byteRate, uInt32_),
+                byteData_.pack(this.fmt.blockAlign, uInt16_),
+                byteData_.pack(this.fmt.bitsPerSample, uInt16_),
+                this.getFmtExtensionBytes_()
+            );
+        } else {
+            throw Error("Could not find the 'fmt ' chunk");
+        }
+    }
+
+    /**
+     * Return the bytes of the fmt extension fields.
      * @return {!Array<number>} The fmt extension bytes.
      * @private
      */
@@ -1037,31 +1114,24 @@ class WaveFile {
     }
     
     /**
-     * Turn a WaveFile object into a file.
-     * @return {!Array<number>} The wav file bytes.
+     * Return a .wav file byte buffer with the data from the WaveFile object.
+     * The return value of this method can be written straight to disk.
+     * @return {!Uint8Array} The wav file bytes.
      * @private
      */
     createWaveFile_() {
         let options = {"be": this.LEorBE_()};
-        return [].concat(
+        return new Uint8Array([].concat(
             byteData_.packArray(this.container, byteData_.chr),
             byteData_.pack(this.chunkSize, uInt32_),
             byteData_.packArray(this.format, byteData_.chr),
             this.getBextBytes_(),
-            byteData_.packArray(this.fmt.chunkId, byteData_.chr),
-            byteData_.pack(this.fmt.chunkSize, uInt32_),
-            byteData_.pack(this.fmt.audioFormat, uInt16_),
-            byteData_.pack(this.fmt.numChannels, uInt16_),
-            byteData_.pack(this.fmt.sampleRate, uInt32_),
-            byteData_.pack(this.fmt.byteRate, uInt32_),
-            byteData_.pack(this.fmt.blockAlign, uInt16_),
-            byteData_.pack(this.fmt.bitsPerSample, uInt16_),
-            this.getFmtExtensionBytes_(),
+            this.getFmtBytes_(),
             this.getFactBytes_(),
             byteData_.packArray(this.data.chunkId, byteData_.chr),
             byteData_.pack(this.data.chunkSize, uInt32_),
             this.samplesToBytes_(options),
-            this.getCueBytes_());
+            this.getCueBytes_()));
     }
 }
 

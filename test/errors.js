@@ -35,13 +35,23 @@ describe('errors', function() {
         expect(testFunc).to.throw("Could not find the 'WAVE' format identifier");
     });
 
-    it("should throw an error if there is no 'fmt ' chunk",
+    it("should throw an error if there is no 'fmt ' chunk when reading",
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
             wBytes[14] = 0;
             let wav = new WaveFile();
             wav.fromBuffer(wBytes);
+        };
+        expect(testFunc).to.throw("Could not find the 'fmt ' chunk");
+    });
+
+    it("should throw an error if there is no 'fmt ' chunk when writing",
+            function () {
+        testFunc = function() {
+            let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+            wav.fmt.chunkId = "";
+            wav.toBuffer();
         };
         expect(testFunc).to.throw("Could not find the 'fmt ' chunk");
     });

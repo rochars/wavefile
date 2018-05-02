@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -28,6 +28,8 @@
     "16-bit",
     "24-bit",
     "32-bit",
+    "40-bit",
+    "48-bit",
     "64-bit",
     "PCM",
     "IMA",

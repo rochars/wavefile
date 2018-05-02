@@ -78,7 +78,7 @@ Hit **"Load in player"** to generate wave files.
 
 This website uses **wavefile** to create the files. The effects are provided by other libraries.
 
-Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not play them).
+Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not to play them).
 
 ## Use
 ```javascript
@@ -283,6 +283,13 @@ fs.writeFileSync("11bit-file-new.wav", wav.toBuffer());
 The **changeResolution** option only works when dealing with bit depths that do not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.
 
 ### The properties
+Since **version 6.0.0** (2018-05-02) the samples are stored in **data.samples**.
+```javascript
+console.log(wav.data.samples);
+// Output an array of numbers
+```
+
+The other public properties:
 ```javascript
 let wav = new Wavefile(fs.readFileSync("file.wav"));
 
@@ -290,6 +297,11 @@ let wav = new Wavefile(fs.readFileSync("file.wav"));
 console.log(wav.container); //"RIFF" or "RIFX"
 console.log(wav.chunkSize);
 console.log(wav.format); // WAVE
+
+// "bext"
+console.log(wav.bext.chunkId);
+console.log(wav.bext.chunkSize);
+// ...
 
 // "fmt "
 console.log(wav.fmt.chunkId);
@@ -315,18 +327,18 @@ console.log(wav.fact.chunkId);
 console.log(wav.fact.chunkSize);
 console.log(wav.fact.dwSampleLength);
 
-// "bext"
-console.log(wav.bext.chunkId);
-console.log(wav.bext.chunkSize);
-// ...
-
 // "data"
 console.log(wav.data.chunkId);
 console.log(wav.data.chunkSize);
 console.log(wav.data.samples);
+
+// "cue "
+console.log(wav.cue.chunkId);
+console.log(wav.cue.chunkSize);
+// ...
 ```
 
-### BWF data
+#### BWF data
 BWF data ("bext" chunk) is stored in the *bext* property.
 ```javascript
 wav.bext = {
@@ -338,16 +350,39 @@ wav.bext = {
     "originationDate": "", // 10 chars
     "originationTime": "", // 8 chars
     "timeReference": [], // 2 32-bit numbers representing a 64-bit value
-    "version": "", // 16-bit number
+    "version": 0, // 16-bit number
     "UMID": "", // 64 chars
-    "loudnessValue": "", // 16-bit number
-    "loudnessRange": "", // 16-bit number
-    "maxTruePeakLevel": "", // 16-bit number
-    "maxMomentaryLoudness": "", // 16-bit number
-    "maxShortTermLoudness": "", // 16-bit number
+    "loudnessValue": 0, // 16-bit number
+    "loudnessRange": 0, // 16-bit number
+    "maxTruePeakLevel": 0, // 16-bit number
+    "maxMomentaryLoudness": 0, // 16-bit number
+    "maxShortTermLoudness": 0, // 16-bit number
     "reserved": "", // 180 chars
     "codingHistory": "" // string, unlimited size
 };
+```
+
+#### Cue points
+"cue " chunk data is stored as follows:
+```javascript
+wav.cue = {
+    "chunkId": "",
+    "chunkSize": 0,
+    "dwCuePoints": 0, //DWORD
+    "points": [],
+};
+```
+
+Items in cue.points are objects with this signature:
+```javascript
+{
+    "dwName": 0, //DWORD
+    "dwPosition": 0, //DWORD
+    "fccChunk": 0, //FOURCC,
+    "dwChunkStart": 0, //DWORD,
+    "dwBlockStart": 0, //DWORD,
+    "dwSampleOffset": 0, //DWORD,
+}
 ```
 
 ### The samples

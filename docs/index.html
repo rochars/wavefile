@@ -91,7 +91,7 @@ buffer = wav.toBuffer();
 <h3>Creating wave files in the browser:</h3><p>https://tr2099.github.io/</p>
 <p>Hit <strong>&quot;Load in player&quot;</strong> to generate wave files.</p>
 <p>This website uses <strong>wavefile</strong> to create the files. The effects are provided by other libraries.</p>
-<p>Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not play them).</p>
+<p>Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not to play them).</p>
 <h2>Use</h2><pre class="prettyprint source lang-javascript"><code>let fs = require(&quot;fs&quot;);
 let Wavefile = require(&quot;wavefile&quot;);
 
@@ -194,12 +194,20 @@ wav.toBitDepth(&quot;11&quot;);
 
 // write the new 11-bit file to disk:
 fs.writeFileSync(&quot;11bit-file-new.wav&quot;, wav.toBuffer());</code></pre><p>The <strong>changeResolution</strong> option only works when dealing with bit depths that do not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.</p>
-<h3>The properties</h3><pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
+<h3>The properties</h3><p>Since <strong>version 6.0.0</strong> (2018-05-02) the samples are stored in <strong>data.samples</strong>.</p>
+<pre class="prettyprint source lang-javascript"><code>console.log(wav.data.samples);
+// Output an array of numbers</code></pre><p>The other public properties:</p>
+<pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
 
 // The container data
 console.log(wav.container); //&quot;RIFF&quot; or &quot;RIFX&quot;
 console.log(wav.chunkSize);
 console.log(wav.format); // WAVE
+
+// &quot;bext&quot;
+console.log(wav.bext.chunkId);
+console.log(wav.bext.chunkSize);
+// ...
 
 // &quot;fmt &quot;
 console.log(wav.fmt.chunkId);
@@ -225,15 +233,15 @@ console.log(wav.fact.chunkId);
 console.log(wav.fact.chunkSize);
 console.log(wav.fact.dwSampleLength);
 
-// &quot;bext&quot;
-console.log(wav.bext.chunkId);
-console.log(wav.bext.chunkSize);
-// ...
-
 // &quot;data&quot;
 console.log(wav.data.chunkId);
 console.log(wav.data.chunkSize);
-console.log(wav.data.samples);</code></pre><h3>BWF data</h3><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
+console.log(wav.data.samples);
+
+// &quot;cue &quot;
+console.log(wav.cue.chunkId);
+console.log(wav.cue.chunkSize);
+// ...</code></pre><h4>BWF data</h4><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
 <pre class="prettyprint source lang-javascript"><code>wav.bext = {
     &quot;chunkId&quot;: &quot;&quot;,
     &quot;chunkSize&quot;: 0,
@@ -243,16 +251,30 @@ console.log(wav.data.samples);</code></pre><h3>BWF data</h3><p>BWF data (&quot;b
     &quot;originationDate&quot;: &quot;&quot;, // 10 chars
     &quot;originationTime&quot;: &quot;&quot;, // 8 chars
     &quot;timeReference&quot;: [], // 2 32-bit numbers representing a 64-bit value
-    &quot;version&quot;: &quot;&quot;, // 16-bit number
+    &quot;version&quot;: 0, // 16-bit number
     &quot;UMID&quot;: &quot;&quot;, // 64 chars
-    &quot;loudnessValue&quot;: &quot;&quot;, // 16-bit number
-    &quot;loudnessRange&quot;: &quot;&quot;, // 16-bit number
-    &quot;maxTruePeakLevel&quot;: &quot;&quot;, // 16-bit number
-    &quot;maxMomentaryLoudness&quot;: &quot;&quot;, // 16-bit number
-    &quot;maxShortTermLoudness&quot;: &quot;&quot;, // 16-bit number
+    &quot;loudnessValue&quot;: 0, // 16-bit number
+    &quot;loudnessRange&quot;: 0, // 16-bit number
+    &quot;maxTruePeakLevel&quot;: 0, // 16-bit number
+    &quot;maxMomentaryLoudness&quot;: 0, // 16-bit number
+    &quot;maxShortTermLoudness&quot;: 0, // 16-bit number
     &quot;reserved&quot;: &quot;&quot;, // 180 chars
     &quot;codingHistory&quot;: &quot;&quot; // string, unlimited size
-};</code></pre><h3>The samples</h3><p>Range:</p>
+};</code></pre><h4>Cue points</h4><p>&quot;cue &quot; chunk data is stored as follows:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.cue = {
+    &quot;chunkId&quot;: &quot;&quot;,
+    &quot;chunkSize&quot;: 0,
+    &quot;dwCuePoints&quot;: 0, //DWORD
+    &quot;points&quot;: [],
+};</code></pre><p>Items in cue.points are objects with this signature:</p>
+<pre class="prettyprint source lang-javascript"><code>{
+    &quot;dwName&quot;: 0, //DWORD
+    &quot;dwPosition&quot;: 0, //DWORD
+    &quot;fccChunk&quot;: 0, //FOURCC,
+    &quot;dwChunkStart&quot;: 0, //DWORD,
+    &quot;dwBlockStart&quot;: 0, //DWORD,
+    &quot;dwSampleOffset&quot;: 0, //DWORD,
+}</code></pre><h3>The samples</h3><p>Range:</p>
 <ul>
 <li>0 to 255 for 8-bit</li>
 <li>-32768 to 32767 for 16-bit</li>
@@ -290,7 +312,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 02 2018 01:53:10 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 02 2018 04:35:54 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
