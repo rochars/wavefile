@@ -9,6 +9,15 @@
   .waveform {
     background-color: #000;
   }
+  .drop-zone {
+    border: 1px dashed #333;
+    padding: 20px;
+    background-color: #eee;
+  }
+  .play-button {
+    padding: 10px;
+    font-size: 1.5em;
+  }
   </style>
 </head>
 <body>
@@ -18,12 +27,13 @@
     <p>A demonstration of the use of <a href="https://github.com/rochars/wavefile">wavefile</a> and <a href="https://wavesurfer-js.org/">wavesurfer</a> to create a player that supports 4-bit IMA ADPCM, mu-Law, A-Law, 11-bit wav files, 64-bit wav files and more:</p>
 
     <!-- drop file -->
-    <div id="drop_zone">
-        <h2>Drop files here then click on "play"</h2>
+    <div id="drop_zone" class="drop-zone">
+        <h2>Drop .wav files here and click on "play"</h2>
         <div id="waveform" class="waveform"></div>
-        <input type="button"
-            value="Play"
-            onclick="wavesurfer.playPause()">
+        <input type="button" class="play-button"
+              value="Play"
+              onclick="wavesurfer.playPause()""
+            >
     </div>
     <script>
         var wavesurfer = WaveSurfer.create({
@@ -47,7 +57,7 @@
             } else if (wav.bitDepth == "4") {
                 wav.fromIMAADPCM();
             }
-            if (wav.chunkId == "RIFX") {
+            if (wav.container == "RIFX") {
               wav.toRIFF();
             }
             wav.toBitDepth("16");
@@ -101,7 +111,7 @@
       <li>16-bit</li>
       <li>24-bit</li>
       <li>32-bit integer</li>
-      <li>Anything between 8-bit and 32-bit (11-bit, 12-bit, etc)</li>
+      <li>Anything between 8-bit and 48-bit (11-bit, 12-bit, etc)</li>
       <li>32-bit floating-point</li>
       <li>64-bit floating-point</li>
     </ul>
@@ -119,6 +129,7 @@
       <li>A-Law</li>
     </ul>
 
+    <p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/example"><img src="https://img.shields.io/badge/example-online-blue.svg?style=for-the-badge" alt="Example"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a></p>
     <p>Copyright &copy; 2017-2018 Rafael da Silva Rocha.<br>
         <a href="https://github.com/rochars/wavefile">https://github.com/rochars/wavefile</a></p>
 

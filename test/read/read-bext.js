@@ -18,14 +18,10 @@ describe("BWF data reading", function() {
 
     it("should find the 'bext' chunk",
             function() {
-        assert.equal(wav.bextChunkId, "bext");
+        assert.equal(wav.bext.chunkId, "bext");
     });
     it("bextChunkSize should be > 0",
             function() {
-        assert.ok(wav.bextChunkSize > 0);
-    });
-    it("bextChunkString should be != ''",
-            function() {
-        assert.ok(wav.bextChunkString != "");
+        assert.ok(wav.bext.chunkSize > 0);
     });
 });

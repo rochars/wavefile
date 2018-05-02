@@ -23,11 +23,11 @@ describe('read 16bit file from disk and write to new file', function() {
 
     it("chunkId should be 'RIFF'",
             function() {
-        assert.equal(wav2.chunkId, "RIFF");
+        assert.equal(wav2.container, "RIFF");
     });
     it("fmtChunkId should be 'fmt '",
             function() {
-        assert.equal(wav2.fmtChunkId, "fmt ");
+        assert.equal(wav2.fmt.chunkId, "fmt ");
     });
     it("format should be 'WAVE'",
             function() {
@@ -35,56 +35,56 @@ describe('read 16bit file from disk and write to new file', function() {
     });
     it("fmtChunkSize should be 40",
             function() {
-        assert.equal(wav2.fmtChunkSize, 40);
+        assert.equal(wav2.fmt.chunkSize, 40);
     });
     it("audioFormat should be 65534 (WAVE_FORMAT_EXTENSIBLE)",
             function() {
-        assert.equal(wav2.audioFormat, 65534);
+        assert.equal(wav2.fmt.audioFormat, 65534);
     });
     it("numChannels should be 2",
             function() {
-        assert.equal(wav2.numChannels, 2);
+        assert.equal(wav2.fmt.numChannels, 2);
     });
     it("sampleRate should be 8000",
             function() {
-        assert.equal(wav2.sampleRate, 8000);
+        assert.equal(wav2.fmt.sampleRate, 8000);
     });
     it("byteRate should be 32000",
             function() {
-        assert.equal(wav2.byteRate, 32000);
+        assert.equal(wav2.fmt.byteRate, 32000);
     });
     it("blockAlign should be 4 (stereo)",
             function() {
-        assert.equal(wav2.blockAlign, 4);
+        assert.equal(wav2.fmt.blockAlign, 4);
     });
     it("bitsPerSample should be 16",
             function() {
-        assert.equal(wav2.bitsPerSample, 16);
+        assert.equal(wav2.fmt.bitsPerSample, 16);
     });
     it("dataChunkId should be 'data'",
             function() {
-        assert.equal(wav2.dataChunkId, 'data');
+        assert.equal(wav2.data.chunkId, 'data');
     });
     it("dataChunkSize should be > 0",
             function() {
-        assert.ok(wav2.dataChunkSize > 0);
+        assert.ok(wav2.data.chunkSize > 0);
     });
     it("samples.length should be > 0",
             function() {
-        assert.ok(wav2.samples.length > 0);
+        assert.ok(wav2.data.samples.length > 0);
     });
     it("samples on the new file should have the same length as in the original file",
             function() {
-        assert.equal(wav2.samples.length, wav.samples.length);
+        assert.equal(wav2.data.samples.length, wav.data.samples.length);
     });
     it("samples on the new file should be same as the original file",
             function() {
-        assert.deepEqual(wav2.samples, wav.samples);
+        assert.deepEqual(wav2.data.samples, wav.data.samples);
     });
 
     it("dwChannelMask should be 0",
             function() {
-        assert.equal(wav2.dwChannelMask, 0);
+        assert.equal(wav2.fmt.dwChannelMask, 0);
     });
     
 });

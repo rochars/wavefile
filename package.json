@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "5.0.3",
+  "version": "6.0.0",
   "description": "Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -47,10 +47,9 @@
     "test": "nyc ./node_modules/mocha/bin/_mocha test --src --recursive",
     "test-dist": "nyc ./node_modules/mocha/bin/_mocha test --dist --recursive",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
-    "compile": "google-closure-compiler-js dist/wavefile.js > dist/wavefile-min.js",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
-    "pack": "webpack && npm run compile && npm run doc",
-    "build": "npm run lint && npm run pack && npm run test-dist && npm test"
+    "pack": "webpack && npm run test-dist",
+    "build": "npm run lint && npm run pack && npm test && npm run doc"
   },
   "devDependencies": {
     "browser-env": "^3.2.5",
@@ -63,7 +62,7 @@
     "mocha": "^3.5.3",
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^3.2.2",
-    "string-replace-loader": "^1.3.0",
+    "string-replace-loader": "^2.1.1",
     "webpack": "^3.8.1"
   },
   "dependencies": {

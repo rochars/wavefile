@@ -17,7 +17,7 @@ describe('read a file with bext from disk and write to new file',
     
     it("bextChunkId should be 'bext'",
             function() {
-        assert.equal(wav2.bextChunkId, 'bext');
+        assert.equal(wav2.bext.chunkId, 'bext');
     });
 
 });
@@ -31,17 +31,22 @@ describe('bext field with less bytes than the field size ' +
     let path = "test/files/";
     let wav = new WaveFile(
         fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
-    wav.bextChunkFields.originator = "test";
+    wav.bext.originator = "test";
     let wav2 = new WaveFile(wav.toBuffer());
     
     it("bextChunkId should be 'bext'",
             function() {
-        assert.equal(wav2.bextChunkId, 'bext');
+        assert.equal(wav2.bext.chunkId, 'bext');
+    });
+
+    it("bext.chunkSize should be 0",
+            function() {
+        assert.equal(wav2.bext.chunkSize, 602);
     });
 
     it("'originator' field should be 'test\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
             function() {
-        assert.equal(wav2.bextChunkFields.originator,
+        assert.equal(wav2.bext.originator,
             'test\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000');
     });
 

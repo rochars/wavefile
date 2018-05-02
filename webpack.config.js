@@ -1,13 +1,14 @@
 /**
- * Copyright (c) 2017 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  * https://github.com/rochars/wavefile
  *
  */
 
+const ClosureCompiler = require('google-closure-compiler-js').webpack;
 module.exports = {
   entry: './index.js',
   output: {
-    filename: './dist/wavefile.js'
+    filename: './dist/wavefile-min.js'
   },
   module: {
     loaders: [
@@ -18,11 +19,20 @@ module.exports = {
           multiple: [
             {
               search: 'module.exports = WaveFile;',
-              replace: "window['WaveFile'] = WaveFile;"
+              replace: "window['WaveFile'] = window['WaveFile'] ? window['WaveFile'] : WaveFile;"
             },
           ]
         }
       }
-    ]
-  }
+    ],
+  },
+  plugins: [
+    new ClosureCompiler({
+      options: {
+        languageIn: 'ECMASCRIPT6',
+        languageOut: 'ECMASCRIPT5',
+        compilationLevel: 'SIMPLE'
+      }
+    })
+  ]
 };

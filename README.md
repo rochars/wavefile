@@ -16,6 +16,7 @@ With **wavefile** you can:
 - Read/write the data in a wav file header
 - Turn RIFF files to RIFX and RIFX files to RIFF
 - Edit BWF metada ("bext" chunk)
+- Change the bit depth of the audio
 
 And more.
 
@@ -28,43 +29,20 @@ npm install wavefile
 
 ## See it in action
 
-### Using wavefile to extend the support of audio files in the browser:
+### Using wavefile to extend the browser audio playing capabilities:
 https://rochars.github.io/wavefile/example
 
 Drag and drop .wav files and play them. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM, 64-bit wav files and more.
 
-Check out wavesurfer:  
-https://github.com/katspaugh/wavesurfer.js
+Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With **wavefile** you can extended this by changing the bit depth of wav files on the fly before loading them into the player:
 
-### Creating wave files from scratch in the browser:
-https://tr2099.github.io/
-
-Hit **"Load in player"** to generate wave files.
-
-This website uses **wavefile** to create the files. The effects are provided by other libraries.
-
-Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point.
-
-## Use
-```javascript
-let fs = require("fs");
-let Wavefile = require("wavefile");
-
-let wav = new Wavefile(fs.readFileSync("file.wav"));
-console.log(wav.chunkId);
-console.log(wav.chunkSize);
-console.log(wav.fmtChunkId);
-fs.writeFileSync(path, wav.toBuffer());
-```
-
-## Using wavefile to extend the browser audio playing capabilities
-Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With **wavefile** you can extended this by changing the bit depth of wav files on the fly, then loading them into your player:
+Playing ADPCM in the browser:
 ```javascript
 // Load a wav file that is encoded as 4-bit IMA ADPCM:
 let wav = new Wavefile(ADPCMFileBuffer);
 
 // Change the bit depth to 16-bit, supported by most browsers:
-wav.toBitDepth("16");
+wav.fromIMAADPCM();
 
 // Get the byte buffer of your new, browser-friendly wav file:
 let buffer = wav.toBuffer();
@@ -73,10 +51,74 @@ let buffer = wav.toBuffer();
 // ...
 ```
 
-With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice.
+Playing a 64-bit wave file in the browser:
+```javascript
+// Load a wav file that has 64-bit audio:
+let wav = new Wavefile(buffer);
+
+// Change the bit depth to 16-bit, supported by most browsers:
+wav.toBitDepth("16");
+
+// Get the byte buffer of your new, browser-friendly wav file:
+buffer = wav.toBuffer();
+
+// Load your new wav file into your player
+// ...
+```
+
+With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice. This example use **wavesurfer**.
+
+Check out wavesurfer:  
+https://github.com/katspaugh/wavesurfer.js
+
+### Creating wave files in the browser:
+https://tr2099.github.io/
+
+Hit **"Load in player"** to generate wave files.
+
+This website uses **wavefile** to create the files. The effects are provided by other libraries.
+
+Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not play them).
+
+## Use
+```javascript
+let fs = require("fs");
+let Wavefile = require("wavefile");
+
+let wav = new Wavefile(fs.readFileSync("file.wav"));
+console.log(wav.container);
+console.log(wav.chunkSize);
+console.log(wav.fmt.chunkId);
+fs.writeFileSync(path, wav.toBuffer());
+```
 
 ## Create wave files from scratch
 You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.
+
+### Mono:
+```javascript
+let wav = new WaveFile();
+
+// Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
+wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+fs.writeFileSync(path, wav.toBuffer());
+```
+
+### Stereo:
+Samples can be informed interleaved or de-interleaved. If they are de-interleaved, WaveFile will interleave them. In this example they are de-interleaved.
+```javascript
+// Stereo, 48 kHz, 8-bit, de-interleaved samples
+// WaveFile interleave the samples automatically
+wav.fromScratch(2, 48000, '8', [
+    [0, -2, 4, 3],
+    [0, -1, 4, 3]
+]);
+fs.writeFileSync(path, wav.toBuffer());
+
+// Default is RIFF. To create RIFX files:
+wav.fromScratch(1, 44100, '32', samples, {"container": "RIFX"});
+fs.writeFileSync(path, wav.toBuffer());
+```
 
 Possible values for the bit depth are:  
 "4" - 4-bit IMA-ADPCM  
@@ -89,7 +131,7 @@ Possible values for the bit depth are:
 "32f" - 32-bit floating point  
 "64" - 64-bit floating point
 
-You can also use any bit depth between "8" and "32", like **"11", "12", "17", "20" and so on**.
+You can also use any bit depth between "8" and "53", like **"11", "12", "17", "20" and so on**.
 
 ### A word on bit depths
 Bit depths that do not fill full bytes (like 11-bit, 21-bit and so son) are actually stored
@@ -108,35 +150,23 @@ Most players will deal with this by adjusting the level to the next greater bit 
 
 **wavefile** do not limit the range of the samples for those cases, so you should know what you are doing when dealing with uncommon bit depths to avoid unexpected results.
 
-```javascript
-let wav = new WaveFile();
-
-// Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
-wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
-fs.writeFileSync(path, wav.toBuffer());
-
-// stereo, 48 kHz, 8-bit
-// samples are de-interleaved
-wav.fromScratch(2, 48000, '8', [
-    [0, -2, 4, 3],
-    [0, -1, 4, 3]
-]);
-// Interleaving the samples
-wav.interleave();
-fs.writeFileSync(path, wav.toBuffer());
-
-// Default is RIFF. To create RIFX files:
-wav.fromScratch(1, 44100, '32', samples, {"container": "RIFX"});
-fs.writeFileSync(path, wav.toBuffer());
-```
+Files with sample resolution greater than 32-bit (integer) are implemented as WAVE_FORMAT_EXTENSIBLE and are unlikely to be supported by any player. They can be played in the example page:  
+https://rochars.github.io/wavefile/example  
+They are converted to 16-bit before being loaded by the player, allowing normal reproduction.
 
 ## Interleave and de-interleave stereo samples
+Samples in WaveFile objects are interleaved by default, even if you created the file from scratch using de-interleaved samples.
+
+You can de-interleave them:
+```javascript
+// De-interleave the samples into multiple channels
+wav.deInterleave();
+```
+
+To interleave them:
 ```javascript
 // Interleave stereo samples
 wav.interleave();
-
-// De-interleave the samples into multiple channels
-wav.deInterleave();
 ```
 
 ## RIFF to RIFX and RIFX to RIFF
@@ -149,11 +179,15 @@ wav.toRIFF();
 ```
 
 ## IMA-ADPCM
-16-bit 8000 Hz wave files can be compressed as IMA-ADPCM:
+16-bit 8000 Hz mono wave files can be compressed as IMA-ADPCM:
 ```javascript
 // Encode a 16-bit wave file as 4-bit IMA-ADPCM:
 wav.toIMAADPCM();
 ```
+
+IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
+
+If the audio is not 16-bit it will be converted to 16-bit before compressing. Compressing audio with sample rates different from 8000 Hz or number of channels greater than 1 will throw errors.
 
 To decode 4-bit IMA-ADPCM as 16-bit linear PCM:
 ```javascript
@@ -161,14 +195,16 @@ To decode 4-bit IMA-ADPCM as 16-bit linear PCM:
 wav.fromIMAADPCM();
 ```
 
-IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
+Decoding always result in 16-bit audio.
 
 ## A-Law
-16-bit wave files can be encoded as A-Law:
+16-bit wave files (mono or stereo) can be encoded as A-Law:
 ```javascript
 // Encode a 16-bit wave file as 8-bit A-law:
 wav.toALaw();
 ```
+
+If the audio is not 16-bit it will be converted to 16-bit before compressing.
 
 To decode 8-bit A-Law as 16-bit linear PCM:
 ```javascript
@@ -176,12 +212,16 @@ To decode 8-bit A-Law as 16-bit linear PCM:
 wav.fromALaw();
 ```
 
+Decoding always result in 16-bit audio.
+
 ## mu-Law
-16-bit wave files can be encoded as mu-Law:
+16-bit wave files (mono or stereo) can be encoded as mu-Law:
 ```javascript
 // Encode a 16-bit wave file as 8-bit mu-law:
 wav.toMuLaw();
 ```
+
+If the audio is not 16-bit it will be converted to 16-bit before compressing.
 
 To decode 8-bit mu-Law as 16-bit linear PCM:
 ```javascript
@@ -189,10 +229,10 @@ To decode 8-bit mu-Law as 16-bit linear PCM:
 wav.fromMuLaw();
 ```
 
-## Change the bit depth
-If the samples are stereo they need to be interleaved before changing the bit depth.
+Decoding always result in 16-bit audio.
 
-Notice that you **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods. Only 16-bit samples can be encoded, and decoding always result in 16-bit samples.
+## Change the bit depth
+You **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods.
 
 ```javascript
 // Load a wav file with 32-bit audio
@@ -209,8 +249,8 @@ wav.toBitDepth("11");
 fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
 
-### Change the bit depth of a file without re-scaling the samples
-This may be needed when dealing with files whose bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in clipping.
+### Change the declared bit depth without re-scaling the samples
+This may be needed when dealing with files whose audio bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in clipping.
 
 You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to **false**.
 
@@ -246,58 +286,58 @@ The **changeResolution** option only works when dealing with bit depths that do 
 ```javascript
 let wav = new Wavefile(fs.readFileSync("file.wav"));
 
-// The container, "RIFF" or "RIFX"
-console.log(wav.chunkId);
+// The container data
+console.log(wav.container); //"RIFF" or "RIFX"
 console.log(wav.chunkSize);
 console.log(wav.format); // WAVE
 
 // "fmt "
-console.log(wav.fmtChunkId);
-console.log(wav.fmtChunkSize);
-console.log(wav.audioFormat);
-console.log(wav.numChannels);
-console.log(wav.sampleRate);
-console.log(wav.byteRate);
-console.log(wav.blockAlign);
-console.log(wav.bitsPerSample);
+console.log(wav.fmt.chunkId);
+console.log(wav.fmt.chunkSize);
+console.log(wav.fmt.audioFormat);
+console.log(wav.fmt.numChannels);
+console.log(wav.fmt.sampleRate);
+console.log(wav.fmt.byteRate);
+console.log(wav.fmt.blockAlign);
+console.log(wav.fmt.bitsPerSample);
 // "fmt " extension
-console.log(wav.cbSize);
-console.log(wav.validBitsPerSample);
-console.log(this.dwChannelMask);
+console.log(wav.fmt.cbSize);
+console.log(wav.fmt.validBitsPerSample);
+console.log(wav.fmt.dwChannelMask);
 // subformat is a 128-bit GUID split into 4 32-bit values.
-console.log(this.subformat1); 
-console.log(this.subformat2); 
-console.log(this.subformat3);
-console.log(this.subformat4);
+console.log(wav.fmt.subformat[0]); 
+console.log(wav.fmt.subformat[1]); 
+console.log(wav.fmt.subformat[2]);
+console.log(wav.fmt.subformat[3]);
 
 // "fact"
-console.log(wav.factChunkId);
-console.log(wav.factChunkSize);
-console.log(wav.dwSampleLength);
+console.log(wav.fact.chunkId);
+console.log(wav.fact.chunkSize);
+console.log(wav.fact.dwSampleLength);
 
 // "bext"
-console.log(wav.bextChunkId);
-console.log(wav.bextChunkSize);
-console.log(wav.bextChunkFields);
+console.log(wav.bext.chunkId);
+console.log(wav.bext.chunkSize);
+// ...
 
 // "data"
-console.log(wav.dataChunkId);
-console.log(wav.dataChunkSize);
-
-// array of numbers
-console.log(wav.samples);
+console.log(wav.data.chunkId);
+console.log(wav.data.chunkSize);
+console.log(wav.data.samples);
 ```
 
 ### BWF data
-BWF data ("bext" chunk) is stored in the *bextChunkFields* property.
+BWF data ("bext" chunk) is stored in the *bext* property.
 ```javascript
-wav.bextChunkFields = {
+wav.bext = {
+    "chunkId": "",
+    "chunkSize": 0,
     "description": "", // 256 chars
     "originator": "", // 32 chars
     "originatorReference": "", // 32 chars
     "originationDate": "", // 10 chars
     "originationTime": "", // 8 chars
-    "timeReference": "", // 64-bit value kept as an array of 8 bytes
+    "timeReference": [], // 2 32-bit numbers representing a 64-bit value
     "version": "", // 16-bit number
     "UMID": "", // 64 chars
     "loudnessValue": "", // 16-bit number

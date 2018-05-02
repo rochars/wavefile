@@ -16,7 +16,7 @@ describe('create 32-bit PCM wave files from scratch', function() {
     fs.writeFileSync("./test/files/out/32-bitPCM-441kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
-        assert.equal(wav.chunkId, "RIFF");
+        assert.equal(wav.container, "RIFF");
     });
 
     it('format should be "WAVE"', function() {
@@ -24,47 +24,47 @@ describe('create 32-bit PCM wave files from scratch', function() {
     });
 
     it('fmtChunkId should be "fmt "', function() {
-        assert.equal(wav.fmtChunkId, "fmt ");
+        assert.equal(wav.fmt.chunkId, "fmt ");
     });
 
     it('fmtChunkSize should be 16', function() {
-        assert.equal(wav.fmtChunkSize, 16);
+        assert.equal(wav.fmt.chunkSize, 16);
     });
 
     it('audioFormat should be 1', function() {
-        assert.equal(wav.audioFormat, 1);
+        assert.equal(wav.fmt.audioFormat, 1);
     });
 
     it('numChannels should be 1', function() {
-        assert.equal(wav.numChannels, 1);
+        assert.equal(wav.fmt.numChannels, 1);
     });
 
     it('sampleRate should be 44100', function() {
-        assert.equal(wav.sampleRate, 44100);
+        assert.equal(wav.fmt.sampleRate, 44100);
     });
 
     it('byteRate should be 176400', function() {
-        assert.equal(wav.byteRate, 176400);
+        assert.equal(wav.fmt.byteRate, 176400);
     });
 
     it('blockAlign should be 4', function() {
-        assert.equal(wav.blockAlign, 4);
+        assert.equal(wav.fmt.blockAlign, 4);
     });
 
     it('bitsPerSample should be 32', function() {
-        assert.equal(wav.bitsPerSample, 32);
+        assert.equal(wav.fmt.bitsPerSample, 32);
     });
 
     it('dataChunkId should be "data"', function() {
-        assert.equal(wav.dataChunkId, "data");
+        assert.equal(wav.data.chunkId, "data");
     });
 
     it('dataChunkSize should be 16', function() {
-        assert.equal(wav.dataChunkSize, 16);
+        assert.equal(wav.data.chunkSize, 16);
     });
 
     it('samples should be the same as the args', function() {
-        assert.deepEqual(wav.samples, [0, -2147483648, 2147483647, 4]);
+        assert.deepEqual(wav.data.samples, [0, -2147483648, 2147483647, 4]);
     });
 
     it('bitDepth should be "24"', function() {
