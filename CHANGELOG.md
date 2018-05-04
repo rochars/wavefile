@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## version 6.2.0 (2018-05-04)
+- Limited support of RF64. Need to be tested with files > 4gb in size.
+
+## version 6.1.1 (2018-05-03)
+- Using byte-data^7.0.0 and riff-chunks^4.0.1.
+
+## version 6.1.1 (2018-05-03)
+- Using byte-data^7.0.0 and riff-chunks^4.0.1.
+
 ## version 6.1.0 (2018-05-02)
 - Reading and writing the data in the "cue " chunk.
 

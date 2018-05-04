@@ -54,7 +54,6 @@ class WaveFile {
         /**
          * The data of the "fmt" chunk.
          * @type {!Object<string, *>}
-         * @nocollapse
          */
         this.fmt = {
             /** @type {!string} */
@@ -89,7 +88,6 @@ class WaveFile {
         /**
          * The data of the "fact" chunk.
          * @type {!Object<string, *>}
-         * @nocollapse
          */
         this.fact = {
             /** @type {!string} */
@@ -103,7 +101,6 @@ class WaveFile {
         /**
          * The data of the "cue " chunk.
          * @type {!Object<string, *>}
-         * @nocollapse
          */
         this.cue = {
             /** @type {!string} */
@@ -112,14 +109,13 @@ class WaveFile {
             "chunkSize": 0,
             /** @type {!number} */
             "dwCuePoints": 0,
-            /** @type {!Object<string, string|number>} */
+            /** @type {!Array<Object>} */
             "points": [],
         };
 
         /**
          * The data of the "bext" chunk.
          * @type {!Object<string, *>}
-         * @nocollapse
          */
         this.bext = {
             /** @type {!string} */
@@ -165,11 +161,12 @@ class WaveFile {
          * The data of the "ds64" chunk.
          * Used only with RF64 files.
          * @type {!Object<string, *>}
-         * @nocollapse
          */
         this.ds64 = {
             /** @type {!string} */
             "chunkId": "",
+            /** @type {!number} */
+            "chunkSize": 0,
             /** @type {!number} */
             "riffSizeHigh": 0, // DWORD
             /** @type {!number} */
@@ -186,14 +183,13 @@ class WaveFile {
             "sampleCountLow": 0, // DWORD
             /** @type {!number} */
             "tableLength": 0, // DWORD
-            /** @type {!Array} */
+            /** @type {!Array<number>} */
             "table": []
         };
 
         /**
          * The data of the "data" chunk.
          * @type {!Object<string, *>}
-         * @nocollapse
          */
         this.data = {
             /** @type {!string} */
@@ -349,6 +345,7 @@ class WaveFile {
         this.readRIFFChunk_(bytes);
         let bigEndian = this.container == "RIFX";
         let chunk = riffChunks_.read(bytes, bigEndian);
+        this.readDs64Chunk_(chunk["subChunks"]);
         this.readFmtChunk_(chunk["subChunks"]);
         this.readFactChunk_(chunk["subChunks"]);
         this.readBextChunk_(chunk["subChunks"]);
@@ -379,19 +376,36 @@ class WaveFile {
     }
 
     /**
-     * Turn the file to RIFF.
+     * Force a file as RIFF. Do not work with RF64 files.
      */
     toRIFF() {
-        this.container = "RIFF";
-        this.LEorBE_();
+        if (this.container == "RF64") {
+            this.fromScratch(
+                this.fmt.numChannels,
+                this.fmt.sampleRate,
+                this.bitDepth,
+                this.data.samples);
+        } else {
+            this.container = "RIFF";
+            this.LEorBE_();
+        }
     }
 
     /**
-     * Turn the file to RIFX.
+     * Force a file as RIFX. Do not work with RF64 files.
      */
     toRIFX() {
-        this.container = "RIFX";
-        this.LEorBE_();
+        if (this.container == "RF64") {
+            this.fromScratch(
+                this.fmt.numChannels,
+                this.fmt.sampleRate,
+                this.bitDepth,
+                this.data.samples,
+                {"container": "RIFX"});
+        } else {
+            this.container = "RIFX";
+            this.LEorBE_();
+        }
     }
 
     /**
@@ -416,8 +430,17 @@ class WaveFile {
             this.fmt.sampleRate,
             bitDepth,
             this.data.samples,
-            {"container": this.container}
-        );
+            {"container": this.correctContainer_()});
+    }
+
+    /**
+     * Return "RIFF" if the container is "RF64", the current
+     * container name otherwise.
+     * Used to enforce "RIFF" as the container in operations where
+     * RF64 is not allowed.
+     */
+    correctContainer_() {
+        return this.container == "RF64" ? "RIFF" : this.container;
     }
 
     /**
@@ -479,8 +502,7 @@ class WaveFile {
                 this.fmt.sampleRate,
                 "4",
                 imaadpcm_.encode(this.data.samples),
-                {"container": this.container}
-            );
+                {"container": this.correctContainer_()});
         }
     }
 
@@ -493,8 +515,7 @@ class WaveFile {
             this.fmt.sampleRate,
             "16",
             imaadpcm_.decode(this.data.samples, this.fmt.blockAlign),
-            {"container": this.container}
-        );
+            {"container": this.correctContainer_()});
     }
 
     /**
@@ -508,8 +529,7 @@ class WaveFile {
             this.fmt.sampleRate,
             "8a",
             alawmulaw_.alaw.encode(this.data.samples),
-            {"container": this.container}
-        );
+            {"container": this.correctContainer_()});
     }
 
     /**
@@ -521,8 +541,7 @@ class WaveFile {
             this.fmt.sampleRate,
             "16",
             alawmulaw_.alaw.decode(this.data.samples),
-            {"container": this.container}
-        );
+            {"container": this.correctContainer_()});
     }
 
     /**
@@ -536,8 +555,7 @@ class WaveFile {
             this.fmt.sampleRate,
             "8m",
             alawmulaw_.mulaw.encode(this.data.samples),
-            {"container": this.container}
-        );
+            {"container": this.correctContainer_()});
     }
 
     /**
@@ -549,8 +567,7 @@ class WaveFile {
             this.fmt.sampleRate,
             "16",
             alawmulaw_.mulaw.decode(this.data.samples),
-            {"container": this.container}
-        );
+            {"container": this.correctContainer_()});
     }
 
     /**
@@ -624,15 +641,15 @@ class WaveFile {
     }
 
     /**
-     * Reset the attributes related to the "fact" chunk.
+     * Reset attributes that should emptied when a file is
+     * created with the fromScratch() method.
      * @private
      */
     clearHeader_() {
         this.fmt.cbSize = 0;
         this.fmt.validBitsPerSample = 0;
         this.fact.chunkId = "";
-        this.fact.chunkSize = 0;
-        this.fact.dwSampleLength = 0;
+        this.ds64.chunkId = "";
     }
 
     /**
@@ -678,23 +695,23 @@ class WaveFile {
      * @private
      */
     LEorBE_() {
-        let bigEndian = this.container == "RIFX";
-        uInt8_.be = bigEndian;
-        uInt16_.be = bigEndian;
-        uInt32_.be = bigEndian;
+        let bigEndian = this.container === "RIFX";
+        uInt8_["be"] = bigEndian;
+        uInt16_["be"] = bigEndian;
+        uInt32_["be"] = bigEndian;
         return bigEndian;
     }
 
     /**
      * Find a chunk by its FourCC in a array of RIFF chunks.
-     * @param {!Object<string, Object>} chunks The wav file chunks.
+     * @param {!Array<!Object>} chunks The wav file chunks.
      * @param {!string} fourCC The chunk fourCC.
      * @return {Object|null}
      * @private
      */
     findChunk_(chunks, fourCC) {
         for (let i = 0; i<chunks.length; i++) {
-            if (chunks[i]["chunkId"] == fourCC) {
+            if (chunks[i]["chunkId"] === fourCC) {
                 return chunks[i];
             }
         }
@@ -710,7 +727,7 @@ class WaveFile {
     readRIFFChunk_(bytes) {
         this.container = byteData_.unpackArray(
             bytes.slice(0, 4), byteData_.chr);
-        if (this.container != "RIFF" && this.container != "RIFX") {
+        if (["RIFF", "RIFX", "RF64"].indexOf(this.container) === -1) {
             throw Error("Not a supported format.");
         }
         this.LEorBE_();
@@ -724,7 +741,7 @@ class WaveFile {
 
     /**
      * Read the "fmt " chunk of a wave file.
-     * @param {!Object<string, *>} chunks The wav file chunks.
+     * @param {!Array<!Object>} chunks The wav file chunks.
      * @throws {Error} If no "fmt " chunk is found.
      * @private
      */
@@ -783,7 +800,7 @@ class WaveFile {
 
     /**
      * Read the "fact" chunk of a wav file.
-     * @param {!Object<string, *>} chunks The wav file chunks.
+     * @param {!Array<!Object>} chunks The wav file chunks.
      * @throws {Error} If no "fact" chunk is found.
      * @private
      */
@@ -801,7 +818,7 @@ class WaveFile {
 
     /**
      * Read the "cue " chunk of a wave file.
-     * @param {!Object<string, *>} chunks The RIFF file chunks.
+     * @param {!Array<!Object>} chunks The RIFF file chunks.
      * @private
      */
     readCueChunk_(chunks) {
@@ -835,7 +852,7 @@ class WaveFile {
 
     /**
      * Read the "data" chunk of a wave file.
-     * @param {!Object<string, *>} chunks The RIFF file chunks.
+     * @param {!Array<!Object>} chunks The RIFF file chunks.
      * @param {!Object<string, *>} options Type options.
      * @throws {Error} If no "data" chunk is found.
      * @private
@@ -853,7 +870,7 @@ class WaveFile {
 
     /**
      * Read the "bext" chunk of a wav file.
-     * @param {!Object<string, *>} chunks The wav file chunks.
+     * @param {!Array<!Object>} chunks The wav file chunks.
      * @private
      */
     readBextChunk_(chunks) {
@@ -889,6 +906,44 @@ class WaveFile {
                 "codingHistory": this.readString_(
                     chunkData, chunkData.length - 602),
             };
+        }
+    }
+
+    /**
+     * Read the "fmt " chunk of a wave file.
+     * @param {!Array<!Object>} chunks The wav file chunks.
+     * @throws {Error} If no "fmt " chunk is found.
+     * @private
+     */
+    readDs64Chunk_(chunks) {
+        let chunk = this.findChunk_(chunks, "ds64");
+        if (chunk) {
+            let chunkData = chunk["chunkData"];
+            this.ds64.chunkId = chunk["chunkId"];
+            this.ds64.chunkSize = chunk["chunkSize"];
+            this.ds64.riffSizeHigh = byteData_.unpack(
+                chunkData.slice(0, 4), uInt32_);
+            this.ds64.riffSizeLow = byteData_.unpack(
+                chunkData.slice(4, 8), uInt32_);
+            this.ds64.dataSizeHigh = byteData_.unpack(
+                chunkData.slice(8, 12), uInt32_);
+            this.ds64.dataSizeLow = byteData_.unpack(
+                chunkData.slice(12, 16), uInt32_);
+            this.ds64.originationTime = byteData_.unpack(
+                chunkData.slice(16, 20), uInt32_);
+            this.ds64.sampleCountHigh = byteData_.unpack(
+                chunkData.slice(20, 24), uInt32_);
+            this.ds64.sampleCountLow = byteData_.unpack(
+                chunkData.slice(24, 28), uInt32_);
+            //if (this.ds64.chunkSize > 28) {
+            //    this.ds64.tableLength = byteData_.unpack(
+            //        chunkData.slice(28, 32), uInt32_);
+            //    this.ds64.table = chunkData.slice(32, 32 + this.ds64.tableLength);    
+            //}
+        } else {
+            if (this.container == "RF64") {
+                throw Error("Could not find the 'ds64' chunk");    
+            }
         }
     }
 
@@ -1010,6 +1065,33 @@ class WaveFile {
     }
 
     /**
+     * Return the bytes of the "ds64" chunk.
+     * @return {!Array<number>} The "ds64" chunk bytes.
+     * @private
+     */
+    getDs64Bytes_() {
+        let ds64Bytes = [];
+        if (this.ds64["chunkId"]) {
+            ds64Bytes = ds64Bytes.concat(
+                byteData_.packArray(this.ds64.chunkId, byteData_.chr),
+                byteData_.pack(this.ds64.chunkSize, uInt32_),
+                byteData_.pack(this.ds64.riffSizeHigh, uInt32_),
+                byteData_.pack(this.ds64.riffSizeLow, uInt32_),
+                byteData_.pack(this.ds64.dataSizeHigh, uInt32_),
+                byteData_.pack(this.ds64.dataSizeLow, uInt32_),
+                byteData_.pack(this.ds64.originationTime, uInt32_),
+                byteData_.pack(this.ds64.sampleCountHigh, uInt32_),
+                byteData_.pack(this.ds64.sampleCountLow, uInt32_));          
+        }
+        //if (this.ds64.tableLength) {
+        //    ds64Bytes = ds64Bytes.concat(
+        //        byteData_.pack(this.ds64.tableLength, uInt32_),
+        //        this.ds64.table);
+        //}
+        return ds64Bytes;
+    }
+
+    /**
      * Return the bytes of the "cue " chunk.
      * @return {!Array<number>} The "cue " chunk bytes.
      * @private
@@ -1125,6 +1207,7 @@ class WaveFile {
             byteData_.packArray(this.container, byteData_.chr),
             byteData_.pack(this.chunkSize, uInt32_),
             byteData_.packArray(this.format, byteData_.chr),
+            this.getDs64Bytes_(),
             this.getBextBytes_(),
             this.getFmtBytes_(),
             this.getFactBytes_(),

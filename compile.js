@@ -7,4 +7,4 @@
 /** @private */
 const WaveFile = require("./index.js");
 
-window['WaveFile'] = WaveFile;
+window["WaveFile"] = WaveFile;

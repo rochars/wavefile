@@ -5,13 +5,15 @@
 
 let assert = require("assert");
 
-describe("64-bit reading (file < 4GB)", function() {
+describe("64-bit writing (file < 64-bit)", function() {
 
     
     let fs = require("fs");
     const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     let wav = new WaveFile(fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
+    fs.writeFileSync(path + "out/RF64-16-bit-8kHz-stereo-reaper.wav", wav.toBuffer());
+    wav = new WaveFile(fs.readFileSync(path + "out/RF64-16-bit-8kHz-stereo-reaper.wav"));
 
     it("chunkId should be 'RF64'",
             function() {
@@ -50,7 +52,7 @@ describe("64-bit reading (file < 4GB)", function() {
     it("ds64.tableLength should be 0", function() {
         assert.equal(wav.ds64.tableLength, 0);
     });
-    it("ds64.table should be null", function() {
+    it("ds64.table should not be null", function() {
         assert.deepEqual(wav.ds64.table, []);
     });
     

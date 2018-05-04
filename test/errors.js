@@ -13,14 +13,26 @@ describe('errors', function() {
     let path = "test/files/";
     let testFunc;
         
-    it("should throw an error if not a RIFF or RIFX file",
+    it("should throw an error if not a RIFF, RIFX or RF64 file",
             function () {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "RF64-64-bit-8kHz--mono-bext.wav");
+            wBytes[0] = 1;
             let wav = new WaveFile();
             wav.fromBuffer(wBytes);
         };
         expect(testFunc).to.throw("Not a supported format.");
+    });
+
+    it("should throw an error if a RF64 have no ds64 chunk",
+            function () {
+        testFunc = function() {
+            let wBytes = fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav");
+            wBytes[12] = 1;
+            let wav = new WaveFile();
+            wav.fromBuffer(wBytes);
+        };
+        expect(testFunc).to.throw("Could not find the 'ds64' chunk");
     });
 
     it("should throw an error if there is no 'WAVE' chunk",

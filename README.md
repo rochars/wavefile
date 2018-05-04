@@ -92,10 +92,10 @@ console.log(wav.fmt.chunkId);
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
-## Create wave files from scratch
+### Create wave files from scratch
 You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.
 
-### Mono:
+#### Mono:
 ```javascript
 let wav = new WaveFile();
 
@@ -104,7 +104,7 @@ wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
-### Stereo:
+#### Stereo:
 Samples can be informed interleaved or de-interleaved. If they are de-interleaved, WaveFile will interleave them. In this example they are de-interleaved.
 ```javascript
 // Stereo, 48 kHz, 8-bit, de-interleaved samples
@@ -133,7 +133,7 @@ Possible values for the bit depth are:
 
 You can also use any bit depth between "8" and "53", like **"11", "12", "17", "20" and so on**.
 
-### A word on bit depths
+#### A word on bit depths
 Bit depths that do not fill full bytes (like 11-bit, 21-bit and so son) are actually stored
 like the next greater bit depth that fill a full sequence of bytes:
 - 11-bit is stored like 16-bit (2 bytes)
@@ -154,7 +154,7 @@ Files with sample resolution greater than 32-bit (integer) are implemented as WA
 https://rochars.github.io/wavefile/example  
 They are converted to 16-bit before being loaded by the player, allowing normal reproduction.
 
-## Interleave and de-interleave stereo samples
+### Interleave and de-interleave stereo samples
 Samples in WaveFile objects are interleaved by default, even if you created the file from scratch using de-interleaved samples.
 
 You can de-interleave them:
@@ -169,7 +169,7 @@ To interleave them:
 wav.interleave();
 ```
 
-## RIFF to RIFX and RIFX to RIFF
+### RIFF to RIFX and RIFX to RIFF
 ```javascript
 // Turn a RIFF file to a RIFX file
 wav.toRIFX();
@@ -178,7 +178,7 @@ wav.toRIFX();
 wav.toRIFF();
 ```
 
-## IMA-ADPCM
+### IMA-ADPCM
 16-bit 8000 Hz mono wave files can be compressed as IMA-ADPCM:
 ```javascript
 // Encode a 16-bit wave file as 4-bit IMA-ADPCM:
@@ -197,7 +197,7 @@ wav.fromIMAADPCM();
 
 Decoding always result in 16-bit audio.
 
-## A-Law
+### A-Law
 16-bit wave files (mono or stereo) can be encoded as A-Law:
 ```javascript
 // Encode a 16-bit wave file as 8-bit A-law:
@@ -214,7 +214,7 @@ wav.fromALaw();
 
 Decoding always result in 16-bit audio.
 
-## mu-Law
+### mu-Law
 16-bit wave files (mono or stereo) can be encoded as mu-Law:
 ```javascript
 // Encode a 16-bit wave file as 8-bit mu-law:
@@ -231,7 +231,7 @@ wav.fromMuLaw();
 
 Decoding always result in 16-bit audio.
 
-## Change the bit depth
+### Change the bit depth
 You **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods.
 
 ```javascript
@@ -249,7 +249,7 @@ wav.toBitDepth("11");
 fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
 
-### Change the declared bit depth without re-scaling the samples
+#### Change the declared bit depth without re-scaling the samples
 This may be needed when dealing with files whose audio bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in clipping.
 
 You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to **false**.
@@ -383,6 +383,22 @@ Items in cue.points are objects with this signature:
     "dwBlockStart": 0, //DWORD,
     "dwSampleOffset": 0, //DWORD,
 }
+```
+
+#### RF64
+**wavefile** have limited support of RF64 files. Changing the bit depth or applying compression to the samples will result in a RIFF file.
+```javascript
+this.ds64 = {
+    "chunkId": "",
+    "chunkSize": 0,
+    "riffSizeHigh": 0,
+    "riffSizeLow": 0,
+    "dataSizeHigh": 0,
+    "dataSizeLow": 0,
+    "originationTime": 0,
+    "sampleCountHigh": 0,
+    "sampleCountLow": 0
+};
 ```
 
 ### The samples
