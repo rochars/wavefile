@@ -953,7 +953,7 @@ class WaveFile {
         options.float = (this.fmt.audioFormat == 3  ||
                 this.fmt.bitsPerSample == 64) ? true : false;
         let bytes = byteData_.packArray(
-            this.data.samples, new byteData_.Type(options));
+            this.data.samples, options);
         if (bytes.length % 2) {
             bytes.push(0);
         }
@@ -974,7 +974,7 @@ class WaveFile {
             this.fmt.bitsPerSample == 64) ? true : false;
         options.single = false;
         this.data.samples = byteData_.unpackArray(
-            bytes, new byteData_.Type(options));
+            bytes, options);
     }
 
     /**
