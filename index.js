@@ -327,6 +327,7 @@ class WaveFile {
             // only supports uncompressed integer PCM samples
             this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
         }
+        this.checkWriteInput_();
     }
 
     /**
@@ -485,14 +486,18 @@ class WaveFile {
 
     /**
      * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
+     * @param {!string} bitDepth The new bit depth of the samples.
+     *      One of "8" ... "32" (integers), "32f" or "64" (floats).
+     *      Optional. Default is 16.
      */
-    fromIMAADPCM() {
+    fromIMAADPCM(bitDepth="16") {
         this.fromScratch(
             this.fmt.numChannels,
             this.fmt.sampleRate,
             "16",
             imaadpcm_.decode(this.data.samples, this.fmt.blockAlign),
             {"container": this.correctContainer_()});
+        this.toBitDepth(bitDepth);
     }
 
     /**
@@ -511,14 +516,18 @@ class WaveFile {
 
     /**
      * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+     * @param {!string} bitDepth The new bit depth of the samples.
+     *      One of "8" ... "32" (integers), "32f" or "64" (floats).
+     *      Optional. Default is 16.
      */
-    fromALaw() {
+    fromALaw(bitDepth="16") {
         this.fromScratch(
             this.fmt.numChannels,
             this.fmt.sampleRate,
             "16",
             alawmulaw_.alaw.decode(this.data.samples),
             {"container": this.correctContainer_()});
+        this.toBitDepth(bitDepth);
     }
 
     /**
@@ -537,14 +546,18 @@ class WaveFile {
 
     /**
      * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+     * @param {!string} bitDepth The new bit depth of the samples.
+     *      One of "8" ... "32" (integers), "32f" or "64" (floats).
+     *      Optional. Default is 16.
      */
-    fromMuLaw() {
+    fromMuLaw(bitDepth="16") {
         this.fromScratch(
             this.fmt.numChannels,
             this.fmt.sampleRate,
             "16",
             alawmulaw_.mulaw.decode(this.data.samples),
             {"container": this.correctContainer_()});
+        this.toBitDepth(bitDepth);
     }
 
     /**

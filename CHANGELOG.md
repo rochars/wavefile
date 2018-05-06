@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## version 6.3.0 (2018-05-06)
+- fromIMAADPCM, fromALaw and fromMuLaw can receive an optional parameter: the bit depth of the output. If ommited, defaults to "16".
+- Fix: argument validation in fromScratch
+
 ## version 6.2.0 (2018-05-04)
 - Limited support of RF64. Need to be tested with files > 4gb in size.
 

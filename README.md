@@ -195,7 +195,11 @@ To decode 4-bit IMA-ADPCM as 16-bit linear PCM:
 wav.fromIMAADPCM();
 ```
 
-Decoding always result in 16-bit audio.
+Decoding always result in 16-bit audio. To decode to another bit depth:
+```javascript
+// Decode 4-bit IMA-ADPCM as 24-bit:
+wav.fromIMAADPCM("24");
+```
 
 ### A-Law
 16-bit wave files (mono or stereo) can be encoded as A-Law:
@@ -212,8 +216,11 @@ To decode 8-bit A-Law as 16-bit linear PCM:
 wav.fromALaw();
 ```
 
-Decoding always result in 16-bit audio.
-
+Decoding always result in 16-bit audio. To decode to another bit depth:
+```javascript
+// Decode 8-bit A-Law as 24-bit:
+wav.fromALaw("24");
+```
 ### mu-Law
 16-bit wave files (mono or stereo) can be encoded as mu-Law:
 ```javascript
@@ -229,7 +236,11 @@ To decode 8-bit mu-Law as 16-bit linear PCM:
 wav.fromMuLaw();
 ```
 
-Decoding always result in 16-bit audio.
+Decoding always result in 16-bit audio. To decode to another bit depth:
+```javascript
+// Decode 8-bit mu-Law as 24-bit:
+wav.fromMuLaw("24");
+```
 
 ### Change the bit depth
 You **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods.

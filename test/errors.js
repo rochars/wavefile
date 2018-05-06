@@ -12,7 +12,32 @@ describe('errors', function() {
     const WaveFile = require("../test/loader.js");
     let path = "test/files/";
     let testFunc;
-        
+    
+    it("fromScratch() should throw an error if the bit depth is not valid",
+            function () {
+        testFunc = function() {
+            let wav = new WaveFile();
+            wav.fromScratch(1, 44100, '1', [0]);
+        };
+        expect(testFunc).to.throw("Invalid bit depth.");
+    });
+    it("fromScratch() should throw an error if the number of channels is not valid",
+            function () {
+        testFunc = function() {
+            let wav = new WaveFile();
+            wav.fromScratch(0, 44100, '32', [0]);
+        };
+        expect(testFunc).to.throw("Invalid number of channels.");
+    });
+    it("fromScratch() should throw an error if the number of channels is not valid",
+            function () {
+        testFunc = function() {
+            let wav = new WaveFile();
+            wav.fromScratch(1, 0, '32', [0]);
+        };
+        expect(testFunc).to.throw("Invalid sample rate.");
+    });
+
     it("should throw an error if not a RIFF, RIFX or RF64 file",
             function () {
         testFunc = function() {

@@ -15,7 +15,8 @@ module.exports = {
         languageIn: 'ECMASCRIPT6',
         languageOut: 'ECMASCRIPT5',
         compilationLevel: 'SIMPLE',
-        warningLevel: "VERBOSE"
+        warningLevel: "VERBOSE",
+        useTypesForOptimization: true
       }
     })
   ]
