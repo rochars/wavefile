@@ -410,6 +410,17 @@ Range:
 - -1.0 to 1.0 for 32-bit (float)
 - -1.0 to 1.0 for 64-bit (float)
 
+## References
+https://tech.ebu.ch/docs/tech/tech3285.pdf  
+https://tech.ebu.ch/docs/tech/tech3306-2009.pdf  
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html  
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html  
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml  
+https://gist.github.com/hackNightly/3776503  
+http://www.neurophys.wisc.edu/auditory/riff-format.txt  
+https://github.com/chirlu/sox/blob/master/src/wav.c  
+https://github.com/erikd/libsndfile
+
 ## LICENSE
 Copyright (c) 2017-2018 Rafael da Silva Rocha.
 

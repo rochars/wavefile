@@ -47,7 +47,7 @@
             } else if (wav.bitDepth == "4") {
                 wav.fromIMAADPCM();
             }
-            if (wav.chunkId == "RIFX") {
+            if (wav.container == "RIFX") {
               wav.toRIFF();
             }
             wav.toBitDepth("16");
