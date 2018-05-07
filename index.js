@@ -853,7 +853,6 @@ class WaveFile {
             this.cue.chunkSize = chunk["chunkSize"];
             this.cue.dwCuePoints = this.read_(chunkData, uInt32_);
             for (let i=0; i<this.cue.dwCuePoints; i++) {
-                let offset = 4 + (i * 24);
                 this.cue.points.push({
                     "dwName": this.read_(chunkData, uInt32_),
                     "dwPosition": this.read_(chunkData, uInt32_),
