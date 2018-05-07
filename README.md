@@ -107,6 +107,11 @@ wavDataURI = wav.toDataURI();
 #### WaveFile.fromBuffer()
 Load a .wav file from a byte buffer into a WaveFile object:
 ```javascript
+wav.fromBuffer(buffer);
+```
+
+This is the same as passing the buffer when creating the WaveFile object:
+```javascript
 let wav = new Wavefile(buffer);
 ```
 
