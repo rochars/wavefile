@@ -82,14 +82,51 @@ Some bit depths may not be supported by your browser, like 32-bit floating point
 
 ## Use
 ```javascript
-let fs = require("fs");
-let Wavefile = require("wavefile");
+const fs = require("fs");
+const Wavefile = require("wavefile");
 
+// Load a wav file from disk into a WaveFile object
 let wav = new Wavefile(fs.readFileSync("file.wav"));
+
+// Check some of the file properties
 console.log(wav.container);
 console.log(wav.chunkSize);
 console.log(wav.fmt.chunkId);
+
+// Call toBuffer() to get the bytes of the file.
+// You can write the output straight to disk:
 fs.writeFileSync(path, wav.toBuffer());
+
+// Call toDataURI() to get the file as a base64-encoded
+// DataURI to load the file a web browser:
+wavDataURI = wav.toDataURI();
+```
+
+### Main methods:
+
+#### WaveFile.fromBuffer()
+Load a .wav file from a byte buffer into a WaveFile object:
+```javascript
+let wav = new Wavefile(buffer);
+```
+
+#### WaveFile.fromScratch()
+Create a WaveFile object with the arguments you pass:
+```javascript
+// A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
+wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+```
+
+#### WaveFile.toBuffer()
+Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:
+```javascript
+buffer = wav.toBuffer();
+```
+
+#### WaveFile.toDataURI()
+Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:
+```javascript
+wavDataURI = wav.toDataURI();
 ```
 
 ### Create wave files from scratch

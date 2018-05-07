@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -92,14 +92,29 @@ buffer = wav.toBuffer();
 <p>Hit <strong>&quot;Load in player&quot;</strong> to generate wave files.</p>
 <p>This website uses <strong>wavefile</strong> to create the files. The effects are provided by other libraries.</p>
 <p>Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not to play them).</p>
-<h2>Use</h2><pre class="prettyprint source lang-javascript"><code>let fs = require(&quot;fs&quot;);
-let Wavefile = require(&quot;wavefile&quot;);
+<h2>Use</h2><pre class="prettyprint source lang-javascript"><code>const fs = require(&quot;fs&quot;);
+const Wavefile = require(&quot;wavefile&quot;);
 
+// Load a wav file from disk into a WaveFile object
 let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
+
+// Check some of the file properties
 console.log(wav.container);
 console.log(wav.chunkSize);
 console.log(wav.fmt.chunkId);
-fs.writeFileSync(path, wav.toBuffer());</code></pre><h3>Create wave files from scratch</h3><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.</p>
+
+// Call toBuffer() to get the bytes of the file.
+// You can write the output straight to disk:
+fs.writeFileSync(path, wav.toBuffer());
+
+// Call toDataURI() to get the file as a base64-encoded
+// DataURI to load the file a web browser:
+wavDataURI = wav.toDataURI();</code></pre><h3>Main methods:</h3><h4>WaveFile.fromBuffer()</h4><p>Load a .wav file from a byte buffer into a WaveFile object:</p>
+<pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(buffer);</code></pre><h4>WaveFile.fromScratch()</h4><p>Create a WaveFile object with the arguments you pass:</p>
+<pre class="prettyprint source lang-javascript"><code>// A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
+wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);</code></pre><h4>WaveFile.toBuffer()</h4><p>Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:</p>
+<pre class="prettyprint source lang-javascript"><code>buffer = wav.toBuffer();</code></pre><h4>WaveFile.toDataURI()</h4><p>Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:</p>
+<pre class="prettyprint source lang-javascript"><code>wavDataURI = wav.toDataURI();</code></pre><h3>Create wave files from scratch</h3><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.</p>
 <h4>Mono:</h4><pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
@@ -327,7 +342,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun May 06 2018 17:22:34 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 07 2018 00:36:13 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

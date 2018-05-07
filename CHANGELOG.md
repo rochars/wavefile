@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.4.0 (2018-05-07)
+- WaveFile.toBase64() and WaveFile.toDataURI() to export the file as a Base64 string or a DataURI.
+
 ## version 6.3.0 (2018-05-06)
 - fromIMAADPCM, fromALaw and fromMuLaw can receive an optional parameter: the bit depth of the output. If ommited, defaults to "16".
 - Fix: argument validation in fromScratch

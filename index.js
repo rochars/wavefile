@@ -17,6 +17,8 @@ const alawmulaw_ = require("alawmulaw");
 /** @private */
 const byteData_ = require("byte-data");
 /** @private */
+const encodeBase64 = require("base64-arraybuffer").encode;
+/** @private */
 const uInt8_ = {"bits": 8};
 /** @private */
 const uInt16_ = {"bits": 16};
@@ -364,7 +366,26 @@ class WaveFile {
     }
 
     /**
-     * Force a file as RIFF. Do not work with RF64 files.
+     * Return a base64 string representig the WaveFile object as a wav file.
+     * @return {string} A .wav file as a base64 string.
+     * @throws {Error} If any property of the object appears invalid.
+     */
+    toBase64() {
+        return encodeBase64(this.toBuffer());
+    }
+
+    /**
+     * Return a base64 string representig the WaveFile object as a wav file.
+     * The return value of this method can be used to load the audio in browsers.
+     * @return {string} A .wav file as a DataURI.
+     * @throws {Error} If any property of the object appears invalid.
+     */
+    toDataURI() {
+        return "data:audio/wav;base64," + this.toBase64();
+    }
+
+    /**
+     * Force a file as RIFF.
      */
     toRIFF() {
         if (this.container == "RF64") {
@@ -380,7 +401,7 @@ class WaveFile {
     }
 
     /**
-     * Force a file as RIFX. Do not work with RF64 files.
+     * Force a file as RIFX.
      */
     toRIFX() {
         if (this.container == "RF64") {
