@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.4.1 (2018-05-07)
+- Using compilationLevel: ADVANCED with Closure Compiler.
+
 ## version 6.4.0 (2018-05-07)
 - WaveFile.toBase64() and WaveFile.toDataURI() to export the file as a Base64 string or a DataURI.
 

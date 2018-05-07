@@ -5,7 +5,7 @@
  */
 const ClosureCompiler = require('google-closure-compiler-js').webpack;
 module.exports = {
-  entry: './compile.js',
+  entry: './index.js',
   output: {
     filename: './dist/wavefile-min.js'
   },
@@ -14,10 +14,22 @@ module.exports = {
       options: {
         languageIn: 'ECMASCRIPT6',
         languageOut: 'ECMASCRIPT5',
-        compilationLevel: 'SIMPLE',
+        compilationLevel: 'ADVANCED',
         warningLevel: "VERBOSE",
-        useTypesForOptimization: true
+        exportLocalPropertyDefinitions: true,
+        generateExports: true
       }
     })
-  ]
+  ],
+  module: {
+    rules: [
+      {
+        loader: 'string-replace-loader',
+        options: {
+          search: 'module.exports = WaveFile;',
+          replace: 'window["WaveFile"] = WaveFile;',
+        }
+      }
+    ]
+  }
 };
