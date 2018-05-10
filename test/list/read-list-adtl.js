@@ -235,8 +235,8 @@ describe('read Audacity-16bit-lots-of-markers.wav and write to new file', functi
     it("wav2.chunkSize should be == fileSizeInBytes2", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-    it("wav.LIST[0]['chunkSize'] == wav.getLISTSize_()", function() {
-        assert.equal(wav2.LIST[0]["chunkSize"], wav2.getLISTSize_() - 8);
+    it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
+        assert.equal(wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
     });
     it("wav2.cue should be == wav.cue", function() {
         assert.deepEqual(wav2.cue, wav.cue);

@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getLISTSize_">getLISTSize_</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -265,7 +265,7 @@ WaveFile.LIST = [];</code></pre><p>WaveFile.LIST is an array of objects with thi
     &quot;format&quot;: &quot;&quot;, // 'adtl' or 'INFO'
     /** @type {!Array&lt;Object>} */
     &quot;subChunks&quot;: []
-};</code></pre><p>Where &quot;subChunks&quot; contains the subChunks of the &quot;LIST&quot; chunk. WaveFile supports &quot;LIST&quot; chunks of format &quot;INFO&quot;. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same.</p>
+};</code></pre><p>Where &quot;subChunks&quot; are the subChunks of the &quot;LIST&quot; chunk. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same. WaveFile 6.5 can read and write &quot;LIST&quot; chunks of format &quot;INFO&quot;.</p>
 <p>For &quot;LIST&quot; chunks with the &quot;INFO&quot; format, &quot;subChunks&quot; is an array of objects with this signature:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {!string} */
@@ -297,10 +297,7 @@ WaveFile.LIST = [];</code></pre><p>WaveFile.LIST is an array of objects with thi
 <li>-1.0 to 1.0 for 32-bit (float)</li>
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
-<h2>References</h2><p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html<br>https://<a href="http://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml">www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml</a><br>https://gist.github.com/hackNightly/3776503<br>http://<a href="http://www.neurophys.wisc.edu/auditory/riff-format.txt">www.neurophys.wisc.edu/auditory/riff-format.txt</a><br>https://github.com/chirlu/sox/blob/master/src/wav.c<br>https://github.com/erikd/libsndfile
-http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf
-https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#wavl
-https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
+<h2>References</h2><p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html<br>https://<a href="http://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml">www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml</a><br>https://gist.github.com/hackNightly/3776503<br>http://<a href="http://www.neurophys.wisc.edu/auditory/riff-format.txt">www.neurophys.wisc.edu/auditory/riff-format.txt</a><br>https://github.com/chirlu/sox/blob/master/src/wav.c<br>https://github.com/erikd/libsndfile<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf<br>https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#wavl<br>https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
 <h2>LICENSE</h2><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -330,7 +327,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 10 2018 03:28:54 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 10 2018 06:15:44 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

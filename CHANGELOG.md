@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## version 6.5.0 (2018-05-08)
+## version 6.5.1 (2018-05-10)
+- Safer estimation of chunkSizes.
+- Fix: data.chunkSize calculated when writing the file.
+
+## version 6.5.0 (2018-05-10)
 - Reading and writing tags from "LIST" chunks of type "INFO".
 - Reading and writing cue points.
 - BWF data is kept when changing bit depth, using compression or when re-creating an existing WaveFile object with the fromScratch() or fromBuffer() method.

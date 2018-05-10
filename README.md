@@ -404,7 +404,7 @@ WaveFile.LIST is an array of objects with this signature:
     "subChunks": []
 };
 ```
-Where "subChunks" contains the subChunks of the "LIST" chunk. WaveFile supports "LIST" chunks of format "INFO". A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same.
+Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. WaveFile 6.5 can read and write "LIST" chunks of format "INFO".
 
 For "LIST" chunks with the "INFO" format, "subChunks" is an array of objects with this signature:
 ```javascript
@@ -457,9 +457,9 @@ https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml
 https://gist.github.com/hackNightly/3776503  
 http://www.neurophys.wisc.edu/auditory/riff-format.txt  
 https://github.com/chirlu/sox/blob/master/src/wav.c  
-https://github.com/erikd/libsndfile
-http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf
-https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&showPrintDialog=1#wavl
+https://github.com/erikd/libsndfile  
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf  
+https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&showPrintDialog=1#wavl  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
 ## LICENSE
