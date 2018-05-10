@@ -15,12 +15,17 @@ describe('create 13-bit wave files from scratch', function() {
     for (let i=0; i<9000; i++) {
         samples.push(0);
     }
-
     wav.fromScratch(1, 8000, '13', samples);
 
     let fs = require('fs');
     fs.writeFileSync("./test/files/out/13-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
 
+    var stats = fs.statSync("./test/files/out/13-bit-48kHz-mono-fromScratch.wav");
+    var fileSizeInBytes = stats["size"];
+
+    it("chunkSize should be == fileSizeInBytes", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes);
+    });
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
     });

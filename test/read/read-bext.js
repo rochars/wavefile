@@ -11,17 +11,18 @@ describe("BWF data reading", function() {
     const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
-    let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");
-    let wav = new WaveFile(wBytes);
+    let wav = new WaveFile(fs.readFileSync(path + "24bit-16kHz-bext-mono.wav"));
 
-    wav.fromBuffer(wBytes);
+    var stats = fs.statSync(path + "24bit-16kHz-bext-mono.wav");
+    var fileSizeInBytes2 = stats["size"];
 
-    it("should find the 'bext' chunk",
-            function() {
+    it("chunkSize should be == fileSizeInBytes", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes2);
+    });
+    it("should find the 'bext' chunk", function() {
         assert.equal(wav.bext.chunkId, "bext");
     });
-    it("bextChunkSize should be > 0",
-            function() {
+    it("bextChunkSize should be > 0", function() {
         assert.ok(wav.bext.chunkSize > 0);
     });
 });

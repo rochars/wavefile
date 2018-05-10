@@ -103,6 +103,8 @@ describe('read 4-bit 22050kHz file from disk and write to new file', function() 
     
     let wBytes = fs.readFileSync(path + "ima22m.wav");
     let wav = new WaveFile(wBytes);
+    fs.writeFileSync(path + "/out/ima22m-JUST-READ.wav", wav.toBuffer());
+
     let wav2 = new WaveFile(wav.toBuffer());
     fs.writeFileSync(path + "/out/ima22m.wav", wav2.toBuffer());
 

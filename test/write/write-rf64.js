@@ -49,12 +49,12 @@ describe("64-bit writing (file < 64-bit)", function() {
     it("ds64.sampleCountLow should be 0", function() {
         assert.equal(wav.ds64.sampleCountLow, 0);
     });
-    it("ds64.tableLength should be 0", function() {
-        assert.equal(wav.ds64.tableLength, 0);
-    });
-    it("ds64.table should not be null", function() {
-        assert.deepEqual(wav.ds64.table, []);
-    });
+    //it("ds64.tableLength should be 0", function() {
+    //    assert.equal(wav.ds64.tableLength, 0);
+    //});
+    //it("ds64.table should not be null", function() {
+    //    assert.deepEqual(wav.ds64.table, []);
+    //});
     
     // --------------------------------
 

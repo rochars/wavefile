@@ -3,7 +3,7 @@
  * 
  */
 
-var assert = require('assert');
+let assert = require('assert');
 
 describe('read 16bit file from disk and write to new file', function() {
     
@@ -11,71 +11,60 @@ describe('read 16bit file from disk and write to new file', function() {
     const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
-    let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
-    let wav = new WaveFile();
+    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav2 = new WaveFile(wav.toBuffer());
+    fs.writeFileSync(path + "/out/16-bit-8kHz-noBext-mono.wav", wav2.toBuffer());
 
-    wav.fromBuffer(wBytes);
+    let stats = fs.statSync(path + "16-bit-8kHz-noBext-mono.wav");
+    let fileSizeInBytes1 = stats["size"];
 
-    let wav2 = new WaveFile();
+    stats = fs.statSync(path + "/out/16-bit-8kHz-noBext-mono.wav");
+    let fileSizeInBytes2 = stats["size"];
 
-    let bytes3 = wav.toBuffer();
-
-    wav2.fromBuffer(bytes3);
-
-    let bytes4 = wav2.toBuffer();
-
-    fs.writeFileSync(path + "/out/16-bit-8kHz-noBext-mono.wav", bytes4);
-
-    it("chunkId should be 'RIFF'",
-            function() {
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
+    });
+    it("wav2.chunkSize should be == fileSizeInBytes2", function() {
+        assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
+    });
+    
+    it("chunkId should be 'RIFF'", function() {
         assert.equal(wav2.container, "RIFF");
     });
-    it("fmtChunkId should be 'fmt '",
-            function() {
+    it("fmtChunkId should be 'fmt '", function() {
         assert.equal(wav2.fmt.chunkId, "fmt ");
     });
-    it("format should be 'WAVE'",
-            function() {
+    it("format should be 'WAVE'", function() {
         assert.equal(wav2.format, "WAVE");
     });
-    it("fmtChunkSize should be 16",
-            function() {
+    it("fmtChunkSize should be 16", function() {
         assert.equal(wav2.fmt.chunkSize, 16);
     });
-    it("audioFormat should be 1 (PCM)",
-            function() {
+    it("audioFormat should be 1 (PCM)", function() {
         assert.equal(wav2.fmt.audioFormat, 1);
     });
-    it("numChannels should be 1",
-            function() {
+    it("numChannels should be 1", function() {
         assert.equal(wav2.fmt.numChannels, 1);
     });
-    it("sampleRate should be 8000",
-            function() {
+    it("sampleRate should be 8000", function() {
         assert.equal(wav2.fmt.sampleRate, 8000);
     });
-    it("byteRate should be 16000",
-            function() {
+    it("byteRate should be 16000", function() {
         assert.equal(wav2.fmt.byteRate, 16000);
     });
-    it("blockAlign should be 2",
-            function() {
+    it("blockAlign should be 2", function() {
         assert.equal(wav2.fmt.blockAlign, 2);
     });
-    it("bitsPerSample should be 16",
-            function() {
+    it("bitsPerSample should be 16", function() {
         assert.equal(wav2.fmt.bitsPerSample, 16);
     });
-    it("dataChunkId should be 'data'",
-            function() {
+    it("dataChunkId should be 'data'", function() {
         assert.equal(wav2.data.chunkId, 'data');
     });
-    it("dataChunkSize should be > 0",
-            function() {
+    it("dataChunkSize should be > 0", function() {
         assert.ok(wav2.data.chunkSize > 0);
     });
-    it("samples.length should be > 0",
-            function() {
+    it("samples.length should be > 0", function() {
         assert.ok(wav2.data.samples.length > 0);
     });
     it("samples on the new file should have the same length as in the original file",

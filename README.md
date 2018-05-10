@@ -27,6 +27,8 @@ And more.
 npm install wavefile
 ```
 
+**wavefile** can be used as a dependency in projects that use Google Closure Compiler with ADVANCED_OPTIMIZATIONS.
+
 ## See it in action
 
 ### Using wavefile to extend the browser audio playing capabilities:
@@ -41,11 +43,11 @@ Playing ADPCM in the browser:
 // Load a wav file that is encoded as 4-bit IMA ADPCM:
 let wav = new Wavefile(ADPCMFileBuffer);
 
-// Change the bit depth to 16-bit, supported by most browsers:
+// Decode the file to 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
 
-// Get the byte buffer of your new, browser-friendly wav file:
-let buffer = wav.toBuffer();
+// Get the DataURI of your new, browser-friendly wav file:
+let dataURI = wav.toDataURI();
 
 // Load your new wav file into your player
 // ...
@@ -59,11 +61,8 @@ let wav = new Wavefile(buffer);
 // Change the bit depth to 16-bit, supported by most browsers:
 wav.toBitDepth("16");
 
-// Get the byte buffer of your new, browser-friendly wav file:
-buffer = wav.toBuffer();
-
-// Load your new wav file into your player
-// ...
+// Get the DataURI of your new, browser-friendly wav file:
+let dataURI = wav.toDataURI();
 ```
 
 With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice. This example use **wavesurfer**.
@@ -82,11 +81,8 @@ Some bit depths may not be supported by your browser, like 32-bit floating point
 
 ## Use
 ```javascript
-const fs = require("fs");
-const Wavefile = require("wavefile");
-
 // Load a wav file from disk into a WaveFile object
-let wav = new Wavefile(fs.readFileSync("file.wav"));
+let wav = new Wavefile(buffer);
 
 // Check some of the file properties
 console.log(wav.container);
@@ -95,7 +91,7 @@ console.log(wav.fmt.chunkId);
 
 // Call toBuffer() to get the bytes of the file.
 // You can write the output straight to disk:
-fs.writeFileSync(path, wav.toBuffer());
+let wavBuffer = wav.toBuffer();
 
 // Call toDataURI() to get the file as a base64-encoded
 // DataURI to load the file a web browser:
@@ -161,7 +157,6 @@ fs.writeFileSync(path, wav.toBuffer());
 wav.fromScratch(1, 44100, '32', samples, {"container": "RIFX"});
 fs.writeFileSync(path, wav.toBuffer());
 ```
-
 Possible values for the bit depth are:  
 "4" - 4-bit IMA-ADPCM  
 "8" - 8-bit  
@@ -176,23 +171,7 @@ Possible values for the bit depth are:
 You can also use any bit depth between "8" and "53", like **"11", "12", "17", "20" and so on**.
 
 #### A word on bit depths
-Bit depths that do not fill full bytes (like 11-bit, 21-bit and so son) are actually stored
-like the next greater bit depth that fill a full sequence of bytes:
-- 11-bit is stored like 16-bit (2 bytes)
-- 14-bit is stored like 16-bit (2 bytes)
-- 17-bit is stored like 24-bit (3 bytes)
-- 27-bit is stored like 32-bit (4 bytes)
-
-So even if files like this are valid (and playable in most players), they allow their samples to be greater than the actual limit of their audio bit depth. So:
-- 11-bit files can contain 16-bit samples
-- 17-bit files can contain 24-bit samples
-- 29-bit files can contain 32-bit samples
-
-Most players will deal with this by adjusting the level to the next greater bit depth, so **most times a true 14-bit wave file will actually play like a 16-bit wave file with a low volume**.
-
-**wavefile** do not limit the range of the samples for those cases, so you should know what you are doing when dealing with uncommon bit depths to avoid unexpected results.
-
-Files with sample resolution greater than 32-bit (integer) are implemented as WAVE_FORMAT_EXTENSIBLE and are unlikely to be supported by any player. They can be played in the example page:  
+Files with sample resolutions other than 4, 8, 16, 24, 32 (integer), 32 (FP) and 64-bit (FP) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players. They can be played in the example page:  
 https://rochars.github.io/wavefile/example  
 They are converted to 16-bit before being loaded by the player, allowing normal reproduction.
 
@@ -226,7 +205,6 @@ wav.toRIFF();
 // Encode a 16-bit wave file as 4-bit IMA-ADPCM:
 wav.toIMAADPCM();
 ```
-
 IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
 
 If the audio is not 16-bit it will be converted to 16-bit before compressing. Compressing audio with sample rates different from 8000 Hz or number of channels greater than 1 will throw errors.
@@ -249,7 +227,6 @@ wav.fromIMAADPCM("24");
 // Encode a 16-bit wave file as 8-bit A-law:
 wav.toALaw();
 ```
-
 If the audio is not 16-bit it will be converted to 16-bit before compressing.
 
 To decode 8-bit A-Law as 16-bit linear PCM:
@@ -263,13 +240,13 @@ Decoding always result in 16-bit audio. To decode to another bit depth:
 // Decode 8-bit A-Law as 24-bit:
 wav.fromALaw("24");
 ```
+
 ### mu-Law
 16-bit wave files (mono or stereo) can be encoded as mu-Law:
 ```javascript
 // Encode a 16-bit wave file as 8-bit mu-law:
 wav.toMuLaw();
 ```
-
 If the audio is not 16-bit it will be converted to 16-bit before compressing.
 
 To decode 8-bit mu-Law as 16-bit linear PCM:
@@ -285,8 +262,6 @@ wav.fromMuLaw("24");
 ```
 
 ### Change the bit depth
-You **can't** change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the *toIMAADPCM()*, *fromIMAADPCM()*, *toALaw()*, *fromALaw()*, *toMuLaw()* and *fromMuLaw()* methods.
-
 ```javascript
 // Load a wav file with 32-bit audio
 let wav = new Wavefile(fs.readFileSync("32bit-file.wav"));
@@ -301,39 +276,6 @@ fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 wav.toBitDepth("11");
 fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
-
-#### Change the declared bit depth without re-scaling the samples
-This may be needed when dealing with files whose audio bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in clipping.
-
-You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to **false**.
-
-```javascript
-// Load a wav file that say it has 11-bit audio, but has samples
-// in the 16-bit range:
-let wav = new Wavefile(fs.readFileSync("11bit-file.wav"));
-
-// Change the bit depth of the file to 16-bit without actually
-// modifying the samples so the output file will have the same
-// leve as the original one:
-wav.toBitDepth("16", false);
-
-// Write the new 16-bit file to disk
-fs.writeFileSync("16bit-file.wav", wav.toBuffer());
-```
-
-Now that your samples are in the correct range you may change again to
-11-bit, but this time actually scaling down the samples:
-
-```javascript
-// Change the bit depth of the file to 11-bit, but now actually
-// scaling down the samples to 11-bit:
-wav.toBitDepth("11");
-
-// write the new 11-bit file to disk:
-fs.writeFileSync("11bit-file-new.wav", wav.toBuffer());
-```
-
-The **changeResolution** option only works when dealing with bit depths that do not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.
 
 ### The properties
 Since **version 6.0.0** (2018-05-02) the samples are stored in **data.samples**.
@@ -388,7 +330,9 @@ console.log(wav.data.samples);
 // "cue "
 console.log(wav.cue.chunkId);
 console.log(wav.cue.chunkSize);
-// ...
+
+// "LIST"
+console.log(wav.LISTChunks.length);
 ```
 
 #### BWF data
@@ -438,10 +382,66 @@ Items in cue.points are objects with this signature:
 }
 ```
 
+#### LIST chunk
+"LIST" chunk data is stored as follows:
+```javascript
+/**
+ * An array of the "LIST" chunks present in the file.
+ * @type {Array<Object>}
+ */
+wav.LISTChunks = [];
+```
+
+WaveFile.LISTChunks is an array of objects with this signature:
+```javascript
+{
+    /** @type {!string} */
+    "chunkId": "", // always 'LIST'
+    /** @type {!number} */
+    "chunkSize": 0,
+    /** @type {!string} */
+    "format": "", // 'adtl' or 'INFO'
+    /** @type {!Array<Object>} */
+    "subChunks": []
+};
+```
+Where "subChunks" contains the subChunks of the "LIST" chunk. They can be "INFO" or "adtl". A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same.
+
+For "LIST" chunks with the "adtl" format, "subChunks" is an array of objects with this signature:
+```javascript
+{
+    /** @type {!string} */
+    "chunkId": "" // only 'labl' or 'note'
+    /** @type {!number} */
+    "chunkSize" 0,
+    /** @type {!number} */
+    "dwName": 0,
+    /** @type {!string} */
+    "value": ""
+}
+```
+Where "value" is the text of the "labl" or "note" chunk, and "dwName" is the cue point to where the note/labl points to.
+
+For "LIST" chunks with the "INFO" format, "subChunks" is an array of objects with this signature:
+```javascript
+{
+    /** @type {!string} */
+    "chunkId": "" // some RIFF tag
+    /** @type {!number} */
+    "chunkSize" 0,
+    /** @type {!string} */
+    "value": ""
+}
+```
+Where "chunkId" may be any RIFF tag:  
+https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
+
 #### RF64
 **wavefile** have limited support of RF64 files. Changing the bit depth or applying compression to the samples will result in a RIFF file.
+
+"ds64" data is stored as follows:
 ```javascript
-this.ds64 = {
+wav.ds64 = {
     "chunkId": "",
     "chunkSize": 0,
     "riffSizeHigh": 0,
@@ -453,6 +453,7 @@ this.ds64 = {
     "sampleCountLow": 0
 };
 ```
+**The "ds64" chunk is read-only.**
 
 ### The samples
 Range:
@@ -473,6 +474,9 @@ https://gist.github.com/hackNightly/3776503
 http://www.neurophys.wisc.edu/auditory/riff-format.txt  
 https://github.com/chirlu/sox/blob/master/src/wav.c  
 https://github.com/erikd/libsndfile
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf
+https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&showPrintDialog=1#wavl
+https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
 ## LICENSE
 Copyright (c) 2017-2018 Rafael da Silva Rocha.

@@ -1,6 +1,7 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * 
+/*
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefile
+ *
  */
 
 let chai = require("chai");
@@ -132,7 +133,7 @@ describe('errors', function() {
         testFunc = function() {
             let wBytes = fs.readFileSync(path + "32bit-48kHz-noBext-mono.wav");
             let wav = new WaveFile();
-            wav.enforceFact_ = true;
+            wav.enforceFact = true;
             wav.fromBuffer(wBytes);
             wav.toBuffer();
         };

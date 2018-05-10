@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getLISTSize_">getLISTSize_</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -61,18 +61,19 @@
 </ul>
 <p>And more.</p>
 <p><strong>wavefile</strong> is extensively tested and contains samples of all supported formats. Please note that some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in every player.</p>
-<h2>Install</h2><pre class="prettyprint source"><code>npm install wavefile</code></pre><h2>See it in action</h2><h3>Using wavefile to extend the browser audio playing capabilities:</h3><p>https://rochars.github.io/wavefile/example</p>
+<h2>Install</h2><pre class="prettyprint source"><code>npm install wavefile</code></pre><p><strong>wavefile</strong> can be used as a dependency in projects that use Google Closure Compiler with ADVANCED_OPTIMIZATIONS.</p>
+<h2>See it in action</h2><h3>Using wavefile to extend the browser audio playing capabilities:</h3><p>https://rochars.github.io/wavefile/example</p>
 <p>Drag and drop .wav files and play them. This example uses <strong>wavefile</strong> and <strong>wavesurfer</strong> to create a browser player that supports mu-Law, A-Law, IMA ADPCM, 64-bit wav files and more.</p>
 <p>Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With <strong>wavefile</strong> you can extended this by changing the bit depth of wav files on the fly before loading them into the player:</p>
 <p>Playing ADPCM in the browser:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file that is encoded as 4-bit IMA ADPCM:
 let wav = new Wavefile(ADPCMFileBuffer);
 
-// Change the bit depth to 16-bit, supported by most browsers:
+// Decode the file to 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
 
-// Get the byte buffer of your new, browser-friendly wav file:
-let buffer = wav.toBuffer();
+// Get the DataURI of your new, browser-friendly wav file:
+let dataURI = wav.toDataURI();
 
 // Load your new wav file into your player
 // ...</code></pre><p>Playing a 64-bit wave file in the browser:</p>
@@ -82,21 +83,15 @@ let wav = new Wavefile(buffer);
 // Change the bit depth to 16-bit, supported by most browsers:
 wav.toBitDepth(&quot;16&quot;);
 
-// Get the byte buffer of your new, browser-friendly wav file:
-buffer = wav.toBuffer();
-
-// Load your new wav file into your player
-// ...</code></pre><p>With <strong>wavefile</strong> you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice. This example use <strong>wavesurfer</strong>.</p>
+// Get the DataURI of your new, browser-friendly wav file:
+let dataURI = wav.toDataURI();</code></pre><p>With <strong>wavefile</strong> you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice. This example use <strong>wavesurfer</strong>.</p>
 <p>Check out wavesurfer:<br>https://github.com/katspaugh/wavesurfer.js</p>
 <h3>Creating wave files in the browser:</h3><p>https://tr2099.github.io/</p>
 <p>Hit <strong>&quot;Load in player&quot;</strong> to generate wave files.</p>
 <p>This website uses <strong>wavefile</strong> to create the files. The effects are provided by other libraries.</p>
 <p>Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not to play them).</p>
-<h2>Use</h2><pre class="prettyprint source lang-javascript"><code>const fs = require(&quot;fs&quot;);
-const Wavefile = require(&quot;wavefile&quot;);
-
-// Load a wav file from disk into a WaveFile object
-let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
+<h2>Use</h2><pre class="prettyprint source lang-javascript"><code>// Load a wav file from disk into a WaveFile object
+let wav = new Wavefile(buffer);
 
 // Check some of the file properties
 console.log(wav.container);
@@ -105,7 +100,7 @@ console.log(wav.fmt.chunkId);
 
 // Call toBuffer() to get the bytes of the file.
 // You can write the output straight to disk:
-fs.writeFileSync(path, wav.toBuffer());
+let wavBuffer = wav.toBuffer();
 
 // Call toDataURI() to get the file as a base64-encoded
 // DataURI to load the file a web browser:
@@ -133,23 +128,7 @@ fs.writeFileSync(path, wav.toBuffer());
 wav.fromScratch(1, 44100, '32', samples, {&quot;container&quot;: &quot;RIFX&quot;});
 fs.writeFileSync(path, wav.toBuffer());</code></pre><p>Possible values for the bit depth are:<br>&quot;4&quot; - 4-bit IMA-ADPCM<br>&quot;8&quot; - 8-bit<br>&quot;8a&quot; - 8-bit A-Law<br>&quot;8m&quot; - 8-bit mu-Law<br>&quot;16&quot; - 16-bit<br>&quot;24&quot; - 24-bit<br>&quot;32&quot; - 32-bit<br>&quot;32f&quot; - 32-bit floating point<br>&quot;64&quot; - 64-bit floating point</p>
 <p>You can also use any bit depth between &quot;8&quot; and &quot;53&quot;, like <strong>&quot;11&quot;, &quot;12&quot;, &quot;17&quot;, &quot;20&quot; and so on</strong>.</p>
-<h4>A word on bit depths</h4><p>Bit depths that do not fill full bytes (like 11-bit, 21-bit and so son) are actually stored
-like the next greater bit depth that fill a full sequence of bytes:</p>
-<ul>
-<li>11-bit is stored like 16-bit (2 bytes)</li>
-<li>14-bit is stored like 16-bit (2 bytes)</li>
-<li>17-bit is stored like 24-bit (3 bytes)</li>
-<li>27-bit is stored like 32-bit (4 bytes)</li>
-</ul>
-<p>So even if files like this are valid (and playable in most players), they allow their samples to be greater than the actual limit of their audio bit depth. So:</p>
-<ul>
-<li>11-bit files can contain 16-bit samples</li>
-<li>17-bit files can contain 24-bit samples</li>
-<li>29-bit files can contain 32-bit samples</li>
-</ul>
-<p>Most players will deal with this by adjusting the level to the next greater bit depth, so <strong>most times a true 14-bit wave file will actually play like a 16-bit wave file with a low volume</strong>.</p>
-<p><strong>wavefile</strong> do not limit the range of the samples for those cases, so you should know what you are doing when dealing with uncommon bit depths to avoid unexpected results.</p>
-<p>Files with sample resolution greater than 32-bit (integer) are implemented as WAVE_FORMAT_EXTENSIBLE and are unlikely to be supported by any player. They can be played in the example page:<br>https://rochars.github.io/wavefile/example<br>They are converted to 16-bit before being loaded by the player, allowing normal reproduction.</p>
+<h4>A word on bit depths</h4><p>Files with sample resolutions other than 4, 8, 16, 24, 32 (integer), 32 (FP) and 64-bit (FP) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players. They can be played in the example page:<br>https://rochars.github.io/wavefile/example<br>They are converted to 16-bit before being loaded by the player, allowing normal reproduction.</p>
 <h3>Interleave and de-interleave stereo samples</h3><p>Samples in WaveFile objects are interleaved by default, even if you created the file from scratch using de-interleaved samples.</p>
 <p>You can de-interleave them:</p>
 <pre class="prettyprint source lang-javascript"><code>// De-interleave the samples into multiple channels
@@ -181,8 +160,7 @@ wav.toMuLaw();</code></pre><p>If the audio is not 16-bit it will be converted to
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 16-bit:
 wav.fromMuLaw();</code></pre><p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 24-bit:
-wav.fromMuLaw(&quot;24&quot;);</code></pre><h3>Change the bit depth</h3><p>You <strong>can't</strong> change to and from 4-bit ADPCM, 8-bit A-Law and 8-bit mu-Law. To encode/decode files as ADPCM, A-Law and mu-Law you must use the <em>toIMAADPCM()</em>, <em>fromIMAADPCM()</em>, <em>toALaw()</em>, <em>fromALaw()</em>, <em>toMuLaw()</em> and <em>fromMuLaw()</em> methods.</p>
-<pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
+wav.fromMuLaw(&quot;24&quot;);</code></pre><h3>Change the bit depth</h3><pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
 let wav = new Wavefile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
 // Change the bit depth to 24-bit
@@ -193,27 +171,7 @@ fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
 
 // You can use any supported bit depth:
 wav.toBitDepth(&quot;11&quot;);
-fs.writeFileSync(&quot;11bit-file.wav&quot;, wav.toBuffer());</code></pre><h4>Change the declared bit depth without re-scaling the samples</h4><p>This may be needed when dealing with files whose audio bit depths do not fill a full sequence of bytes (like 12-bit files), as those files may contain samples that outrange their declared bit depth limits and re-scaling their samples may result in clipping.</p>
-<p>You may want to change the bit depth of those files but don't touch their samples. You can do this by setting the optional changeResolution parameter to <strong>false</strong>.</p>
-<pre class="prettyprint source lang-javascript"><code>// Load a wav file that say it has 11-bit audio, but has samples
-// in the 16-bit range:
-let wav = new Wavefile(fs.readFileSync(&quot;11bit-file.wav&quot;));
-
-// Change the bit depth of the file to 16-bit without actually
-// modifying the samples so the output file will have the same
-// leve as the original one:
-wav.toBitDepth(&quot;16&quot;, false);
-
-// Write the new 16-bit file to disk
-fs.writeFileSync(&quot;16bit-file.wav&quot;, wav.toBuffer());</code></pre><p>Now that your samples are in the correct range you may change again to
-11-bit, but this time actually scaling down the samples:</p>
-<pre class="prettyprint source lang-javascript"><code>// Change the bit depth of the file to 11-bit, but now actually
-// scaling down the samples to 11-bit:
-wav.toBitDepth(&quot;11&quot;);
-
-// write the new 11-bit file to disk:
-fs.writeFileSync(&quot;11bit-file-new.wav&quot;, wav.toBuffer());</code></pre><p>The <strong>changeResolution</strong> option only works when dealing with bit depths that do not fill a full sequence of bytes, both to and from. Changing to and from other bit depths will always re-scale the samples.</p>
-<h3>The properties</h3><p>Since <strong>version 6.0.0</strong> (2018-05-02) the samples are stored in <strong>data.samples</strong>.</p>
+fs.writeFileSync(&quot;11bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>The properties</h3><p>Since <strong>version 6.0.0</strong> (2018-05-02) the samples are stored in <strong>data.samples</strong>.</p>
 <pre class="prettyprint source lang-javascript"><code>console.log(wav.data.samples);
 // Output an array of numbers</code></pre><p>The other public properties:</p>
 <pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
@@ -260,7 +218,9 @@ console.log(wav.data.samples);
 // &quot;cue &quot;
 console.log(wav.cue.chunkId);
 console.log(wav.cue.chunkSize);
-// ...</code></pre><h4>BWF data</h4><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
+
+// &quot;LIST&quot;
+console.log(wav.LISTChunks.length);</code></pre><h4>BWF data</h4><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
 <pre class="prettyprint source lang-javascript"><code>wav.bext = {
     &quot;chunkId&quot;: &quot;&quot;,
     &quot;chunkSize&quot;: 0,
@@ -293,8 +253,45 @@ console.log(wav.cue.chunkSize);
     &quot;dwChunkStart&quot;: 0, //DWORD,
     &quot;dwBlockStart&quot;: 0, //DWORD,
     &quot;dwSampleOffset&quot;: 0, //DWORD,
-}</code></pre><h4>RF64</h4><p><strong>wavefile</strong> have limited support of RF64 files. Changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
-<pre class="prettyprint source lang-javascript"><code>this.ds64 = {
+}</code></pre><h4>LIST chunk</h4><p>&quot;LIST&quot; chunk data is stored as follows:</p>
+<pre class="prettyprint source lang-javascript"><code>/**
+ * An array of the &quot;LIST&quot; chunks present in the file.
+ * @type {Array&lt;Object>}
+ */
+wav.LISTChunks = [];</code></pre><p>WaveFile.LISTChunks is an array of objects with this signature:</p>
+<pre class="prettyprint source lang-javascript"><code>{
+    /** @type {!string} */
+    &quot;chunkId&quot;: &quot;&quot;, // always 'LIST'
+    /** @type {!number} */
+    &quot;chunkSize&quot;: 0,
+    /** @type {!string} */
+    &quot;format&quot;: &quot;&quot;, // 'adtl' or 'INFO'
+    /** @type {!Array&lt;Object>} */
+    &quot;subChunks&quot;: []
+};</code></pre><p>Where &quot;subChunks&quot; contains the subChunks of the &quot;LIST&quot; chunk. They can be &quot;INFO&quot; or &quot;adtl&quot;. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same.</p>
+<p>For &quot;LIST&quot; chunks with the &quot;adtl&quot; format, &quot;subChunks&quot; is an array of objects with this signature:</p>
+<pre class="prettyprint source lang-javascript"><code>{
+    /** @type {!string} */
+    &quot;chunkId&quot;: &quot;&quot; // only 'labl' or 'note'
+    /** @type {!number} */
+    &quot;chunkSize&quot; 0,
+    /** @type {!number} */
+    &quot;dwName&quot;: 0,
+    /** @type {!string} */
+    &quot;value&quot;: &quot;&quot;
+}</code></pre><p>Where &quot;value&quot; is the text of the &quot;labl&quot; or &quot;note&quot; chunk, and &quot;dwName&quot; is the cue point to where the note/labl points to.</p>
+<p>For &quot;LIST&quot; chunks with the &quot;INFO&quot; format, &quot;subChunks&quot; is an array of objects with this signature:</p>
+<pre class="prettyprint source lang-javascript"><code>{
+    /** @type {!string} */
+    &quot;chunkId&quot;: &quot;&quot; // some RIFF tag
+    /** @type {!number} */
+    &quot;chunkSize&quot; 0,
+    /** @type {!string} */
+    &quot;value&quot;: &quot;&quot;
+}</code></pre><p>Where &quot;chunkId&quot; may be any RIFF tag:<br>https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
+<h4>RF64</h4><p><strong>wavefile</strong> have limited support of RF64 files. Changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
+<p>&quot;ds64&quot; data is stored as follows:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.ds64 = {
     &quot;chunkId&quot;: &quot;&quot;,
     &quot;chunkSize&quot;: 0,
     &quot;riffSizeHigh&quot;: 0,
@@ -304,7 +301,8 @@ console.log(wav.cue.chunkSize);
     &quot;originationTime&quot;: 0,
     &quot;sampleCountHigh&quot;: 0,
     &quot;sampleCountLow&quot;: 0
-};</code></pre><h3>The samples</h3><p>Range:</p>
+};</code></pre><p><strong>The &quot;ds64&quot; chunk is read-only.</strong></p>
+<h3>The samples</h3><p>Range:</p>
 <ul>
 <li>0 to 255 for 8-bit</li>
 <li>-32768 to 32767 for 16-bit</li>
@@ -313,7 +311,10 @@ console.log(wav.cue.chunkSize);
 <li>-1.0 to 1.0 for 32-bit (float)</li>
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
-<h2>References</h2><p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html<br>https://<a href="http://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml">www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml</a><br>https://gist.github.com/hackNightly/3776503<br>http://<a href="http://www.neurophys.wisc.edu/auditory/riff-format.txt">www.neurophys.wisc.edu/auditory/riff-format.txt</a><br>https://github.com/chirlu/sox/blob/master/src/wav.c<br>https://github.com/erikd/libsndfile</p>
+<h2>References</h2><p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html<br>https://<a href="http://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml">www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml</a><br>https://gist.github.com/hackNightly/3776503<br>http://<a href="http://www.neurophys.wisc.edu/auditory/riff-format.txt">www.neurophys.wisc.edu/auditory/riff-format.txt</a><br>https://github.com/chirlu/sox/blob/master/src/wav.c<br>https://github.com/erikd/libsndfile
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf
+https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&amp;showPrintDialog=1#wavl
+https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
 <h2>LICENSE</h2><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -343,7 +344,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 07 2018 13:36:46 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 10 2018 02:22:06 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

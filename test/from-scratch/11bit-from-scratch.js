@@ -21,6 +21,12 @@ describe('create 11-bit wave files from scratch', function() {
     let fs = require('fs');
     fs.writeFileSync("./test/files/out/11-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
 
+    var stats = fs.statSync("./test/files/out/11-bit-48kHz-mono-fromScratch.wav");
+    var fileSizeInBytes = stats["size"];
+
+    it("chunkSize + 8 should be == fileSizeInBytes", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes);
+    });
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
     });

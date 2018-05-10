@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "6.4.1",
+  "version": "6.5.0",
   "description": "Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -13,6 +13,10 @@
     "WAVE",
     "BWF",
     "bext",
+    "LIST",
+    "INFO",
+    "ID3",
+    "chunk",
     "audio",
     "file",
     "read",
@@ -39,7 +43,8 @@
     "decode",
     "compander",
     "A-Law",
-    "mu-Law"
+    "mu-Law",
+    "cue"
   ],
   "repository": {
     "type": "git",
@@ -47,6 +52,10 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
+    "test-list": "nyc ./node_modules/mocha/bin/_mocha test/list --src --recursive",
+    "test-afsp": "nyc ./node_modules/mocha/bin/_mocha test/list/afsp.js --src --recursive",
+    "test-adtl": "nyc ./node_modules/mocha/bin/_mocha test/list/read-list-adtl.js --src --recursive",
+    "test-info": "nyc ./node_modules/mocha/bin/_mocha test/list/read-list-info.js --src --recursive",
     "test": "nyc ./node_modules/mocha/bin/_mocha test --src --recursive",
     "test-dist": "nyc ./node_modules/mocha/bin/_mocha test --dist --recursive",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
@@ -74,7 +83,7 @@
     "bitdepth": "^3.1.1",
     "byte-data": "^8.0.0",
     "imaadpcm": "^1.1.4",
-    "riff-chunks": "^4.0.2"
+    "riff-chunks": "^4.0.4"
   },
   "main": "index.js"
 }

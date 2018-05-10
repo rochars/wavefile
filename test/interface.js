@@ -1,7 +1,7 @@
-/*!
- * Wavefile
- * Copyright (c) 2017 Rafael da Silva Rocha.
- * 
+/*
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefile
+ *
  */
 
 var assert = require("assert");

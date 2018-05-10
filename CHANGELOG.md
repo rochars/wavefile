@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## version 6.5.0 (2018-05-08)
+- Reading and writing tags from "LIST" chunks of type "INFO".
+- Reading and writing cue points.
+- BWF data is kept when changing bit depth, using compression or when re-creating an existing WaveFile object with the fromScratch() or fromBuffer() method.
+- Reading the "junk" chunk. The chunk is kept when changing bit depth, using compression or when re-creating an existing WaveFile object with the fromScratch() or fromBuffer() method.
+- Fix: all chunkSize fields are calculated when writing the file.
+- Fix: calling clearHeader_() on fromBuffer(), not just fromScratch(). The method is used to clear data in the file header that might lead to corrupt files, like the "fact" chunk.
+
 ## version 6.4.1 (2018-05-07)
 - Using compilationLevel: ADVANCED with Closure Compiler.
 

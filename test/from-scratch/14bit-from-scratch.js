@@ -9,17 +9,24 @@ var assert = require('assert');
 describe('create 14-bit wave files from scratch', function() {
     
     const WaveFile = require("../../test/loader.js");
-    let wav = new WaveFile();
 
     let samples = [];
     for (let i=0; i<9000; i++) {
         samples.push(0);
     }
 
+    let wav = new WaveFile();
     wav.fromScratch(1, 8000, '14', samples);
 
     let fs = require('fs');
     fs.writeFileSync("./test/files/out/14-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
+
+    var stats = fs.statSync("./test/files/out/14-bit-48kHz-mono-fromScratch.wav");
+    var fileSizeInBytes1 = stats["size"];
+
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
+    });
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");

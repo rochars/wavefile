@@ -7,12 +7,17 @@ let assert = require("assert");
 
 describe("64-bit reading (file < 4GB)", function() {
 
-    
     let fs = require("fs");
     const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     let wav = new WaveFile(fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
 
+    var stats = fs.statSync(path + "RF64-16bit-8kHz-stereo-reaper.wav");
+    var fileSizeInBytes2 = stats["size"];
+
+    it("chunkSize should be == fileSizeInBytes", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes2);
+    });
     it("chunkId should be 'RF64'",
             function() {
         assert.equal(wav.container, "RF64");
@@ -21,7 +26,6 @@ describe("64-bit reading (file < 4GB)", function() {
             function() {
         assert.equal(wav.chunkSize, wav.ds64.riffSizeHigh);
     });
-    
     // ds64 fields
     it("ds64 chunk should not be null", function() {
         assert.equal(wav.ds64.chunkId, "ds64");
@@ -47,63 +51,40 @@ describe("64-bit reading (file < 4GB)", function() {
     it("ds64.sampleCountLow should be 0", function() {
         assert.equal(wav.ds64.sampleCountLow, 0);
     });
-    it("ds64.tableLength should be 0", function() {
-        assert.equal(wav.ds64.tableLength, 0);
-    });
-    it("ds64.table should be null", function() {
-        assert.deepEqual(wav.ds64.table, []);
-    });
-    
-    // --------------------------------
-
-
-    it("fmtChunkId should be 'fmt '",
-            function() {
+    it("fmtChunkId should be 'fmt '", function() {
         assert.equal(wav.fmt.chunkId, "fmt ");
     });
-    it("format should be 'WAVE'",
-            function() {
+    it("format should be 'WAVE'", function() {
         assert.equal(wav.format, "WAVE");
     });
-    it("fmtChunkSize should be 16",
-            function() {
+    it("fmtChunkSize should be 16", function() {
         assert.equal(wav.fmt.chunkSize, 16);
     });
-    it("audioFormat should be 1",
-            function() {
+    it("audioFormat should be 1", function() {
         assert.equal(wav.fmt.audioFormat, 1);
     });
-    it("numChannels should be 2",
-            function() {
+    it("numChannels should be 2", function() {
         assert.equal(wav.fmt.numChannels, 2);
     });
-    it("sampleRate should be 8000",
-            function() {
+    it("sampleRate should be 8000", function() {
         assert.equal(wav.fmt.sampleRate, 8000);
     });
-    it("byteRate should be 32000",
-            function() {
+    it("byteRate should be 32000", function() {
         assert.equal(wav.fmt.byteRate, 32000);
     });
-    it("blockAlign should be 4",
-            function() {
+    it("blockAlign should be 4", function() {
         assert.equal(wav.fmt.blockAlign, 4);
     });
-    it("bitsPerSample should be 16",
-            function() {
+    it("bitsPerSample should be 16", function() {
         assert.equal(wav.fmt.bitsPerSample, 16);
     });
-    it("dataChunkId should be 'data'",
-            function() {
+    it("dataChunkId should be 'data'", function() {
         assert.equal(wav.data.chunkId, 'data');
     });
-    it("dataChunkSize should be > 0",
-            function() {
+    it("dataChunkSize should be > 0", function() {
         assert.ok(wav.data.chunkSize > 0);
     });
-    it("samples.length should be > 0",
-            function() {
+    it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
     });
-
 });

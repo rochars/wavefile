@@ -76,6 +76,7 @@ describe("16-bit RIFF to RIFX", function() {
     });
 });
 
+
 describe("RIFX cbSize and validBitsPerSample", function() {
 
     let fs = require("fs");

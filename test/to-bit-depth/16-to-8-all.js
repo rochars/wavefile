@@ -32,10 +32,26 @@ describe("16-bit mono from file to 13-bit", function() {
     const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
     
-    let wav = new WaveFile(
-        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wavB = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     wav.toBitDepth("13");
+    wav.LISTChunks = [];
     fs.writeFileSync(path + "/out/to-bit-depth/16-to-13.wav", wav.toBuffer());
+
+    let wav2 = new WaveFile(fs.readFileSync(path + "/out/to-bit-depth/16-to-13.wav"));
+
+    let stats = fs.statSync(path + "16-bit-8kHz-noBext-mono.wav");
+    let fileSizeInBytes1 = stats["size"];
+    stats = fs.statSync(path + "/out/to-bit-depth/16-to-13.wav");
+    let fileSizeInBytes2 = stats["size"];
+
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wavB.chunkSize + 8, fileSizeInBytes1);
+    });
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
+    });
+
 });
 
 describe("16-bit mono from file to 12-bit", function() {
