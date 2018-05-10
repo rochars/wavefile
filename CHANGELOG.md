@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 6.6.0 (2018-05-11)
+## version 6.6.1 (2018-05-11)
 - Set, get and delete tags on files with setTag(), getTag() and deleteTag().
 
 ## version 6.5.1 (2018-05-10)
