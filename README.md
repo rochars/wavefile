@@ -10,10 +10,11 @@ https://github.com/rochars/wavefile
 **wavefile** is a module to work with wav files. It is partly inspired by SoX and intended to run in both Node.js and the browser.
 
 With **wavefile** you can:
-- Create wav files from scratch
-- Read existing wav files
+- Create wave files from scratch
+- Read existing .wav files
+- Read and write tags on .wav files
 - Encode/decode files as ADPCM, A-Law and mu-Law
-- Read/write the data in a wav file header
+- Read/write the data in a .wav file header
 - Turn RIFF files to RIFX and RIFX files to RIFF
 - Edit BWF metada ("bext" chunk)
 - Change the bit depth of the audio
@@ -38,7 +39,7 @@ Drag and drop .wav files and play them. This example uses **wavefile** and **wav
 
 Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With **wavefile** you can extended this by changing the bit depth of wav files on the fly before loading them into the player:
 
-Playing ADPCM in the browser:
+Playing ADPCM in the browser
 ```javascript
 // Load a wav file that is encoded as 4-bit IMA ADPCM:
 let wav = new WaveFile(ADPCMFileBuffer);
@@ -53,7 +54,7 @@ let dataURI = wav.toDataURI();
 // ...
 ```
 
-Playing a 64-bit wave file in the browser:
+Playing a 64-bit wave file in the browser
 ```javascript
 // Load a wav file that has 64-bit audio:
 let wav = new WaveFile(buffer);
@@ -70,7 +71,7 @@ With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on
 Check out wavesurfer:  
 https://github.com/katspaugh/wavesurfer.js
 
-### Creating wave files in the browser:
+### Creating wave files in the browser
 https://tr2099.github.io/
 
 Hit **"Load in player"** to generate wave files.
@@ -98,7 +99,7 @@ let wavBuffer = wav.toBuffer();
 wavDataURI = wav.toDataURI();
 ```
 
-### Main methods:
+### Main methods
 
 #### WaveFile.fromBuffer()
 Load a .wav file from a byte buffer into a WaveFile object:
@@ -188,6 +189,24 @@ To interleave them:
 ```javascript
 // Interleave stereo samples
 wav.interleave();
+```
+
+### Create tags on files
+You can create tags on files with **WaveFile.setTag()** method. If the tag already exists, it's value is rewritten.
+```javascript
+// Write the ICMT tag with some comments to the file
+wav.setTag("ICMT", "some comments");
+```
+
+To get the value of a tag (if it exists), use **WaveFile.getTag()**:
+```javascript
+console.log(wav.getTag("ICMT"));
+// some comments
+```
+
+You can delete tags with **WaveFile.deleteTag()**:
+```javascript
+wav.deleteTag("ICMT");
 ```
 
 ### RIFF to RIFX and RIFX to RIFF

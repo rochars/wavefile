@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.6.0 (2018-05-11)
+- Set, get and delete tags on files with setTag(), getTag() and deleteTag().
+
 ## version 6.5.1 (2018-05-10)
 - Safer estimation of chunkSizes.
 - Fix: data.chunkSize calculated when writing the file.

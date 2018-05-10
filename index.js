@@ -645,6 +645,110 @@ class WaveFile {
     }
 
     /**
+     * Write a RIFF tag in the INFO chunk. If the tag do not exist,
+     * then it is created. It if exists, it is overwritten.
+     * @param {!string} tag The tag name.
+     * @param {!string} value The tag value.
+     * @return {boolean} True if the tag was set.
+     * @throws {Error} If the tag name is not valid.
+     * @export
+     */
+    setTag(tag, value) {
+        tag = this.fixTagName_(tag);
+        let index = this.getTagIndex_(tag);
+        if (index.TAG !== null) {
+            this.LIST[index.LIST]["subChunks"][index.TAG]["chunkSize"] =
+                (value.length + 1).toString();
+            this.LIST[index.LIST]["subChunks"][index.TAG]["value"] = value;
+        } else if (index.LIST !== null) {
+            this.LIST[index.LIST]["subChunks"].push({
+                "chunkId": tag,
+                "chunkSize": (value.length + 1).toString(),
+                "value": value});
+        } else {
+            this.LIST.push({
+                "chunkId": "LIST",
+                "chunkSize": 8 + value.length + 1,
+                "format": "INFO",
+                "chunkData": [],
+                "subChunks": []});
+            this.LIST[this.LIST.length - 1]["subChunks"].push({
+                "chunkId": tag,
+                "chunkSize": (value.length + 1).toString(),
+                "value": value});
+        }
+        return true;
+    }
+
+    /**
+     * Return the value of a RIFF tag in the INFO chunk.
+     * @param {!string} tag The tag name.
+     * @return {!string|null} The value if the tag is found, null otherwise.
+     * @export
+     */
+    getTag(tag) {
+        let index = this.getTagIndex_(tag);
+        if (index.TAG !== null) {
+            return this.LIST[index.LIST]["subChunks"][index.TAG]["value"];
+        }
+        return null;
+    }
+
+    /**
+     * Remove a RIFF tag in the INFO chunk.
+     * @param {!string} tag The tag name.
+     * @return {boolean} True if a tag was deleted.
+     * @export
+     */
+    deleteTag(tag) {
+        let index = this.getTagIndex_(tag);
+        if (index.TAG !== null) {
+            this.LIST[index.LIST]["subChunks"].splice(index.TAG, 1);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return the index of a tag in a FILE chunk.
+     * @param {!string} tag The tag name.
+     * @return {!Object<string, number|null>}
+     *      Object.LIST is the INFO index in LIST
+     *      Object.TAG is the tag index in the INFO
+     * @private
+     */
+    getTagIndex_(tag) {
+        let index = {LIST: null, TAG: null};
+        for (let i=0; i<this.LIST.length; i++) {
+            if (this.LIST[i]["format"] == "INFO") {
+                index.LIST = i;
+                for (let j=0; j<this.LIST[i]["subChunks"].length; j++) {
+                    if (this.LIST[i]["subChunks"][j]["chunkId"] == tag) {
+                        index.TAG = j;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        return index;
+    }
+
+    /*
+     * 
+     */
+    fixTagName_(tag) {
+        if (tag.constructor !== String) {
+            throw new Error("Invalid tag name.");
+        } else if(tag.length < 4) {
+            for (let i=0; i<4-tag.length; i++) {
+                tag += ' ';
+            }
+        }
+        return tag;
+    }
+
+    /**
      * Return the closest greater number of bits for a number of bits that
      * do not fill a full sequence of bytes.
      * @param {!string} bitDepth The bit depth.

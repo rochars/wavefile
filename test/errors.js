@@ -18,6 +18,15 @@ describe('errors', function() {
             function () {
         testFunc = function() {
             let wav = new WaveFile();
+            wav.fromScratch(1, 44100, '8', [0]);
+            wav.setTag(2, "no");
+        };
+        expect(testFunc).to.throw("Invalid tag name.");
+    });
+    it("fromScratch() should throw an error if the bit depth is not valid",
+            function () {
+        testFunc = function() {
+            let wav = new WaveFile();
             wav.fromScratch(1, 44100, '1', [0]);
         };
         expect(testFunc).to.throw("Invalid bit depth.");
