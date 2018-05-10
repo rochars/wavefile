@@ -7,6 +7,7 @@
 - Reading the "junk" chunk. The chunk is kept when changing bit depth, using compression or when re-creating an existing WaveFile object with the fromScratch() or fromBuffer() method.
 - Fix: all chunkSize fields are calculated when writing the file.
 - Fix: calling clearHeader_() on fromBuffer(), not just fromScratch(). The method is used to clear data in the file header that might lead to corrupt files, like the "fact" chunk.
+- Fix: assure samples are de-interleaved on fromScratch() before using the array.
 
 ## version 6.4.1 (2018-05-07)
 - Using compilationLevel: ADVANCED with Closure Compiler.

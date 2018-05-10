@@ -306,9 +306,17 @@ class WaveFile {
         let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
         this.clearHeader_();
         this.bitDepth = bitDepth;
+        // interleave the samples if they were passed de-interleaved
+        this.data.samples = samples;
+        if (samples.length > 0) {
+            if (samples[0].constructor === Array) {
+                this.isInterleaved = false;
+                this.interleave();
+            }
+        }
         // Normal PCM file header
         this.container = options["container"];
-        this.chunkSize = 36 + samples.length * numBytes;
+        this.chunkSize = 36 + this.data.samples.length * numBytes;
         this.format = "WAVE";
         this.fmt.chunkId = "fmt ";
         this.fmt.chunkSize = 16;
@@ -322,18 +330,10 @@ class WaveFile {
         this.fmt.cbSize = 0;
         this.fmt.validBitsPerSample = 0;
         this.data.chunkId = "data";
-        this.data.samples = samples;
-        // interleave the samples if they were passed de-interleaved
-        if (samples.length > 0) {
-            if (samples[0].constructor === Array) {
-                this.isInterleaved = false;
-                this.interleave();
-            }
-        }
-        this.data.chunkSize = samples.length * numBytes;
+        this.data.chunkSize = this.data.samples.length * numBytes;
         // IMA ADPCM header
         if (bitDepth == "4") {
-            this.chunkSize = 40 + samples.length;
+            this.chunkSize = 40 + this.data.samples.length;
             this.fmt.chunkSize = 20;
             this.fmt.byteRate = 4055;
             this.fmt.blockAlign = 256;
@@ -342,22 +342,22 @@ class WaveFile {
             this.fmt.validBitsPerSample = 505;
             this.fact.chunkId = "fact";
             this.fact.chunkSize = 4;
-            this.fact.dwSampleLength = samples.length * 2;
-            this.data.chunkSize = samples.length;
+            this.fact.dwSampleLength = this.data.samples.length * 2;
+            this.data.chunkSize = this.data.samples.length;
         }
         // A-Law and mu-Law header
         if (bitDepth == "8a" || bitDepth == "8m") {
-            this.chunkSize = 40 + samples.length;
+            this.chunkSize = 40 + this.data.samples.length;
             this.fmt.chunkSize = 20;
             this.fmt.cbSize = 2;
             this.fmt.validBitsPerSample = 8;
             this.fact.chunkId = "fact";
             this.fact.chunkSize = 4;
-            this.fact.dwSampleLength = samples.length;
+            this.fact.dwSampleLength = this.data.samples.length;
         }
         // WAVE_FORMAT_EXTENSIBLE
         if (this.fmt.audioFormat == 65534) {
-            this.chunkSize = 36 + 24 + samples.length * numBytes;
+            this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
             this.fmt.chunkSize = 40;
             this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
             this.fmt.cbSize = 22;
@@ -383,7 +383,6 @@ class WaveFile {
     fromBuffer(bytes) {
         this.clearHeader_();
         this.readRIFFChunk_(bytes);
-        let bigEndian = this.container == "RIFX";
         let chunk = riffChunks_.read(bytes);
         this.readDs64Chunk_(chunk["subChunks"]);
         this.readFmtChunk_(chunk["subChunks"]);
@@ -506,7 +505,7 @@ class WaveFile {
                 }
             }
             this.data.samples = finalSamples;
-            this.isInterleaved = true;    
+            this.isInterleaved = true;
         }
     }
 
@@ -1004,7 +1003,7 @@ class WaveFile {
      */
     readLISTChunk_(chunks) {
         let listChunks = this.findChunk_(chunks, "LIST", true);
-        if (listChunks == null) {
+        if (listChunks === null) {
             return;
         }
         for (let j=0; j<listChunks.length; j++) {
@@ -1082,7 +1081,7 @@ class WaveFile {
     readZSTR_(bytes) {
         let str = "";
         for (let i=0; i<bytes.length; i++) {
-            if (bytes[i] == 0) {
+            if (bytes[i] === 0) {
                 break;
             }
             str += byteData_.unpack([bytes[i]], chr_);

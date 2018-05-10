@@ -41,7 +41,7 @@ Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit d
 Playing ADPCM in the browser:
 ```javascript
 // Load a wav file that is encoded as 4-bit IMA ADPCM:
-let wav = new Wavefile(ADPCMFileBuffer);
+let wav = new WaveFile(ADPCMFileBuffer);
 
 // Decode the file to 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
@@ -56,7 +56,7 @@ let dataURI = wav.toDataURI();
 Playing a 64-bit wave file in the browser:
 ```javascript
 // Load a wav file that has 64-bit audio:
-let wav = new Wavefile(buffer);
+let wav = new WaveFile(buffer);
 
 // Change the bit depth to 16-bit, supported by most browsers:
 wav.toBitDepth("16");
@@ -82,7 +82,7 @@ Some bit depths may not be supported by your browser, like 32-bit floating point
 ## Use
 ```javascript
 // Load a wav file from disk into a WaveFile object
-let wav = new Wavefile(buffer);
+let wav = new WaveFile(buffer);
 
 // Check some of the file properties
 console.log(wav.container);
@@ -108,7 +108,7 @@ wav.fromBuffer(buffer);
 
 This is the same as passing the buffer when creating the WaveFile object:
 ```javascript
-let wav = new Wavefile(buffer);
+let wav = new WaveFile(buffer);
 ```
 
 #### WaveFile.fromScratch()
@@ -262,19 +262,18 @@ wav.fromMuLaw("24");
 ```
 
 ### Change the bit depth
+
+You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method.
+
 ```javascript
 // Load a wav file with 32-bit audio
-let wav = new Wavefile(fs.readFileSync("32bit-file.wav"));
+let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
 
 // Change the bit depth to 24-bit
 wav.toBitDepth("24");
 
 // Write the new 24-bit file
 fs.writeFileSync("24bit-file.wav", wav.toBuffer());
-
-// You can use any supported bit depth:
-wav.toBitDepth("11");
-fs.writeFileSync("11bit-file.wav", wav.toBuffer());
 ```
 
 ### The properties
@@ -286,7 +285,7 @@ console.log(wav.data.samples);
 
 The other public properties:
 ```javascript
-let wav = new Wavefile(fs.readFileSync("file.wav"));
+let wav = new WaveFile(fs.readFileSync("file.wav"));
 
 // The container data
 console.log(wav.container); //"RIFF" or "RIFX"
@@ -332,13 +331,13 @@ console.log(wav.cue.chunkId);
 console.log(wav.cue.chunkSize);
 
 // "LIST"
-console.log(wav.LISTChunks.length);
+console.log(wav.LIST.length);
 ```
 
 #### BWF data
 BWF data ("bext" chunk) is stored in the *bext* property.
 ```javascript
-wav.bext = {
+WaveFile.bext = {
     "chunkId": "",
     "chunkSize": 0,
     "description": "", // 256 chars
@@ -362,7 +361,7 @@ wav.bext = {
 #### Cue points
 "cue " chunk data is stored as follows:
 ```javascript
-wav.cue = {
+WaveFile.cue = {
     "chunkId": "",
     "chunkSize": 0,
     "dwCuePoints": 0, //DWORD
@@ -389,10 +388,10 @@ Items in cue.points are objects with this signature:
  * An array of the "LIST" chunks present in the file.
  * @type {Array<Object>}
  */
-wav.LISTChunks = [];
+WaveFile.LIST = [];
 ```
 
-WaveFile.LISTChunks is an array of objects with this signature:
+WaveFile.LIST is an array of objects with this signature:
 ```javascript
 {
     /** @type {!string} */
@@ -405,22 +404,7 @@ WaveFile.LISTChunks is an array of objects with this signature:
     "subChunks": []
 };
 ```
-Where "subChunks" contains the subChunks of the "LIST" chunk. They can be "INFO" or "adtl". A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same.
-
-For "LIST" chunks with the "adtl" format, "subChunks" is an array of objects with this signature:
-```javascript
-{
-    /** @type {!string} */
-    "chunkId": "" // only 'labl' or 'note'
-    /** @type {!number} */
-    "chunkSize" 0,
-    /** @type {!number} */
-    "dwName": 0,
-    /** @type {!string} */
-    "value": ""
-}
-```
-Where "value" is the text of the "labl" or "note" chunk, and "dwName" is the cue point to where the note/labl points to.
+Where "subChunks" contains the subChunks of the "LIST" chunk. WaveFile supports "LIST" chunks of format "INFO". A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same.
 
 For "LIST" chunks with the "INFO" format, "subChunks" is an array of objects with this signature:
 ```javascript

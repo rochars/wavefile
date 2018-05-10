@@ -6,6 +6,31 @@
 
 var assert = require('assert');
 
+
+describe('fromScratch with interleaved stereo samples', function() {
+    
+    const WaveFile = require("../test/loader.js");
+    let wav = new WaveFile();
+    let stereoSamples = [
+        [0, -2, 4, 3],
+        [0, -1, 4, 3]
+    ];
+    wav.fromScratch(2, 8000, '8', stereoSamples); 
+
+    it('byteRate when fromScratch is called with interleaved samples.',
+            function() {
+        assert.deepEqual(wav.fmt.byteRate, 16000);
+    });
+    it('chunkSize when fromScratch is called with interleaved samples.',
+            function() {
+        assert.deepEqual(wav.chunkSize, 44);
+    });
+    it('data.chunkSize when fromScratch is called with interleaved samples.',
+            function() {
+        assert.deepEqual(wav.data.chunkSize, 8);
+    });
+});
+
 describe('interleave', function() {
     
     const WaveFile = require("../test/loader.js");   

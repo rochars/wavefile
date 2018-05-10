@@ -67,7 +67,7 @@
 <p>Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With <strong>wavefile</strong> you can extended this by changing the bit depth of wav files on the fly before loading them into the player:</p>
 <p>Playing ADPCM in the browser:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file that is encoded as 4-bit IMA ADPCM:
-let wav = new Wavefile(ADPCMFileBuffer);
+let wav = new WaveFile(ADPCMFileBuffer);
 
 // Decode the file to 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
@@ -78,7 +78,7 @@ let dataURI = wav.toDataURI();
 // Load your new wav file into your player
 // ...</code></pre><p>Playing a 64-bit wave file in the browser:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file that has 64-bit audio:
-let wav = new Wavefile(buffer);
+let wav = new WaveFile(buffer);
 
 // Change the bit depth to 16-bit, supported by most browsers:
 wav.toBitDepth(&quot;16&quot;);
@@ -91,7 +91,7 @@ let dataURI = wav.toDataURI();</code></pre><p>With <strong>wavefile</strong> you
 <p>This website uses <strong>wavefile</strong> to create the files. The effects are provided by other libraries.</p>
 <p>Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not to play them).</p>
 <h2>Use</h2><pre class="prettyprint source lang-javascript"><code>// Load a wav file from disk into a WaveFile object
-let wav = new Wavefile(buffer);
+let wav = new WaveFile(buffer);
 
 // Check some of the file properties
 console.log(wav.container);
@@ -106,7 +106,7 @@ let wavBuffer = wav.toBuffer();
 // DataURI to load the file a web browser:
 wavDataURI = wav.toDataURI();</code></pre><h3>Main methods:</h3><h4>WaveFile.fromBuffer()</h4><p>Load a .wav file from a byte buffer into a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>wav.fromBuffer(buffer);</code></pre><p>This is the same as passing the buffer when creating the WaveFile object:</p>
-<pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(buffer);</code></pre><h4>WaveFile.fromScratch()</h4><p>Create a WaveFile object with the arguments you pass:</p>
+<pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile(buffer);</code></pre><h4>WaveFile.fromScratch()</h4><p>Create a WaveFile object with the arguments you pass:</p>
 <pre class="prettyprint source lang-javascript"><code>// A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);</code></pre><h4>WaveFile.toBuffer()</h4><p>Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:</p>
 <pre class="prettyprint source lang-javascript"><code>buffer = wav.toBuffer();</code></pre><h4>WaveFile.toDataURI()</h4><p>Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:</p>
@@ -160,21 +160,18 @@ wav.toMuLaw();</code></pre><p>If the audio is not 16-bit it will be converted to
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 16-bit:
 wav.fromMuLaw();</code></pre><p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 24-bit:
-wav.fromMuLaw(&quot;24&quot;);</code></pre><h3>Change the bit depth</h3><pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
-let wav = new Wavefile(fs.readFileSync(&quot;32bit-file.wav&quot;));
+wav.fromMuLaw(&quot;24&quot;);</code></pre><h3>Change the bit depth</h3><p>You can change the bit depth of the audio with the <strong>toBitDepth(bitDepth)</strong> method.</p>
+<pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
+let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
 // Change the bit depth to 24-bit
 wav.toBitDepth(&quot;24&quot;);
 
 // Write the new 24-bit file
-fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
-
-// You can use any supported bit depth:
-wav.toBitDepth(&quot;11&quot;);
-fs.writeFileSync(&quot;11bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>The properties</h3><p>Since <strong>version 6.0.0</strong> (2018-05-02) the samples are stored in <strong>data.samples</strong>.</p>
+fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>The properties</h3><p>Since <strong>version 6.0.0</strong> (2018-05-02) the samples are stored in <strong>data.samples</strong>.</p>
 <pre class="prettyprint source lang-javascript"><code>console.log(wav.data.samples);
 // Output an array of numbers</code></pre><p>The other public properties:</p>
-<pre class="prettyprint source lang-javascript"><code>let wav = new Wavefile(fs.readFileSync(&quot;file.wav&quot;));
+<pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile(fs.readFileSync(&quot;file.wav&quot;));
 
 // The container data
 console.log(wav.container); //&quot;RIFF&quot; or &quot;RIFX&quot;
@@ -220,8 +217,8 @@ console.log(wav.cue.chunkId);
 console.log(wav.cue.chunkSize);
 
 // &quot;LIST&quot;
-console.log(wav.LISTChunks.length);</code></pre><h4>BWF data</h4><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
-<pre class="prettyprint source lang-javascript"><code>wav.bext = {
+console.log(wav.LIST.length);</code></pre><h4>BWF data</h4><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
+<pre class="prettyprint source lang-javascript"><code>WaveFile.bext = {
     &quot;chunkId&quot;: &quot;&quot;,
     &quot;chunkSize&quot;: 0,
     &quot;description&quot;: &quot;&quot;, // 256 chars
@@ -240,7 +237,7 @@ console.log(wav.LISTChunks.length);</code></pre><h4>BWF data</h4><p>BWF data (&q
     &quot;reserved&quot;: &quot;&quot;, // 180 chars
     &quot;codingHistory&quot;: &quot;&quot; // string, unlimited size
 };</code></pre><h4>Cue points</h4><p>&quot;cue &quot; chunk data is stored as follows:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.cue = {
+<pre class="prettyprint source lang-javascript"><code>WaveFile.cue = {
     &quot;chunkId&quot;: &quot;&quot;,
     &quot;chunkSize&quot;: 0,
     &quot;dwCuePoints&quot;: 0, //DWORD
@@ -258,7 +255,7 @@ console.log(wav.LISTChunks.length);</code></pre><h4>BWF data</h4><p>BWF data (&q
  * An array of the &quot;LIST&quot; chunks present in the file.
  * @type {Array&lt;Object>}
  */
-wav.LISTChunks = [];</code></pre><p>WaveFile.LISTChunks is an array of objects with this signature:</p>
+WaveFile.LIST = [];</code></pre><p>WaveFile.LIST is an array of objects with this signature:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {!string} */
     &quot;chunkId&quot;: &quot;&quot;, // always 'LIST'
@@ -268,18 +265,7 @@ wav.LISTChunks = [];</code></pre><p>WaveFile.LISTChunks is an array of objects w
     &quot;format&quot;: &quot;&quot;, // 'adtl' or 'INFO'
     /** @type {!Array&lt;Object>} */
     &quot;subChunks&quot;: []
-};</code></pre><p>Where &quot;subChunks&quot; contains the subChunks of the &quot;LIST&quot; chunk. They can be &quot;INFO&quot; or &quot;adtl&quot;. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same.</p>
-<p>For &quot;LIST&quot; chunks with the &quot;adtl&quot; format, &quot;subChunks&quot; is an array of objects with this signature:</p>
-<pre class="prettyprint source lang-javascript"><code>{
-    /** @type {!string} */
-    &quot;chunkId&quot;: &quot;&quot; // only 'labl' or 'note'
-    /** @type {!number} */
-    &quot;chunkSize&quot; 0,
-    /** @type {!number} */
-    &quot;dwName&quot;: 0,
-    /** @type {!string} */
-    &quot;value&quot;: &quot;&quot;
-}</code></pre><p>Where &quot;value&quot; is the text of the &quot;labl&quot; or &quot;note&quot; chunk, and &quot;dwName&quot; is the cue point to where the note/labl points to.</p>
+};</code></pre><p>Where &quot;subChunks&quot; contains the subChunks of the &quot;LIST&quot; chunk. WaveFile supports &quot;LIST&quot; chunks of format &quot;INFO&quot;. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same.</p>
 <p>For &quot;LIST&quot; chunks with the &quot;INFO&quot; format, &quot;subChunks&quot; is an array of objects with this signature:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {!string} */
@@ -344,7 +330,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 10 2018 02:22:06 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 10 2018 03:28:54 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
