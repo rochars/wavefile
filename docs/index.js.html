@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#clearLISTadtl_">clearLISTadtl_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getCuePoints_">getCuePoints_</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint_">setCuePoint_</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -38,9 +38,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/*
- * wavefile
- * Read &amp; write wave files with 4, 8, 11, 12, 16, 20, 24, 32 &amp; 64-bit data.
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
  */
@@ -309,12 +307,6 @@ class WaveFile {
          * @private
          */
         this.head_ = 0;
-        /**
-         * If the "fact" chunk should be enforced or not.
-         * @type {!boolean}
-         * @export
-         */
-        this.enforceFact = false;
         // Load a file from the buffer if one was passed
         // when creating the object
         if(bytes) {
@@ -341,19 +333,123 @@ class WaveFile {
         if (!options["container"]) {
             options["container"] = "RIFF";
         }
-        // closest nuber of bytes if not / 8
-        let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
-        this.clearHeader_();
         this.bitDepth = bitDepth;
         // interleave the samples if they were passed de-interleaved
         this.data.samples = samples;
         if (samples.length > 0) {
             if (samples[0].constructor === Array) {
                 this.isInterleaved = false;
-                this.interleave();
+                this.assureInterleaved_();
             }
         }
+        // closest nuber of bytes if not / 8
+        let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
         // Normal PCM file header
+        if (["8","16","24","32","32f","64"].indexOf(bitDepth) > -1) {
+            this.createPCMHeader_(
+                bitDepth, numChannels, sampleRate, numBytes, options);
+        // IMA ADPCM header
+        } else if (bitDepth == "4") {
+            this.createADPCMHeader_(
+                bitDepth, numChannels, sampleRate, numBytes, options);
+        // A-Law and mu-Law header
+        } else if (bitDepth == "8a" || bitDepth == "8m") {
+            this.createALawMulawHeader_(
+                bitDepth, numChannels, sampleRate, numBytes, options);
+        // WAVE_FORMAT_EXTENSIBLE
+        } else {
+            this.createExtensibleHeader_(
+                bitDepth, numChannels, sampleRate, numBytes, options);
+        }
+        // the data chunk
+        this.data.chunkId = "data";
+        this.data.chunkSize = this.data.samples.length * numBytes;
+        this.validateHeader_();
+        this.LEorBE_();
+    }
+
+    /**
+     * Create the header of a ADPCM wave file.
+     * @param {!string} bitDepth The audio bit depth
+     * @param {!number} numChannels The number of channels
+     * @param {!number} sampleRate The sample rate.
+     * @param {!number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createADPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        this.chunkSize = 40 + this.data.samples.length;
+        this.fmt.chunkSize = 20;
+        this.fmt.byteRate = 4055;
+        this.fmt.blockAlign = 256;
+        this.fmt.bitsPerSample = 4;
+        this.fmt.cbSize = 2;
+        this.fmt.validBitsPerSample = 505;
+        this.fact.chunkId = "fact";
+        this.fact.chunkSize = 4;
+        this.fact.dwSampleLength = this.data.samples.length * 2;
+        this.data.chunkSize = this.data.samples.length;
+    }
+
+    /**
+     * Create the header of WAVE_FORMAT_EXTENSIBLE file.
+     * @param {!string} bitDepth The audio bit depth
+     * @param {!number} numChannels The number of channels
+     * @param {!number} sampleRate The sample rate.
+     * @param {!number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createExtensibleHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
+        this.fmt.chunkSize = 40;
+        this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
+        this.fmt.cbSize = 22;
+        this.fmt.validBitsPerSample = parseInt(bitDepth, 10);
+        this.fmt.dwChannelMask = 0;
+        // subformat 128-bit GUID as 4 32-bit values
+        // only supports uncompressed integer PCM samples
+        this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
+    }
+
+    /**
+     * Create the header of mu-Law and A-Law wave files.
+     * @param {!string} bitDepth The audio bit depth
+     * @param {!number} numChannels The number of channels
+     * @param {!number} sampleRate The sample rate.
+     * @param {!number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createALawMulawHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        this.chunkSize = 40 + this.data.samples.length;
+        this.fmt.chunkSize = 20;
+        this.fmt.cbSize = 2;
+        this.fmt.validBitsPerSample = 8;
+        this.fact.chunkId = "fact";
+        this.fact.chunkSize = 4;
+        this.fact.dwSampleLength = this.data.samples.length;
+    }
+
+    /**
+     * Create the header of a linear PCM wave file.
+     * @param {!string} bitDepth The audio bit depth
+     * @param {!number} numChannels The number of channels
+     * @param {!number} sampleRate The sample rate.
+     * @param {!number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.clearHeader_();
         this.container = options["container"];
         this.chunkSize = 36 + this.data.samples.length * numBytes;
         this.format = "WAVE";
@@ -368,46 +464,6 @@ class WaveFile {
         this.fmt.bitsPerSample = parseInt(bitDepth, 10);
         this.fmt.cbSize = 0;
         this.fmt.validBitsPerSample = 0;
-        this.data.chunkId = "data";
-        this.data.chunkSize = this.data.samples.length * numBytes;
-        // IMA ADPCM header
-        if (bitDepth == "4") {
-            this.chunkSize = 40 + this.data.samples.length;
-            this.fmt.chunkSize = 20;
-            this.fmt.byteRate = 4055;
-            this.fmt.blockAlign = 256;
-            this.fmt.bitsPerSample = 4;
-            this.fmt.cbSize = 2;
-            this.fmt.validBitsPerSample = 505;
-            this.fact.chunkId = "fact";
-            this.fact.chunkSize = 4;
-            this.fact.dwSampleLength = this.data.samples.length * 2;
-            this.data.chunkSize = this.data.samples.length;
-        }
-        // A-Law and mu-Law header
-        if (bitDepth == "8a" || bitDepth == "8m") {
-            this.chunkSize = 40 + this.data.samples.length;
-            this.fmt.chunkSize = 20;
-            this.fmt.cbSize = 2;
-            this.fmt.validBitsPerSample = 8;
-            this.fact.chunkId = "fact";
-            this.fact.chunkSize = 4;
-            this.fact.dwSampleLength = this.data.samples.length;
-        }
-        // WAVE_FORMAT_EXTENSIBLE
-        if (this.fmt.audioFormat == 65534) {
-            this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
-            this.fmt.chunkSize = 40;
-            this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
-            this.fmt.cbSize = 22;
-            this.fmt.validBitsPerSample = parseInt(bitDepth, 10);
-            this.fmt.dwChannelMask = 0;
-            // subformat 128-bit GUID as 4 32-bit values
-            // only supports uncompressed integer PCM samples
-            this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
-        }
-        this.checkWriteInput_();
-        this.LEorBE_();
     }
 
     /**
@@ -442,7 +498,7 @@ class WaveFile {
      * @export
      */
     toBuffer() {
-        this.checkWriteInput_();
+        this.validateHeader_();
         this.assureInterleaved_();
         return this.createWaveFile_();
     }
@@ -459,7 +515,7 @@ class WaveFile {
 
     /**
      * Return a base64 string representig the WaveFile object as a wav file.
-     * The return value of this method can be used to load the audio in browsers.
+     * The return of this method can be used to load the audio in browsers.
      * @return {string} A .wav file as a DataURI.
      * @throws {Error} If any property of the object appears invalid.
      * @export
@@ -697,12 +753,12 @@ class WaveFile {
         let index = this.getTagIndex_(tag);
         if (index.TAG !== null) {
             this.LIST[index.LIST]["subChunks"][index.TAG]["chunkSize"] =
-                (value.length + 1).toString();
+                value.length + 1;
             this.LIST[index.LIST]["subChunks"][index.TAG]["value"] = value;
         } else if (index.LIST !== null) {
             this.LIST[index.LIST]["subChunks"].push({
                 "chunkId": tag,
-                "chunkSize": (value.length + 1).toString(),
+                "chunkSize": value.length + 1,
                 "value": value});
         } else {
             this.LIST.push({
@@ -713,7 +769,7 @@ class WaveFile {
                 "subChunks": []});
             this.LIST[this.LIST.length - 1]["subChunks"].push({
                 "chunkId": tag,
-                "chunkSize": (value.length + 1).toString(),
+                "chunkSize": value.length + 1,
                 "value": value});
         }
         return true;
@@ -749,6 +805,103 @@ class WaveFile {
     }
 
     /**
+     * Create a cue point in the wave file.
+     * @param {!number} position The cue point position in milisenconds
+     * @param {!string} labl The LIST adtl labl text of the marker.
+     * @export
+     */
+    setCuePoint(position, labl) {
+        this.clearLISTadtl_();
+        this.cue.chunkId = "cue ";
+        position = (position * this.fmt.sampleRate) / 1000;
+        let existingPoints = this.getCuePoints_();
+        let len = this.cue.points.length;
+        this.cue.points = [];
+        let hasSet = false;
+        if (len == 0) {
+            this.setCuePoint_(position, 1);
+        } else {
+            for (let i=0; i&lt;len; i++) {
+                if (existingPoints[i] > position &amp;&amp; !hasSet) {
+                    this.setCuePoint_(position, i + 1);
+                    this.setCuePoint_(existingPoints[i], i + 2);
+                    hasSet = true;
+                } else {
+                    this.setCuePoint_(existingPoints[i], i + 1);
+                }
+            }
+            if (!hasSet) {
+                this.setCuePoint_(position, this.cue.points.length + 1);
+            }
+        }
+        this.cue.dwCuePoints = this.cue.points.length;
+    }
+
+    /**
+     * Remove a cue point from a wave file.
+     * @param {!number} index the index of the point. First is 1,
+     *      second is 2, and so on.
+     * @export
+     */
+    deleteCuePoint(index) {
+        this.cue.chunkId = "cue ";
+        let existingPoints = this.getCuePoints_();
+        let len = this.cue.points.length;
+        this.cue.points = [];
+        for (let i=0; i&lt;len; i++) {
+            if (i + 1 != index) {
+                this.setCuePoint_(existingPoints[i], i + 1);
+            }
+        }
+        this.cue.dwCuePoints = this.cue.points.length;
+        if (this.cue.dwCuePoints) {
+            this.cue.chunkId = 'cue ';
+        } else {
+            this.cue.chunkId = '';
+            this.clearLISTadtl_();
+        }
+    }
+
+    /**
+     * Push a new cue point in this.cue.points.
+     * @param {!number} position The position in miliseconds
+     * @param {!number} dwName the dwName of the cue point
+     */
+    setCuePoint_(position, dwName) {
+        this.cue.points.push({
+            "dwName": dwName,
+            "dwPosition": position,
+            "fccChunk": "data",
+            "dwChunkStart": 0,
+            "dwBlockStart": 0,
+            "dwSampleOffset": position,
+        });
+    }
+
+    /**
+     * Return an array with the position of all cue points in the file.
+     * @return {!Array&lt;number>}
+     */
+    getCuePoints_() {
+        let points = [];
+        for (let i=0; i&lt;this.cue.points.length; i++) {
+            points.push(this.cue.points[i]["dwPosition"]);
+        }
+        return points;
+    }
+
+    /**
+     * Clear any LIST chunk labeled as "adtl".
+     */
+    clearLISTadtl_() {
+        for (let i=0; i&lt;this.LIST.length; i++) {
+            if (this.LIST[i]["format"] == 'adtl') {
+                this.LIST.splice(i);
+            }
+        }
+    }
+
+    /**
      * Return the index of a tag in a FILE chunk.
      * @param {!string} tag The tag name.
      * @return {!Object&lt;string, number|null>}
@@ -773,8 +926,11 @@ class WaveFile {
         return index;
     }
 
-    /*
-     * 
+    /**
+     * Fix a RIFF tag format if possible, throw an error otherwise.
+     * @param {!string} tag The tag name.
+     * @return {string} The tag name in proper fourCC format.
+     * @private
      */
     fixTagName_(tag) {
         if (tag.constructor !== String) {
@@ -801,11 +957,11 @@ class WaveFile {
     }
 
     /**
-     * Validate the input for wav writing.
+     * Validate the header of the file.
      * @throws {Error} If any property of the object appears invalid.
      * @private
      */
-    checkWriteInput_() {
+    validateHeader_() {
         this.validateBitDepth_();
         this.validateNumChannels_();
         this.validateSampleRate_();
@@ -1025,8 +1181,6 @@ class WaveFile {
             this.fact.chunkId = chunk["chunkId"];
             this.fact.chunkSize = chunk["chunkSize"];
             this.fact.dwSampleLength = this.read_(chunk["chunkData"], uInt32_);
-        } else if (this.enforceFact) {
-            throw Error("Could not find the 'fact' chunk");
         }
     }
 
@@ -1500,7 +1654,8 @@ class WaveFile {
     /**
      * Return the bytes of the sub chunks of a "LIST" chunk.
      * @param {!Array&lt;Object>} subChunks The "LIST" sub chunks.
-     * @param {!string} format The format of the "LIST" chunk: "adtl" or "INFO".
+     * @param {!string} format The format of the "LIST" chunk.
+     *      Currently supported values are "adtl" or "INFO".
      * @return {!Array&lt;number>} The sub chunk bytes.
      * @private
      */
@@ -1511,20 +1666,25 @@ class WaveFile {
                 bytes = bytes.concat(
                     byteData_.pack(subChunks[i]["chunkId"], fourCC_),
                     byteData_.pack(subChunks[i]["value"].length + 1, uInt32_),
-                    this.writeString_(subChunks[i]["value"], subChunks[i]["value"].length));
+                    this.writeString_(
+                        subChunks[i]["value"], subChunks[i]["value"].length));
                 bytes.push(0);
             } else if (format == "adtl") {
                 if (["labl", "note"].indexOf(subChunks[i]["chunkId"]) > -1) {
                     bytes = bytes.concat(
                         byteData_.pack(subChunks[i]["chunkId"], fourCC_),
-                        byteData_.pack(subChunks[i]["value"].length + 4 + 1, uInt32_),
+                        byteData_.pack(
+                            subChunks[i]["value"].length + 4 + 1, uInt32_),
                         byteData_.pack(subChunks[i]["dwName"], uInt32_),
-                        this.writeString_(subChunks[i]["value"], subChunks[i]["value"].length));
+                        this.writeString_(
+                            subChunks[i]["value"],
+                            subChunks[i]["value"].length));
                     bytes.push(0);
                 }
             } //else {
             //    bytes = bytes.concat(
-            //        byteData_.pack(subChunks[i]["chunkData"].length, uInt32_),
+            //        byteData_.pack(
+            //            subChunks[i]["chunkData"].length, uInt32_),
             //        subChunks[i]["chunkData"]
             //    );
             //}
@@ -1617,7 +1777,7 @@ module.exports = WaveFile;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 10 2018 20:55:06 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 11 2018 04:51:58 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

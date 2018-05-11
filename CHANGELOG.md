@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.7.0 (2018-05-11)
+- Set and delete cue points with setCuePoint() and deleteCuePoint().
+
 ## version 6.6.1 (2018-05-11)
 - Set, get and delete tags on files with setTag(), getTag() and deleteTag().
 

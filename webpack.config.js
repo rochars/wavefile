@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+/*
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  * https://github.com/rochars/wavefile
  *
  */

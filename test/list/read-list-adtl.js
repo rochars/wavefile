@@ -209,7 +209,6 @@ describe("16-bit LIST writing (16bit-16kHz-2markers-mono.wav)", function() {
     });
 });
 
-
 // Audacity file
 describe('read Audacity-16bit-lots-of-markers.wav and write to new file', function() {
     
@@ -319,5 +318,49 @@ describe('read Audacity-16bit-lots-of-markers.wav and write to new file', functi
     it("dwChannelMask should be 0", function() {
         assert.equal(wav2.fmt.dwChannelMask, 0);
     });
+});
 
+// Audacity file with 17 markers
+describe('read Audacity-16bit-lots-of-markers.wav and write to new file', function() {
+    
+    let fs = require("fs");
+    const WaveFile = require("../../test/loader.js");
+    let path = "test/files/";
+    let wav = new WaveFile(fs.readFileSync(path + "Audacity-16bit-17-MARKERS.wav"));
+    let wavB = new WaveFile(fs.readFileSync(path + "Audacity-16bit-17-MARKERS.wav"));
+    fs.writeFileSync(path + "/out/Audacity-16bit-17-MARKERS-out.wav", wavB.toBuffer());
+
+    let stats = fs.statSync(path + "Audacity-16bit-17-MARKERS.wav");
+    let fileSizeInBytes1 = stats["size"];
+
+    stats = fs.statSync(path + "/out/Audacity-16bit-17-MARKERS-out.wav");
+    let fileSizeInBytes2 = stats["size"];
+
+    let wav2 = new WaveFile(fs.readFileSync(path + "/out/Audacity-16bit-17-MARKERS-out.wav"));
+    
+    // Other tests
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
+    });
+    it("wav2.chunkSize should be == fileSizeInBytes2", function() {
+        assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
+    });
+    it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
+        assert.equal(wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
+    });
+    it("wav2.cue should be == wav.cue", function() {
+        assert.deepEqual(wav2.cue, wav.cue);
+    });
+    it("wav2.fmt should be == wav.fmt", function() {
+        assert.deepEqual(wav2.fmt, wav.fmt);
+    });
+    it("wav2.fact should be == wav.fact", function() {
+        assert.deepEqual(wav2.fact, wav.fact);
+    });
+    it("wav2.bext should be == wav.bext", function() {
+        assert.deepEqual(wav2.bext, wav.bext);
+    });
+    it("wav2.junk should be == wav.junk", function() {
+        assert.deepEqual(wav2.junk, wav.junk);
+    });
 });

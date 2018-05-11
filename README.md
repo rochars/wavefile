@@ -1,5 +1,4 @@
 # wavefile
-Read & write wave files with 4, 8, 11, 12, 16, 20, 24, 32 & 64-bit data.  
 Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
@@ -21,7 +20,7 @@ With **wavefile** you can:
 
 And more.
 
-**wavefile** is extensively tested and contains samples of all supported formats. Please note that some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in every player.
+**wavefile** is extensively tested and contains samples of all supported formats. Some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in some players.
 
 ## Install
 ```
@@ -32,12 +31,12 @@ npm install wavefile
 
 ## See it in action
 
-### Using wavefile to extend the browser audio playing capabilities:
+### Using wavefile to extend the browser capabilities
 https://rochars.github.io/wavefile/example
 
 Drag and drop .wav files and play them. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM, 64-bit wav files and more.
 
-Web browsers are typically limited to play wav files with 8, 16, 24 and 32-bit data. With **wavefile** you can extended this by changing the bit depth of wav files on the fly before loading them into the player:
+Web browsers can handle wave files with 8, 16, 24 and 32-bit data (with some exceptions). With **wavefile** you can extended this by changing the bit depth of wav files on the fly before loading them into the player:
 
 Playing ADPCM in the browser
 ```javascript
@@ -70,15 +69,6 @@ With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on
 
 Check out wavesurfer:  
 https://github.com/katspaugh/wavesurfer.js
-
-### Creating wave files in the browser
-https://tr2099.github.io/
-
-Hit **"Load in player"** to generate wave files.
-
-This website uses **wavefile** to create the files. The effects are provided by other libraries.
-
-Some bit depths may not be supported by your browser, like 32-bit floating point or 64-bit floating point (WaveFile is used just to create the files, not to play them).
 
 ## Use
 ```javascript
@@ -281,7 +271,6 @@ wav.fromMuLaw("24");
 ```
 
 ### Change the bit depth
-
 You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method.
 
 ```javascript
@@ -378,12 +367,22 @@ WaveFile.bext = {
 ```
 
 #### Cue points
+You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in miliseconds and create a point in the corresponding position of the file:
+```javascript
+wav.setCuePoint(1750);
+```
+
+To delete a cue point, inform its index. Points are ordered according to their position. The first point is 1. Mind that deleting a point will change the index of other points (but not their position).
+```javascript
+wav.deleteCuePoint(1);
+```
+
 "cue " chunk data is stored as follows:
 ```javascript
 WaveFile.cue = {
     "chunkId": "",
     "chunkSize": 0,
-    "dwCuePoints": 0, //DWORD
+    "dwCuePoints": 0,
     "points": [],
 };
 ```
@@ -391,12 +390,12 @@ WaveFile.cue = {
 Items in cue.points are objects with this signature:
 ```javascript
 {
-    "dwName": 0, //DWORD
-    "dwPosition": 0, //DWORD
-    "fccChunk": 0, //FOURCC,
-    "dwChunkStart": 0, //DWORD,
-    "dwBlockStart": 0, //DWORD,
-    "dwSampleOffset": 0, //DWORD,
+    "dwName": 0,
+    "dwPosition": 0,
+    "fccChunk": 0,
+    "dwChunkStart": 0,
+    "dwBlockStart": 0,
+    "dwSampleOffset": 0,
 }
 ```
 
@@ -423,7 +422,7 @@ WaveFile.LIST is an array of objects with this signature:
     "subChunks": []
 };
 ```
-Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. WaveFile 6.5 can read and write "LIST" chunks of format "INFO".
+Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. **wavefile** can read and write "LIST" chunks of format "INFO".
 
 For "LIST" chunks with the "INFO" format, "subChunks" is an array of objects with this signature:
 ```javascript

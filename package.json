@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "6.6.1",
+  "version": "6.7.0",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -56,6 +56,7 @@
     "test-afsp": "nyc ./node_modules/mocha/bin/_mocha test/list/afsp.js --src --recursive",
     "test-adtl": "nyc ./node_modules/mocha/bin/_mocha test/list/read-list-adtl.js --src --recursive",
     "test-info": "nyc ./node_modules/mocha/bin/_mocha test/list/read-list-info.js --src --recursive",
+    "test-cue": "nyc ./node_modules/mocha/bin/_mocha test/cue --src --recursive",
     "test": "nyc ./node_modules/mocha/bin/_mocha test --src --recursive",
     "test-dist": "nyc ./node_modules/mocha/bin/_mocha test --dist --recursive",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
