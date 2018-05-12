@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.8.0 (2018-05-12)
+- Reading and writing the "adtl" LIST subchunk. Labels ("labl") can be created with cue points using setCuePoint(timeInMs, labelText)
+
 ## version 6.7.0 (2018-05-11)
 - Set and delete cue points with setCuePoint() and deleteCuePoint().
 

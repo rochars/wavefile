@@ -369,10 +369,10 @@ WaveFile.bext = {
 #### Cue points
 You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in miliseconds and create a point in the corresponding position of the file:
 ```javascript
-wav.setCuePoint(1750);
+wav.setCuePoint(1750, "some label");
 ```
 
-To delete a cue point, inform its index. Points are ordered according to their position. The first point is 1. Mind that deleting a point will change the index of other points (but not their position).
+To delete a cue point use **WaveFile.deleteCuePoint()** inform the index of the point. Points are ordered according to their position. The first point is 1. Mind that deleting a point will change the index of other points (but not their position).
 ```javascript
 wav.deleteCuePoint(1);
 ```

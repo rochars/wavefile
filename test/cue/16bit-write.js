@@ -6,6 +6,64 @@
 
 var assert = require('assert');
 
+describe('cue points with no labels', function() {
+
+    let fs = require('fs');
+    const WaveFile = require("../../test/loader.js");
+    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    wav.deleteCuePoint(1);
+    wav.LIST = [];
+    wav.deleteCuePoint(1);
+
+    fs.writeFileSync("./test/files/out/fromScratch-CUE12.wav", wav.toBuffer());
+
+    var stats = fs.statSync("./test/files/out/fromScratch-CUE12.wav");
+    var fileSizeInBytes1 = stats["size"];
+    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE12.wav"));
+
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
+    });
+    //cue
+    it("wav.cue.chunkId should be 'cue '", function() {
+        assert.equal(wavCue2.cue.chunkId, "cue ");
+    });
+    it("wav.cue.points.length should be 5", function() {
+        assert.equal(wavCue2.cue.points.length, 15);
+    });
+});
+
+describe('delete all points', function() {
+
+    let fs = require('fs');
+    const WaveFile = require("../../test/loader.js");
+    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    wav.deleteCuePoint(1);
+    wav.deleteCuePoint(1);
+    wav.deleteCuePoint(1);
+    wav.deleteCuePoint(1);
+    wav.deleteCuePoint(1);
+    wav.deleteCuePoint(1);
+    wav.deleteCuePoint(1);
+
+    fs.writeFileSync("./test/files/out/fromScratch-CUE11.wav", wav.toBuffer());
+
+    var stats = fs.statSync("./test/files/out/fromScratch-CUE11.wav");
+    var fileSizeInBytes1 = stats["size"];
+    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE11.wav"));
+
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
+    });
+    //cue
+    it("wav.cue.chunkId should be 'cue '", function() {
+        assert.equal(wavCue2.cue.chunkId, "cue ");
+    });
+    it("wav.cue.points.length should be 5", function() {
+        assert.equal(wavCue2.cue.points.length, 10);
+    });
+});
+
 describe('delete a point', function() {
     
     const WaveFile = require("../../test/loader.js");
@@ -48,7 +106,7 @@ describe('delete a point', function() {
     });
 });
 
-describe('delete a point', function() {
+describe('delete all points', function() {
 
     let fs = require('fs');
     const WaveFile = require("../../test/loader.js");
@@ -158,6 +216,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points', fun
     wav.setCuePoint(500, "cue marker 4"); //
     wav.setCuePoint(750, "cue marker 5"); //
     wav.setCuePoint(1750, "cue marker 6"); //
+    wav.setCuePoint(1550, "cue marker 7"); //
     //console.log(wav.cue.points)
 
     let fs = require('fs');
@@ -176,7 +235,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points', fun
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
     it("wav.cue.points.length should be 1", function() {
-        assert.equal(wavCue2.cue.points.length, 6);
+        assert.equal(wavCue2.cue.points.length, 7);
     });
 });
 
