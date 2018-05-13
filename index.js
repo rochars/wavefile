@@ -4,25 +4,27 @@
  *
  */
 
-/** @private */
+/** @const @private */
 const bitDepth_ = require("bitdepth");
-/** @private */
+/** @const @private */
 const riffChunks_ = require("riff-chunks");
-/** @private */
+/** @const @private */
 const imaadpcm_ = require("imaadpcm");
-/** @private */
+/** @const @private */
 const alawmulaw_ = require("alawmulaw");
-/** @private */
+/** @const @private */
 const byteData_ = require("byte-data");
-/** @private */
-const encodeBase64 = require("base64-arraybuffer").encode;
-/** @private */
+/** @const @private */
+const encodeBase64_ = require("base64-arraybuffer").encode;
+/** @const @private */
+const decodeBase64_ = require("base64-arraybuffer").decode;
+/** @const @private */
 const uInt16_ = {"bits": 16};
-/** @private */
+/** @const @private */
 const uInt32_ = {"bits": 32};
-/** @private */
+/** @const @private */
 const fourCC_ = {"bits": 32, "char": true};
-/** @private */
+/** @const @private */
 const chr_ = {"bits": 8, "char": true};
 
 /**
@@ -31,7 +33,7 @@ const chr_ = {"bits": 8, "char": true};
 class WaveFile {
 
     /**
-     * @param {Uint8Array|Array<number>} bytes A wave file buffer.
+     * @param {Uint8Array} bytes A wave file buffer.
      * @throws {Error} If no "RIFF" chunk is found.
      * @throws {Error} If no "fmt " chunk is found.
      * @throws {Error} If no "fact" chunk is found and "fact" is needed.
@@ -41,49 +43,49 @@ class WaveFile {
         /**
          * The container identifier.
          * Only "RIFF" and "RIFX" are supported.
-         * @type {!string}
+         * @type {string}
          * @export
          */
         this.container = "";
         /**
-         * @type {!number}
+         * @type {number}
          * @export
          */
         this.chunkSize = 0;
         /**
          * The format.
          * Always "WAVE".
-         * @type {!string}
+         * @type {string}
          * @export
          */
         this.format = "";
         /**
          * The data of the "fmt" chunk.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.fmt = {
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "audioFormat": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "numChannels": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "sampleRate": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "byteRate": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "blockAlign": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "bitsPerSample": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "cbSize": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "validBitsPerSample": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "dwChannelMask": 0,
             /**
              * 4 32-bit values representing a 128-bit ID
@@ -93,115 +95,115 @@ class WaveFile {
         };
         /**
          * The data of the "fact" chunk.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.fact = {
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "dwSampleLength": 0
         };
         /**
          * The data of the "cue " chunk.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.cue = {
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "dwCuePoints": 0,
-            /** @export @type {!Array<Object>} */
+            /** @export @type {!Array<!Object>} */
             "points": [],
         };
         /**
          * The data of the "bext" chunk.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.bext = {
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "description": "", //256
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "originator": "", //32
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "originatorReference": "", //32
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "originationDate": "", //10
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "originationTime": "", //8
             /**
              * 2 32-bit values, timeReference high and low
              * @export @type {!Array<number>}
              */
             "timeReference": [],
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "version": 0, //WORD
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "UMID": "", // 64 chars
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "loudnessValue": 0, //WORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "loudnessRange": 0, //WORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "maxTruePeakLevel": 0, //WORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "maxMomentaryLoudness": 0, //WORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "maxShortTermLoudness": 0, //WORD
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "reserved": "", //180
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "codingHistory": "" // string, unlimited
         };
         /**
          * The data of the "ds64" chunk.
          * Used only with RF64 files.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.ds64 = {
-            /** @type {!string} */
+            /** @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "riffSizeHigh": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "riffSizeLow": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "dataSizeHigh": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "dataSizeLow": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "originationTime": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "sampleCountHigh": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "sampleCountLow": 0, // DWORD
-            /** @export @type {!number} */
+            /** @export @type {number} */
             //"tableLength": 0, // DWORD
             /** @export @type {!Array<number>} */
             //"table": []
         };
         /**
          * The data of the "data" chunk.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.data = {
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
             /** @export @type {!Array<number>} */
             "samples": []
@@ -215,31 +217,31 @@ class WaveFile {
          *      "format": "",
          *      "subChunks": []
          *   }
-         * @type {!Array<Object>}
+         * @type {!Array<!Object>}
          * @export
          */
         this.LIST = [];
         /**
          * The data of the "junk" chunk.
-         * @type {!Object<!string, *>}
+         * @type {!Object<string, *>}
          * @export
          */
         this.junk = {
-            /** @export @type {!string} */
+            /** @export @type {string} */
             "chunkId": "",
-            /** @export @type {!number} */
+            /** @export @type {number} */
             "chunkSize": 0,
             /** @export @type {!Array<number>} */
             "chunkData": []
         };
         /**
          * If the data in data.samples is interleaved or not.
-         * @type {!boolean}
+         * @type {boolean}
          * @export
          */
         this.isInterleaved = true;
         /**
-         * @type {!string}
+         * @type {string}
          * @export
          */
         this.bitDepth = "0";
@@ -247,7 +249,7 @@ class WaveFile {
          * Audio formats.
          * Formats not listed here will be set to 65534
          * and treated as WAVE_FORMAT_EXTENSIBLE
-         * @enum {!number}
+         * @enum {number}
          * @private
          */
         this.audioFormats_ = {
@@ -264,7 +266,7 @@ class WaveFile {
             "64": 3
         };
         /**
-         * @type {!number}
+         * @type {number}
          * @private
          */
         this.head_ = 0;
@@ -277,16 +279,18 @@ class WaveFile {
 
     /**
      * Set up a WaveFile object based on the arguments passed.
-     * @param {!number} numChannels The number of channels
-     *     (Integer numbers: 1 for mono, 2 stereo and so on).
-     * @param {!number} sampleRate The sample rate.
-     *     Integer numbers like 8000, 44100, 48000, 96000, 192000.
-     * @param {!string} bitDepth The audio bit depth.
-     *     One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
-     *     or any value between "8" and "32".
+     * @param {number} numChannels The number of channels
+     *      (Integer numbers: 1 for mono, 2 stereo and so on).
+     * @param {number} sampleRate The sample rate.
+     *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
+     * @param {string} bitDepth The audio bit depth.
+     *      One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
+     *      or any value between "8" and "32".
      * @param {!Array<number>} samples Array of samples to be written.
-     *     The samples must be in the correct range according to the
-     *     bit depth.
+     *      The samples must be in the correct range according to the
+     *      bit depth.
+     * @param {Object} options Optional. Used to force the container
+     *      as RIFX with {"container": "RIFX"}
      * @throws {Error} If any argument does not meet the criteria.
      * @export
      */
@@ -302,8 +306,8 @@ class WaveFile {
                 this.isInterleaved = false;
                 this.assureInterleaved_();
             }
-        }
-        // closest nuber of bytes if not / 8
+        } 
+        /** type {number} */
         let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
         // Normal PCM file header
         if (["8","16","24","32","32f","64"].indexOf(bitDepth) > -1) {
@@ -330,106 +334,8 @@ class WaveFile {
     }
 
     /**
-     * Create the header of a ADPCM wave file.
-     * @param {!string} bitDepth The audio bit depth
-     * @param {!number} numChannels The number of channels
-     * @param {!number} sampleRate The sample rate.
-     * @param {!number} numBytes The number of bytes each sample use.
-     * @param {!Object} options The extra options, like container defintion.
-     * @private
-     */
-    createADPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
-        this.createPCMHeader_(
-            bitDepth, numChannels, sampleRate, numBytes, options);
-        this.chunkSize = 40 + this.data.samples.length;
-        this.fmt.chunkSize = 20;
-        this.fmt.byteRate = 4055;
-        this.fmt.blockAlign = 256;
-        this.fmt.bitsPerSample = 4;
-        this.fmt.cbSize = 2;
-        this.fmt.validBitsPerSample = 505;
-        this.fact.chunkId = "fact";
-        this.fact.chunkSize = 4;
-        this.fact.dwSampleLength = this.data.samples.length * 2;
-        this.data.chunkSize = this.data.samples.length;
-    }
-
-    /**
-     * Create the header of WAVE_FORMAT_EXTENSIBLE file.
-     * @param {!string} bitDepth The audio bit depth
-     * @param {!number} numChannels The number of channels
-     * @param {!number} sampleRate The sample rate.
-     * @param {!number} numBytes The number of bytes each sample use.
-     * @param {!Object} options The extra options, like container defintion.
-     * @private
-     */
-    createExtensibleHeader_(
-            bitDepth, numChannels, sampleRate, numBytes, options) {
-        this.createPCMHeader_(
-            bitDepth, numChannels, sampleRate, numBytes, options);
-        this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
-        this.fmt.chunkSize = 40;
-        this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
-        this.fmt.cbSize = 22;
-        this.fmt.validBitsPerSample = parseInt(bitDepth, 10);
-        this.fmt.dwChannelMask = 0;
-        // subformat 128-bit GUID as 4 32-bit values
-        // only supports uncompressed integer PCM samples
-        this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
-    }
-
-    /**
-     * Create the header of mu-Law and A-Law wave files.
-     * @param {!string} bitDepth The audio bit depth
-     * @param {!number} numChannels The number of channels
-     * @param {!number} sampleRate The sample rate.
-     * @param {!number} numBytes The number of bytes each sample use.
-     * @param {!Object} options The extra options, like container defintion.
-     * @private
-     */
-    createALawMulawHeader_(
-            bitDepth, numChannels, sampleRate, numBytes, options) {
-        this.createPCMHeader_(
-            bitDepth, numChannels, sampleRate, numBytes, options);
-        this.chunkSize = 40 + this.data.samples.length;
-        this.fmt.chunkSize = 20;
-        this.fmt.cbSize = 2;
-        this.fmt.validBitsPerSample = 8;
-        this.fact.chunkId = "fact";
-        this.fact.chunkSize = 4;
-        this.fact.dwSampleLength = this.data.samples.length;
-    }
-
-    /**
-     * Create the header of a linear PCM wave file.
-     * @param {!string} bitDepth The audio bit depth
-     * @param {!number} numChannels The number of channels
-     * @param {!number} sampleRate The sample rate.
-     * @param {!number} numBytes The number of bytes each sample use.
-     * @param {!Object} options The extra options, like container defintion.
-     * @private
-     */
-    createPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
-        this.clearHeader_();
-        this.container = options["container"];
-        this.chunkSize = 36 + this.data.samples.length * numBytes;
-        this.format = "WAVE";
-        this.fmt.chunkId = "fmt ";
-        this.fmt.chunkSize = 16;
-        this.fmt.byteRate = (numChannels * numBytes) * sampleRate;
-        this.fmt.blockAlign = numChannels * numBytes;
-        this.fmt.audioFormat = this.audioFormats_[bitDepth] ?
-            this.audioFormats_[bitDepth] : 65534;
-        this.fmt.numChannels = numChannels;
-        this.fmt.sampleRate = sampleRate;
-        this.fmt.bitsPerSample = parseInt(bitDepth, 10);
-        this.fmt.cbSize = 0;
-        this.fmt.validBitsPerSample = 0;
-    }
-
-    /**
      * Init a WaveFile object from a byte buffer.
-     * @param {!Uint8Array|!Array<number>} bytes The buffer.
+     * @param {!Uint8Array} bytes The buffer.
      * @throws {Error} If container is not RIFF or RIFX.
      * @throws {Error} If no "fmt " chunk is found.
      * @throws {Error} If no "fact" chunk is found and "fact" is needed.
@@ -439,6 +345,7 @@ class WaveFile {
     fromBuffer(bytes) {
         this.clearHeader_();
         this.readRIFFChunk_(bytes);
+        /** @type {!Object} */
         let chunk = riffChunks_.read(bytes);
         this.readDs64Chunk_(chunk["subChunks"]);
         this.readFmtChunk_(chunk["subChunks"]);
@@ -452,7 +359,7 @@ class WaveFile {
     }
 
     /**
-     * Return a byte buffer representig the WaveFile object as a wav file.
+     * Return a byte buffer representig the WaveFile object as a .wav file.
      * The return value of this method can be written straight to disk.
      * @return {!Uint8Array} A .wav file.
      * @throws {Error} If any property of the object appears invalid.
@@ -465,17 +372,27 @@ class WaveFile {
     }
 
     /**
-     * Return a base64 string representig the WaveFile object as a wav file.
+     * Use a .wav file encoded as a base64 string to load the WaveFile object.
+     * @param {string} base64String A .wav file as a base64 string.
+     * @throws {Error} If any property of the object appears invalid.
+     * @export
+     */
+    fromBase64(base64String) {
+        this.fromBuffer(new Uint8Array(decodeBase64_(base64String)));
+    }
+
+    /**
+     * Return a base64 string representig the WaveFile object as a .wav file.
      * @return {string} A .wav file as a base64 string.
      * @throws {Error} If any property of the object appears invalid.
      * @export
      */
     toBase64() {
-        return encodeBase64(this.toBuffer());
+        return encodeBase64_(this.toBuffer());
     }
 
     /**
-     * Return a base64 string representig the WaveFile object as a wav file.
+     * Return a DataURI string representig the WaveFile object as a .wav file.
      * The return of this method can be used to load the audio in browsers.
      * @return {string} A .wav file as a DataURI.
      * @throws {Error} If any property of the object appears invalid.
@@ -483,6 +400,16 @@ class WaveFile {
      */
     toDataURI() {
         return "data:audio/wav;base64," + this.toBase64();
+    }
+
+    /**
+     * Use a .wav file encoded as a DataURI to load the WaveFile object.
+     * @param {string} dataURI A .wav file as DataURI.
+     * @throws {Error} If any property of the object appears invalid.
+     * @export
+     */
+    fromDataURI(dataURI) {
+        this.fromBase64(dataURI.replace("data:audio/wav;base64,", ""));
     }
 
     /**
@@ -522,9 +449,9 @@ class WaveFile {
 
     /**
      * Change the bit depth of the samples.
-     * @param {!string} bitDepth The new bit depth of the samples.
+     * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8" ... "32" (integers), "32f" or "64" (floats)
-     * @param {!boolean} changeResolution A boolean indicating if the
+     * @param {boolean} changeResolution A boolean indicating if the
      *      resolution of samples should be actually changed or not.
      * @throws {Error} If the bit depth is not valid.
      * @export
@@ -615,7 +542,7 @@ class WaveFile {
 
     /**
      * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
-     * @param {!string} bitDepth The new bit depth of the samples.
+     * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8" ... "32" (integers), "32f" or "64" (floats).
      *      Optional. Default is 16.
      * @export
@@ -649,7 +576,7 @@ class WaveFile {
 
     /**
      * Decode a 8-bit A-Law wave file into a 16-bit wave file.
-     * @param {!string} bitDepth The new bit depth of the samples.
+     * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8" ... "32" (integers), "32f" or "64" (floats).
      *      Optional. Default is 16.
      * @export
@@ -683,7 +610,7 @@ class WaveFile {
 
     /**
      * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
-     * @param {!string} bitDepth The new bit depth of the samples.
+     * @param {string} bitDepth The new bit depth of the samples.
      *      One of "8" ... "32" (integers), "32f" or "64" (floats).
      *      Optional. Default is 16.
      * @export
@@ -703,14 +630,14 @@ class WaveFile {
     /**
      * Write a RIFF tag in the INFO chunk. If the tag do not exist,
      * then it is created. It if exists, it is overwritten.
-     * @param {!string} tag The tag name.
-     * @param {!string} value The tag value.
-     * @return {boolean} True if the tag was set.
+     * @param {string} tag The tag name.
+     * @param {string} value The tag value.
      * @throws {Error} If the tag name is not valid.
      * @export
      */
     setTag(tag, value) {
         tag = this.fixTagName_(tag);
+        /** @type {!Object} */
         let index = this.getTagIndex_(tag);
         if (index.TAG !== null) {
             this.LIST[index.LIST]["subChunks"][index.TAG]["chunkSize"] =
@@ -733,16 +660,16 @@ class WaveFile {
                 "chunkSize": value.length + 1,
                 "value": value});
         }
-        return true;
     }
 
     /**
      * Return the value of a RIFF tag in the INFO chunk.
-     * @param {!string} tag The tag name.
-     * @return {!string|null} The value if the tag is found, null otherwise.
+     * @param {string} tag The tag name.
+     * @return {string|null} The value if the tag is found, null otherwise.
      * @export
      */
     getTag(tag) {
+        /** @type {!Object} */
         let index = this.getTagIndex_(tag);
         if (index.TAG !== null) {
             return this.LIST[index.LIST]["subChunks"][index.TAG]["value"];
@@ -752,11 +679,12 @@ class WaveFile {
 
     /**
      * Remove a RIFF tag in the INFO chunk.
-     * @param {!string} tag The tag name.
+     * @param {string} tag The tag name.
      * @return {boolean} True if a tag was deleted.
      * @export
      */
     deleteTag(tag) {
+        /** @type {!Object} */
         let index = this.getTagIndex_(tag);
         if (index.TAG !== null) {
             this.LIST[index.LIST]["subChunks"].splice(index.TAG, 1);
@@ -767,15 +695,17 @@ class WaveFile {
 
     /**
      * Create a cue point in the wave file.
-     * @param {!number} position The cue point position in milliseconds.
-     * @param {!string} labl The LIST adtl labl text of the marker. Optional.
+     * @param {number} position The cue point position in milliseconds.
+     * @param {string} labl The LIST adtl labl text of the marker. Optional.
      * @export
      */
     setCuePoint(position, labl="") {
         this.cue.chunkId = "cue ";
         position = (position * this.fmt.sampleRate) / 1000;
+        /** @type {!Array<Object>} */
         let existingPoints = this.getCuePoints_();
         this.clearLISTadtl_();
+        /** @type {number} */
         let len = this.cue.points.length;
         this.cue.points = [];
         let hasSet = false;
@@ -806,12 +736,13 @@ class WaveFile {
 
     /**
      * Remove a cue point from a wave file.
-     * @param {!number} index the index of the point. First is 1,
+     * @param {number} index the index of the point. First is 1,
      *      second is 2, and so on.
      * @export
      */
     deleteCuePoint(index) {
         this.cue.chunkId = "cue ";
+        /** @type {!Array<Object>} */
         let existingPoints = this.getCuePoints_();
         this.clearLISTadtl_();
         let len = this.cue.points.length;
@@ -835,11 +766,12 @@ class WaveFile {
 
     /**
      * Update the label of a cue point.
-     * @param {!number} pointIndex The ID of the cue point.
-     * @param {!string} label The new text for the label.
+     * @param {number} pointIndex The ID of the cue point.
+     * @param {string} label The new text for the label.
      * @export
      */
     updateLabel(pointIndex, label) {
+        /** @type {number|null} */
         let adtlIndex = this.getAdtlChunk_();
         if (adtlIndex !== null) {
             for (let i=0; i<this.LIST[adtlIndex]["subChunks"].length; i++) {
@@ -853,8 +785,8 @@ class WaveFile {
 
     /**
      * Push a new cue point in this.cue.points.
-     * @param {!number} position The position in milliseconds.
-     * @param {!number} dwName the dwName of the cue point
+     * @param {number} position The position in milliseconds.
+     * @param {number} dwName the dwName of the cue point
      */
     setCuePoint_(position, dwName, label) {
         this.cue.points.push({
@@ -870,27 +802,28 @@ class WaveFile {
 
     /**
      * Return an array with the position of all cue points in the file.
-     * @return {!Array<number>}
+     * @return {!Array<!Object>}
      */
     getCuePoints_() {
+        /** @type {!Array<Object>} */
         let points = [];
         for (let i=0; i<this.cue.points.length; i++) {
-            let point = {
+            points.push({
                 'dwPosition': this.cue.points[i]["dwPosition"],
                 'label': this.getLabelForCuePoint_(
-                    this.cue.points[i]["dwName"])};
-            points.push(point);
+                    this.cue.points[i]["dwName"])});
         }
         return points;
     }
 
     /**
      * Return the label of a cue point.
-     * @param {!number} pointDwName The ID of the cue point.
-     * @return {!string}
+     * @param {number} pointDwName The ID of the cue point.
+     * @return {string}
      * @private
      */
     getLabelForCuePoint_(pointDwName) {
+        /** @type {number|null} */
         let adtlIndex = this.getAdtlChunk_();
         if (adtlIndex !== null) {
             for (let i=0; i<this.LIST[adtlIndex]["subChunks"].length; i++) {
@@ -916,11 +849,12 @@ class WaveFile {
 
     /**
      * Create a new "labl" subchunk in a "LIST" chunk of type "adtl".
-     * @param {!number} dwName The ID of the cue point.
-     * @param {!string} label The label for the cue point.
+     * @param {number} dwName The ID of the cue point.
+     * @param {string} label The label for the cue point.
      * @private
      */
     setLabl_(dwName, label) {
+        /** @type {number|null} */
         let adtlIndex = this.getAdtlChunk_();
         if (adtlIndex === null) {
             this.LIST.push({
@@ -936,9 +870,9 @@ class WaveFile {
 
     /**
      * Create a new "labl" subchunk in a "LIST" chunk of type "adtl".
-     * @param {!number} adtlIndex The index of the "adtl" LIST in this.LIST.
-     * @param {!number} dwName The ID of the cue point.
-     * @param {!string} label The label for the cue point.
+     * @param {number} adtlIndex The index of the "adtl" LIST in this.LIST.
+     * @param {number} dwName The ID of the cue point.
+     * @param {string} label The label for the cue point.
      * @private
      */
     setLabelText_(adtlIndex, dwName, label) {
@@ -953,7 +887,7 @@ class WaveFile {
 
     /**
      * Return the index of the "adtl" LIST in this.LIST.
-     * @return {!number|null}
+     * @return {number|null}
      * @private
      */
     getAdtlChunk_() {
@@ -967,13 +901,14 @@ class WaveFile {
 
     /**
      * Return the index of a tag in a FILE chunk.
-     * @param {!string} tag The tag name.
+     * @param {string} tag The tag name.
      * @return {!Object<string, number|null>}
      *      Object.LIST is the INFO index in LIST
      *      Object.TAG is the tag index in the INFO
      * @private
      */
     getTagIndex_(tag) {
+        /** @type {!Object} */
         let index = {LIST: null, TAG: null};
         for (let i=0; i<this.LIST.length; i++) {
             if (this.LIST[i]["format"] == "INFO") {
@@ -992,7 +927,7 @@ class WaveFile {
 
     /**
      * Fix a RIFF tag format if possible, throw an error otherwise.
-     * @param {!string} tag The tag name.
+     * @param {string} tag The tag name.
      * @return {string} The tag name in proper fourCC format.
      * @private
      */
@@ -1008,10 +943,108 @@ class WaveFile {
     }
 
     /**
+     * Create the header of a ADPCM wave file.
+     * @param {string} bitDepth The audio bit depth
+     * @param {number} numChannels The number of channels
+     * @param {number} sampleRate The sample rate.
+     * @param {number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createADPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        this.chunkSize = 40 + this.data.samples.length;
+        this.fmt.chunkSize = 20;
+        this.fmt.byteRate = 4055;
+        this.fmt.blockAlign = 256;
+        this.fmt.bitsPerSample = 4;
+        this.fmt.cbSize = 2;
+        this.fmt.validBitsPerSample = 505;
+        this.fact.chunkId = "fact";
+        this.fact.chunkSize = 4;
+        this.fact.dwSampleLength = this.data.samples.length * 2;
+        this.data.chunkSize = this.data.samples.length;
+    }
+
+    /**
+     * Create the header of WAVE_FORMAT_EXTENSIBLE file.
+     * @param {string} bitDepth The audio bit depth
+     * @param {number} numChannels The number of channels
+     * @param {number} sampleRate The sample rate.
+     * @param {number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createExtensibleHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
+        this.fmt.chunkSize = 40;
+        this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
+        this.fmt.cbSize = 22;
+        this.fmt.validBitsPerSample = parseInt(bitDepth, 10);
+        this.fmt.dwChannelMask = 0;
+        // subformat 128-bit GUID as 4 32-bit values
+        // only supports uncompressed integer PCM samples
+        this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
+    }
+
+    /**
+     * Create the header of mu-Law and A-Law wave files.
+     * @param {string} bitDepth The audio bit depth
+     * @param {number} numChannels The number of channels
+     * @param {number} sampleRate The sample rate.
+     * @param {number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createALawMulawHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        this.chunkSize = 40 + this.data.samples.length;
+        this.fmt.chunkSize = 20;
+        this.fmt.cbSize = 2;
+        this.fmt.validBitsPerSample = 8;
+        this.fact.chunkId = "fact";
+        this.fact.chunkSize = 4;
+        this.fact.dwSampleLength = this.data.samples.length;
+    }
+
+    /**
+     * Create the header of a linear PCM wave file.
+     * @param {string} bitDepth The audio bit depth
+     * @param {number} numChannels The number of channels
+     * @param {number} sampleRate The sample rate.
+     * @param {number} numBytes The number of bytes each sample use.
+     * @param {!Object} options The extra options, like container defintion.
+     * @private
+     */
+    createPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
+        this.clearHeader_();
+        this.container = options["container"];
+        this.chunkSize = 36 + this.data.samples.length * numBytes;
+        this.format = "WAVE";
+        this.fmt.chunkId = "fmt ";
+        this.fmt.chunkSize = 16;
+        this.fmt.byteRate = (numChannels * numBytes) * sampleRate;
+        this.fmt.blockAlign = numChannels * numBytes;
+        this.fmt.audioFormat = this.audioFormats_[bitDepth] ?
+            this.audioFormats_[bitDepth] : 65534;
+        this.fmt.numChannels = numChannels;
+        this.fmt.sampleRate = sampleRate;
+        this.fmt.bitsPerSample = parseInt(bitDepth, 10);
+        this.fmt.cbSize = 0;
+        this.fmt.validBitsPerSample = 0;
+    }
+
+    /**
      * Return the closest greater number of bits for a number of bits that
      * do not fill a full sequence of bytes.
-     * @param {!string} bitDepth The bit depth.
-     * @return {!string}
+     * @param {string} bitDepth The bit depth.
+     * @return {string}
      */
     realBitDepth_(bitDepth) {
         if (bitDepth != "32f") {
@@ -1033,7 +1066,7 @@ class WaveFile {
 
     /**
      * Validate the bit depth.
-     * @return {!boolean} True is the bit depth is valid.
+     * @return {boolean} True is the bit depth is valid.
      * @throws {Error} If bit depth is invalid.
      * @private
      */
@@ -1050,11 +1083,12 @@ class WaveFile {
 
     /**
      * Validate the number of channels.
-     * @return {!boolean} True is the number of channels is valid.
+     * @return {boolean} True is the number of channels is valid.
      * @throws {Error} If the number of channels is invalid.
      * @private
      */
     validateNumChannels_() {
+        /** @type {number} */
         let blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
         if (this.fmt.numChannels < 1 || blockAlign > 65535) {
             throw new Error("Invalid number of channels.");
@@ -1064,11 +1098,12 @@ class WaveFile {
 
     /**
      * Validate the sample rate value.
-     * @return {!boolean} True is the sample rate is valid.
+     * @return {boolean} True is the sample rate is valid.
      * @throws {Error} If the sample rate is invalid.
      * @private
      */
     validateSampleRate_() {
+        /** @type {number} */
         let byteRate = this.fmt.numChannels *
             (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
         if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
@@ -1128,10 +1163,11 @@ class WaveFile {
      * Set up to work wih big-endian or little-endian files.
      * The types used are changed to LE or BE. If the
      * the file is big-endian (RIFX), true is returned.
-     * @return {!boolean} True if the file is RIFX.
+     * @return {boolean} True if the file is RIFX.
      * @private
      */
     LEorBE_() {
+        /** @type {boolean} */
         let bigEndian = this.container === "RIFX";
         uInt16_["be"] = bigEndian;
         uInt32_["be"] = bigEndian;
@@ -1141,13 +1177,14 @@ class WaveFile {
     /**
      * Find a chunk by its fourCC_ in a array of RIFF chunks.
      * @param {!Array<!Object>} chunks The wav file chunks.
-     * @param {!string} chunkId The chunk fourCC_.
+     * @param {string} chunkId The chunk fourCC_.
      * @param {boolean} multiple True if there may be multiple chunks
      *      with the same chunkId.
-     * @return {Object|Array<Object>|null}
+     * @return {Object|Array<!Object>|null}
      * @private
      */
     findChunk_(chunks, chunkId, multiple=false) {
+        /** @type {!Array<!Object>} */
         let chunk = [];
         for (let i=0; i<chunks.length; i++) {
             if (chunks[i]["chunkId"] == chunkId) {
@@ -1166,7 +1203,7 @@ class WaveFile {
 
     /**
      * Read the RIFF chunk a wave file.
-     * @param {!Uint8Array|!Array<number>} bytes A wav buffer.
+     * @param {!Uint8Array} bytes A wav buffer.
      * @throws {Error} If no "RIFF" chunk is found.
      * @private
      */
@@ -1191,6 +1228,7 @@ class WaveFile {
      * @private
      */
     readFmtChunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "fmt ");
         if (chunk) {
             this.head_ = 0;
@@ -1239,6 +1277,7 @@ class WaveFile {
      * @private
      */
     readFactChunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "fact");
         if (chunk) {
             this.head_ = 0;
@@ -1254,6 +1293,7 @@ class WaveFile {
      * @private
      */
     readCueChunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "cue ");
         if (chunk) {
             this.head_ = 0;
@@ -1281,6 +1321,7 @@ class WaveFile {
      * @private
      */
     readDataChunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "data");
         if (chunk) {
             this.data.chunkId = "data";
@@ -1297,6 +1338,7 @@ class WaveFile {
      * @private
      */
     readBextChunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "bext");
         if (chunk) {
             this.head_ = 0;
@@ -1331,6 +1373,7 @@ class WaveFile {
      * @private
      */
     readDs64Chunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "ds64");
         if (chunk) {
             this.head_ = 0;
@@ -1363,6 +1406,7 @@ class WaveFile {
      * @private
      */
     readLISTChunk_(chunks) {
+        /** type {Array<Array<!Object>>>} */
         let listChunks = this.findChunk_(chunks, "LIST", true);
         if (listChunks === null) {
             return;
@@ -1385,7 +1429,7 @@ class WaveFile {
     /**
      * Read the sub chunks of a "LIST" chunk.
      * @param {!Object} subChunk The "LIST" subchunks.
-     * @param {!string} format The "LIST" format, "adtl" or "INFO".
+     * @param {string} format The "LIST" format, "adtl" or "INFO".
      * @private
      */
     readLISTSubChunks_(subChunk, format) {
@@ -1423,6 +1467,7 @@ class WaveFile {
      * @private
      */
     readJunkChunk_(chunks) {
+        /** type {Array<!Object>} */
         let chunk = this.findChunk_(chunks, "junk");
         if (chunk) {
             this.junk = {
@@ -1436,10 +1481,11 @@ class WaveFile {
     /**
      * Read bytes as a ZSTR string.
      * @param {!Array<number>|!Uint8Array} bytes The bytes.
-     * @return {!string} The string.
+     * @return {string} The string.
      * @private
      */
     readZSTR_(bytes) {
+        /** type {string} */
         let str = "";
         for (let i=0; i<bytes.length; i++) {
             if (bytes[i] === 0) {
@@ -1453,11 +1499,12 @@ class WaveFile {
     /**
      * Read bytes as a string from a RIFF chunk.
      * @param {!Array<number>|!Uint8Array} bytes The bytes.
-     * @param {!number} maxSize the max size of the string.
-     * @return {!string} The string.
+     * @param {number} maxSize the max size of the string.
+     * @return {string} The string.
      * @private
      */
     readString_(bytes, maxSize) {
+        /** type {string} */
         let str = "";
         for (let i=0; i<maxSize; i++) {
             str += byteData_.unpack([bytes[this.head_]], chr_);
@@ -1484,12 +1531,13 @@ class WaveFile {
     /**
      * Write a variable size string as bytes. If the string is smaller
      * than the max size the output array is filled with 0s.
-     * @param {!string} str The string to be written as bytes.
-     * @param {!number} maxSize the max size of the string.
+     * @param {string} str The string to be written as bytes.
+     * @param {number} maxSize the max size of the string.
      * @return {!Array<number>} The bytes.
      * @private
      */
-    writeString_(str, maxSize, push=true) {        
+    writeString_(str, maxSize, push=true) {
+        /** type {!Array<number>} */   
         let bytes = byteData_.packArray(str, chr_);
         if (push) {
             for (let i=bytes.length; i<maxSize; i++) {
@@ -1505,29 +1553,34 @@ class WaveFile {
      * @private
      */
     samplesToBytes_() {
-        let bdType = {
-            "be": this.container === "RIFX",
-            "bits": this.fmt.bitsPerSample == 4 ? 8 : this.fmt.bitsPerSample,
-            "float": this.fmt.audioFormat == 3 ? true : false
-        };
-        bdType["signed"] = bdType["bits"] == 8 ? false : true;
-        let bytes = byteData_.packArray(this.data.samples, bdType);
-        return bytes;
+        return byteData_.packArray(
+            this.data.samples, this.getSamplesType_());
     }
 
     /**
      * Turn bytes to samples and load them in the data.samples property.
-     * @param {!Array<number>|!Uint8Array} bytes The bytes.
+     * @param {!Array<number>} bytes The bytes.
      * @private
      */
     samplesFromBytes_(bytes) {
+        this.data.samples = byteData_.unpackArray(
+            bytes, this.getSamplesType_());
+    }
+
+    /**
+     * Get the data type definition for the samples.
+     * @return {!Object<string, number|boolean>} The type definition.
+     * @private
+     */
+    getSamplesType_() {
+        /** type {!Object<string, number|boolean>} */
         let bdType = {
             "be": this.container === "RIFX",
             "bits": this.fmt.bitsPerSample == 4 ? 8 : this.fmt.bitsPerSample,
             "float": this.fmt.audioFormat == 3 ? true : false
         };
         bdType["signed"] = bdType["bits"] == 8 ? false : true;
-        this.data.samples = byteData_.unpackArray(bytes, bdType);
+        return bdType;
     }
 
     /**
@@ -1536,9 +1589,10 @@ class WaveFile {
      * @private
      */
     getBextBytes_() {
-        let bextBytes = [];
+        /** type {!Array<number>} */
+        let bytes = [];
         if (this.bext.chunkId) {
-            return bextBytes.concat(
+            bytes = bytes.concat(
                 byteData_.pack(this.bext.chunkId, fourCC_),
                 byteData_.pack(602 + this.bext.codingHistory.length, uInt32_),
                 this.writeString_(this.bext.description, 256),
@@ -1559,7 +1613,7 @@ class WaveFile {
                 this.writeString_(
                     this.bext.codingHistory, this.bext.codingHistory.length));
         }
-        return bextBytes;
+        return bytes;
     }
 
     /**
@@ -1568,9 +1622,10 @@ class WaveFile {
      * @private
      */
     getDs64Bytes_() {
-        let ds64Bytes = [];
+        /** type {!Array<number>} */
+        let bytes = [];
         if (this.ds64.chunkId) {
-            ds64Bytes = ds64Bytes.concat(
+            bytes = bytes.concat(
                 byteData_.pack(this.ds64.chunkId, fourCC_),
                 byteData_.pack(this.ds64.chunkSize, uInt32_), // 
                 byteData_.pack(this.ds64.riffSizeHigh, uInt32_),
@@ -1586,7 +1641,7 @@ class WaveFile {
         //        byteData_.pack(this.ds64.tableLength, uInt32_),
         //        this.ds64.table);
         //}
-        return ds64Bytes;
+        return bytes;
     }
 
     /**
@@ -1595,16 +1650,17 @@ class WaveFile {
      * @private
      */
     getCueBytes_() {
-        let cueBytes = [];
+        /** type {!Array<number>} */
+        let bytes = [];
         if (this.cue.chunkId) {
             let cuePointsBytes = this.getCuePointsBytes_();
-            return cueBytes.concat(
+            bytes = bytes.concat(
                 byteData_.pack(this.cue.chunkId, fourCC_),
                 byteData_.pack(cuePointsBytes.length + 4, uInt32_),
                 byteData_.pack(this.cue.dwCuePoints, uInt32_),
                 cuePointsBytes);
         }
-        return cueBytes;
+        return bytes;
     }
 
     /**
@@ -1613,6 +1669,7 @@ class WaveFile {
      * @private
      */
     getCuePointsBytes_() {
+        /** type {!Array<number>} */
         let points = [];
         for (let i=0; i<this.cue.dwCuePoints; i++) {
             points = points.concat(
@@ -1632,14 +1689,15 @@ class WaveFile {
      * @private
      */
     getFactBytes_() {
-        let factBytes = [];
+        /** type {!Array<number>} */
+        let bytes = [];
         if (this.fact.chunkId) {
-            return factBytes.concat(
+            bytes = bytes.concat(
                 byteData_.pack(this.fact.chunkId, fourCC_),
                 byteData_.pack(this.fact.chunkSize, uInt32_),
                 byteData_.pack(this.fact.dwSampleLength, uInt32_));
         }
-        return factBytes;
+        return bytes;
     }
 
     /**
@@ -1671,6 +1729,7 @@ class WaveFile {
      * @private
      */
     getFmtExtensionBytes_() {
+        /** type {!Array<number>} */
         let extension = [];
         if (this.fmt.chunkSize > 16) {
             extension = extension.concat(
@@ -1700,6 +1759,7 @@ class WaveFile {
      * @export for tests
      */
     getLISTBytes_() {
+        /** type {!Array<number>} */
         let bytes = [];
         for (let i=0; i<this.LIST.length; i++) {
             let subChunksBytes = this.getLISTSubChunksBytes_(
@@ -1716,12 +1776,13 @@ class WaveFile {
     /**
      * Return the bytes of the sub chunks of a "LIST" chunk.
      * @param {!Array<Object>} subChunks The "LIST" sub chunks.
-     * @param {!string} format The format of the "LIST" chunk.
+     * @param {string} format The format of the "LIST" chunk.
      *      Currently supported values are "adtl" or "INFO".
      * @return {!Array<number>} The sub chunk bytes.
      * @private
      */
     getLISTSubChunksBytes_(subChunks, format) {
+        /** type {!Array<number>} */
         let bytes = [];
         for (let i=0; i<subChunks.length; i++) {
             if (format == "INFO") {
@@ -1763,20 +1824,21 @@ class WaveFile {
      * @private
      */
     getJunkBytes_() {
-        let junkBytes = [];
+        /** type {!Array<number>} */
+        let bytes = [];
         if (this.junk.chunkId) {
-            return junkBytes.concat(
+            return bytes.concat(
                 byteData_.pack(this.junk.chunkId, fourCC_),
                 byteData_.pack(this.junk.chunkData.length, uInt32_),
                 this.junk.chunkData);
         }
-        return junkBytes;
+        return bytes;
     }
 
     /**
      * Return "RIFF" if the container is "RF64", the current container name
      * otherwise. Used to enforce "RIFF" when RF64 is not allowed.
-     * @return {!string}
+     * @return {string}
      * @private
      */
     correctContainer_() {
@@ -1806,7 +1868,9 @@ class WaveFile {
      * @private
      */
     createWaveFile_() {
+        /** type {!Array<number>} */
         let samplesBytes = this.samplesToBytes_();
+        /** type {!Array<number>} */
         let fileBody = [].concat(
             byteData_.pack(this.format, fourCC_),
             this.getJunkBytes_(),
@@ -1819,6 +1883,7 @@ class WaveFile {
             samplesBytes,
             this.getCueBytes_(),
             this.getLISTBytes_());
+        // concat with the main header and return a .wav file
         return new Uint8Array([].concat(
             byteData_.pack(this.container, fourCC_),
             byteData_.pack(fileBody.length, uInt32_),

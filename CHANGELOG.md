@@ -1,7 +1,10 @@
 # CHANGELOG
 
+## version 6.10.0 (2018-05-14)
+- fromBase64() and fromDataURI() added to the API to load WaveFile objects from base64 strings and DataURIs.
+
 ## version 6.9.0 (2018-05-12)
-- Update labels with updateLabel(labelIndex, labelText);
+- Update labels with updateLabel(labelIndex, labelText)
 
 ## version 6.8.0 (2018-05-12)
 - Reading and writing the "adtl" LIST subchunk. Labels ("labl") can be created with cue points using setCuePoint(timeInMs, labelText)

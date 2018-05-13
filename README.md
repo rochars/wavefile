@@ -121,39 +121,39 @@ Return a DataURI string with the WaveFile object data. The DataURI is a .wav fil
 wavDataURI = wav.toDataURI();
 ```
 
-### WaveFile.setCuePoint()
+#### WaveFile.setCuePoint()
 Set a cue point with a text label in the file. The point position is informed in milliseconds:
 ```javascript
 WaveFile.setCuePoint(1750, "some label");
 ```
 
-### WaveFile.deleteCuePoint()
+#### WaveFile.deleteCuePoint()
 Delete a cue point. The cue point is informed by the order they appear on the file (starting on 1):
 ```javascript
 // remove the first cue point and its label
 WaveFile.deleteCuePoint(1);
 ```
 
-### WaveFile.updateLabel()
+#### WaveFile.updateLabel()
 Update the label text of a cue point. The cue point is informed by the order they appear on the file (starting on 1):
 ```javascript
 // remove the first cue point and its label
 WaveFile.updateLabel(2, "updated label");
 ```
 
-### WaveFile.setTag()
+#### WaveFile.setTag()
 Create (or overwrite) a RIFF tag in the file:
 ```javascript
 WaveFile.setTag("ICMT", "some comments");
 ```
 
-### WaveFile.getTag()
+#### WaveFile.getTag()
 Return the value of a existing RIFF tag:
 ```javascript
 WaveFile.getTag("ICMT");
 ```
 
-### WaveFile.deleteTag()
+#### WaveFile.deleteTag()
 Remove a tag from the file:
 ```javascript
 WaveFile.deleteTag("ICMT");
