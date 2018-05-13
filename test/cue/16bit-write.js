@@ -6,6 +6,35 @@
 
 var assert = require('assert');
 
+describe('update cue point label', function() {
+
+    let fs = require('fs');
+    const WaveFile = require("../../test/loader.js");
+    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    wav.updateLabel(2, "updated label");
+    fs.writeFileSync("./test/files/out/fromScratch-CUE13.wav", wav.toBuffer());
+
+    var stats = fs.statSync("./test/files/out/fromScratch-CUE13.wav");
+    var fileSizeInBytes1 = stats["size"];
+    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE13.wav"));
+
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
+    });
+    //cue
+    it("wav.cue.chunkId should be 'cue '", function() {
+        assert.equal(wavCue2.cue.chunkId, "cue ");
+    });
+    it("wav.cue.points.length should be 17", function() {
+        assert.equal(wavCue2.cue.points.length, 17);
+    });
+    it("updated label should be 'updated label'", function() {
+        labelText = wavCue2.LIST[0]["subChunks"][1]["value"];
+        assert.equal(labelText, "updated label");
+    });
+    
+});
+
 describe('cue points with no labels', function() {
 
     let fs = require('fs');
@@ -28,7 +57,7 @@ describe('cue points with no labels', function() {
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
-    it("wav.cue.points.length should be 5", function() {
+    it("wav.cue.points.length should be 15", function() {
         assert.equal(wavCue2.cue.points.length, 15);
     });
 });
@@ -59,7 +88,7 @@ describe('delete all points', function() {
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
-    it("wav.cue.points.length should be 5", function() {
+    it("wav.cue.points.length should be 10", function() {
         assert.equal(wavCue2.cue.points.length, 10);
     });
 });
@@ -101,7 +130,7 @@ describe('delete a point', function() {
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
-    it("wav.cue.points.length should be 5", function() {
+    it("wav.cue.points.length should be 4", function() {
         assert.equal(wavCue2.cue.points.length, 4);
     });
 });
@@ -142,7 +171,7 @@ describe('delete all points', function() {
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "");
     });
-    it("wav.cue.points.length should be 5", function() {
+    it("wav.cue.points.length should be 0", function() {
         assert.equal(wavCue2.cue.points.length, 0);
     });
 });
@@ -234,7 +263,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points', fun
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
-    it("wav.cue.points.length should be 1", function() {
+    it("wav.cue.points.length should be 7", function() {
         assert.equal(wavCue2.cue.points.length, 7);
     });
 });
@@ -271,7 +300,7 @@ describe('create 44100 kHz 24-bit stereo wave file with two cue points', functio
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
-    it("wav.cue.points.length should be 1", function() {
+    it("wav.cue.points.length should be 2", function() {
         assert.equal(wavCue2.cue.points.length, 2);
     });
 });
@@ -417,7 +446,7 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
     it('dataChunkId should be "data"', function() {
         assert.equal(wav.data.chunkId, "data");
     });
-    it('dataChunkSize should be 8', function() {
+    it('dataChunkSize should be 128000', function() {
         assert.equal(wav.data.chunkSize, 128000);
     });
     it('bitDepth should be "16"', function() {
@@ -565,7 +594,7 @@ describe('create 8000 kHz wave file with one cue point in 1s', function() {
     it('dataChunkId should be "data"', function() {
         assert.equal(wav.data.chunkId, "data");
     });
-    it('dataChunkSize should be 8', function() {
+    it('dataChunkSize should be 32000', function() {
         assert.equal(wav.data.chunkSize, 32000);
     });
     it('samples should be the same as the args', function() {

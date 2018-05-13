@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#clearLISTadtl_">clearLISTadtl_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getCuePoints_">getCuePoints_</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint_">setCuePoint_</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#clearLISTadtl_">clearLISTadtl_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getCuePoints_">getCuePoints_</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint_">setCuePoint_</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -806,11 +806,11 @@ class WaveFile {
 
     /**
      * Create a cue point in the wave file.
-     * @param {!number} position The cue point position in milisenconds
-     * @param {!string} labl The LIST adtl labl text of the marker.
+     * @param {!number} position The cue point position in milliseconds.
+     * @param {!string} labl The LIST adtl labl text of the marker. Optional.
      * @export
      */
-    setCuePoint(position, labl) {
+    setCuePoint(position, labl="") {
         this.cue.chunkId = "cue ";
         position = (position * this.fmt.sampleRate) / 1000;
         let existingPoints = this.getCuePoints_();
@@ -844,12 +844,122 @@ class WaveFile {
     }
 
     /**
+     * Remove a cue point from a wave file.
+     * @param {!number} index the index of the point. First is 1,
+     *      second is 2, and so on.
+     * @export
+     */
+    deleteCuePoint(index) {
+        this.cue.chunkId = "cue ";
+        let existingPoints = this.getCuePoints_();
+        this.clearLISTadtl_();
+        let len = this.cue.points.length;
+        this.cue.points = [];
+        for (let i=0; i&lt;len; i++) {
+            if (i + 1 != index) {
+                this.setCuePoint_(
+                    existingPoints[i]["dwPosition"],
+                    i + 1,
+                    existingPoints[i]["label"]);
+            }
+        }
+        this.cue.dwCuePoints = this.cue.points.length;
+        if (this.cue.dwCuePoints) {
+            this.cue.chunkId = 'cue ';
+        } else {
+            this.cue.chunkId = '';
+            this.clearLISTadtl_();
+        }
+    }
+
+    /**
+     * Update the label of a cue point.
+     * @param {!number} pointIndex The ID of the cue point.
+     * @param {!string} label The new text for the label.
+     * @export
+     */
+    updateLabel(pointIndex, label) {
+        let adtlIndex = this.getAdtlChunk_();
+        if (adtlIndex !== null) {
+            for (let i=0; i&lt;this.LIST[adtlIndex]["subChunks"].length; i++) {
+                if (this.LIST[adtlIndex]["subChunks"][i]["dwName"] ==
+                        pointIndex) {
+                    this.LIST[adtlIndex]["subChunks"][i]["value"] = label;
+                }
+            }
+        }
+    }
+
+    /**
+     * Push a new cue point in this.cue.points.
+     * @param {!number} position The position in milliseconds.
+     * @param {!number} dwName the dwName of the cue point
+     */
+    setCuePoint_(position, dwName, label) {
+        this.cue.points.push({
+            "dwName": dwName,
+            "dwPosition": position,
+            "fccChunk": "data",
+            "dwChunkStart": 0,
+            "dwBlockStart": 0,
+            "dwSampleOffset": position,
+        });
+        this.setLabl_(dwName, label);
+    }
+
+    /**
+     * Return an array with the position of all cue points in the file.
+     * @return {!Array&lt;number>}
+     */
+    getCuePoints_() {
+        let points = [];
+        for (let i=0; i&lt;this.cue.points.length; i++) {
+            let point = {
+                'dwPosition': this.cue.points[i]["dwPosition"],
+                'label': this.getLabelForCuePoint_(
+                    this.cue.points[i]["dwName"])};
+            points.push(point);
+        }
+        return points;
+    }
+
+    /**
+     * Return the label of a cue point.
+     * @param {!number} pointDwName The ID of the cue point.
+     * @return {!string}
+     * @private
+     */
+    getLabelForCuePoint_(pointDwName) {
+        let adtlIndex = this.getAdtlChunk_();
+        if (adtlIndex !== null) {
+            for (let i=0; i&lt;this.LIST[adtlIndex]["subChunks"].length; i++) {
+                if (this.LIST[adtlIndex]["subChunks"][i]["dwName"] ==
+                        pointDwName) {
+                    return this.LIST[adtlIndex]["subChunks"][i]["value"];
+                }
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Clear any LIST chunk labeled as "adtl".
+     */
+    clearLISTadtl_() {
+        for (let i=0; i&lt;this.LIST.length; i++) {
+            if (this.LIST[i]["format"] == 'adtl') {
+                this.LIST.splice(i);
+            }
+        }
+    }
+
+    /**
      * Create a new "labl" subchunk in a "LIST" chunk of type "adtl".
      * @param {!number} dwName The ID of the cue point.
      * @param {!string} label The label for the cue point.
      * @private
      */
-    setLabl_(dwName, label="") {
+    setLabl_(dwName, label) {
         let adtlIndex = this.getAdtlChunk_();
         if (adtlIndex === null) {
             this.LIST.push({
@@ -858,7 +968,7 @@ class WaveFile {
                 "format": "adtl",
                 "chunkData": [],
                 "subChunks": []});
-            adtlIndex = this.getAdtlChunk_();
+            adtlIndex = this.LIST.length - 1;
         }
         this.setLabelText_(adtlIndex === null ? 0 : adtlIndex, dwName, label);
     }
@@ -892,98 +1002,6 @@ class WaveFile {
             }
         }
         return null;
-    }
-
-    /**
-     * Remove a cue point from a wave file.
-     * @param {!number} index the index of the point. First is 1,
-     *      second is 2, and so on.
-     * @export
-     */
-    deleteCuePoint(index) {
-        this.cue.chunkId = "cue ";
-        let existingPoints = this.getCuePoints_();
-        this.clearLISTadtl_();
-        let len = this.cue.points.length;
-        this.cue.points = [];
-        for (let i=0; i&lt;len; i++) {
-            if (i + 1 != index) {
-                this.setCuePoint_(
-                    existingPoints[i]["dwPosition"],
-                    i + 1,
-                    existingPoints[i]["label"]);
-            }
-        }
-        this.cue.dwCuePoints = this.cue.points.length;
-        if (this.cue.dwCuePoints) {
-            this.cue.chunkId = 'cue ';
-        } else {
-            this.cue.chunkId = '';
-            this.clearLISTadtl_();
-        }
-    }
-
-    /**
-     * Push a new cue point in this.cue.points.
-     * @param {!number} position The position in miliseconds
-     * @param {!number} dwName the dwName of the cue point
-     */
-    setCuePoint_(position, dwName, label) {
-        this.cue.points.push({
-            "dwName": dwName,
-            "dwPosition": position,
-            "fccChunk": "data",
-            "dwChunkStart": 0,
-            "dwBlockStart": 0,
-            "dwSampleOffset": position,
-        });
-        this.setLabl_(dwName, label);
-    }
-
-    /**
-     * Return an array with the position of all cue points in the file.
-     * @return {!Array&lt;number>}
-     */
-    getCuePoints_() {
-        let points = [];
-        for (let i=0; i&lt;this.cue.points.length; i++) {
-            let point = {
-                'dwPosition': this.cue.points[i]["dwPosition"],
-                'label': this.getLabelForCuePoint_(
-                    this.cue.points[i]["dwName"])};
-            points.push(point);
-        }
-        return points;
-    }
-
-    /**
-     * Return the label for a cue point.
-     * @param {!number} pointDwName The ID of the cue point.
-     * @return {!string}
-     * @private
-     */
-    getLabelForCuePoint_(pointDwName) {
-        let adtlIndex = this.getAdtlChunk_();
-        if (adtlIndex !== null) {
-            for (let i=0; i&lt;this.LIST[adtlIndex]["subChunks"].length; i++) {
-                if (this.LIST[adtlIndex]["subChunks"][i]["dwName"] ==
-                        pointDwName) {
-                    return this.LIST[adtlIndex]["subChunks"][i]["value"];
-                }
-            }
-        }
-        return "";
-    }
-
-    /**
-     * Clear any LIST chunk labeled as "adtl".
-     */
-    clearLISTadtl_() {
-        for (let i=0; i&lt;this.LIST.length; i++) {
-            if (this.LIST[i]["format"] == 'adtl') {
-                this.LIST.splice(i);
-            }
-        }
     }
 
     /**
@@ -1682,9 +1700,8 @@ class WaveFile {
                 byteData_.pack(this.fmt.bitsPerSample, uInt16_),
                 this.getFmtExtensionBytes_()
             );
-        } else {
-            throw Error("Could not find the 'fmt ' chunk");
         }
+        throw Error("Could not find the 'fmt ' chunk");
     }
 
     /**
@@ -1861,7 +1878,7 @@ module.exports = WaveFile;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat May 12 2018 20:20:36 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat May 12 2018 22:03:43 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

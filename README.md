@@ -6,14 +6,14 @@ https://github.com/rochars/wavefile
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/)
 
 ## About
-**wavefile** is a module to work with wav files. It is partly inspired by SoX and intended to run in both Node.js and the browser.
+**wavefile** is a module to work with .wav files in both Node.js and the browser.
 
 With **wavefile** you can:
 - Create wave files from scratch
 - Read existing .wav files
 - Read and write tags on .wav files
-- Encode/decode files as ADPCM, A-Law and mu-Law
-- Read/write the data in a .wav file header
+- Set and delete cue points and their labels
+- Encode/decode files as ADPCM, A-Law and μ-Law
 - Turn RIFF files to RIFX and RIFX files to RIFF
 - Edit BWF metada ("bext" chunk)
 - Change the bit depth of the audio
@@ -94,7 +94,7 @@ wavDataURI = wav.toDataURI();
 #### WaveFile.fromBuffer()
 Load a .wav file from a byte buffer into a WaveFile object:
 ```javascript
-wav.fromBuffer(buffer);
+WaveFile.fromBuffer(buffer);
 ```
 
 This is the same as passing the buffer when creating the WaveFile object:
@@ -106,7 +106,7 @@ let wav = new WaveFile(buffer);
 Create a WaveFile object with the arguments you pass:
 ```javascript
 // A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
-wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+WaveFile.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 ```
 
 #### WaveFile.toBuffer()
@@ -119,6 +119,44 @@ buffer = wav.toBuffer();
 Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:
 ```javascript
 wavDataURI = wav.toDataURI();
+```
+
+### WaveFile.setCuePoint()
+Set a cue point with a text label in the file. The point position is informed in milliseconds:
+```javascript
+WaveFile.setCuePoint(1750, "some label");
+```
+
+### WaveFile.deleteCuePoint()
+Delete a cue point. The cue point is informed by the order they appear on the file (starting on 1):
+```javascript
+// remove the first cue point and its label
+WaveFile.deleteCuePoint(1);
+```
+
+### WaveFile.updateLabel()
+Update the label text of a cue point. The cue point is informed by the order they appear on the file (starting on 1):
+```javascript
+// remove the first cue point and its label
+WaveFile.updateLabel(2, "updated label");
+```
+
+### WaveFile.setTag()
+Create (or overwrite) a RIFF tag in the file:
+```javascript
+WaveFile.setTag("ICMT", "some comments");
+```
+
+### WaveFile.getTag()
+Return the value of a existing RIFF tag:
+```javascript
+WaveFile.getTag("ICMT");
+```
+
+### WaveFile.deleteTag()
+Remove a tag from the file:
+```javascript
+WaveFile.deleteTag("ICMT");
 ```
 
 ### Create wave files from scratch
@@ -367,7 +405,7 @@ WaveFile.bext = {
 ```
 
 #### Cue points
-You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in miliseconds and create a point in the corresponding position of the file:
+You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in milliseconds and create a point in the corresponding position of the file:
 ```javascript
 wav.setCuePoint(1750, "some label");
 ```
@@ -422,7 +460,7 @@ WaveFile.LIST is an array of objects with this signature:
     "subChunks": []
 };
 ```
-Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. **wavefile** can read and write "LIST" chunks of format "INFO".
+Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. **wavefile** can read and write "LIST" chunks of format "INFO" and "adtl".
 
 For "LIST" chunks with the "INFO" format, "subChunks" is an array of objects with this signature:
 ```javascript

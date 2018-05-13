@@ -767,11 +767,11 @@ class WaveFile {
 
     /**
      * Create a cue point in the wave file.
-     * @param {!number} position The cue point position in milisenconds
-     * @param {!string} labl The LIST adtl labl text of the marker.
+     * @param {!number} position The cue point position in milliseconds.
+     * @param {!string} labl The LIST adtl labl text of the marker. Optional.
      * @export
      */
-    setCuePoint(position, labl) {
+    setCuePoint(position, labl="") {
         this.cue.chunkId = "cue ";
         position = (position * this.fmt.sampleRate) / 1000;
         let existingPoints = this.getCuePoints_();
@@ -805,12 +805,122 @@ class WaveFile {
     }
 
     /**
+     * Remove a cue point from a wave file.
+     * @param {!number} index the index of the point. First is 1,
+     *      second is 2, and so on.
+     * @export
+     */
+    deleteCuePoint(index) {
+        this.cue.chunkId = "cue ";
+        let existingPoints = this.getCuePoints_();
+        this.clearLISTadtl_();
+        let len = this.cue.points.length;
+        this.cue.points = [];
+        for (let i=0; i<len; i++) {
+            if (i + 1 != index) {
+                this.setCuePoint_(
+                    existingPoints[i]["dwPosition"],
+                    i + 1,
+                    existingPoints[i]["label"]);
+            }
+        }
+        this.cue.dwCuePoints = this.cue.points.length;
+        if (this.cue.dwCuePoints) {
+            this.cue.chunkId = 'cue ';
+        } else {
+            this.cue.chunkId = '';
+            this.clearLISTadtl_();
+        }
+    }
+
+    /**
+     * Update the label of a cue point.
+     * @param {!number} pointIndex The ID of the cue point.
+     * @param {!string} label The new text for the label.
+     * @export
+     */
+    updateLabel(pointIndex, label) {
+        let adtlIndex = this.getAdtlChunk_();
+        if (adtlIndex !== null) {
+            for (let i=0; i<this.LIST[adtlIndex]["subChunks"].length; i++) {
+                if (this.LIST[adtlIndex]["subChunks"][i]["dwName"] ==
+                        pointIndex) {
+                    this.LIST[adtlIndex]["subChunks"][i]["value"] = label;
+                }
+            }
+        }
+    }
+
+    /**
+     * Push a new cue point in this.cue.points.
+     * @param {!number} position The position in milliseconds.
+     * @param {!number} dwName the dwName of the cue point
+     */
+    setCuePoint_(position, dwName, label) {
+        this.cue.points.push({
+            "dwName": dwName,
+            "dwPosition": position,
+            "fccChunk": "data",
+            "dwChunkStart": 0,
+            "dwBlockStart": 0,
+            "dwSampleOffset": position,
+        });
+        this.setLabl_(dwName, label);
+    }
+
+    /**
+     * Return an array with the position of all cue points in the file.
+     * @return {!Array<number>}
+     */
+    getCuePoints_() {
+        let points = [];
+        for (let i=0; i<this.cue.points.length; i++) {
+            let point = {
+                'dwPosition': this.cue.points[i]["dwPosition"],
+                'label': this.getLabelForCuePoint_(
+                    this.cue.points[i]["dwName"])};
+            points.push(point);
+        }
+        return points;
+    }
+
+    /**
+     * Return the label of a cue point.
+     * @param {!number} pointDwName The ID of the cue point.
+     * @return {!string}
+     * @private
+     */
+    getLabelForCuePoint_(pointDwName) {
+        let adtlIndex = this.getAdtlChunk_();
+        if (adtlIndex !== null) {
+            for (let i=0; i<this.LIST[adtlIndex]["subChunks"].length; i++) {
+                if (this.LIST[adtlIndex]["subChunks"][i]["dwName"] ==
+                        pointDwName) {
+                    return this.LIST[adtlIndex]["subChunks"][i]["value"];
+                }
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Clear any LIST chunk labeled as "adtl".
+     */
+    clearLISTadtl_() {
+        for (let i=0; i<this.LIST.length; i++) {
+            if (this.LIST[i]["format"] == 'adtl') {
+                this.LIST.splice(i);
+            }
+        }
+    }
+
+    /**
      * Create a new "labl" subchunk in a "LIST" chunk of type "adtl".
      * @param {!number} dwName The ID of the cue point.
      * @param {!string} label The label for the cue point.
      * @private
      */
-    setLabl_(dwName, label="") {
+    setLabl_(dwName, label) {
         let adtlIndex = this.getAdtlChunk_();
         if (adtlIndex === null) {
             this.LIST.push({
@@ -819,7 +929,7 @@ class WaveFile {
                 "format": "adtl",
                 "chunkData": [],
                 "subChunks": []});
-            adtlIndex = this.getAdtlChunk_();
+            adtlIndex = this.LIST.length - 1;
         }
         this.setLabelText_(adtlIndex === null ? 0 : adtlIndex, dwName, label);
     }
@@ -853,98 +963,6 @@ class WaveFile {
             }
         }
         return null;
-    }
-
-    /**
-     * Remove a cue point from a wave file.
-     * @param {!number} index the index of the point. First is 1,
-     *      second is 2, and so on.
-     * @export
-     */
-    deleteCuePoint(index) {
-        this.cue.chunkId = "cue ";
-        let existingPoints = this.getCuePoints_();
-        this.clearLISTadtl_();
-        let len = this.cue.points.length;
-        this.cue.points = [];
-        for (let i=0; i<len; i++) {
-            if (i + 1 != index) {
-                this.setCuePoint_(
-                    existingPoints[i]["dwPosition"],
-                    i + 1,
-                    existingPoints[i]["label"]);
-            }
-        }
-        this.cue.dwCuePoints = this.cue.points.length;
-        if (this.cue.dwCuePoints) {
-            this.cue.chunkId = 'cue ';
-        } else {
-            this.cue.chunkId = '';
-            this.clearLISTadtl_();
-        }
-    }
-
-    /**
-     * Push a new cue point in this.cue.points.
-     * @param {!number} position The position in miliseconds
-     * @param {!number} dwName the dwName of the cue point
-     */
-    setCuePoint_(position, dwName, label) {
-        this.cue.points.push({
-            "dwName": dwName,
-            "dwPosition": position,
-            "fccChunk": "data",
-            "dwChunkStart": 0,
-            "dwBlockStart": 0,
-            "dwSampleOffset": position,
-        });
-        this.setLabl_(dwName, label);
-    }
-
-    /**
-     * Return an array with the position of all cue points in the file.
-     * @return {!Array<number>}
-     */
-    getCuePoints_() {
-        let points = [];
-        for (let i=0; i<this.cue.points.length; i++) {
-            let point = {
-                'dwPosition': this.cue.points[i]["dwPosition"],
-                'label': this.getLabelForCuePoint_(
-                    this.cue.points[i]["dwName"])};
-            points.push(point);
-        }
-        return points;
-    }
-
-    /**
-     * Return the label for a cue point.
-     * @param {!number} pointDwName The ID of the cue point.
-     * @return {!string}
-     * @private
-     */
-    getLabelForCuePoint_(pointDwName) {
-        let adtlIndex = this.getAdtlChunk_();
-        if (adtlIndex !== null) {
-            for (let i=0; i<this.LIST[adtlIndex]["subChunks"].length; i++) {
-                if (this.LIST[adtlIndex]["subChunks"][i]["dwName"] ==
-                        pointDwName) {
-                    return this.LIST[adtlIndex]["subChunks"][i]["value"];
-                }
-            }
-        }
-        return "";
-    }
-
-    /**
-     * Clear any LIST chunk labeled as "adtl".
-     */
-    clearLISTadtl_() {
-        for (let i=0; i<this.LIST.length; i++) {
-            if (this.LIST[i]["format"] == 'adtl') {
-                this.LIST.splice(i);
-            }
-        }
     }
 
     /**
@@ -1643,9 +1661,8 @@ class WaveFile {
                 byteData_.pack(this.fmt.bitsPerSample, uInt16_),
                 this.getFmtExtensionBytes_()
             );
-        } else {
-            throw Error("Could not find the 'fmt ' chunk");
         }
+        throw Error("Could not find the 'fmt ' chunk");
     }
 
     /**
