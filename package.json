@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "6.10.0",
+  "version": "6.10.1",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -15,15 +15,10 @@
     "bext",
     "LIST",
     "INFO",
-    "chunk",
     "audio",
-    "file",
     "read",
     "write",
     "create",
-    "edit",
-    "save",
-    "server",
     "browser",
     "8-bit",
     "11-bit",
@@ -36,7 +31,6 @@
     "48-bit",
     "64-bit",
     "PCM",
-    "IMA",
     "ADPCM",
     "encode",
     "decode",
@@ -61,7 +55,8 @@
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "pack": "webpack && npm run test-dist",
-    "build": "npm run lint && npm run pack && npm test && npm run doc"
+    "build": "npm run lint && npm test && npm run pack && npm run doc",
+    "build-ci": "npm run lint && npm run pack && npm test && npm run doc"
   },
   "devDependencies": {
     "browser-env": "^3.2.5",
@@ -78,12 +73,12 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "alawmulaw": "^2.0.4",
+    "alawmulaw": "^2.0.5",
     "base64-arraybuffer": "^0.1.5",
-    "bitdepth": "^3.1.1",
-    "byte-data": "^8.0.0",
-    "imaadpcm": "^1.1.4",
-    "riff-chunks": "^4.0.4"
+    "bitdepth": "^3.1.2",
+    "byte-data": "^8.0.2",
+    "imaadpcm": "^1.1.5",
+    "riff-chunks": "^4.0.5"
   },
   "main": "index.js"
 }

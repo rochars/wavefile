@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## version 6.10.0 (2018-05-14)
+## version 6.10.1 (2018-05-14)
+- fix: JSDoc tags and documentation.
+
+## version 6.10.0 (2018-05-13)
 - fromBase64() and fromDataURI() added to the API to load WaveFile objects from base64 strings and DataURIs.
 
 ## version 6.9.0 (2018-05-12)

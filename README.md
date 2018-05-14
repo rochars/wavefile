@@ -329,7 +329,7 @@ console.log(wav.data.samples);
 // Output an array of numbers
 ```
 
-The other public properties:
+The WaveFile properties:
 ```javascript
 let wav = new WaveFile(fs.readFileSync("file.wav"));
 

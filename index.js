@@ -4,27 +4,27 @@
  *
  */
 
-/** @const @private */
+/** @private */
 const bitDepth_ = require("bitdepth");
-/** @const @private */
+/** @private */
 const riffChunks_ = require("riff-chunks");
-/** @const @private */
+/** @private */
 const imaadpcm_ = require("imaadpcm");
-/** @const @private */
+/** @private */
 const alawmulaw_ = require("alawmulaw");
-/** @const @private */
+/** @private */
 const byteData_ = require("byte-data");
-/** @const @private */
+/** @private */
 const encodeBase64_ = require("base64-arraybuffer").encode;
-/** @const @private */
+/** @private */
 const decodeBase64_ = require("base64-arraybuffer").decode;
-/** @const @private */
+/** @private */
 const uInt16_ = {"bits": 16};
-/** @const @private */
+/** @private */
 const uInt32_ = {"bits": 32};
-/** @const @private */
+/** @private */
 const fourCC_ = {"bits": 32, "char": true};
-/** @const @private */
+/** @private */
 const chr_ = {"bits": 8, "char": true};
 
 /**
@@ -787,6 +787,7 @@ class WaveFile {
      * Push a new cue point in this.cue.points.
      * @param {number} position The position in milliseconds.
      * @param {number} dwName the dwName of the cue point
+     * @private
      */
     setCuePoint_(position, dwName, label) {
         this.cue.points.push({
@@ -803,6 +804,7 @@ class WaveFile {
     /**
      * Return an array with the position of all cue points in the file.
      * @return {!Array<!Object>}
+     * @private
      */
     getCuePoints_() {
         /** @type {!Array<Object>} */
@@ -838,6 +840,7 @@ class WaveFile {
 
     /**
      * Clear any LIST chunk labeled as "adtl".
+     * @private
      */
     clearLISTadtl_() {
         for (let i=0; i<this.LIST.length; i++) {
@@ -1045,6 +1048,7 @@ class WaveFile {
      * do not fill a full sequence of bytes.
      * @param {string} bitDepth The bit depth.
      * @return {string}
+     * @private
      */
     realBitDepth_(bitDepth) {
         if (bitDepth != "32f") {

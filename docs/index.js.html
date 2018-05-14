@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#clearLISTadtl_">clearLISTadtl_</a></li><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getCuePoints_">getCuePoints_</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#realBitDepth_">realBitDepth_</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint_">setCuePoint_</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#@private">@private</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -43,27 +43,27 @@
  *
  */
 
-/** @const @private */
+/** @private */
 const bitDepth_ = require("bitdepth");
-/** @const @private */
+/** @private */
 const riffChunks_ = require("riff-chunks");
-/** @const @private */
+/** @private */
 const imaadpcm_ = require("imaadpcm");
-/** @const @private */
+/** @private */
 const alawmulaw_ = require("alawmulaw");
-/** @const @private */
+/** @private */
 const byteData_ = require("byte-data");
-/** @const @private */
+/** @private */
 const encodeBase64_ = require("base64-arraybuffer").encode;
-/** @const @private */
+/** @private */
 const decodeBase64_ = require("base64-arraybuffer").decode;
-/** @const @private */
+/** @private */
 const uInt16_ = {"bits": 16};
-/** @const @private */
+/** @private */
 const uInt32_ = {"bits": 32};
-/** @const @private */
+/** @private */
 const fourCC_ = {"bits": 32, "char": true};
-/** @const @private */
+/** @private */
 const chr_ = {"bits": 8, "char": true};
 
 /**
@@ -826,6 +826,7 @@ class WaveFile {
      * Push a new cue point in this.cue.points.
      * @param {number} position The position in milliseconds.
      * @param {number} dwName the dwName of the cue point
+     * @private
      */
     setCuePoint_(position, dwName, label) {
         this.cue.points.push({
@@ -842,6 +843,7 @@ class WaveFile {
     /**
      * Return an array with the position of all cue points in the file.
      * @return {!Array&lt;!Object>}
+     * @private
      */
     getCuePoints_() {
         /** @type {!Array&lt;Object>} */
@@ -877,6 +879,7 @@ class WaveFile {
 
     /**
      * Clear any LIST chunk labeled as "adtl".
+     * @private
      */
     clearLISTadtl_() {
         for (let i=0; i&lt;this.LIST.length; i++) {
@@ -1084,6 +1087,7 @@ class WaveFile {
      * do not fill a full sequence of bytes.
      * @param {string} bitDepth The bit depth.
      * @return {string}
+     * @private
      */
     realBitDepth_(bitDepth) {
         if (bitDepth != "32f") {
@@ -1943,7 +1947,7 @@ module.exports = WaveFile;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun May 13 2018 11:46:12 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 00:26:45 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
