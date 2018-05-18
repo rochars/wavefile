@@ -480,10 +480,10 @@ class WaveFile {
      */
     interleave() {
         if (!this.isInterleaved) {
+            /** @type {!Array<number>} */
             let finalSamples = [];
-            let numChannels = this.data.samples[0].length;
-            for (let i = 0; i < numChannels; i++) {
-                for (let j = 0; j < this.data.samples.length; j++) {
+            for (let i=0; i < this.data.samples[0].length; i++) {
+                for (let j=0; j < this.data.samples.length; j++) {
                     finalSamples.push(this.data.samples[j][i]);
                 }
             }
@@ -498,18 +498,16 @@ class WaveFile {
      */
     deInterleave() {
         if (this.isInterleaved) {
+            /** @type {!Array<!Array<number>>} */
             let finalSamples = [];
-            let i;
-            for (i = 0; i < this.fmt.numChannels; i++) {
+            for (let i=0; i < this.fmt.numChannels; i++) {
                 finalSamples[i] = [];
             }
-            i = 0;
-            let j;
-            while (i < this.data.samples.length) {
-                for (j = 0; j < this.fmt.numChannels; j++) {
+            for (let i=0; i < this.data.samples.length; i++) {
+                for (let j=0; j < this.fmt.numChannels; j++) {
                     finalSamples[j].push(this.data.samples[i+j]);
                 }
-                i += j;
+                i += this.fmt.numChannels - 1;
             }
             this.data.samples = finalSamples;
             this.isInterleaved = false;
