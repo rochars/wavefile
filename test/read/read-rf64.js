@@ -1,16 +1,20 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading RF64 files.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("64-bit reading (file < 4GB)", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
 
     var stats = fs.statSync(path + "RF64-16bit-8kHz-stereo-reaper.wav");
     var fileSizeInBytes2 = stats["size"];
@@ -18,12 +22,10 @@ describe("64-bit reading (file < 4GB)", function() {
     it("chunkSize should be == fileSizeInBytes", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes2);
     });
-    it("chunkId should be 'RF64'",
-            function() {
+    it("chunkId should be 'RF64'", function() {
         assert.equal(wav.container, "RF64");
     });
-    it("chunkSize should be the same as wav.ds64.riffSizeHigh",
-            function() {
+    it("chunkSize should be the same as wav.ds64.riffSizeHigh", function() {
         assert.equal(wav.chunkSize, wav.ds64.riffSizeHigh);
     });
     // ds64 fields
@@ -39,7 +41,8 @@ describe("64-bit reading (file < 4GB)", function() {
     it("ds64.riffSizeLow should be 0", function() {
         assert.equal(wav.ds64.riffSizeLow, 0);
     });
-    it("wav.data.chunkSize should be the same as wav.ds64.dataSizeHigh", function() {
+    it("wav.data.chunkSize should be the same as wav.ds64.dataSizeHigh",
+            function() {
         assert.ok(wav.ds64.dataSizeHigh, wav.data.chunkSize);
     });
     it("ds64.dataSizeLow should be 0", function() {

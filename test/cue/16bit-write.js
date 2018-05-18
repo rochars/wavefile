@@ -1,22 +1,27 @@
-/*
+/**
+ * WaveFile: https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
- * https://github.com/rochars/wavefile
  *
+ * Test writing the "cue " chunk.
+ * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('update cue point label', function() {
 
-    let fs = require('fs');
-    const WaveFile = require("../../test/loader.js");
-    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
     wav.updateLabel(2, "updated label");
-    fs.writeFileSync("./test/files/out/fromScratch-CUE13.wav", wav.toBuffer());
-
+    fs.writeFileSync(
+        "./test/files/out/fromScratch-CUE13.wav", wav.toBuffer());
     var stats = fs.statSync("./test/files/out/fromScratch-CUE13.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE13.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE13.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -32,23 +37,21 @@ describe('update cue point label', function() {
         labelText = wavCue2.LIST[0]["subChunks"][1]["value"];
         assert.equal(labelText, "updated label");
     });
-    
 });
 
 describe('cue points with no labels', function() {
 
-    let fs = require('fs');
-    const WaveFile = require("../../test/loader.js");
-    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
     wav.deleteCuePoint(1);
     wav.LIST = [];
     wav.deleteCuePoint(1);
-
-    fs.writeFileSync("./test/files/out/fromScratch-CUE12.wav", wav.toBuffer());
-
+    fs.writeFileSync(
+        "./test/files/out/fromScratch-CUE12.wav", wav.toBuffer());
     var stats = fs.statSync("./test/files/out/fromScratch-CUE12.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE12.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE12.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -64,9 +67,8 @@ describe('cue points with no labels', function() {
 
 describe('delete all points', function() {
 
-    let fs = require('fs');
-    const WaveFile = require("../../test/loader.js");
-    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
@@ -74,12 +76,12 @@ describe('delete all points', function() {
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
-
-    fs.writeFileSync("./test/files/out/fromScratch-CUE11.wav", wav.toBuffer());
-
+    fs.writeFileSync(
+        "./test/files/out/fromScratch-CUE11.wav", wav.toBuffer());
     var stats = fs.statSync("./test/files/out/fromScratch-CUE11.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE11.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE11.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -95,7 +97,6 @@ describe('delete all points', function() {
 
 describe('delete a point', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -112,16 +113,14 @@ describe('delete a point', function() {
     wav.setCuePoint(500, "cue marker 1"); //
     wav.setCuePoint(750, "cue marker 2"); //
     wav.setCuePoint(1750, "cue marker 6"); //
-
     wav.deleteCuePoint(2); // point in 750
     wav.deleteCuePoint(3); // point 1250
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/fromScratch-CUE10.wav", wav.toBuffer());
-
+    fs.writeFileSync(
+        "./test/files/out/fromScratch-CUE10.wav", wav.toBuffer());
     var stats = fs.statSync("./test/files/out/fromScratch-CUE10.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE10.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE10.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -137,9 +136,8 @@ describe('delete a point', function() {
 
 describe('delete all points', function() {
 
-    let fs = require('fs');
-    const WaveFile = require("../../test/loader.js");
-    let wav = new WaveFile(fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync("./test/files/Audacity-16bit-17-MARKERS.wav"));
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
@@ -157,12 +155,12 @@ describe('delete all points', function() {
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
-
     fs.writeFileSync("./test/files/out/fromScratch-CUE9.wav", wav.toBuffer());
 
     var stats = fs.statSync("./test/files/out/fromScratch-CUE9.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE9.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE9.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -176,10 +174,8 @@ describe('delete all points', function() {
     });
 });
 
-
 describe('delete a point', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -197,15 +193,14 @@ describe('delete a point', function() {
     wav.setCuePoint(750, "cue marker 2"); 
     wav.setCuePoint(1750, "cue marker 6");
     wav.deleteCuePoint(2);
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/fromScratch-CUE8.wav", wav.toBuffer());
-
+    fs.writeFileSync(
+        "./test/files/out/fromScratch-CUE8.wav", wav.toBuffer());
     var stats = fs.statSync("./test/files/out/fromScratch-CUE8.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE8.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE8.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -217,7 +212,6 @@ describe('delete a point', function() {
     it("wav.cue.points.length should be 5", function() {
         assert.equal(wavCue2.cue.points.length, 5);
     });
-
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wav.cue.chunkId, "cue ");
     });
@@ -226,9 +220,9 @@ describe('delete a point', function() {
     });
 });
 
-describe('create 44100 kHz 24-bit stereo wave file with lots of cue points', function() {
+describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
+        function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -246,15 +240,14 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points', fun
     wav.setCuePoint(750, "cue marker 5"); //
     wav.setCuePoint(1750, "cue marker 6"); //
     wav.setCuePoint(1550, "cue marker 7"); //
-    //console.log(wav.cue.points)
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/fromScratch-CUE7.wav", wav.toBuffer());
-
+    fs.writeFileSync(
+        "./test/files/out/fromScratch-CUE7.wav", wav.toBuffer());
     var stats = fs.statSync("./test/files/out/fromScratch-CUE7.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE7.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE7.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -268,9 +261,9 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points', fun
     });
 });
 
-describe('create 44100 kHz 24-bit stereo wave file with two cue points', function() {
+describe('create 44100 kHz 24-bit stereo wave file with two cue points',
+    function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -283,15 +276,13 @@ describe('create 44100 kHz 24-bit stereo wave file with two cue points', functio
     wav.fromScratch(2, 44100, '24', deInterleaved);
     wav.setCuePoint(1500, "cue marker");
     wav.setCuePoint(1000, "cue marker 2");
-
-    let fs = require('fs');
     fs.writeFileSync("./test/files/out/fromScratch-CUE6.wav", wav.toBuffer());
-
     var stats = fs.statSync("./test/files/out/fromScratch-CUE6.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE6.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE6.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -305,9 +296,9 @@ describe('create 44100 kHz 24-bit stereo wave file with two cue points', functio
     });
 });
 
-describe('create 44100 kHz 24-bit stereo wave file with one cue point', function() {
+describe('create 44100 kHz 24-bit stereo wave file with one cue point',
+    function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -319,15 +310,13 @@ describe('create 44100 kHz 24-bit stereo wave file with one cue point', function
     ];
     wav.fromScratch(2, 44100, '24', deInterleaved);
     wav.setCuePoint(1500, "cue marker");
-
-    let fs = require('fs');
     fs.writeFileSync("./test/files/out/fromScratch-CUE5.wav", wav.toBuffer());
-
     var stats = fs.statSync("./test/files/out/fromScratch-CUE5.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE5.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE5.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -343,7 +332,6 @@ describe('create 44100 kHz 24-bit stereo wave file with one cue point', function
 
 describe('create 16000 kHz stereo wave file with one cue point', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<32000; i++)  {
@@ -355,15 +343,13 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
     ];
     wav.fromScratch(2, 8000, '16', deInterleaved);
     wav.setCuePoint(1500, "cue marker");
-
-    let fs = require('fs');
     fs.writeFileSync("./test/files/out/fromScratch-CUE4.wav", wav.toBuffer());
-
     var stats = fs.statSync("./test/files/out/fromScratch-CUE4.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE4.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE4.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -377,10 +363,8 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
     });
 });
 
-
 describe('create 16000 kHz stereo wave file with one cue point', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<32000; i++)  {
@@ -392,15 +376,13 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
     ];
     wav.fromScratch(2, 16000, '16', deInterleaved);
     wav.setCuePoint(1000, "cue marker");
-
-    let fs = require('fs');
     fs.writeFileSync("./test/files/out/fromScratch-CUE3.wav", wav.toBuffer());
-
     var stats = fs.statSync("./test/files/out/fromScratch-CUE3.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE3.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE3.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -454,10 +436,8 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
     });
 });
 
-
 describe('create 16000 kHz wave file with one cue point', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<32000; i++)  {
@@ -465,15 +445,13 @@ describe('create 16000 kHz wave file with one cue point', function() {
     }
     wav.fromScratch(1, 16000, '16', samples);
     wav.setCuePoint(1000, "cue marker");
-
-    let fs = require('fs');
     fs.writeFileSync("./test/files/out/fromScratch-CUE2.wav", wav.toBuffer());
-
     var stats = fs.statSync("./test/files/out/fromScratch-CUE2.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE2.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE2.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
@@ -532,7 +510,6 @@ describe('create 16000 kHz wave file with one cue point', function() {
 
 describe('create 8000 kHz wave file with one cue point in 1s', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<16000; i++)  {
@@ -540,15 +517,13 @@ describe('create 8000 kHz wave file with one cue point in 1s', function() {
     }
     wav.fromScratch(1, 8000, '16', samples);
     wav.setCuePoint(1000, "cue marker");
-
-    let fs = require('fs');
     fs.writeFileSync("./test/files/out/fromScratch-CUE.wav", wav.toBuffer());
-
     var stats = fs.statSync("./test/files/out/fromScratch-CUE.wav");
     var fileSizeInBytes1 = stats["size"];
-
-    let wavCue = new WaveFile(fs.readFileSync("./test/files/test-cue-reaper.wav"));
-    let wavCue2 = new WaveFile(fs.readFileSync("./test/files/out/fromScratch-CUE.wav"));
+    let wavCue = new WaveFile(
+        fs.readFileSync("./test/files/test-cue-reaper.wav"));
+    let wavCue2 = new WaveFile(
+        fs.readFileSync("./test/files/out/fromScratch-CUE.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);

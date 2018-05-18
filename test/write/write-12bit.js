@@ -1,25 +1,31 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 12-bit files.
  * 
  */
 
-var assert = require('assert');
+const assert = require('assert');
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('read 16bit file from disk and write to new file', function() {
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     wav.LISTChunks = [];
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/M1F1-int12WE-AFsp-out-12bit.wav", wav2.toBuffer());
-    wav2 = new WaveFile(fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-out-12bit.wav"));
-
-    var stats = fs.statSync(path + "M1F1-int12WE-AFsp.wav");
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-out-12bit.wav", wav2.toBuffer());
+    wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-out-12bit.wav"));
+    var stats = fs.statSync(
+        path + "M1F1-int12WE-AFsp.wav");
     var fileSizeInBytes1 = stats["size"];
-    stats = fs.statSync(path + "/out/M1F1-int12WE-AFsp-out-12bit.wav");
+    stats = fs.statSync(
+        path + "/out/M1F1-int12WE-AFsp-out-12bit.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
@@ -40,7 +46,8 @@ describe('read 16bit file from disk and write to new file', function() {
     it("fmtChunkSize should be 40", function() {
         assert.equal(wav2.fmt.chunkSize, 40);
     });
-    it("audioFormat should be 65534 (WAVE_FORMAT_EXTENSIBLE)", function() {
+    it("audioFormat should be 65534 " +
+        "(WAVE_FORMAT_EXTENSIBLE)", function() {
         assert.equal(wav2.fmt.audioFormat, 65534);
     });
     it("numChannels should be 2", function() {
@@ -67,12 +74,12 @@ describe('read 16bit file from disk and write to new file', function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav2.data.samples.length > 0);
     });
-    it("samples on the new file should have the same length as in the original file",
-            function() {
+    it("samples on the new file should have the same length as in the " +
+        "original file", function() {
         assert.equal(wav2.data.samples.length, wav.data.samples.length);
     });
-    it("samples on the new file should be same as the original file",
-            function() {
+    it("samples on the new file should be same as the original " +
+        "file", function() {
         assert.deepEqual(wav2.data.samples, wav.data.samples);
     });
     it("dwChannelMask should be 0", function() {

@@ -1,33 +1,34 @@
-/*!
- * Wavefile
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 14-bit files with the fromScratch() method.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('create 14-bit wave files from scratch', function() {
     
-    const WaveFile = require("../../test/loader.js");
-
     let samples = [];
     for (let i=0; i<9000; i++) {
         samples.push(0);
     }
-
     let wav = new WaveFile();
     wav.fromScratch(1, 8000, '14', samples);
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/14-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
-
-    var stats = fs.statSync("./test/files/out/14-bit-48kHz-mono-fromScratch.wav");
+    fs.writeFileSync(
+        "./test/files/out/14-bit-48kHz-mono-fromScratch.wav",
+        wav.toBuffer());
+    var stats = fs.statSync(
+        "./test/files/out/14-bit-48kHz-mono-fromScratch.wav");
     var fileSizeInBytes1 = stats["size"];
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
     });
-
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
     });
@@ -79,10 +80,16 @@ describe('create 14-bit wave files from scratch', function() {
     it('bitDepth should be "14"', function() {
         assert.equal(wav.bitDepth, "14");
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat',
+        function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat',
+        function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
 });

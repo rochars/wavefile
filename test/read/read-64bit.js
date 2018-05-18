@@ -1,16 +1,17 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading 64-bit files.
  * 
  */
 
-let assert = require("assert");
-
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 describe("64-bit reading", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
     let wBytes = fs.readFileSync(path + "64bit-48kHz-noBext-mono.wav");
     let wav = new WaveFile(wBytes);
 

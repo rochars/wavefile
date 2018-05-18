@@ -1,23 +1,27 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test the toBitDepth() method to convert an 16-bit file to 27-bit.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("16-bit from file to 27-bit", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
-    let wavB = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     wav.toBitDepth("27");
-    fs.writeFileSync(path + "/out/to-bit-depth/16-to-27.wav", wav.toBuffer());
-
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/to-bit-depth/16-to-27.wav"));
-
+    fs.writeFileSync(
+        path + "/out/to-bit-depth/16-to-27.wav", wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/to-bit-depth/16-to-27.wav"));
     let stats = fs.statSync(path + "16-bit-8kHz-noBext-mono.wav");
     let fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/to-bit-depth/16-to-27.wav");
@@ -29,7 +33,6 @@ describe("16-bit from file to 27-bit", function() {
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-    
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav.container, "RIFF");
     });
@@ -72,7 +75,8 @@ describe("16-bit from file to 27-bit", function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat should have the correct values', function() {
+        assert.deepEqual(
+            wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
     });
 });

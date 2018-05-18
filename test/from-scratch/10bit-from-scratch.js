@@ -1,25 +1,27 @@
-/*!
- * Wavefile
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 10-bit files with the fromScratch() method.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('create 10-bit wave files from scratch', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
-
     let samples = [];
     for (let i=0; i<9000; i++) {
         samples.push(0);
     }
-
     wav.fromScratch(1, 8000, '10', samples);
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/10-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
+    fs.writeFileSync(
+        "./test/files/out/10-bit-48kHz-mono-fromScratch.wav",
+        wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
@@ -72,7 +74,9 @@ describe('create 10-bit wave files from scratch', function() {
     it('bitDepth should be "10"', function() {
         assert.equal(wav.bitDepth, "10");
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat', function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
 });

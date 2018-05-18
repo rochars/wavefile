@@ -1,119 +1,110 @@
-/*
- * Copyright (c) 2018 Rafael da Silva Rocha.
- * https://github.com/rochars/wavefile
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  *
+ * Test the interleave() and deInterleave() methods.
+ * 
  */
 
-var assert = require('assert');
-
+const assert = require('assert');
+const WaveFile = require("../test/loader.js");
 
 describe('fromScratch with interleaved stereo samples', function() {
     
-    const WaveFile = require("../test/loader.js");
     let wav = new WaveFile();
     let stereoSamples = [
         [0, -2, 4, 3],
         [0, -1, 4, 3]
     ];
     wav.fromScratch(2, 8000, '8', stereoSamples); 
-
-    it('byteRate when fromScratch is called with interleaved samples.',
+    it('byteRate should be 16000',
             function() {
         assert.deepEqual(wav.fmt.byteRate, 16000);
     });
-    it('chunkSize when fromScratch is called with interleaved samples.',
+    it('chunkSize should be 44',
             function() {
         assert.deepEqual(wav.chunkSize, 44);
     });
-    it('data.chunkSize when fromScratch is called with interleaved samples.',
+    it('data.chunkSize should be 8',
             function() {
         assert.deepEqual(wav.data.chunkSize, 8);
     });
 });
 
 describe('interleave', function() {
-    
-    const WaveFile = require("../test/loader.js");   
 
-    it('should interleave the samples of a 2-channel wave file',
+    it('should interleave the samples of a 2-channel wave file on load',
             function() {
         let wav = new WaveFile();
-        let stereoSamples = [
+        wav.fromScratch(2, 48000, '8', [
             [0, -2, 4, 3],
             [0, -1, 4, 3]
-        ];
-        wav.fromScratch(2, 48000, '8', stereoSamples);
-        //wav.interleave();
+        ]);
         let expected = [0, 0, -2, -1, 4, 4, 3, 3];
         assert.deepEqual(wav.data.samples, expected);
     });
+    it('should interleave the samples of a 3-channel wave file on load',
+            function() {
+        let wav = new WaveFile();
+        wav.fromScratch(2, 48000, '8', [
+            [0, -2, 4, 3],
+            [0, -1, 4, 3],
+            [0, -1, 5, 3]
+        ]);
+        let expected = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
+        assert.deepEqual(wav.data.samples, expected);
+    });
+    it('should automatically interleave the samples when writing to buffer',
+            function() {
+        let wav = new WaveFile();
+        wav.fromScratch(
+            1, 48000, '8', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
+        wav.fmt.numChannels = 3;
+        wav.deInterleave();
+        wav.toBuffer();        
+        assert.deepEqual(
+            wav.data.samples, [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
+    });
+});
+
+describe('deInterleave', function() {
 
     it('should de-interleave the samples of a 2-channel wave file',
             function() {
         let wav = new WaveFile();
-        let samples = [0, 0, -2, -1, 4, 4, 3, 3];
-        wav.fromScratch(1, 48000, '8', samples);
+        wav.fromScratch(1, 48000, '8', [0, 0, -2, -1, 4, 4, 3, 3]);
         wav.fmt.numChannels = 2;
         wav.deInterleave();
-        let expected = [
+        assert.deepEqual(wav.data.samples, [
             [0, -2, 4, 3],
             [0, -1, 4, 3]
-        ];
-        assert.deepEqual(wav.data.samples, expected);
+        ]);
     });
-
-    it('should interleave the samples of a 3-channel wave file',
+    it('should de-interleave the samples of a 3-channel wave file according ' +
+        'to the updated value of fmt.numChannels',
             function() {
         let wav = new WaveFile();
-        let stereoSamples = [
-            [0, -2, 4, 3],
-            [0, -1, 4, 3],
-            [0, -1, 5, 3]
-        ];
-        wav.fromScratch(2, 48000, '8', stereoSamples);
-        //wav.interleave();
-        let expected = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
-        assert.deepEqual(wav.data.samples, expected);
-    });
-
-    it('should de-interleave the samples of a 3-channel wave file',
-            function() {
-        let wav = new WaveFile();
-        let samples = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
-        wav.fromScratch(1, 48000, '8', samples);
+        wav.fromScratch(
+            1, 48000, '8', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
         wav.fmt.numChannels = 3;
         wav.deInterleave();
-        let expected = [
+        assert.deepEqual(wav.data.samples, [
             [0, -2, 4, 3],
             [0, -1, 4, 3],
             [0, -1, 5, 3]
-        ];
-        assert.deepEqual(wav.data.samples, expected);
+        ]);
     });
-
     it('should de-interleave the samples of a 3-channel file',
             function() {
         let wav = new WaveFile();
-        let samples = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
-        wav.fromScratch(1, 48000, '8', samples);
+        wav.fromScratch(
+            1, 48000, '8', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
         wav.fmt.numChannels = 3;
         wav.deInterleave();
-        let expected = [
+        assert.deepEqual(wav.data.samples, [
             [0, -2, 4, 3],
             [0, -1, 4, 3],
             [0, -1, 5, 3]
-        ];
-        assert.deepEqual(wav.data.samples, expected);
-    });
-
-    it('should automatically interleave the samples when writing to buffer',
-            function() {
-        let wav = new WaveFile();
-        let samples = [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3];
-        wav.fromScratch(1, 48000, '8', samples);
-        wav.fmt.numChannels = 3;
-        wav.deInterleave();
-        wav.toBuffer();        
-        assert.deepEqual(wav.data.samples, samples);
+        ]);
     });
 });

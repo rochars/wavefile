@@ -1,22 +1,27 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test the toBitDepth() method to convert an 16-bit file to 8-bit.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("16-bit from file to 8-bit", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
-    let wav3 = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav3 = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     wav.toBitDepth("8");
-    fs.writeFileSync(path + "/out/to-bit-depth/16-to-8.wav", wav.toBuffer());
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/to-bit-depth/16-to-8.wav"));
-
+    fs.writeFileSync(
+        path + "/out/to-bit-depth/16-to-8.wav", wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/to-bit-depth/16-to-8.wav"));
     var stats = fs.statSync(path + "16-bit-8kHz-noBext-mono.wav");
     var fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/to-bit-depth/16-to-8.wav");
@@ -71,10 +76,6 @@ describe("16-bit from file to 8-bit", function() {
 
 describe("16-bit mono from scratch to 8-bit (max range)", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
     let wav = new WaveFile();
     let samples = [-32768, 32767];
     wav.fromScratch(1, 8000, "16", samples);
@@ -123,10 +124,6 @@ describe("16-bit mono from scratch to 8-bit (max range)", function() {
 
 describe("16-bit mono from scratch to 8-bit (0)", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
     let wav = new WaveFile();
     let samples = [0];
     wav.fromScratch(1, 8000, "16", samples);

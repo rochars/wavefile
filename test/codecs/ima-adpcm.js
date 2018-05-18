@@ -1,23 +1,28 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test encoding and decoding IMA-ADPCM files.
  * 
- */ 
+ */
 
-var assert = require('assert');
+const assert = require('assert');
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('4-bit to 24-bit (existing 4-bit wave file)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "/4bit-imaadpcm-8kHz-noBext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "/4bit-imaadpcm-8kHz-noBext-mono.wav"));
     wav.fromIMAADPCM("24");
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/24bit-8kHz-noBext-mono-decoded-source2.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/24bit-8kHz-noBext-mono-decoded-source2.wav");
-    var fileSizeInBytes2 = stats["size"];
+    fs.writeFileSync(
+        path + "/out/24bit-8kHz-noBext-mono-decoded-source2.wav",
+        wav2.toBuffer());
+    let stats = fs.statSync(
+        path + "/out/24bit-8kHz-noBext-mono-decoded-source2.wav");
+    let fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
@@ -61,17 +66,18 @@ describe('4-bit to 24-bit (existing 4-bit wave file)', function() {
 });
 
 describe('16-bit to 4-bit', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
-    wav.toIMAADPCM();
-    
-    fs.writeFileSync(path + "/out/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav", wav.toBuffer());
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav"));
 
-    var stats = fs.statSync(path + "/out/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav");
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    wav.toIMAADPCM();    
+    fs.writeFileSync(
+        path + "/out/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav",
+        wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(
+            path + "/out/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav"));
+    var stats = fs.statSync(
+        path + "/out/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes1", function() {
@@ -119,16 +125,15 @@ describe('16-bit to 4-bit', function() {
 });
 
 describe('4-bit to 16-bit (4-bit encoded with wavefile.js)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "/4bit-imaadpcm-8kHz-noBext-mono-encoded.wav"));
     wav.fromIMAADPCM();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/16bit-8kHz-noBext-mono-decoded.wav",wav2.toBuffer());
-
+    fs.writeFileSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded.wav",
+        wav2.toBuffer());
     var stats = fs.statSync(path + "/out/16bit-8kHz-noBext-mono-decoded.wav");
     var fileSizeInBytes = stats["size"];
 
@@ -174,17 +179,17 @@ describe('4-bit to 16-bit (4-bit encoded with wavefile.js)', function() {
 });
 
 describe('4-bit to 16-bit (existing 4-bit wave file)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "/4bit-imaadpcm-8kHz-noBext-mono.wav"));
+
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "/4bit-imaadpcm-8kHz-noBext-mono.wav"));
     wav.fromIMAADPCM();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/16bit-8kHz-noBext-mono-decoded-source2.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/16bit-8kHz-noBext-mono-decoded-source2.wav");
+    fs.writeFileSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded-source2.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded-source2.wav");
     var fileSizeInBytes = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {
@@ -229,17 +234,17 @@ describe('4-bit to 16-bit (existing 4-bit wave file)', function() {
 });
 
 describe('4-bit to 16-bit (1024 blockalign)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "/4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "/4-bit-imaadpcm-8kHz-noBext-mono-reaper.wav"));
     wav.fromIMAADPCM();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/16bit-8kHz-noBext-mono-decoded-reaper.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/16bit-8kHz-noBext-mono-decoded-reaper.wav");
+    fs.writeFileSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded-reaper.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded-reaper.wav");
     var fileSizeInBytes = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {
@@ -284,17 +289,17 @@ describe('4-bit to 16-bit (1024 blockalign)', function() {
 });
 
 describe('8-bit A-Law to 4-bit ADPCM', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "8bit-alaw-8kHz-noBext-mono-encoded.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "8bit-alaw-8kHz-noBext-mono-encoded.wav"));
     wav.toIMAADPCM();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/4bit-8kHz-mono-imaadpcm-encoded-from-alaw.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/4bit-8kHz-mono-imaadpcm-encoded-from-alaw.wav");
+    fs.writeFileSync(
+        path + "/out/4bit-8kHz-mono-imaadpcm-encoded-from-alaw.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/4bit-8kHz-mono-imaadpcm-encoded-from-alaw.wav");
     var fileSizeInBytes = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {

@@ -1,22 +1,27 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading the "cue " chunk.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("16-bit cue reading", function() {
-
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "16bit-16kHz-markers-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16bit-16kHz-markers-mono.wav"));
     wav.LISTChunks = [];
-    fs.writeFileSync(path + "/out/16bit-16kHz-markers-mono.wav", wav.toBuffer());
-    wav = new WaveFile(fs.readFileSync(path + "/out/16bit-16kHz-markers-mono.wav"));
-
-    var stats = fs.statSync(path + "/out/16bit-16kHz-markers-mono.wav");
+    fs.writeFileSync(
+        path + "/out/16bit-16kHz-markers-mono.wav", wav.toBuffer());
+    wav = new WaveFile(
+        fs.readFileSync(path + "/out/16bit-16kHz-markers-mono.wav"));
+    var stats = fs.statSync(
+        path + "/out/16bit-16kHz-markers-mono.wav");
     var fileSizeInBytes1 = stats["size"];
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
@@ -68,23 +73,19 @@ describe("16-bit cue reading", function() {
 
 describe("16-bit cue reading (file with 2 markers)", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "16bit-16kHz-2markers-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16bit-16kHz-2markers-mono.wav"));
     wav.LISTChunks = [];
-    
-    fs.writeFileSync(path + "/out/16bit-16kHz-2markers-mono.wav", wav.toBuffer());
-    wav = new WaveFile(fs.readFileSync(path + "/out/16bit-16kHz-2markers-mono.wav"));
-
+    fs.writeFileSync(
+        path + "/out/16bit-16kHz-2markers-mono.wav", wav.toBuffer());
+    wav = new WaveFile(
+        fs.readFileSync(path + "/out/16bit-16kHz-2markers-mono.wav"));
     var stats = fs.statSync(path + "/out/16bit-16kHz-2markers-mono.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes2);
     });
-
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav.container, "RIFF");
     });

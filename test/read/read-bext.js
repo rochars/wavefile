@@ -1,16 +1,18 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading the "bext" chunk.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("BWF data reading", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
     let wav = new WaveFile(fs.readFileSync(path + "24bit-16kHz-bext-mono.wav"));
 
     var stats = fs.statSync(path + "24bit-16kHz-bext-mono.wav");

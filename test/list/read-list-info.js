@@ -1,19 +1,20 @@
-/*
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test parsing "LIST" chunks of type "INFO".
  * 
- */ 
+ */
 
-let assert = require('assert');
-
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav', function() {
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    
-    let path = "test/files/";
-    let wav2 = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
-
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
     let stats = fs.statSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav");
     let fileSizeInBytes2 = stats["size"];
 
@@ -82,20 +83,19 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav', function() {
 
 describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function() {
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
-    let wavB = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
-    fs.writeFileSync(path + "/out/M1F1-int12WE-AFsp-LIST-NEW-TAGS.wav", wavB.toBuffer());
-
+    let wav = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-LIST-NEW-TAGS.wav", wavB.toBuffer());
     let stats = fs.statSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav");
     let fileSizeInBytes1 = stats["size"];
-
     stats = fs.statSync(path + "/out/M1F1-int12WE-AFsp-LIST-NEW-TAGS.wav");
     let fileSizeInBytes2 = stats["size"];
 
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-LIST-NEW-TAGS.wav"));
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-LIST-NEW-TAGS.wav"));
     
     // Reading tags from the original file
     it("RIFF tag IART", function() {
@@ -114,7 +114,8 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
         assert.equal(wav.LIST[0]["subChunks"][1]["chunkSize"], 21);
     });
     it("RIFF tag ICMT", function() {
-        assert.equal(wav.LIST[0]["subChunks"][1]["value"], "kabal@CAPELLA edited");
+        assert.equal(
+            wav.LIST[0]["subChunks"][1]["value"], "kabal@CAPELLA edited");
     });
     it("RIFF tag ICRD", function() {
         assert.equal(wav.LIST[0]["subChunks"][2]["chunkId"], "ICRD");
@@ -123,7 +124,8 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
         assert.equal(wav.LIST[0]["subChunks"][2]["chunkSize"], 24);
     });
     it("RIFF tag ICRD", function() {
-        assert.equal(wav.LIST[0]["subChunks"][2]["value"], "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav.LIST[0]["subChunks"][2]["value"], "2003-01-30 03:28:46 UTC");
     });
     it("RIFF tag IENG", function() {
         assert.equal(wav.LIST[0]["subChunks"][3]["chunkId"], "IENG");
@@ -155,7 +157,6 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
     it("wav.LIST[0]['chunkSize'] == wav.getLISTSize_()", function() {
         assert.equal(wav.LIST[0]["chunkSize"], wav.getLISTBytes_().length - 8);
     });
-
     // Reading tags from the file written with WaveFile
     it("RIFF tag IART", function() {
         assert.equal(wav2.LIST[0]["subChunks"][0]["chunkId"], "IART");
@@ -170,11 +171,11 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
         assert.equal(wav2.LIST[0]["subChunks"][1]["chunkId"], "ICMT");
     });
     it("RIFF tag ICMT", function() {
-        //assert.equal(wav2.LIST[0]["subChunks"][1]["chunkSize"], 22);
         assert.equal(wav2.LIST[0]["subChunks"][1]["chunkSize"], 21);
     });
     it("RIFF tag ICMT", function() {
-        assert.equal(wav2.LIST[0]["subChunks"][1]["value"], "kabal@CAPELLA edited");
+        assert.equal(
+            wav2.LIST[0]["subChunks"][1]["value"], "kabal@CAPELLA edited");
     });
     it("RIFF tag ICRD", function() {
         assert.equal(wav2.LIST[0]["subChunks"][2]["chunkId"], "ICRD");
@@ -183,13 +184,13 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
         assert.equal(wav2.LIST[0]["subChunks"][2]["chunkSize"], 24);
     });
     it("RIFF tag ICRD", function() {
-        assert.equal(wav2.LIST[0]["subChunks"][2]["value"], "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav2.LIST[0]["subChunks"][2]["value"], "2003-01-30 03:28:46 UTC");
     });
     it("RIFF tag IENG", function() {
         assert.equal(wav2.LIST[0]["subChunks"][3]["chunkId"], "IENG");
     });
     it("RIFF tag IENG", function() {
-        //assert.equal(wav2.LIST[0]["subChunks"][3]["chunkSize"], 12);
         assert.equal(wav2.LIST[0]["subChunks"][3]["chunkSize"], 11);
     });
     it("RIFF tag IENG", function() {
@@ -199,7 +200,6 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
         assert.equal(wav2.LIST[0]["subChunks"][4]["chunkId"], "IPRD");
     });
     it("RIFF tag IPRD", function() {
-        //assert.equal(wav2.LIST[0]["subChunks"][4]["chunkSize"], 4);
         assert.equal(wav2.LIST[0]["subChunks"][4]["chunkSize"], 3);
     });
     it("RIFF tag IPRD", function() {
@@ -220,7 +220,6 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
         assert.equal(
             wav2.LIST[0]["chunkSize"], wav.getLISTBytes_().length - 8);
     });
-
     // Other tests
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
@@ -317,11 +316,11 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
     it("samples.length should be > 0", function() {
         assert.ok(wav2.data.samples.length > 0);
     });
-    it("samples on the new file should have the same length as in the original file",
+    it("samples on the new file should have the same length",
             function() {
         assert.equal(wav2.data.samples.length, wav.data.samples.length);
     });
-    it("samples on the new file should be same as the original file", function() {
+    it("samples on the new file should be same", function() {
         assert.deepEqual(wav2.data.samples, wav.data.samples);
     });
     it("dwChannelMask should be 0", function() {
@@ -333,20 +332,15 @@ describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav and write to new file', function()
 // Audacity file
 describe('read Audacity-16bit.wav and write to new file', function() {
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     let wav = new WaveFile(fs.readFileSync(path + "Audacity-16bit.wav"));
     let wavB = new WaveFile(fs.readFileSync(path + "Audacity-16bit.wav"));
     fs.writeFileSync(path + "/out/Audacity-16bit.wav", wavB.toBuffer());
-
     let stats = fs.statSync(path + "Audacity-16bit.wav");
     let fileSizeInBytes1 = stats["size"];
-
     stats = fs.statSync(path + "/out/Audacity-16bit.wav");
     let fileSizeInBytes2 = stats["size"];
-
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/Audacity-16bit.wav"));
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/Audacity-16bit.wav"));
     
     // Reading tags from the original file
     it("RIFF tag INAM", function() {
@@ -380,7 +374,7 @@ describe('read Audacity-16bit.wav and write to new file', function() {
         assert.equal(wav.LIST[0]["subChunks"][3]["chunkId"], "ICRD");
     });
     it("RIFF tag IENG", function() {
-        assert.equal(wav.LIST[0]["subChunks"][3]["chunkSize"], 6); //ZSTR + padding byte!
+        assert.equal(wav.LIST[0]["subChunks"][3]["chunkSize"], 6);
     });
     it("RIFF tag IENG", function() {
         assert.equal(wav.LIST[0]["subChunks"][3]["value"], "2018");
@@ -394,7 +388,6 @@ describe('read Audacity-16bit.wav and write to new file', function() {
     it("RIFF tag ITRK", function() {
         assert.equal(wav.LIST[0]["subChunks"][4]["value"], "1");
     });
-
     // Reading tags from the output
     it("RIFF tag INAM", function() {
         assert.equal(wav2.LIST[0]["subChunks"][0]["chunkId"], "INAM");
@@ -409,7 +402,6 @@ describe('read Audacity-16bit.wav and write to new file', function() {
         assert.equal(wav2.LIST[0]["subChunks"][1]["chunkId"], "IPRD");
     });
     it("RIFF tag IPRD", function() {
-        //assert.equal(wav2.LIST[0]["subChunks"][1]["chunkSize"], 12);
         assert.equal(wav2.LIST[0]["subChunks"][1]["chunkSize"], 11);
     });
     it("RIFF tag IPRD", function() {
@@ -419,7 +411,6 @@ describe('read Audacity-16bit.wav and write to new file', function() {
         assert.equal(wav2.LIST[0]["subChunks"][2]["chunkId"], "IART");
     });
     it("RIFF tag IART", function() {
-        //assert.equal(wav2.LIST[0]["subChunks"][2]["chunkSize"], 10);
         assert.equal(wav2.LIST[0]["subChunks"][2]["chunkSize"], 9);
     });
     it("RIFF tag IART", function() {
@@ -429,7 +420,6 @@ describe('read Audacity-16bit.wav and write to new file', function() {
         assert.equal(wav2.LIST[0]["subChunks"][3]["chunkId"], "ICRD");
     });
     it("RIFF tag IENG", function() {
-        //assert.equal(wav2.LIST[0]["subChunks"][3]["chunkSize"], 6); //ZSTR + padding byte!
         assert.equal(wav2.LIST[0]["subChunks"][3]["chunkSize"], 5);
     });
     it("RIFF tag IENG", function() {
@@ -452,7 +442,8 @@ describe('read Audacity-16bit.wav and write to new file', function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
     it("wav.LIST[0]['chunkSize'] == wav.getLISTSize_()", function() {
-        assert.equal(wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
+        assert.equal(
+            wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
     });
     it("wav2.cue should be == wav.cue", function() {
         assert.deepEqual(wav2.cue, wav.cue);
@@ -546,17 +537,16 @@ describe('read Audacity-16bit.wav and write to new file', function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav2.data.samples.length > 0);
     });
-    it("samples on the new file should have the same length as in the original file",
+    it("samples on the new file should have the same length",
             function() {
         assert.equal(wav2.data.samples.length, wav.data.samples.length);
     });
-    it("samples on the new file should be same as the original file", function() {
+    it("samples on the new file should be same", function() {
         assert.deepEqual(wav2.data.samples, wav.data.samples);
     });
     it("dwChannelMask should be 0", function() {
         assert.equal(wav2.fmt.dwChannelMask, 0);
     });
-
 });
 
 describe('read M1F1-int12WE-AFsp.wav and write to new file', function() {
@@ -564,10 +554,12 @@ describe('read M1F1-int12WE-AFsp.wav and write to new file', function() {
     let fs = require("fs");
     const WaveFile = require("../../test/loader.js");
     let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
-    fs.writeFileSync(path + "/out/M1F1-int12WE-AFsp-LIST.wav", wav.toBuffer());
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-LIST.wav"));
-
+    let wav = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-LIST.wav", wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-LIST.wav"));
     let stats = fs.statSync(path + "M1F1-int12WE-AFsp.wav");
     let fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/M1F1-int12WE-AFsp-LIST.wav");
@@ -580,7 +572,8 @@ describe('read M1F1-int12WE-AFsp.wav and write to new file', function() {
         assert.equal(wav.LIST[0]["subChunks"][0]["chunkSize"], 24);
     });
     it("RIFF tag ICRT", function() {
-        assert.equal(wav.LIST[0]["subChunks"][0]["value"], "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav.LIST[0]["subChunks"][0]["value"], "2003-01-30 03:28:46 UTC");
     });
     it("RIFF tag ICMD", function() {
         assert.equal(wav.LIST[0]["subChunks"][2]["chunkId"], "ICMT");
@@ -608,7 +601,8 @@ describe('read M1F1-int12WE-AFsp.wav and write to new file', function() {
         assert.equal(wav2.LIST[0]["subChunks"][0]["chunkSize"], 24);
     });
     it("RIFF tag ICRT", function() {
-        assert.equal(wav2.LIST[0]["subChunks"][0]["value"], "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav2.LIST[0]["subChunks"][0]["value"], "2003-01-30 03:28:46 UTC");
     });
     it("RIFF tag ICMD", function() {
         assert.equal(wav2.LIST[0]["subChunks"][2]["chunkId"], "ICMT");
@@ -693,11 +687,11 @@ describe('read M1F1-int12WE-AFsp.wav and write to new file', function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav2.data.samples.length > 0);
     });
-    it("samples on the new file should have the same length as in the original file",
+    it("samples on the new file should have the same length",
             function() {
         assert.equal(wav2.data.samples.length, wav.data.samples.length);
     });
-    it("samples on the new file should be same as the original file", function() {
+    it("samples on the new file should be same", function() {
         assert.deepEqual(wav2.data.samples, wav.data.samples);
     });
     it("dwChannelMask should be 0", function() {

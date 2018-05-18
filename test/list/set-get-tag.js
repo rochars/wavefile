@@ -1,27 +1,29 @@
-/*
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test the getTag() and setTag() methods.
  * 
- */ 
+ */
 
-let assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("Set 1 new tag", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-
-    let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
-    let wavB = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
-
+    let wav = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     wav.setTag("IENG", "1");
-    fs.writeFileSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-1.wav", wav.toBuffer());
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-1.wav"));
-
-    //let stats = fs.statSync(path + "M1F1-int12WE-AFsp.wav");
-    //let fileSizeInBytes1 = stats["size"];
-    //stats = fs.statSync(path + "/out/M1F1-int12WE-AFsp-out.wav");
-    //let fileSizeInBytes2 = stats["size"];
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-1.wav",
+        wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(
+            path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-1.wav"));
 
     // WAV1
     // 'INFO'
@@ -40,7 +42,8 @@ describe("Set 1 new tag", function() {
         assert.equal(wav.LIST[0].subChunks[0].chunkSize, "24");
     });
     it("'ICRD' value", function() {
-        assert.equal(wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
     });
     // ISFT
     it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
@@ -61,22 +64,23 @@ describe("Set 1 new tag", function() {
     it("'ICMT' value", function() {
         assert.equal(wav.LIST[0].subChunks[2].value, "kabal@CAPELLA");
     });
-
     // WAV2
     it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
-        assert.equal(wav2.getLISTBytes_().length - 8, wav2.LIST[0].chunkSize);
+        assert.equal(
+            wav2.getLISTBytes_().length - 8, wav2.LIST[0].chunkSize);
     });
     it("wav3.getLISTChunkBytes_ == wav3.LIST[0].chunkSize", function() {
         let wav3 = new WaveFile(wav2.toBuffer());
         assert.equal(wav2.chunkSize, wav3.chunkSize);
     });
     it("wav3 create tag", function() {
-        assert.equal(wav2.getLISTBytes_().length, wavB.getLISTBytes_().length + 10);
+        assert.equal(
+            wav2.getLISTBytes_().length, wavB.getLISTBytes_().length + 10);
     });
     it("wav3 create tag, save file, read file", function() {
-        assert.equal(wav2.getLISTBytes_().length, wavB.getLISTBytes_().length + 10);
+        assert.equal(
+            wav2.getLISTBytes_().length, wavB.getLISTBytes_().length + 10);
     });
-    
     // 'INFO'
     it("LISTChunks[0].chunkId should be 'LIST'", function() {
         assert.equal(wav2.LIST[0]["chunkId"], "LIST");
@@ -93,7 +97,8 @@ describe("Set 1 new tag", function() {
         assert.equal(wav2.LIST[0].subChunks[0].chunkSize, "24");
     });
     it("'ICRD' value", function() {
-        assert.equal(wav2.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav2.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
     });
     // ISFT
     it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
@@ -116,13 +121,8 @@ describe("Set 1 new tag", function() {
     });
 });
 
-
 describe("Set multiple new tags, one existing tag", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-
-    let path = "test/files/";
     let wav = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     let wavB = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     // set 4 new tags and rewrite the value
@@ -132,12 +132,16 @@ describe("Set multiple new tags, one existing tag", function() {
     wav.setTag("NEW0", "b");
     wav.setTag("NEW1", "1");
     wav.setTag("NEW2", "1");
-    fs.writeFileSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-2.wav", wav.toBuffer());
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-2.wav"));
-
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-2.wav",
+        wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(
+            path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-2.wav"));
     let stats = fs.statSync(path + "M1F1-int12WE-AFsp.wav");
     let fileSizeInBytes1 = stats["size"];
-    stats = fs.statSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-2.wav");
+    stats = fs.statSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-2.wav");
     let fileSizeInBytes2 = stats["size"];
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
@@ -159,7 +163,8 @@ describe("Set multiple new tags, one existing tag", function() {
         assert.equal(wav.LIST[0].subChunks[0].chunkSize, "24");
     });
     it("'ICRD' value", function() {
-        assert.equal(wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
     });
     it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
         assert.equal(wav.LIST[0].subChunks[1].chunkId, "ISFT");
@@ -222,20 +227,20 @@ describe("Set multiple new tags, one existing tag", function() {
 
 describe("Remove a tag", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-
-    let path = "test/files/";
     let wav = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     let wavB = new WaveFile(fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     wav.setTag("ICMT", "1");
     wav.deleteTag("ISFT");
-    fs.writeFileSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-3.wav", wav.toBuffer());
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-3.wav"));
-
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-3.wav",
+        wav.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(
+            path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-3.wav"));
     let stats = fs.statSync(path + "M1F1-int12WE-AFsp.wav");
     let fileSizeInBytes1 = stats["size"];
-    stats = fs.statSync(path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-3.wav");
+    stats = fs.statSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-3.wav");
     let fileSizeInBytes2 = stats["size"];
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
@@ -257,7 +262,8 @@ describe("Remove a tag", function() {
         assert.equal(wav.LIST[0].subChunks[0].chunkSize, "24");
     });
     it("'ICRD' value", function() {
-        assert.equal(wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+        assert.equal(
+            wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
     });
     it("LISTChunks[0].subChunks[2].chunkId should be 'ICMT'", function() {
         assert.equal(wav.LIST[0].subChunks[1].chunkId, "ICMT");
@@ -308,9 +314,6 @@ describe("Remove a tag", function() {
 });
 
 describe('create 16-bit wave files from scratch with tags', function() {
-    
-    const WaveFile = require("../../test/loader.js");
-    let fs = require('fs');
 
     let wav = new WaveFile();
     let samples = [];
@@ -320,13 +323,17 @@ describe('create 16-bit wave files from scratch with tags', function() {
     wav.fromScratch(1, 8000, '16', samples);
     wav.setTag("WVFL", "true");
     wav.setTag("WVF", "fixed");
-    fs.writeFileSync("./test/files/out/16-bit-8kHz-mono-fromScratch-WITH-TAGS.wav", wav.toBuffer());
-    wav = new WaveFile(fs.readFileSync("./test/files/out/16-bit-8kHz-mono-fromScratch-WITH-TAGS.wav"));
-
-    var stats = fs.statSync("./test/files/out/16-bit-8kHz-mono-fromScratch-WITH-TAGS.wav");
+    fs.writeFileSync(
+        "./test/files/out/16-bit-8kHz-mono-fromScratch-WITH-TAGS.wav",
+        wav.toBuffer());
+    wav = new WaveFile(
+        fs.readFileSync(
+            "./test/files/out/16-bit-8kHz-mono-fromScratch-WITH-TAGS.wav"));
+    var stats = fs.statSync(
+        "./test/files/out/16-bit-8kHz-mono-fromScratch-WITH-TAGS.wav");
     var fileSizeInBytes1 = stats["size"];
     
-    it("Try to remove a tag that does not exist should return false", function() {
+    it("Try to remove a tag that does not exist", function() {
         assert.ok(wav.deleteTag("INEX") === false);
     });
     it("Try to get a tag that does not exist should return null", function() {
@@ -335,7 +342,6 @@ describe('create 16-bit wave files from scratch with tags', function() {
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
     });
-
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
     });
@@ -368,7 +374,6 @@ describe('create 16-bit wave files from scratch with tags', function() {
     it("'WVF ' value", function() {
         assert.equal(wav.LIST[0].subChunks[1].value, "fixed");
     });
-
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
     });

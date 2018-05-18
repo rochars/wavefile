@@ -1,21 +1,25 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 8-bit files.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('read 8-bit file from disk and write to new file', function() {
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
-    let wav = new WaveFile(fs.readFileSync(path + "8bit-16kHz-bext-mono.wav"));
-    let wavB = new WaveFile(fs.readFileSync(path + "8bit-16kHz-bext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "8bit-16kHz-bext-mono.wav"));
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "8bit-16kHz-bext-mono.wav"));
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/8bit-16kHz-bext-mono.wav", wav2.toBuffer());
-    
+    fs.writeFileSync(
+        path + "/out/8bit-16kHz-bext-mono.wav", wav2.toBuffer());
     let stats = fs.statSync(path + "8bit-16kHz-bext-mono.wav");
     let fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/8bit-16kHz-bext-mono.wav");
@@ -27,7 +31,6 @@ describe('read 8-bit file from disk and write to new file', function() {
     it("wav.chunkSize should be == fileSizeInBytes", function() {
         assert.equal(wavB.chunkSize + 8, fileSizeInBytes1);
     });
-
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav2.container, "RIFF");
     });
@@ -67,7 +70,8 @@ describe('read 8-bit file from disk and write to new file', function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav2.data.samples.length > 0);
     });
-    it("samples on the new file should have the same length as in the original file ",
+    it("samples on the new file should have the same length as in " +
+        "the original file ",
             function() {
         assert.equal(wav2.data.samples.length, wav.data.samples.length);
     });

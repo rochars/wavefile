@@ -1,14 +1,17 @@
-/*
+/**
+ * WaveFile: https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
- * https://github.com/rochars/wavefile
  *
+ * Test loading a WaveFile object from a DataURI with the
+ * fromDataURI() method.
+ * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const WaveFile = require("../../test/loader.js");
 
 describe('create 16-bit wave file from DataURI string', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
     let wav2 = new WaveFile();

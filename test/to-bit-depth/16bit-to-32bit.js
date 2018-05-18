@@ -1,23 +1,27 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test the toBitDepth() method to convert an 16-bit file to 32-bit.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("16-bit from file to 32-bit", function() {
-
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wavB = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
-    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     wav.toBitDepth("32");
-    fs.writeFileSync(path + "/out/to-bit-depth/16-to-32.wav", wavB.toBuffer());
-
-    let wav2 = new WaveFile(fs.readFileSync(path + "/out/to-bit-depth/16-to-32.wav"));
-
+    fs.writeFileSync(
+        path + "/out/to-bit-depth/16-to-32.wav", wavB.toBuffer());
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/to-bit-depth/16-to-32.wav"));
     let stats = fs.statSync(path + "16-bit-8kHz-noBext-mono.wav");
     let fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/to-bit-depth/16-to-32.wav");
@@ -29,7 +33,6 @@ describe("16-bit from file to 32-bit", function() {
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav.container, "RIFF");
     });
@@ -72,10 +75,6 @@ describe("16-bit from file to 32-bit", function() {
 });
 
 describe("16-bit mono from scratch to 32-bit (max range)", function() {
-
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
     let wav = new WaveFile();
     let samples = [-32768, 32767];
@@ -122,10 +121,6 @@ describe("16-bit mono from scratch to 32-bit (max range)", function() {
 
 
 describe("16-bit mono from scratch to 32-bit (0)", function() {
-
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
     let wav = new WaveFile();
     let samples = [0];

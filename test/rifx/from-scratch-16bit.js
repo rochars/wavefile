@@ -1,16 +1,21 @@
-/*!
- * Wavefile
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test creating 16-bit RIFX files with the fromScratch method.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('create 16-bit wave files from scratch', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
-    wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
+    wav.fromScratch(
+        1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
 
     it('chunkId should be "RIFX"', function() {
         assert.equal(wav.container, "RIFX");
@@ -56,18 +61,20 @@ describe('create 16-bit wave files from scratch', function() {
     });
 });
 
-describe('create 16-bit wave files from scratch, write and read the file', function() {
+describe("create 16-bit wave files from scratch, write and " +
+    "read the file", function() {
     
-    let WaveFile = require('../../index.js');
-    let fs = require('fs');
-
     let wav = new WaveFile();
-    wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
-
-    fs.writeFileSync("./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav", wav.toBuffer());
-    wav = new WaveFile(fs.readFileSync("./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav"));
-
-    var stats = fs.statSync("./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav");
+    wav.fromScratch(
+        1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
+    fs.writeFileSync(
+        "./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav",
+        wav.toBuffer());
+    wav = new WaveFile(
+        fs.readFileSync(
+            "./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav"));
+    var stats = fs.statSync(
+        "./test/files/out/16-bit-48kHz-mono-RIFX-fromScratch.wav");
     var fileSizeInBytes = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {
@@ -116,4 +123,3 @@ describe('create 16-bit wave files from scratch, write and read the file', funct
         assert.equal(wav.bitDepth, "16");
     });
 });
-

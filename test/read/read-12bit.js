@@ -1,15 +1,17 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading 12-bit files.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("12-bit reading", function() {
-
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
     let wav = new WaveFile(
         fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
@@ -42,7 +44,7 @@ describe("12-bit reading", function() {
             function() {
         assert.equal(wav.fmt.sampleRate, 8000);
     });
-    it("byteRate be 32000", // 16 on a 16-bit, beacause of the block align 4?
+    it("byteRate be 32000",
             function() {
         assert.equal(wav.fmt.byteRate, 32000);
     });
@@ -50,15 +52,15 @@ describe("12-bit reading", function() {
             function() {
         assert.equal(wav.fmt.blockAlign, 4);
     });
-    it("bitsPerSample should be 16", // make sure this is correct
+    it("bitsPerSample should be 16",
             function() {
         assert.equal(wav.fmt.bitsPerSample, 16);
     });
-    it("cbSize should be 22", // make sure this is correct
+    it("cbSize should be 22",
             function() {
         assert.equal(wav.fmt.cbSize, 22);
     });
-    it("validBitsPerSample should be 12", // make sure this is correct
+    it("validBitsPerSample should be 12",
             function() {
         assert.equal(wav.fmt.validBitsPerSample, 12);
     });
@@ -79,7 +81,9 @@ describe("12-bit reading", function() {
             function() {
         assert.equal(wav.fmt.dwChannelMask, 0);
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat', function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
 });

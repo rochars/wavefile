@@ -1,29 +1,35 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing RF64 files. RF64 has limited support;
+ * It is possible to read (at least some) RF64 files and write
+ * them back to disk, but not to create them from scratch.
+ *
+ * Only tested with files with less than 4gb and no table.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("64-bit writing (file < 64-bit)", function() {
-
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
-    fs.writeFileSync(path + "out/RF64-16-bit-8kHz-stereo-reaper.wav", wav.toBuffer());
-    wav = new WaveFile(fs.readFileSync(path + "out/RF64-16-bit-8kHz-stereo-reaper.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
+    fs.writeFileSync(
+        path + "out/RF64-16-bit-8kHz-stereo-reaper.wav", wav.toBuffer());
+    wav = new WaveFile(
+        fs.readFileSync(path + "out/RF64-16-bit-8kHz-stereo-reaper.wav"));
 
-    it("chunkId should be 'RF64'",
-            function() {
+    it("chunkId should be 'RF64'", function() {
         assert.equal(wav.container, "RF64");
     });
-    it("chunkSize should be the same as wav.ds64.riffSizeHigh",
-            function() {
+    it("chunkSize should be the same as wav.ds64.riffSizeHigh", function() {
         assert.equal(wav.chunkSize, wav.ds64.riffSizeHigh);
     });
-    
     // ds64 fields
     it("ds64 chunk should not be null", function() {
         assert.equal(wav.ds64.chunkId, "ds64");
@@ -37,7 +43,8 @@ describe("64-bit writing (file < 64-bit)", function() {
     it("ds64.riffSizeLow should be 0", function() {
         assert.equal(wav.ds64.riffSizeLow, 0);
     });
-    it("wav.data.chunkSize should be the same as wav.ds64.dataSizeHigh", function() {
+    it("wav.data.chunkSize should be the same as wav.ds64.dataSizeHigh",
+            function() {
         assert.ok(wav.ds64.dataSizeHigh, wav.data.chunkSize);
     });
     it("ds64.dataSizeLow should be 0", function() {
@@ -55,57 +62,41 @@ describe("64-bit writing (file < 64-bit)", function() {
     //it("ds64.table should not be null", function() {
     //    assert.deepEqual(wav.ds64.table, []);
     //});
-    
-    // --------------------------------
-
-
-    it("fmtChunkId should be 'fmt '",
-            function() {
+    // Default .wav tests
+    it("fmtChunkId should be 'fmt '", function() {
         assert.equal(wav.fmt.chunkId, "fmt ");
     });
-    it("format should be 'WAVE'",
-            function() {
+    it("format should be 'WAVE'", function() {
         assert.equal(wav.format, "WAVE");
     });
-    it("fmtChunkSize should be 16",
-            function() {
+    it("fmtChunkSize should be 16", function() {
         assert.equal(wav.fmt.chunkSize, 16);
     });
-    it("audioFormat should be 1",
-            function() {
+    it("audioFormat should be 1", function() {
         assert.equal(wav.fmt.audioFormat, 1);
     });
-    it("numChannels should be 2",
-            function() {
+    it("numChannels should be 2", function() {
         assert.equal(wav.fmt.numChannels, 2);
     });
-    it("sampleRate should be 8000",
-            function() {
+    it("sampleRate should be 8000", function() {
         assert.equal(wav.fmt.sampleRate, 8000);
     });
-    it("byteRate should be 32000",
-            function() {
+    it("byteRate should be 32000", function() {
         assert.equal(wav.fmt.byteRate, 32000);
     });
-    it("blockAlign should be 4",
-            function() {
+    it("blockAlign should be 4", function() {
         assert.equal(wav.fmt.blockAlign, 4);
     });
-    it("bitsPerSample should be 16",
-            function() {
+    it("bitsPerSample should be 16", function() {
         assert.equal(wav.fmt.bitsPerSample, 16);
     });
-    it("dataChunkId should be 'data'",
-            function() {
+    it("dataChunkId should be 'data'", function() {
         assert.equal(wav.data.chunkId, 'data');
     });
-    it("dataChunkSize should be > 0",
-            function() {
+    it("dataChunkSize should be > 0", function() {
         assert.ok(wav.data.chunkSize > 0);
     });
-    it("samples.length should be > 0",
-            function() {
+    it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
     });
-
 });

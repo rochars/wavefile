@@ -1,21 +1,25 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading and writing the "bext" chunk.
  * 
  */
 
-var assert = require('assert');
+const assert = require('assert');
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('read a file with bext from disk and write to new file',
     function() {
-    
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
-    let wav2 = new WaveFile(wav.toBuffer());
+
+    let wav = new WaveFile(
+        fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
+    wav = new WaveFile(wav.toBuffer());
     
     it("bextChunkId should be 'bext'", function() {
-        assert.equal(wav2.bext.chunkId, 'bext');
+        assert.equal(wav.bext.chunkId, 'bext');
     });
 
 });
@@ -24,13 +28,10 @@ describe('bext field with less bytes than the field size ' +
     'should be filled with null chars',
     function() {
     
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    let wav = new WaveFile(fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "32bitIEEE-16kHz-bext-mono.wav"));
     wav.bext.originator = "test";
     let wav2 = new WaveFile(wav.toBuffer());
-
     var stats = fs.statSync(path + "32bitIEEE-16kHz-bext-mono.wav");
     var fileSizeInBytes2 = stats["size"];
 

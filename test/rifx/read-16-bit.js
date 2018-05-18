@@ -1,22 +1,23 @@
-/*!
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test reading a 16-bit RIFX file.
  * 
  */
 
-let assert = require("assert");
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe("16-bit RIFX reading", function() {
 
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
-    
     let wBytes = fs.readFileSync(path + "RIFX-16bit-mono.wav");
     let wav = new WaveFile(wBytes);
-
     // The same contents in a RIFF file
-    let riffwav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
-
+    let riffwav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
     var stats = fs.statSync(path + "16-bit-8kHz-noBext-mono.wav");
     var fileSizeInBytes = stats["size"];
 
@@ -62,7 +63,7 @@ describe("16-bit RIFX reading", function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
     });
-    it("samples in RIFX file should be the same as in the RIFF file", function() {
+    it("samples in RIFX file should be the same", function() {
         assert.deepEqual(wav.data.samples, riffwav.data.samples);
     });
 });

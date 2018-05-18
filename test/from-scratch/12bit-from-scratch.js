@@ -1,25 +1,26 @@
-/*!
- * Wavefile
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 12-bit files with the fromScratch() method.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('create 12-bit wave files from scratch', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
-
     let samples = [];
     for (let i=0; i<9000; i++) {
         samples.push(0);
     }
-
     wav.fromScratch(1, 8000, '12', samples);
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/12-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
+    fs.writeFileSync(
+        "./test/files/out/12-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
@@ -72,24 +73,22 @@ describe('create 12-bit wave files from scratch', function() {
     it('bitDepth should be "12"', function() {
         assert.equal(wav.bitDepth, "12");
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat', function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
 });
 
-describe('create 12-bit wav with samples from a existing 12-bit wav', function() {
-    
-    const WaveFile = require("../../test/loader.js");
-    let fs = require('fs');
-    let path = "test/files/";
+describe('create 12-bit wav with samples from a existing 12-bit wav',
+    function() {
 
     let sourcewav = new WaveFile(
         fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
-
     let wav = new WaveFile();
     wav.fromScratch(2, 8000, '12', sourcewav.data.samples);
-
-    fs.writeFileSync("./test/files/out/M1F1-int12WE-AFsp-recreated.wav", wav.toBuffer());
+    fs.writeFileSync(
+        "./test/files/out/M1F1-int12WE-AFsp-recreated.wav", wav.toBuffer());
 
     it('chunkId should be "RIFF"', function() {
         assert.equal(wav.container, "RIFF");
@@ -142,8 +141,9 @@ describe('create 12-bit wav with samples from a existing 12-bit wav', function()
     it('bitDepth should be "12"', function() {
         assert.equal(wav.bitDepth, "12");
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat', function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
 });
-

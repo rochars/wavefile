@@ -1,26 +1,29 @@
-/*!
- * Wavefile
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 13-bit files with the fromScratch() method.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('create 13-bit wave files from scratch', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
-
     let samples = [];
     for (let i=0; i<9000; i++) {
         samples.push(0);
     }
     wav.fromScratch(1, 8000, '13', samples);
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/13-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
-
-    var stats = fs.statSync("./test/files/out/13-bit-48kHz-mono-fromScratch.wav");
+    fs.writeFileSync(
+        "./test/files/out/13-bit-48kHz-mono-fromScratch.wav",
+        wav.toBuffer());
+    var stats = fs.statSync(
+        "./test/files/out/13-bit-48kHz-mono-fromScratch.wav");
     var fileSizeInBytes = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {
@@ -77,7 +80,10 @@ describe('create 13-bit wave files from scratch', function() {
     it('bitDepth should be "13"', function() {
         assert.equal(wav.bitDepth, "13");
     });
-    it('subformat should be [1, 1048576, 2852126848, 1905997824]', function() {
-        assert.deepEqual(wav.fmt.subformat, [1, 1048576, 2852126848, 1905997824]);
+    it('subformat',
+        function() {
+        assert.deepEqual(
+            wav.fmt.subformat,
+            [1, 1048576, 2852126848, 1905997824]);
     });
 });

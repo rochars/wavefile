@@ -1,22 +1,28 @@
-/*!
- * Copyright (c) 2018 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test encoding and decoding mu-Law files.
  * 
  */
 
-var assert = require('assert');
+const assert = require('assert');
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('8-bit mu-Law to 24-bit (mu-Law encoded with WaveFile)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "/8bit-mulaw-8kHz-noBext-mono-encoded.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "/8bit-mulaw-8kHz-noBext-mono-encoded.wav"));
     wav.fromMuLaw("24");
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/24bit-8kHz-noBext-mono-decoded-mulaw.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/24bit-8kHz-noBext-mono-decoded-mulaw.wav");
+    fs.writeFileSync(
+        path + "/out/24bit-8kHz-noBext-mono-decoded-mulaw.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/24bit-8kHz-noBext-mono-decoded-mulaw.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes1", function() {
@@ -61,17 +67,17 @@ describe('8-bit mu-Law to 24-bit (mu-Law encoded with WaveFile)', function() {
 });
 
 describe('16-bit to 8-bit mu-law', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "16-bit-8kHz-noBext-mono.wav"));
     wav.toMuLaw();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/8bit-mulaw-8kHz-noBext-mono-encoded.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/8bit-mulaw-8kHz-noBext-mono-encoded.wav");
+    fs.writeFileSync(
+        path + "/out/8bit-mulaw-8kHz-noBext-mono-encoded.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/8bit-mulaw-8kHz-noBext-mono-encoded.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes1", function() {
@@ -116,17 +122,16 @@ describe('16-bit to 8-bit mu-law', function() {
 });
 
 describe('16-bit stereo to 8-bit mu-law', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "16bit-8kHz-stereo.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16bit-8kHz-stereo.wav"));
     wav.toMuLaw();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/8bit-mulaw-8kHz-stereo-encoded.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/8bit-mulaw-8kHz-stereo-encoded.wav");
+    fs.writeFileSync(
+        path + "/out/8bit-mulaw-8kHz-stereo-encoded.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/8bit-mulaw-8kHz-stereo-encoded.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes1", function() {
@@ -170,18 +175,18 @@ describe('16-bit stereo to 8-bit mu-law', function() {
     });
 });
 
-describe('24-bit to 8-bit mu-law (should turn to 16-bit before encoding)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
+describe('24-bit to 8-bit mu-law (should turn to 16-bit before encoding)',
+    function() {
     
-    let wav = new WaveFile(fs.readFileSync(path + "24bit-16kHz-bext-mono.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "24bit-16kHz-bext-mono.wav"));
     wav.toMuLaw();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/8bit-mulaw-16kHz-mono-encoded-fom-24-bit.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/8bit-mulaw-16kHz-mono-encoded-fom-24-bit.wav");
+    fs.writeFileSync(
+        path + "/out/8bit-mulaw-16kHz-mono-encoded-fom-24-bit.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/8bit-mulaw-16kHz-mono-encoded-fom-24-bit.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes1", function() {
@@ -226,17 +231,16 @@ describe('24-bit to 8-bit mu-law (should turn to 16-bit before encoding)', funct
 });
 
 describe('8-bit mu-Law to 16-bit (mu-Law encoded with WaveFile)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
     
-    let wav = new WaveFile(fs.readFileSync(path + "/8bit-mulaw-8kHz-noBext-mono-encoded.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "/8bit-mulaw-8kHz-noBext-mono-encoded.wav"));
     wav.fromMuLaw();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/16bit-8kHz-noBext-mono-decoded-mulaw.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/16bit-8kHz-noBext-mono-decoded-mulaw.wav");
+    fs.writeFileSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded-mulaw.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/16bit-8kHz-noBext-mono-decoded-mulaw.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {
@@ -280,18 +284,18 @@ describe('8-bit mu-Law to 16-bit (mu-Law encoded with WaveFile)', function() {
     });
 });
 
-describe('8-bit a-law to 8-bit mu-Law (a-law encoded with WaveFile)', function() {
-    let fs = require("fs");
-    const WaveFile = require("../../test/loader.js");
-    let path = "test/files/";
+describe('8-bit a-law to 8-bit mu-Law (a-law encoded with WaveFile)',
+    function() {
     
-    let wav = new WaveFile(fs.readFileSync(path + "/8bit-alaw-8kHz-noBext-mono-encoded.wav"));
+    let wav = new WaveFile(
+        fs.readFileSync(path + "/8bit-alaw-8kHz-noBext-mono-encoded.wav"));
     wav.toMuLaw();
-
     let wav2 = new WaveFile(wav.toBuffer());
-    fs.writeFileSync(path + "/out/8bit-8kHz-mono-mulaw-encoded-from-alaw.wav", wav2.toBuffer());
-
-    var stats = fs.statSync(path + "/out/8bit-8kHz-mono-mulaw-encoded-from-alaw.wav");
+    fs.writeFileSync(
+        path + "/out/8bit-8kHz-mono-mulaw-encoded-from-alaw.wav",
+        wav2.toBuffer());
+    var stats = fs.statSync(
+        path + "/out/8bit-8kHz-mono-mulaw-encoded-from-alaw.wav");
     var fileSizeInBytes2 = stats["size"];
 
     it("chunkSize should be == fileSizeInBytes", function() {

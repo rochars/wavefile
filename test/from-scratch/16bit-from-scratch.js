@@ -1,21 +1,25 @@
-/*!
- * Wavefile
- * Copyright (c) 2017 Rafael da Silva Rocha.
+/**
+ * WaveFile: https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ *
+ * Test writing 16-bit files with the fromScratch() method.
  * 
  */
 
-var assert = require('assert');
+const assert = require("assert");
+const fs = require("fs");
+const WaveFile = require("../../test/loader.js");
+const path = "test/files/";
 
 describe('create 16-bit wave files from scratch', function() {
     
-    const WaveFile = require("../../test/loader.js");
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
-
-    let fs = require('fs');
-    fs.writeFileSync("./test/files/out/16-bit-48kHz-mono-fromScratch.wav", wav.toBuffer());
-
-    var stats = fs.statSync("./test/files/out/16-bit-48kHz-mono-fromScratch.wav");
+    fs.writeFileSync(
+        "./test/files/out/16-bit-48kHz-mono-fromScratch.wav",
+        wav.toBuffer());
+    var stats = fs.statSync(
+        "./test/files/out/16-bit-48kHz-mono-fromScratch.wav");
     var fileSizeInBytes1 = stats["size"];
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
