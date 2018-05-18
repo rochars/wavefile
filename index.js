@@ -706,6 +706,7 @@ class WaveFile {
         /** @type {number} */
         let len = this.cue.points.length;
         this.cue.points = [];
+        /** type {boolean} */
         let hasSet = false;
         if (len == 0) {
             this.setCuePoint_(position, 1, labl);
@@ -743,6 +744,7 @@ class WaveFile {
         /** @type {!Array<Object>} */
         let existingPoints = this.getCuePoints_();
         this.clearLISTadtl_();
+        /** type {number} */
         let len = this.cue.points.length;
         this.cue.points = [];
         for (let i=0; i<len; i++) {
@@ -1414,6 +1416,7 @@ class WaveFile {
             return;
         }
         for (let j=0; j<listChunks.length; j++) {
+            /** type {!Object} */
             let subChunk = listChunks[j];
             this.LIST.push({
                 "chunkId": subChunk["chunkId"],
@@ -1523,7 +1526,9 @@ class WaveFile {
      * @private
      */
     read_(bytes, bdType) {
+        /** type {number} */
         let size = bdType["bits"] / 8;
+        /** type {number} */
         let value = byteData_.unpack(
             bytes.slice(this.head_, this.head_ + size), bdType);
         this.head_ += size;
@@ -1764,6 +1769,7 @@ class WaveFile {
         /** type {!Array<number>} */
         let bytes = [];
         for (let i=0; i<this.LIST.length; i++) {
+            /** type {!Array<number>} */
             let subChunksBytes = this.getLISTSubChunksBytes_(
                     this.LIST[i]["subChunks"], this.LIST[i]["format"]);
             bytes = bytes.concat(
