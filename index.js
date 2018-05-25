@@ -261,8 +261,6 @@ class WaveFile {
             "24": 1,
             "32": 1,
             "32f": 3,
-            "40": 65534,
-            "48": 65534,
             "64": 3
         };
         /**
@@ -309,20 +307,16 @@ class WaveFile {
         } 
         /** type {number} */
         let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
-        // Normal PCM file header
-        if (["8","16","24","32","32f","64"].indexOf(bitDepth) > -1) {
-            this.createPCMHeader_(
-                bitDepth, numChannels, sampleRate, numBytes, options);
-        // IMA ADPCM header
-        } else if (bitDepth == "4") {
+        this.createPCMHeader_(
+            bitDepth, numChannels, sampleRate, numBytes, options);
+        if (bitDepth == "4") {
             this.createADPCMHeader_(
                 bitDepth, numChannels, sampleRate, numBytes, options);
-        // A-Law and mu-Law header
         } else if (bitDepth == "8a" || bitDepth == "8m") {
             this.createALawMulawHeader_(
                 bitDepth, numChannels, sampleRate, numBytes, options);
-        // WAVE_FORMAT_EXTENSIBLE
-        } else {
+        } else if(Object.keys(this.audioFormats_).indexOf(bitDepth) == -1 ||
+                this.fmt.numChannels > 2) {
             this.createExtensibleHeader_(
                 bitDepth, numChannels, sampleRate, numBytes, options);
         }
@@ -503,11 +497,12 @@ class WaveFile {
             for (let i=0; i < this.fmt.numChannels; i++) {
                 finalSamples[i] = [];
             }
-            for (let i=0; i < this.data.samples.length; i++) {
+            /** @type {number} */
+            let len = this.data.samples.length;
+            for (let i=0; i < len; i+=this.fmt.numChannels) {
                 for (let j=0; j < this.fmt.numChannels; j++) {
                     finalSamples[j].push(this.data.samples[i+j]);
                 }
-                i += this.fmt.numChannels - 1;
             }
             this.data.samples = finalSamples;
             this.isInterleaved = false;
@@ -988,10 +983,36 @@ class WaveFile {
         this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
         this.fmt.cbSize = 22;
         this.fmt.validBitsPerSample = parseInt(bitDepth, 10);
-        this.fmt.dwChannelMask = 0;
+        this.fmt.dwChannelMask = this.getDwChannelMask_();
         // subformat 128-bit GUID as 4 32-bit values
         // only supports uncompressed integer PCM samples
         this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
+    }
+
+    /**
+     * Get the value for dwChannelMask according to the number of channels.
+     * @return {number} the dwChannelMask value.
+     * @private
+     */
+    getDwChannelMask_() {
+        let dwChannelMask = 0;
+        // mono = FC
+        if (this.fmt.numChannels == 1) {
+            dwChannelMask = 0x4;
+        // stereo = FL, FR
+        } else if (this.fmt.numChannels == 2) {
+            dwChannelMask = 0x3;
+        // quad = FL, FR, BL, BR
+        } else if (this.fmt.numChannels == 4) {
+            dwChannelMask = 0x33;
+        // 5.1 = FL, FR, FC, LF, BL, BR
+        } else if (this.fmt.numChannels == 6) {
+            dwChannelMask = 0x3F;
+        // 7.1 = FL, FR, FC, LF, BL, BR, SL, SR
+        } else if (this.fmt.numChannels == 8) {
+            dwChannelMask = 0x63F;
+        }
+        return dwChannelMask;
     }
 
     /**
@@ -1184,7 +1205,7 @@ class WaveFile {
      * @param {string} chunkId The chunk fourCC_.
      * @param {boolean} multiple True if there may be multiple chunks
      *      with the same chunkId.
-     * @return {Object|Array<!Object>|null}
+     * @return {Object|Array<!Object>}
      * @private
      */
     findChunk_(chunks, chunkId, multiple=false) {

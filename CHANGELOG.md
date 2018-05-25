@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## version 6.10.3 (2018-05-25)
+- fix: dwChannelMask for 1, 2, 4, 6 and 8 channels.
+
+## version 6.10.2 (2018-05-18)
+- Better implementation of interleave() and deInterleave() methods.
+
 ## version 6.10.1 (2018-05-14)
 - fix: JSDoc tags and documentation.
 

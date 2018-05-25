@@ -74,8 +74,8 @@ describe('create 15-bit wave files from scratch', function() {
     it('cbSize should be 22', function() {
         assert.equal(wav.fmt.cbSize, 22);
     });
-    it('dwChannelMask should be 0', function() {
-        assert.equal(wav.fmt.dwChannelMask, 0);
+    it('dwChannelMask should be 0x4', function() {
+        assert.equal(wav.fmt.dwChannelMask, 0x4);
     });
     it('bitDepth should be "15"', function() {
         assert.equal(wav.bitDepth, "15");

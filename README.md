@@ -6,7 +6,7 @@ https://github.com/rochars/wavefile
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/)
 
 ## About
-**wavefile** is a module to work with .wav files in both Node.js and the browser.
+**wavefile** is a JavaScript module to work with .wav files.
 
 With **wavefile** you can:
 - Create wave files from scratch
@@ -20,7 +20,7 @@ With **wavefile** you can:
 
 And more.
 
-**wavefile** is extensively tested and contains samples of all supported formats. Some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in some players.
+Some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in some players.
 
 ## Install
 ```
