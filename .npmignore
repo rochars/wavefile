@@ -17,3 +17,4 @@ test/
 .travis.yml
 appveyor.yml
 webpack.config.js
+CONTRIBUTING.md
