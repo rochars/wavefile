@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## version 6.10.4 (2018-06-01)
+- fix: listChunks var JSDoc type definition in readLISTChunk_().
+- Better documentation.
+
 ## version 6.10.3 (2018-05-25)
 - fix: dwChannelMask for 1, 2, 4, 6 and 8 channels.
 

@@ -2,7 +2,7 @@
 Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
-[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Example](https://img.shields.io/badge/example-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/example)  
+[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/) [![Example](https://img.shields.io/badge/example-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/example)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/)
 
 ## About
@@ -20,52 +20,30 @@ With **wavefile** you can:
 
 And more.
 
-Some formats (like 8-bit A-Law and 64-bit floating point) are not widely supported and may not load in some players.
-
 ## Install
 ```
 npm install wavefile
 ```
 
-**wavefile** can be used as a dependency in projects that use Google Closure Compiler with ADVANCED_OPTIMIZATIONS.
-
 ## See it in action
 
-### Using wavefile to extend the browser capabilities
+With **wavefile** you can change the bit depth and compression type of wav files on the fly before loading them into a browse player. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by **wavefile**:
+
 https://rochars.github.io/wavefile/example
 
-Drag and drop .wav files and play them. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM, 64-bit wav files and more.
-
-Web browsers can handle wave files with 8, 16, 24 and 32-bit data (with some exceptions). With **wavefile** you can extended this by changing the bit depth of wav files on the fly before loading them into the player:
-
-Playing ADPCM in the browser
 ```javascript
 // Load a wav file that is encoded as 4-bit IMA ADPCM:
-let wav = new WaveFile(ADPCMFileBuffer);
+var wav = new WaveFile(ADPCMFileBuffer);
 
-// Decode the file to 16-bit PCM, supported by most browsers:
+// Decode the file as 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
 
 // Get the DataURI of your new, browser-friendly wav file:
-let dataURI = wav.toDataURI();
+var wavDataURI = wav.toDataURI();
 
 // Load your new wav file into your player
 // ...
 ```
-
-Playing a 64-bit wave file in the browser
-```javascript
-// Load a wav file that has 64-bit audio:
-let wav = new WaveFile(buffer);
-
-// Change the bit depth to 16-bit, supported by most browsers:
-wav.toBitDepth("16");
-
-// Get the DataURI of your new, browser-friendly wav file:
-let dataURI = wav.toDataURI();
-```
-
-With **wavefile** you can play A-Law, mu-Law, IMA-ADPCM and 64-bit wave files on browsers using the HTML5/JavaScript player of your choice. This example use **wavesurfer**.
 
 Check out wavesurfer:  
 https://github.com/katspaugh/wavesurfer.js
@@ -84,9 +62,8 @@ console.log(wav.fmt.chunkId);
 // You can write the output straight to disk:
 let wavBuffer = wav.toBuffer();
 
-// Call toDataURI() to get the file as a base64-encoded
-// DataURI to load the file a web browser:
-wavDataURI = wav.toDataURI();
+// Call toDataURI() to get the file as a DataURI:
+let wavDataURI = wav.toDataURI();
 ```
 
 ### Main methods
@@ -94,7 +71,7 @@ wavDataURI = wav.toDataURI();
 #### WaveFile.fromBuffer()
 Load a .wav file from a byte buffer into a WaveFile object:
 ```javascript
-WaveFile.fromBuffer(buffer);
+wav.fromBuffer(buffer);
 ```
 
 This is the same as passing the buffer when creating the WaveFile object:
@@ -103,10 +80,10 @@ let wav = new WaveFile(buffer);
 ```
 
 #### WaveFile.fromScratch()
-Create a WaveFile object with the arguments you pass:
+Create a wave file from scratch:
 ```javascript
 // A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
-WaveFile.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 ```
 
 #### WaveFile.toBuffer()
@@ -124,43 +101,43 @@ wavDataURI = wav.toDataURI();
 #### WaveFile.setCuePoint()
 Set a cue point with a text label in the file. The point position is informed in milliseconds:
 ```javascript
-WaveFile.setCuePoint(1750, "some label");
+wav.setCuePoint(1750, "some label");
 ```
 
 #### WaveFile.deleteCuePoint()
-Delete a cue point. The cue point is informed by the order they appear on the file (starting on 1):
+Delete a cue point. The cue point is identified by its order on the file (first point is 1):
 ```javascript
 // remove the first cue point and its label
-WaveFile.deleteCuePoint(1);
+wav.deleteCuePoint(1);
 ```
 
 #### WaveFile.updateLabel()
-Update the label text of a cue point. The cue point is informed by the order they appear on the file (starting on 1):
+Update the label text of a cue point. The cue point is identified by its order on the file (first point is 1):
 ```javascript
-// remove the first cue point and its label
-WaveFile.updateLabel(2, "updated label");
+// Update the label of the second cue point
+wav.updateLabel(2, "updated label");
 ```
 
 #### WaveFile.setTag()
 Create (or overwrite) a RIFF tag in the file:
 ```javascript
-WaveFile.setTag("ICMT", "some comments");
+wav.setTag("ICMT", "some comments");
 ```
 
 #### WaveFile.getTag()
 Return the value of a existing RIFF tag:
 ```javascript
-WaveFile.getTag("ICMT");
+wav.getTag("ICMT");
 ```
 
 #### WaveFile.deleteTag()
 Remove a tag from the file:
 ```javascript
-WaveFile.deleteTag("ICMT");
+wav.deleteTag("ICMT");
 ```
 
 ### Create wave files from scratch
-You must inform the number of channels, the sample rate, the bit depth and the samples (in this order). The samples should be represented as an array of numbers. The array may be multidimensional if there is more than one channel.
+You must inform the number of channels, the sample rate, the bit depth and the samples (in this order).
 
 #### Mono:
 ```javascript
@@ -200,12 +177,10 @@ Possible values for the bit depth are:
 You can also use any bit depth between "8" and "53", like **"11", "12", "17", "20" and so on**.
 
 #### A word on bit depths
-Files with sample resolutions other than 4, 8, 16, 24, 32 (integer), 32 (FP) and 64-bit (FP) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players. They can be played in the example page:  
-https://rochars.github.io/wavefile/example  
-They are converted to 16-bit before being loaded by the player, allowing normal reproduction.
+Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.
 
 ### Interleave and de-interleave stereo samples
-Samples in WaveFile objects are interleaved by default, even if you created the file from scratch using de-interleaved samples.
+Samples in WaveFile objects are interleaved by default, even when you create a WaveFile object using de-interleaved samples.
 
 You can de-interleave them:
 ```javascript
@@ -219,8 +194,8 @@ To interleave them:
 wav.interleave();
 ```
 
-### Create tags on files
-You can create tags on files with **WaveFile.setTag()** method. If the tag already exists, it's value is rewritten.
+### Add RIFF tags to files
+You can create (or overwrite) tags on files with the **WaveFile.setTag()** method.
 ```javascript
 // Write the ICMT tag with some comments to the file
 wav.setTag("ICMT", "some comments");
@@ -232,12 +207,31 @@ console.log(wav.getTag("ICMT"));
 // some comments
 ```
 
-You can delete tags with **WaveFile.deleteTag()**:
+You can delete a tag with **WaveFile.deleteTag()**:
 ```javascript
 wav.deleteTag("ICMT");
 ```
 
-### RIFF to RIFX and RIFX to RIFF
+### Add cue points to files
+You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in milliseconds, a text label and creates a cue point in the corresponding position of the file:
+```javascript
+wav.setCuePoint(1750, "some label for the cue point");
+```
+
+To delete a cue point use **WaveFile.deleteCuePoint()** informing the index of the point. Points are ordered according to their position. The first point is indexed as 1.
+```javascript
+wav.deleteCuePoint(1);
+```
+
+Mind that creating or deleting cue points will change the index of other points if they exist.
+
+### RIFX
+**wavefile** can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:
+```javascript
+wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
+```
+
+RIFX to RIFF and RIFF to RIFX:
 ```javascript
 // Turn a RIFF file to a RIFX file
 wav.toRIFX();
@@ -254,7 +248,7 @@ wav.toIMAADPCM();
 ```
 IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
 
-If the audio is not 16-bit it will be converted to 16-bit before compressing. Compressing audio with sample rates different from 8000 Hz or number of channels greater than 1 will throw errors.
+If the audio is not 16-bit it will be converted to 16-bit before compressing. Compressing audio with sample rate different from 8000 Hz or more than one channel is not supported and will throw errors.
 
 To decode 4-bit IMA-ADPCM as 16-bit linear PCM:
 ```javascript
@@ -310,7 +304,6 @@ wav.fromMuLaw("24");
 
 ### Change the bit depth
 You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method.
-
 ```javascript
 // Load a wav file with 32-bit audio
 let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
@@ -323,12 +316,6 @@ fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 ```
 
 ### The properties
-Since **version 6.0.0** (2018-05-02) the samples are stored in **data.samples**.
-```javascript
-console.log(wav.data.samples);
-// Output an array of numbers
-```
-
 The WaveFile properties:
 ```javascript
 let wav = new WaveFile(fs.readFileSync("file.wav"));
@@ -338,12 +325,10 @@ console.log(wav.container); //"RIFF" or "RIFX"
 console.log(wav.chunkSize);
 console.log(wav.format); // WAVE
 
-// "bext"
-console.log(wav.bext.chunkId);
-console.log(wav.bext.chunkSize);
-// ...
+// "bext" chunk
+console.log(wav.bext);
 
-// "fmt "
+// "fmt " chunk
 console.log(wav.fmt.chunkId);
 console.log(wav.fmt.chunkSize);
 console.log(wav.fmt.audioFormat);
@@ -356,28 +341,26 @@ console.log(wav.fmt.bitsPerSample);
 console.log(wav.fmt.cbSize);
 console.log(wav.fmt.validBitsPerSample);
 console.log(wav.fmt.dwChannelMask);
-// subformat is a 128-bit GUID split into 4 32-bit values.
-console.log(wav.fmt.subformat[0]); 
-console.log(wav.fmt.subformat[1]); 
-console.log(wav.fmt.subformat[2]);
-console.log(wav.fmt.subformat[3]);
+console.log(wav.fmt.subformat);
 
-// "fact"
+// "fact" chunk
 console.log(wav.fact.chunkId);
 console.log(wav.fact.chunkSize);
 console.log(wav.fact.dwSampleLength);
 
-// "data"
+// "data" chunk
 console.log(wav.data.chunkId);
 console.log(wav.data.chunkSize);
 console.log(wav.data.samples);
 
-// "cue "
+// "cue " chunk
 console.log(wav.cue.chunkId);
 console.log(wav.cue.chunkSize);
+console.log(wav.cue.dwCuePoints);
+console.log(wav.cue.points);
 
-// "LIST"
-console.log(wav.LIST.length);
+// "LIST" chunk
+console.log(wav.LIST);
 ```
 
 #### BWF data
@@ -386,35 +369,25 @@ BWF data ("bext" chunk) is stored in the *bext* property.
 WaveFile.bext = {
     "chunkId": "",
     "chunkSize": 0,
-    "description": "", // 256 chars
-    "originator": "", // 32 chars
-    "originatorReference": "", // 32 chars
-    "originationDate": "", // 10 chars
-    "originationTime": "", // 8 chars
-    "timeReference": [], // 2 32-bit numbers representing a 64-bit value
-    "version": 0, // 16-bit number
-    "UMID": "", // 64 chars
-    "loudnessValue": 0, // 16-bit number
-    "loudnessRange": 0, // 16-bit number
-    "maxTruePeakLevel": 0, // 16-bit number
-    "maxMomentaryLoudness": 0, // 16-bit number
-    "maxShortTermLoudness": 0, // 16-bit number
-    "reserved": "", // 180 chars
-    "codingHistory": "" // string, unlimited size
+    "description": "",
+    "originator": "",
+    "originatorReference": "",
+    "originationDate": "",
+    "originationTime": "",
+    "timeReference": [],
+    "version": 0,
+    "UMID": "",
+    "loudnessValue": 0,
+    "loudnessRange": 0,
+    "maxTruePeakLevel": 0,
+    "maxMomentaryLoudness": 0,
+    "maxShortTermLoudness": 0,
+    "reserved": "",
+    "codingHistory": ""
 };
 ```
 
 #### Cue points
-You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in milliseconds and create a point in the corresponding position of the file:
-```javascript
-wav.setCuePoint(1750, "some label");
-```
-
-To delete a cue point use **WaveFile.deleteCuePoint()** inform the index of the point. Points are ordered according to their position. The first point is 1. Mind that deleting a point will change the index of other points (but not their position).
-```javascript
-wav.deleteCuePoint(1);
-```
-
 "cue " chunk data is stored as follows:
 ```javascript
 WaveFile.cue = {
@@ -425,7 +398,7 @@ WaveFile.cue = {
 };
 ```
 
-Items in cue.points are objects with this signature:
+Items in *cue.points* are objects with this signature:
 ```javascript
 {
     "dwName": 0,
@@ -442,34 +415,34 @@ Items in cue.points are objects with this signature:
 ```javascript
 /**
  * An array of the "LIST" chunks present in the file.
- * @type {Array<Object>}
+ * @type {!Array<!Object>}
  */
 WaveFile.LIST = [];
 ```
 
-WaveFile.LIST is an array of objects with this signature:
+*WaveFile.LIST* is an array of objects with this signature:
 ```javascript
 {
-    /** @type {!string} */
+    /** @type {string} */
     "chunkId": "", // always 'LIST'
-    /** @type {!number} */
+    /** @type {number} */
     "chunkSize": 0,
-    /** @type {!string} */
+    /** @type {string} */
     "format": "", // 'adtl' or 'INFO'
-    /** @type {!Array<Object>} */
+    /** @type {!Array<!Object>} */
     "subChunks": []
 };
 ```
 Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. **wavefile** can read and write "LIST" chunks of format "INFO" and "adtl".
 
-For "LIST" chunks with the "INFO" format, "subChunks" is an array of objects with this signature:
+For "LIST" chunks with the "INFO" format, "subChunks" will be an array of objects with this signature:
 ```javascript
 {
-    /** @type {!string} */
+    /** @type {string} */
     "chunkId": "" // some RIFF tag
-    /** @type {!number} */
+    /** @type {number} */
     "chunkSize" 0,
-    /** @type {!string} */
+    /** @type {string} */
     "value": ""
 }
 ```
@@ -493,7 +466,6 @@ wav.ds64 = {
     "sampleCountLow": 0
 };
 ```
-**The "ds64" chunk is read-only.**
 
 ### The samples
 Range:
