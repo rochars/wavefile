@@ -1431,7 +1431,7 @@ class WaveFile {
      * @private
      */
     readLISTChunk_(chunks) {
-        /** type {Array<Array<!Object>>>} */
+        /** type {Array<!Array<!Object>>>} */
         let listChunks = this.findChunk_(chunks, "LIST", true);
         if (listChunks === null) {
             return;
