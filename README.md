@@ -476,6 +476,11 @@ Range:
 - -1.0 to 1.0 for 32-bit (float)
 - -1.0 to 1.0 for 64-bit (float)
 
+## Code of conduct
+This project adopts the [Contributor Covenant](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), version 1.4, available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting rocha.rafaelsilva@gmail.com.
+
 ## References
 https://tech.ebu.ch/docs/tech/tech3285.pdf  
 https://tech.ebu.ch/docs/tech/tech3306-2009.pdf  
