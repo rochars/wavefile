@@ -18,3 +18,5 @@ test/
 appveyor.yml
 webpack.config.js
 CONTRIBUTING.md
+BUILDING.md
+ROADMAP.md
