@@ -2,6 +2,32 @@
 
 **wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.
 
+## Sample files for tests
+Real world files are needed to test **wavefile** features. As some aspects of the WAVE format specification are not quite popular, files with some characteristics may be hard to obtain.
+
+If you plan to add sample files to be used in tests, they should go on the *test/files/* folder.
+
+Look at the [ROADMAP.md](https://github.com/rochars/wavefile/blob/master/ROADMAP.md) to see if you have any .wav file that could be used to test the incoming features.
+
+### Files created by yourself
+If you created the file yourself you should use this naming convention:  
+bitDepth-SampleRate-numChannels-origin-fileSpecificData.wav
+
+*origin* is the software used to create the file (like Reaper).
+
+*fileSpecificData* may appear many times, one for each characteristic of the file that is considered relevant.
+
+example:  
+16bit-8kHz-1c-reaper-adpcm.wav
+
+### Files from the web
+If you add a file that is publicly available on the web, the file should keep the same name from where it was originally available and be included in *test/files/ORIGINS.md*.
+
+Publicaly available files that have been modified for test purposes should follow this naming convention:  
+originalNameOfTheFile-fileSpecificData.wav
+
+Where *fileSpecificData* may appear many times, one for each characteristic of the file that is considered relevant. The original file should also be present and listed in *test/files/ORIGINS.md*.
+
 ## Bug fixes and features
 Bug fixes and features should always come with tests. Look at other tests to see how they should be structured.
 
@@ -14,7 +40,11 @@ npm test
 ```
 npm run build
 ```
-This will lint the sources, test the sources, compile a browser version, test the browser version and generate doc files.
+Look at [BUILDING.md](https://github.com/rochars/wavefile/blob/master/BUILDING.md) for details on building **wavefile**.
+
+## Code style
+**wavefile** code should follow the Google JavaScript Style Guide:  
+https://google.github.io/styleguide/jsguide.html
 
 ## Developer's Certificate of Origin 1.1
 By making a contribution to this project, I certify that:
@@ -43,4 +73,5 @@ By making a contribution to this project, I certify that:
 
 ## References:
 https://developercertificate.org/  
-https://github.com/nodejs/node/blob/master/CONTRIBUTING.md
+https://github.com/nodejs/node/blob/master/CONTRIBUTING.md  
+https://google.github.io/styleguide/jsguide.html
