@@ -27,7 +27,7 @@ npm install wavefile
 
 ## See it in action
 
-With **wavefile** you can change the bit depth and compression type of wav files on the fly before loading them into a browse player. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by **wavefile**:
+With **wavefile** you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by **wavefile**:
 
 https://rochars.github.io/wavefile/example
 
@@ -64,76 +64,6 @@ let wavBuffer = wav.toBuffer();
 
 // Call toDataURI() to get the file as a DataURI:
 let wavDataURI = wav.toDataURI();
-```
-
-### Main methods
-
-#### WaveFile.fromBuffer()
-Load a .wav file from a byte buffer into a WaveFile object:
-```javascript
-wav.fromBuffer(buffer);
-```
-
-This is the same as passing the buffer when creating the WaveFile object:
-```javascript
-let wav = new WaveFile(buffer);
-```
-
-#### WaveFile.fromScratch()
-Create a wave file from scratch:
-```javascript
-// A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
-wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
-```
-
-#### WaveFile.toBuffer()
-Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:
-```javascript
-buffer = wav.toBuffer();
-```
-
-#### WaveFile.toDataURI()
-Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:
-```javascript
-wavDataURI = wav.toDataURI();
-```
-
-#### WaveFile.setCuePoint()
-Set a cue point with a text label in the file. The point position is informed in milliseconds:
-```javascript
-wav.setCuePoint(1750, "some label");
-```
-
-#### WaveFile.deleteCuePoint()
-Delete a cue point. The cue point is identified by its order on the file (first point is 1):
-```javascript
-// remove the first cue point and its label
-wav.deleteCuePoint(1);
-```
-
-#### WaveFile.updateLabel()
-Update the label text of a cue point. The cue point is identified by its order on the file (first point is 1):
-```javascript
-// Update the label of the second cue point
-wav.updateLabel(2, "updated label");
-```
-
-#### WaveFile.setTag()
-Create (or overwrite) a RIFF tag in the file:
-```javascript
-wav.setTag("ICMT", "some comments");
-```
-
-#### WaveFile.getTag()
-Return the value of a existing RIFF tag:
-```javascript
-wav.getTag("ICMT");
-```
-
-#### WaveFile.deleteTag()
-Remove a tag from the file:
-```javascript
-wav.deleteTag("ICMT");
 ```
 
 ### Create wave files from scratch
@@ -176,7 +106,7 @@ Possible values for the bit depth are:
 
 You can also use any bit depth between "8" and "53", like **"11", "12", "17", "20" and so on**.
 
-#### A word on bit depths
+#### A word on bit depth
 Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.
 
 ### Interleave and de-interleave stereo samples
@@ -313,6 +243,76 @@ wav.toBitDepth("24");
 
 // Write the new 24-bit file
 fs.writeFileSync("24bit-file.wav", wav.toBuffer());
+```
+
+### Main methods
+
+#### WaveFile.fromBuffer()
+Load a .wav file from a byte buffer into a WaveFile object:
+```javascript
+wav.fromBuffer(buffer);
+```
+
+This is the same as passing the buffer when creating the WaveFile object:
+```javascript
+let wav = new WaveFile(buffer);
+```
+
+#### WaveFile.fromScratch()
+Create a wave file from scratch:
+```javascript
+// A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
+wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+```
+
+#### WaveFile.toBuffer()
+Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:
+```javascript
+buffer = wav.toBuffer();
+```
+
+#### WaveFile.toDataURI()
+Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:
+```javascript
+wavDataURI = wav.toDataURI();
+```
+
+#### WaveFile.setCuePoint()
+Set a cue point with a text label in the file. The point position is informed in milliseconds:
+```javascript
+wav.setCuePoint(1750, "some label");
+```
+
+#### WaveFile.deleteCuePoint()
+Delete a cue point. The cue point is identified by its order on the file (first point is 1):
+```javascript
+// remove the first cue point and its label
+wav.deleteCuePoint(1);
+```
+
+#### WaveFile.updateLabel()
+Update the label text of a cue point. The cue point is identified by its order on the file (first point is 1):
+```javascript
+// Update the label of the second cue point
+wav.updateLabel(2, "updated label");
+```
+
+#### WaveFile.setTag()
+Create (or overwrite) a RIFF tag in the file:
+```javascript
+wav.setTag("ICMT", "some comments");
+```
+
+#### WaveFile.getTag()
+Return the value of a existing RIFF tag:
+```javascript
+wav.getTag("ICMT");
+```
+
+#### WaveFile.deleteTag()
+Remove a tag from the file:
+```javascript
+wav.deleteTag("ICMT");
 ```
 
 ### The properties
@@ -487,7 +487,7 @@ http://www.neurophys.wisc.edu/auditory/riff-format.txt
 https://github.com/chirlu/sox/blob/master/src/wav.c  
 https://github.com/erikd/libsndfile  
 http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf  
-https://sites.google.com/site/musicgapi/technical-documents/wav-file-format?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F&showPrintDialog=1#wavl  
+https://sites.google.com/site/musicgapi/technical-documents/wav-file-format  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
 ## LICENSE
