@@ -42,7 +42,7 @@ npm run build
 ```
 Look at [BUILDING.md](https://github.com/rochars/wavefile/blob/master/BUILDING.md) for details on building **wavefile**.
 
-## Code style
+## Style guide
 **wavefile** code should follow the Google JavaScript Style Guide:  
 https://google.github.io/styleguide/jsguide.html
 
