@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.11.0 (2018-06-10)
+- Reading and writing the "smpl" chunk.
+
 ## version 6.10.4 (2018-06-01)
 - fix: listChunks var JSDoc type definition in readLISTChunk_().
 - Better documentation.

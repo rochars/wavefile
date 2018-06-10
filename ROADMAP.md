@@ -8,10 +8,10 @@ See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTI
 
 ## Planned features
 Items in this list should not require a major version update.
-- Handle regions ("ltxt" chunk)
+- Handle "ltxt" chunks
+- Handle "file" chunks
 - Handle "wavl" and "slnt" chunks
 - Handle "plst" (playlist) chunks
-- Handle "smpl" (sampler) chunk 
 - Handle "inst" (instrument) chunk
 - Change the sample rate of the audio
 - Handle ID3 tags

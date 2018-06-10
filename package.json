@@ -3,7 +3,7 @@
   "version": "6.10.4",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
-  "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
+  "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "keywords": [
     "wav",
@@ -37,7 +37,8 @@
     "compander",
     "A-Law",
     "mu-Law",
-    "cue"
+    "cue",
+    "smpl"
   ],
   "repository": {
     "type": "git",

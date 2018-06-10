@@ -88,10 +88,6 @@ wav.fromScratch(2, 48000, '8', [
     [0, -1, 4, 3]
 ]);
 fs.writeFileSync(path, wav.toBuffer());
-
-// Default is RIFF. To create RIFX files:
-wav.fromScratch(1, 44100, '32', samples, {"container": "RIFX"});
-fs.writeFileSync(path, wav.toBuffer());
 ```
 Possible values for the bit depth are:  
 "4" - 4-bit IMA-ADPCM  
@@ -245,9 +241,9 @@ wav.toBitDepth("24");
 fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 ```
 
-### Main methods
+## Main methods
 
-#### WaveFile.fromBuffer()
+### WaveFile.fromBuffer()
 Load a .wav file from a byte buffer into a WaveFile object:
 ```javascript
 wav.fromBuffer(buffer);
@@ -258,7 +254,7 @@ This is the same as passing the buffer when creating the WaveFile object:
 let wav = new WaveFile(buffer);
 ```
 
-#### WaveFile.fromScratch()
+### WaveFile.fromScratch()
 Create a wave file from scratch:
 ```javascript
 // A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
@@ -271,51 +267,51 @@ Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and
 buffer = wav.toBuffer();
 ```
 
-#### WaveFile.toDataURI()
+### WaveFile.toDataURI()
 Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:
 ```javascript
 wavDataURI = wav.toDataURI();
 ```
 
-#### WaveFile.setCuePoint()
+### WaveFile.setCuePoint()
 Set a cue point with a text label in the file. The point position is informed in milliseconds:
 ```javascript
 wav.setCuePoint(1750, "some label");
 ```
 
-#### WaveFile.deleteCuePoint()
+### WaveFile.deleteCuePoint()
 Delete a cue point. The cue point is identified by its order on the file (first point is 1):
 ```javascript
 // remove the first cue point and its label
 wav.deleteCuePoint(1);
 ```
 
-#### WaveFile.updateLabel()
+### WaveFile.updateLabel()
 Update the label text of a cue point. The cue point is identified by its order on the file (first point is 1):
 ```javascript
 // Update the label of the second cue point
 wav.updateLabel(2, "updated label");
 ```
 
-#### WaveFile.setTag()
+### WaveFile.setTag()
 Create (or overwrite) a RIFF tag in the file:
 ```javascript
 wav.setTag("ICMT", "some comments");
 ```
 
-#### WaveFile.getTag()
+### WaveFile.getTag()
 Return the value of a existing RIFF tag:
 ```javascript
 wav.getTag("ICMT");
 ```
 
-#### WaveFile.deleteTag()
+### WaveFile.deleteTag()
 Remove a tag from the file:
 ```javascript
 wav.deleteTag("ICMT");
 ```
 
-### The properties
+## The properties
 The WaveFile properties:
 ```javascript
 let wav = new WaveFile(fs.readFileSync("file.wav"));
@@ -359,11 +355,25 @@ console.log(wav.cue.chunkSize);
 console.log(wav.cue.dwCuePoints);
 console.log(wav.cue.points);
 
+// "smpl" chunk
+console.log(wav.smpl.chunkId);
+console.log(wav.smpl.chunkSize);
+console.log(wav.smpl.dwManufacturer);
+console.log(wav.smpl.dwProduct);
+console.log(wav.smpl.dwSamplePeriod);
+console.log(wav.smpl.dwMIDIUnityNote);
+console.log(wav.smpl.dwMIDIPitchFraction);
+console.log(wav.smpl.dwSMPTEFormat);
+console.log(wav.smpl.dwSMPTEOffset);
+console.log(wav.smpl.dwNumSampleLoops);
+console.log(wav.smpl.dwSamplerData);
+console.log(wav.smpl.loops);
+
 // "LIST" chunk
 console.log(wav.LIST);
 ```
 
-#### BWF data
+### BWF data
 BWF data ("bext" chunk) is stored in the *bext* property.
 ```javascript
 WaveFile.bext = {
@@ -387,21 +397,11 @@ WaveFile.bext = {
 };
 ```
 
-#### Cue points
-"cue " chunk data is stored as follows:
-```javascript
-WaveFile.cue = {
-    "chunkId": "",
-    "chunkSize": 0,
-    "dwCuePoints": 0,
-    "points": [],
-};
-```
-
-Items in *cue.points* are objects with this signature:
+### Cue points
+Items in *cue.points* are objects that look like this:
 ```javascript
 {
-    "dwName": 0,
+    "dwName": 0, // a cue point ID
     "dwPosition": 0,
     "fccChunk": 0,
     "dwChunkStart": 0,
@@ -410,7 +410,20 @@ Items in *cue.points* are objects with this signature:
 }
 ```
 
-#### LIST chunk
+### Sample loops
+Items in *smpl.loops* are objects that look like this:
+```javascript
+{
+    "dwName": "", // a cue point ID
+    "dwType": 0,
+    "dwStart": 0,
+    "dwEnd": 0,
+    "dwFraction": 0,
+    "dwPlayCount": 0,
+}
+```
+
+### LIST chunk
 "LIST" chunk data is stored as follows:
 ```javascript
 /**
@@ -449,7 +462,7 @@ For "LIST" chunks with the "INFO" format, "subChunks" will be an array of object
 Where "chunkId" may be any RIFF tag:  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
-#### RF64
+### ds64 chunk
 **wavefile** have limited support of RF64 files. Changing the bit depth or applying compression to the samples will result in a RIFF file.
 
 "ds64" data is stored as follows:
@@ -467,7 +480,7 @@ wav.ds64 = {
 };
 ```
 
-### The samples
+## The samples
 Range:
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit
@@ -476,24 +489,37 @@ Range:
 - -1.0 to 1.0 for 32-bit (float)
 - -1.0 to 1.0 for 64-bit (float)
 
+## Contributing to wavefile
+**wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.
+
+See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md) for details.
+
 ## Code of conduct
 This project adopts the [Contributor Covenant](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), version 1.4, available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting rocha.rafaelsilva@gmail.com.
 
 ## References
+
+### Papers
 https://tech.ebu.ch/docs/tech/tech3285.pdf  
 https://tech.ebu.ch/docs/tech/tech3306-2009.pdf  
 http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html  
-http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Samples.html  
-https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml  
-https://gist.github.com/hackNightly/3776503  
-http://www.neurophys.wisc.edu/auditory/riff-format.txt  
-https://github.com/chirlu/sox/blob/master/src/wav.c  
-https://github.com/erikd/libsndfile  
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml 
 http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf  
 https://sites.google.com/site/musicgapi/technical-documents/wav-file-format  
+http://www.neurophys.wisc.edu/auditory/riff-format.txt  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
+
+### Software
+https://github.com/erikd/libsndfile  
+https://gist.github.com/hackNightly/3776503  
+https://github.com/chirlu/sox/blob/master/src/wav.c
+
+### Other
+https://developercertificate.org/  
+https://www.contributor-covenant.org/version/1/4/code-of-conduct.html  
+https://google.github.io/styleguide/jsguide.html
 
 ## LICENSE
 Copyright (c) 2017-2018 Rafael da Silva Rocha.
