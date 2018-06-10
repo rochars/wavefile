@@ -5,3 +5,6 @@
 
 ## http://mauvecloud.net/sounds/index.html
 - ima22.wav
+
+## https://github.com/robsaunders/zodak/tree/master/resources
+- smpl_cue.wav

@@ -494,8 +494,12 @@ Range:
 
 See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md) for details.
 
-## Code of conduct
-This project adopts the [Contributor Covenant](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), version 1.4, available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
+### Style guide
+**wavefile** code should follow the Google JavaScript Style Guide:  
+https://google.github.io/styleguide/jsguide.html
+
+### Code of conduct
+This project adopt the [Contributor Covenant, version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting rocha.rafaelsilva@gmail.com.
 
@@ -505,7 +509,7 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be repor
 https://tech.ebu.ch/docs/tech/tech3285.pdf  
 https://tech.ebu.ch/docs/tech/tech3306-2009.pdf  
 http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html  
-https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml 
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml  
 http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf  
 https://sites.google.com/site/musicgapi/technical-documents/wav-file-format  
 http://www.neurophys.wisc.edu/auditory/riff-format.txt  

@@ -11,41 +11,51 @@ const fs = require("fs");
 const WaveFile = require("../../test/loader.js");
 const path = "test/files/";
 
-// Reaper file with regions defined in a "smpl" chunk
-describe("read 16bit-8kHz-1c-reaper-region.wav and write " +
-    "to new file", function() {
+function getLtxt_(wav) {
+    for (let i=0; i<wav.LIST.length; i++) {
+            if (wav.LIST[i]["format"] == "adtl") {
+            for (let j=0; j<wav.LIST[i]["subChunks"].length; j++) {
+                if (wav.LIST[i]["subChunks"][j]["chunkId"] == "ltxt") {
+                    return wav.LIST[i]["subChunks"][j];
+                }
+            }
+        }
+    }
+}
+
+// File with "ltxt" chunk
+describe("read smpl_cue.wav and write to a new file", function() {
     
-    // read the Reaper file (read only)
-    let wavB = new WaveFile(
-        fs.readFileSync(path + "16bit-8kHz-1c-reaper-region.wav"));
-    // read the Reaper file (toBuffer() will be called on this one)
     let wav = new WaveFile(
-        fs.readFileSync(path + "16bit-8kHz-1c-reaper-region.wav"));
+        fs.readFileSync(path + "smpl_cue.wav"));
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "smpl_cue.wav"));
 
-    // write it to /out
     fs.writeFileSync(
-        path + "/out/16bit-8kHz-1c-reaper-region-out.wav", wav.toBuffer());
-
-    // stats of both files
-    let stats = fs.statSync(path + "16bit-8kHz-1c-reaper-region.wav");
+        path + "/out/smpl_cue-out.wav", wavB.toBuffer());
+    let stats = fs.statSync(
+        path + "smpl_cue.wav");
     let fileSizeInBytes1 = stats["size"];
-    stats = fs.statSync(path + "/out/16bit-8kHz-1c-reaper-region-out.wav");
+    stats = fs.statSync(path + "/out/smpl_cue-out.wav");
     let fileSizeInBytes2 = stats["size"];
-
-    // read the file from /out
     let wav2 = new WaveFile(
-        fs.readFileSync(path + "/out/16bit-8kHz-1c-reaper-region-out.wav"));
+        fs.readFileSync(path + "/out/smpl_cue-out.wav"));
     
-    // smpl
-    it("wav2.smpl should be == wav.smpl", function() {
-        assert.deepEqual(wav2.smpl, wavB.smpl);
+    //ltxt
+    it("ltxt in wav should be same ltxt in wav2", function() {
+        wavLtxt = getLtxt_(wav);
+        wav2Ltxt = getLtxt_(wav2);
+        console.log(wavLtxt);
+        assert.deepEqual(wavLtxt, wav2Ltxt);
     });
-    
     // Other tests
+    it("wav.chunkSize should be == fileSizeInBytes1", function() {
+        assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
+    });
     it("wav2.chunkSize should be == fileSizeInBytes2", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-    it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
+    it("wav2.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
         assert.equal(
             wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
     });

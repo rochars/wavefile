@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.12.0 (unreleased)
+- Add support for 'ltxt' chunks.
+
 ## version 6.11.0 (2018-06-10)
 - Reading and writing the "smpl" chunk.
 

@@ -8,7 +8,6 @@ See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTI
 
 ## Planned features
 Items in this list should not require a major version update.
-- Handle "ltxt" chunks
 - Handle "file" chunks
 - Handle "wavl" and "slnt" chunks
 - Handle "plst" (playlist) chunks
