@@ -46,6 +46,11 @@ Look at [BUILDING.md](https://github.com/rochars/wavefile/blob/master/BUILDING.m
 **wavefile** code should follow the Google JavaScript Style Guide:  
 https://google.github.io/styleguide/jsguide.html
 
+## Code of conduct
+This project adopt the [Contributor Covenant, version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting rocha.rafaelsilva@gmail.com.
+
 ## Developer's Certificate of Origin 1.1
 By making a contribution to this project, I certify that:
 
