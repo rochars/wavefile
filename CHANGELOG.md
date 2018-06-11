@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.12.6 (2018-06-11)
+- fix: remove dist from npm in v6 to avoid breaking dependents.
+
 ## version 6.12.5 (2018-06-11)
 - fix: webpack.config so no dependency dist is used in the bundle.
 
