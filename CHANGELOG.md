@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 6.12.1 (unreleased)
+## version 6.12.1 (2018-06-11)
 - Update riff-chunks to 4.0.6 to fix odd numbers on chunkSize.
 
 ## version 6.12.0 (2018-06-10)
