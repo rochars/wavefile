@@ -9,6 +9,9 @@ module.exports = {
   output: {
     filename: './dist/wavefile-min.js'
   },
+  resolve: {
+    mainFields: ["main"],
+  },
   plugins: [
     new ClosureCompiler({
       options: {
