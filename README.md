@@ -26,8 +26,14 @@ npm install wavefile
 ```
 
 ## Browser
+Use the compiled file in the */dist* folder:
 ```html
 <script src="wavefile-min.js"></script>
+```
+
+Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
+```html
+<script src="https://cdn.jsdelivr.net/gh/rochars/wavefile@6.12.1/dist/wavefile-min.js"></script>
 ```
 
 ## See it in action
