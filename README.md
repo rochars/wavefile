@@ -25,6 +25,11 @@ And more.
 npm install wavefile
 ```
 
+## Browser
+```html
+<script src="wavefile-min.js"></script>
+```
+
 ## See it in action
 
 With **wavefile** you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by **wavefile**:
@@ -261,7 +266,7 @@ Create a wave file from scratch:
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 ```
 
-#### WaveFile.toBuffer()
+### WaveFile.toBuffer()
 Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:
 ```javascript
 buffer = wav.toBuffer();
