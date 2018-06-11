@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.12.5 (2018-06-11)
+- fix: webpack.config so no dependency dist is used in the bundle.
+
 ## version 6.12.4 (2018-06-11)
 - browser version on npm.
 
