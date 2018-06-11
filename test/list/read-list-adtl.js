@@ -45,7 +45,6 @@ describe("read smpl_cue.wav and write to a new file", function() {
     it("ltxt in wav should be same ltxt in wav2", function() {
         wavLtxt = getLtxt_(wav);
         wav2Ltxt = getLtxt_(wav2);
-        console.log(wavLtxt);
         assert.deepEqual(wavLtxt, wav2Ltxt);
     });
     // Other tests
@@ -177,6 +176,8 @@ describe("16-bit LIST reading (file with 2 markers) ", function() {
 
 describe("16-bit LIST writing (16bit-16kHz-2markers-mono.wav)", function() {
 
+    let wavB = new WaveFile(
+        fs.readFileSync(path + "16bit-16kHz-2markers-mono.wav"));
     let wav = new WaveFile(
         fs.readFileSync(path + "16bit-16kHz-2markers-mono.wav"));
     fs.writeFileSync(
@@ -188,6 +189,13 @@ describe("16-bit LIST writing (16bit-16kHz-2markers-mono.wav)", function() {
     let fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/16bit-16kHz-2markers-mono-LIST.wav");
     let fileSizeInBytes2 = stats["size"];
+
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav2.LIST, wav.LIST);
+    });
+    it("wavB.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wavB.LIST, wav2.LIST);
+    });
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
@@ -282,19 +290,47 @@ describe("16-bit LIST writing (16bit-16kHz-2markers-mono.wav)", function() {
 describe("read Audacity-16bit-lots-of-markers.wav and write " +
     "to new file", function() {
     
+    // WaveFile with the original file untouched
     let wav = new WaveFile(
         fs.readFileSync(path + "Audacity-16bit-lots-of-markers.wav"));
+
+    // WaveFile with the original file; this one will be used to
+    // write the file to disk calling toBuffer(). This will redefine
+    // some of the fields in the file.
     let wavB = new WaveFile(
         fs.readFileSync(path + "Audacity-16bit-lots-of-markers.wav"));
+
+    // Write wavB to disk
     fs.writeFileSync(
         path + "/out/Audacity-16bit-lots-of-markers-out.wav", wavB.toBuffer());
+
     let stats = fs.statSync(path + "Audacity-16bit-lots-of-markers.wav");
     let fileSizeInBytes1 = stats["size"];
     stats = fs.statSync(path + "/out/Audacity-16bit-lots-of-markers-out.wav");
     let fileSizeInBytes2 = stats["size"];
+
+    // WaveFile with the re-written file
     let wav2 = new WaveFile(
         fs.readFileSync(path + "/out/Audacity-16bit-lots-of-markers-out.wav"));
-    
+
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav2.LIST, wav.LIST);
+    });
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav2.chunkSize, wav.chunkSize);
+    });
+
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav2.LIST[0]["subChunks"], wav.LIST[0]["subChunks"]);
+    });
+
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav.chunkSize, wavB.chunkSize);
+    });
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav.LIST, wavB.LIST);
+    });
+
     // Other tests
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);
@@ -384,6 +420,7 @@ describe("read Audacity-16bit-lots-of-markers.wav and write " +
     it("dwChannelMask should be 0", function() {
         assert.equal(wav2.fmt.dwChannelMask, 0);
     });
+    
 });
 
 // Audacity file with 17 markers
@@ -404,6 +441,10 @@ describe("read Audacity-16bit-lots-of-markers.wav and write " +
     let wav2 = new WaveFile(
         fs.readFileSync(path + "/out/Audacity-16bit-17-MARKERS-out.wav"));
     
+    it("wav.LIST should be == wav2.LIST", function() {
+        assert.deepEqual(wav2.LIST, wav.LIST);
+    });
+
     // Other tests
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wav.chunkSize + 8, fileSizeInBytes1);

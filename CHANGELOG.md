@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.12.1 (unreleased)
+- Update riff-chunks to 4.0.6 to fix odd numbers on chunkSize.
+
 ## version 6.12.0 (2018-06-10)
 - Add support for 'ltxt' chunks.
 
