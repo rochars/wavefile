@@ -33,7 +33,7 @@ Use the compiled file in the */dist* folder:
 
 Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
 ```html
-<script src="https://cdn.jsdelivr.net/gh/rochars/wavefile@6.12.1/dist/wavefile-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wavefile@6.12.4"></script>
 ```
 
 ## See it in action

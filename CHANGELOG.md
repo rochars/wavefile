@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## version 6.12.4 (2018-06-11)
+- browser version on npm.
+
+## version 6.12.3 (2018-06-11)
+- Removed /dist from .npmignore.
+
 ## version 6.12.2 (2018-06-11)
 - Add 'browser' to package.json.
 
