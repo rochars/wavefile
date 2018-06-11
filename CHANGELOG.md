@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 6.12.0 (unreleased)
+## version 6.12.0 (2018-06-10)
 - Add support for 'ltxt' chunks.
 
 ## version 6.11.0 (2018-06-10)
