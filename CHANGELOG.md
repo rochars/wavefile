@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.12.2 (2018-06-11)
+- Add 'browser' to package.json.
+
 ## version 6.12.1 (2018-06-11)
 - Update riff-chunks to 4.0.6 to fix odd numbers on chunkSize.
 
