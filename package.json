@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "6.12.6",
+  "version": "6.12.7",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
@@ -78,9 +78,9 @@
     "alawmulaw": "^2.0.5",
     "base64-arraybuffer": "^0.1.5",
     "bitdepth": "^3.1.2",
-    "byte-data": "^8.0.2",
+    "byte-data": "^9.0.2",
     "imaadpcm": "^1.1.5",
-    "riff-chunks": "^4.0.6"
+    "riff-chunks": "^5.0.0"
   },
   "main": "index.js"
 }

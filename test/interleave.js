@@ -16,18 +16,18 @@ describe('fromScratch with interleaved stereo samples', function() {
         [0, -2, 4, 3],
         [0, -1, 4, 3]
     ];
-    wav.fromScratch(2, 8000, '8', stereoSamples); 
+    wav.fromScratch(2, 8000, '16', stereoSamples); 
     it('byteRate should be 16000',
             function() {
-        assert.deepEqual(wav.fmt.byteRate, 16000);
+        assert.deepEqual(wav.fmt.byteRate, 32000);
     });
     it('chunkSize should be 44',
             function() {
-        assert.deepEqual(wav.chunkSize, 44);
+        assert.deepEqual(wav.chunkSize, 52);
     });
     it('data.chunkSize should be 8',
             function() {
-        assert.deepEqual(wav.data.chunkSize, 8);
+        assert.deepEqual(wav.data.chunkSize, 16);
     });
 });
 
@@ -36,7 +36,7 @@ describe('interleave', function() {
     it('should interleave the samples of a 2-channel wave file on load',
             function() {
         let wav = new WaveFile();
-        wav.fromScratch(2, 48000, '8', [
+        wav.fromScratch(2, 48000, '16', [
             [0, -2, 4, 3],
             [0, -1, 4, 3]
         ]);
@@ -46,7 +46,7 @@ describe('interleave', function() {
     it('should interleave the samples of a 3-channel wave file on load',
             function() {
         let wav = new WaveFile();
-        wav.fromScratch(2, 48000, '8', [
+        wav.fromScratch(2, 48000, '16', [
             [0, -2, 4, 3],
             [0, -1, 4, 3],
             [0, -1, 5, 3]
@@ -58,7 +58,7 @@ describe('interleave', function() {
             function() {
         let wav = new WaveFile();
         wav.fromScratch(
-            1, 48000, '8', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
+            1, 48000, '16', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
         wav.fmt.numChannels = 3;
         wav.deInterleave();
         wav.toBuffer();        
@@ -72,7 +72,7 @@ describe('deInterleave', function() {
     it('should de-interleave the samples of a 2-channel wave file',
             function() {
         let wav = new WaveFile();
-        wav.fromScratch(1, 48000, '8', [0, 0, -2, -1, 4, 4, 3, 3]);
+        wav.fromScratch(1, 48000, '16', [0, 0, -2, -1, 4, 4, 3, 3]);
         wav.fmt.numChannels = 2;
         wav.deInterleave();
         assert.deepEqual(wav.data.samples, [
@@ -85,7 +85,7 @@ describe('deInterleave', function() {
             function() {
         let wav = new WaveFile();
         wav.fromScratch(
-            1, 48000, '8', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
+            1, 48000, '16', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
         wav.fmt.numChannels = 3;
         wav.deInterleave();
         assert.deepEqual(wav.data.samples, [
@@ -98,7 +98,7 @@ describe('deInterleave', function() {
             function() {
         let wav = new WaveFile();
         wav.fromScratch(
-            1, 48000, '8', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
+            1, 48000, '16', [0, 0, 0, -2, -1, -1, 4, 4, 5, 3, 3, 3]);
         wav.fmt.numChannels = 3;
         wav.deInterleave();
         assert.deepEqual(wav.data.samples, [

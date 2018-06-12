@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.12.7 (unreleased)
+- update: byte-data to version 9 and riff-chunks to version 5.
+
 ## version 6.12.6 (2018-06-11)
 - fix: remove dist from npm in v6 to avoid breaking dependents.
 
