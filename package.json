@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "6.12.5",
+  "version": "6.12.6",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
