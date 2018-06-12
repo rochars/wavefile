@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 6.12.7 (unreleased)
+## version 6.12.7 (2018-06-12)
 - update: byte-data to version 9 and riff-chunks to version 5.
 
 ## version 6.12.6 (2018-06-11)
