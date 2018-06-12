@@ -509,6 +509,7 @@ class WaveFile {
         }
         this.assureInterleaved_();
         this.assureUncompressed_();
+        this.truncateSamples();
         bitDepth_.toBitDepth(this.data.samples, thisBitDepth, toBitDepth);
         this.fromScratch(
             this.fmt.numChannels,
@@ -1677,6 +1678,24 @@ class WaveFile {
     samplesToBytes_() {
         return byteData_.packArray(
             this.data.samples, this.getSamplesType_());
+    }
+
+    /**
+     * Truncate float samples on over and underflow.
+     * @private
+     */
+    truncateSamples() {
+        if (this.fmt.audioFormat == 3) {
+            /** @type {number} */   
+            let len = this.data.samples.length;
+            for (let i=0; i<len; i++) {
+                if (this.data.samples[i] > 1) {
+                    this.data.samples[i] = 1;
+                } else if (this.data.samples[i] < -1) {
+                    this.data.samples[i] = -1;
+                }
+            }
+        }
     }
 
     /**
