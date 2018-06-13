@@ -15,7 +15,7 @@ With **wavefile** you can:
 - Set and delete cue points and their labels
 - Encode/decode files as ADPCM, A-Law and μ-Law
 - Turn RIFF files to RIFX and RIFX files to RIFF
-- Create or edit BWF metada ("bext" chunk)
+- Create or edit BWF metadata ("bext" chunk)
 - Change the bit depth of the audio
 
 And more.
