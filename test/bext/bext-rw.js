@@ -41,7 +41,7 @@ describe('bext field with less bytes than the field size ' +
     it("bextChunkId should be 'bext'", function() {
         assert.equal(wav2.bext.chunkId, 'bext');
     });
-    it("bext.chunkSize should be 0", function() {
+    it("bext.chunkSize should be 602", function() {
         assert.equal(wav2.bext.chunkSize, 602);
     });
     it("'originator' field should be 'test\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
@@ -49,5 +49,86 @@ describe('bext field with less bytes than the field size ' +
         assert.equal(wav2.bext.originator,
             'test\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000');
     });
+});
 
+describe('Add bext to a file with no bext',function() {
+    
+    // Load a file with no "bext" chunk
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+
+    // Add BWF data
+    wav.bext.originator = "test";
+    
+    // Write to a new file    
+    fs.writeFileSync(path + '/out/16-bit-8kHz-noBext-mono-add-bext.wav', wav.toBuffer());
+
+    // Load the new file; it is expected to have BWF data
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/16-bit-8kHz-noBext-mono-add-bext.wav"));
+    it("bextChunkId should be 'bext'", function() {
+        assert.equal(wav2.bext.chunkId, 'bext');
+    });
+    it("bext.chunkSize should be 602", function() {
+        assert.equal(wav2.bext.chunkSize, 602);
+    });
+    it("'originator' field should be 'test\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+            function() {
+        assert.equal(wav2.bext.originator,
+            'test\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000');
+    });
+});
+
+describe('Add bext to a file with no bext (just the timeReference field)',function() {
+    
+    // Load a file with no "bext" chunk
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+
+    // Add BWF timeReference
+    wav.bext.timeReference = [1, 0];
+    
+    // Write to a new file    
+    fs.writeFileSync(path + '/out/16-bit-8kHz-noBext-mono-add-bext-timeReference.wav', wav.toBuffer());
+
+    // Load the new file; it is expected to have BWF data
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/16-bit-8kHz-noBext-mono-add-bext-timeReference.wav"));
+    it("bextChunkId should be 'bext'", function() {
+        assert.equal(wav2.bext.chunkId, 'bext');
+    });
+    it("bext.chunkSize should be 602", function() {
+        assert.equal(wav2.bext.chunkSize, 602);
+    });
+    it("'timeReference' field should be [1, 0]",
+            function() {
+        assert.deepEqual(wav2.bext.timeReference, [1, 0]);
+    });
+});
+
+describe('Add bext to a file with no bext (just the loudnessValue field)',function() {
+    
+    // Load a file with no "bext" chunk
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+
+    // Add BWF loudnessValue
+    wav.bext.loudnessValue = 1;
+    
+    // Write to a new file    
+    fs.writeFileSync(path + '/out/16-bit-8kHz-noBext-mono-add-bext-loudnessValue.wav', wav.toBuffer());
+
+    // Load the new file; it is expected to have BWF data
+    let wav2 = new WaveFile(
+        fs.readFileSync(path + "/out/16-bit-8kHz-noBext-mono-add-bext-loudnessValue.wav"));
+    it("bextChunkId should be 'bext'", function() {
+        assert.equal(wav2.bext.chunkId, 'bext');
+    });
+    it("bext.chunkSize should be 602", function() {
+        assert.equal(wav2.bext.chunkSize, 602);
+    });
+    it("'loudnessValue' field should be 1",
+            function() {
+        assert.deepEqual(wav2.bext.loudnessValue, 1);
+    });
 });

@@ -194,7 +194,7 @@ class WaveFile {
              * 2 32-bit values, timeReference high and low
              * @export @type {!Array<number>}
              */
-            "timeReference": [],
+            "timeReference": [0, 0],
             /** @export @type {number} */
             "version": 0, //WORD
             /** @export @type {string} */
@@ -1732,6 +1732,7 @@ class WaveFile {
     getBextBytes_() {
         /** @type {!Array<number>} */
         let bytes = [];
+        this.enforceBext_();
         if (this.bext.chunkId) {
             bytes = bytes.concat(
                 byteData_.pack(this.bext.chunkId, byteData_.types.fourCC),
@@ -1755,6 +1756,24 @@ class WaveFile {
                     this.bext.codingHistory, this.bext.codingHistory.length));
         }
         return bytes;
+    }
+
+    /**
+     * Make sure a "bext" chunk is created if BWF data was created in a file.
+     * @private
+     */
+    enforceBext_() {
+        for (var prop in this.bext) {
+            if (this.bext.hasOwnProperty(prop)) {
+                if (this.bext[prop] && prop != "timeReference") {
+                    this.bext.chunkId = "bext";
+                    break;
+                }
+            }
+        }
+        if (this.bext.timeReference[0] || this.bext.timeReference[1]) {
+            this.bext.chunkId = "bext";
+        }
     }
 
     /**

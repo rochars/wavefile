@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 6.2.0 (unreleased)
+- feature: Add BWF data to files.
+
 ## version 6.12.7 (2018-06-12)
 - update: byte-data to version 9 and riff-chunks to version 5.
 
