@@ -16,7 +16,6 @@ Items in this list should not require a major version update.
 - Handle ID3 tags
 - Handle RF64 (fully)
 - Handle Wave64
-- Easier way to edit BWF data
 
 ## Planned changes
 Items in this list may require a major version update.

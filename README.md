@@ -15,7 +15,7 @@ With **wavefile** you can:
 - Set and delete cue points and their labels
 - Encode/decode files as ADPCM, A-Law and μ-Law
 - Turn RIFF files to RIFX and RIFX files to RIFF
-- Edit BWF metada ("bext" chunk)
+- Create or edit BWF metada ("bext" chunk)
 - Change the bit depth of the audio
 
 And more.
@@ -247,6 +247,21 @@ wav.toBitDepth("24");
 fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 ```
 
+### Add BWF metadata
+To add BWF data to a file you can use the **bext** property:
+```javascript
+// Load a wav file with no "bext"
+let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
+
+// Add some BWF metadata
+wav.bext.originator = "wavefile";
+
+// Write the new BWF file
+fs.writeFileSync("32bit-file-with-bext.wav", wav.toBuffer());
+```
+
+By default **wavefile** will not insert a "bext" chunk in new files or in files that do not already have a "bext" chunk unless a property of **WaveFile.bext** is changed from it's default value. See below the full list of properties in **WaveFile.bext**.
+
 ## Main methods
 
 ### WaveFile.fromBuffer()
@@ -390,7 +405,7 @@ WaveFile.bext = {
     "originatorReference": "",
     "originationDate": "",
     "originationTime": "",
-    "timeReference": [],
+    "timeReference": [0, 0],
     "version": 0,
     "UMID": "",
     "loudnessValue": 0,

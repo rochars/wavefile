@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 6.2.0 (unreleased)
+## version 6.13.0 (2018-06-13)
 - feature: Add BWF data to files.
 
 ## version 6.12.7 (2018-06-12)
