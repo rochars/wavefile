@@ -14,12 +14,14 @@
  * 
  */
 
-let WaveFile = require('../index.js');
+let WaveFile;
 
 if (process.argv[3] == '--dist') {
     require('browser-env')();
     require('../dist/wavefile.min.js');
     WaveFile = window.WaveFile;
+} else {
+	WaveFile = require('../index.js');
 }
 
 module.exports = WaveFile;

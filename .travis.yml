@@ -8,6 +8,6 @@ node_js:
   - "9"
   - "10"
 script:
-  - npm run build-ci
+  - npm run build
 after_success:
   - npm run coverage

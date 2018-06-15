@@ -7,7 +7,9 @@ const ClosureCompiler = require('google-closure-compiler-js').webpack;
 module.exports = {
   entry: './index.js',
   output: {
-    filename: './dist/wavefile.min.js'
+    filename: './dist/wavefile.min.js',
+    library: "WaveFile",
+    libraryTarget: "window",
   },
   resolve: {
     mainFields: ["main"],
@@ -24,15 +26,4 @@ module.exports = {
       }
     })
   ],
-  module: {
-    rules: [
-      {
-        loader: 'string-replace-loader',
-        options: {
-          search: 'module.exports = WaveFile;',
-          replace: 'window["WaveFile"] = WaveFile;',
-        }
-      }
-    ]
-  }
 };
