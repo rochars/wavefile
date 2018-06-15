@@ -18,7 +18,7 @@ let WaveFile = require('../index.js');
 
 if (process.argv[3] == '--dist') {
     require('browser-env')();
-    require('../dist/wavefile-min.js');
+    require('../dist/wavefile.min.js');
     WaveFile = window.WaveFile;
 }
 

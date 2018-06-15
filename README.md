@@ -28,7 +28,7 @@ npm install wavefile
 ## Browser
 Use the compiled file in the */dist* folder:
 ```html
-<script src="wavefile-min.js"></script>
+<script src="wavefile.min.js"></script>
 ```
 
 ## See it in action

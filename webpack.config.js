@@ -7,7 +7,7 @@ const ClosureCompiler = require('google-closure-compiler-js').webpack;
 module.exports = {
   entry: './index.js',
   output: {
-    filename: './dist/wavefile-min.js'
+    filename: './dist/wavefile.min.js'
   },
   resolve: {
     mainFields: ["main"],
