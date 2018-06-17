@@ -11,9 +11,6 @@ module.exports = {
     library: "WaveFile",
     libraryTarget: "window",
   },
-  resolve: {
-    mainFields: ["main"],
-  },
   plugins: [
     new ClosureCompiler({
       options: {

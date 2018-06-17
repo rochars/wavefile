@@ -5,10 +5,10 @@
  */
 
 /**
- * @type {!Object}
+ * @type {!Function}
  * @private
  */
-const bitDepth_ = require("bitdepth");
+const bitdepthlib_ = require("bitdepth");
 /**
  * @type {!Object}
  * @private
@@ -510,7 +510,7 @@ class WaveFile {
         this.assureInterleaved_();
         this.assureUncompressed_();
         this.truncateSamples();
-        bitDepth_.toBitDepth(this.data.samples, thisBitDepth, toBitDepth);
+        bitdepthlib_(this.data.samples, thisBitDepth, toBitDepth);
         this.fromScratch(
             this.fmt.numChannels,
             this.fmt.sampleRate,

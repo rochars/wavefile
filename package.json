@@ -74,12 +74,12 @@
     "webpack": "^3.8.1"
   },
   "dependencies": {
-    "alawmulaw": "^2.0.5",
-    "base64-arraybuffer": "^0.1.5",
-    "bitdepth": "^3.1.2",
-    "byte-data": "^9.0.2",
-    "imaadpcm": "^1.1.5",
-    "riff-chunks": "^5.0.0"
+    "alawmulaw": "3.0.0",
+    "base64-arraybuffer": "0.1.5",
+    "bitdepth": "4.0.0",
+    "byte-data": "10.0.0",
+    "imaadpcm": "2.0.0",
+    "riff-chunks": "6.0.0"
   },
   "main": "index.js"
 }
