@@ -1,13 +1,14 @@
 {
   "name": "wavefile",
-  "version": "7.0.0-alpha.2",
+  "version": "7.0.0-alpha.6",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "main": "index.js",
-  "unpkg": "./dist/wavefile.js",
-  "jsdelivr": "./dist/wavefile.js",
+  "module": "./dist/wavefile.js",
+  "unpkg": "./dist/wavefile.min.js",
+  "jsdelivr": "./dist/wavefile.min.js",
   "keywords": [
     "wav",
     "RIFF",
@@ -50,26 +51,14 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
-    "test-list": "nyc ./node_modules/mocha/bin/_mocha test/list --src --recursive",
-    "test-afsp": "nyc ./node_modules/mocha/bin/_mocha test/list/afsp.js --src --recursive",
-    "test-adtl": "nyc ./node_modules/mocha/bin/_mocha test/list/read-list-adtl.js --src --recursive",
-    "test-info": "nyc ./node_modules/mocha/bin/_mocha test/list/read-list-info.js --src --recursive",
-    "test-cue": "nyc ./node_modules/mocha/bin/_mocha test/cue --src --recursive",
-    "test-overflow": "nyc ./node_modules/mocha/bin/_mocha test/overflow.js --src --recursive",
     "test": "nyc ./node_modules/mocha/bin/_mocha test --src --recursive",
     "test-dist": "nyc ./node_modules/mocha/bin/_mocha test --dist --recursive",
-    "test-dist-min": "nyc ./node_modules/mocha/bin/_mocha test --dist-min --recursive",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
-    "pack": "webpack && npm run test-dist && npm run test-dist-min",
-    "pack-min": "webpack && npm run test-dist-min",
+    "pack": "webpack && uglifyjs dist/wavefile.js -m -o dist/wavefile.min.js && npm run test-dist",
     "build": "npm run lint && npm test && npm run pack && npm run doc"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.51",
-    "@babel/preset-env": "^7.0.0-beta.51",
-    "babel-loader": "^8.0.0-beta.3",
-    "browser-env": "^3.2.5",
     "chai": "^4.1.2",
     "codecov": "^3.0.0",
     "docdash": "^0.4.0",
@@ -79,6 +68,7 @@
     "mocha": "^3.5.3",
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^3.2.2",
+    "uglify-js": "^3.4.0",
     "webpack": "^3.12.0"
   },
   "dependencies": {

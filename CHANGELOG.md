@@ -1,7 +1,11 @@
 # CHANGELOG
 
 ## version 7.0.0 (unreleased)
-- New dist files: ./dist/wavefile.js and ./dist/wavefile.min.js
+- New distribution:
+	- "main": "index.js", ES6 source
+	- "module": "./dist/wavefile.js", ES5 UMD
+	- "unpkg": "./dist/wavefile.min.js", ES5 UMD minified
+	- "jsdelivr": "./dist/wavefile.min.js", ES5 UMD minified
 
 ## version 6.13.0 (2018-06-13)
 - feature: Add BWF data to files.
