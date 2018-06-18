@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 7.0.0 (unreleased)
+- New dist files: ./dist/wavefile.js and ./dist/wavefile.min.js
+
 ## version 6.13.0 (2018-06-13)
 - feature: Add BWF data to files.
 

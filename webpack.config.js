@@ -4,23 +4,35 @@
  *
  */
 const ClosureCompiler = require('google-closure-compiler-js').webpack;
-module.exports = {
-  entry: './index.js',
-  output: {
-    filename: './dist/wavefile.min.js',
-    library: "WaveFile",
-    libraryTarget: "window",
+module.exports = [
+  // uncompiled dist
+  {
+    entry: './index.js',
+    output: {
+      filename: './dist/wavefile.js',
+      library: "WaveFile",
+      libraryTarget: "window",
+    }
   },
-  plugins: [
-    new ClosureCompiler({
-      options: {
-        languageIn: 'ECMASCRIPT6',
-        languageOut: 'ECMASCRIPT5',
-        compilationLevel: 'ADVANCED',
-        warningLevel: "VERBOSE",
-        exportLocalPropertyDefinitions: true,
-        generateExports: true
-      }
-    })
-  ],
-};
+  // compiled dist
+  {
+    entry: './index.js',
+    output: {
+      filename: './dist/wavefile.min.js',
+      library: "WaveFile",
+      libraryTarget: "window",
+    },
+    plugins: [
+      new ClosureCompiler({
+        options: {
+          languageIn: 'ECMASCRIPT6',
+          languageOut: 'ECMASCRIPT5',
+          compilationLevel: 'ADVANCED',
+          warningLevel: "VERBOSE",
+          exportLocalPropertyDefinitions: true,
+          generateExports: true
+        }
+      })
+    ],
+  }
+];
