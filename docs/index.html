@@ -62,7 +62,8 @@
 </ul>
 <p>And more.</p>
 <h2>Install</h2><pre class="prettyprint source"><code>npm install wavefile</code></pre><h2>Browser</h2><p>Use the compiled file in the <em>/dist</em> folder:</p>
-<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;wavefile.min.js&quot;>&lt;/script></code></pre><h2>See it in action</h2><p>With <strong>wavefile</strong> you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses <strong>wavefile</strong> and <strong>wavesurfer</strong> to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by <strong>wavefile</strong>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;wavefile.min.js&quot;>&lt;/script></code></pre><p>Or get it from the <a href="https://www.jsdelivr.com">jsDelivr</a> CDN:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile@7/dist/wavefile.min.js&quot;>&lt;/script></code></pre><h2>See it in action</h2><p>With <strong>wavefile</strong> you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses <strong>wavefile</strong> and <strong>wavesurfer</strong> to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by <strong>wavefile</strong>:</p>
 <p>https://rochars.github.io/wavefile/example</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file that is encoded as 4-bit IMA ADPCM:
 var wav = new WaveFile(ADPCMFileBuffer);
@@ -161,97 +162,414 @@ wav.bext.originator = &quot;wavefile&quot;;
 
 // Write the new BWF file
 fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());</code></pre><p>By default <strong>wavefile</strong> will not insert a &quot;bext&quot; chunk in new files or in files that do not already have a &quot;bext&quot; chunk unless a property of <strong>WaveFile.bext</strong> is changed from it's default value. See below the full list of properties in <strong>WaveFile.bext</strong>.</p>
-<h2>Main methods</h2><h3>WaveFile.fromBuffer()</h3><p>Load a .wav file from a byte buffer into a WaveFile object:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.fromBuffer(buffer);</code></pre><p>This is the same as passing the buffer when creating the WaveFile object:</p>
-<pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile(buffer);</code></pre><h3>WaveFile.fromScratch()</h3><p>Create a wave file from scratch:</p>
-<pre class="prettyprint source lang-javascript"><code>// A mono, 44.1 kHz, 32-bit .wav file with just 4 samples:
-wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);</code></pre><h3>WaveFile.toBuffer()</h3><p>Return a Uint8Array with the WaveFile object data. The buffer is a .wav file and can be written to disk:</p>
-<pre class="prettyprint source lang-javascript"><code>buffer = wav.toBuffer();</code></pre><h3>WaveFile.toDataURI()</h3><p>Return a DataURI string with the WaveFile object data. The DataURI is a .wav file and can be played in browsers:</p>
-<pre class="prettyprint source lang-javascript"><code>wavDataURI = wav.toDataURI();</code></pre><h3>WaveFile.setCuePoint()</h3><p>Set a cue point with a text label in the file. The point position is informed in milliseconds:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.setCuePoint(1750, &quot;some label&quot;);</code></pre><h3>WaveFile.deleteCuePoint()</h3><p>Delete a cue point. The cue point is identified by its order on the file (first point is 1):</p>
-<pre class="prettyprint source lang-javascript"><code>// remove the first cue point and its label
-wav.deleteCuePoint(1);</code></pre><h3>WaveFile.updateLabel()</h3><p>Update the label text of a cue point. The cue point is identified by its order on the file (first point is 1):</p>
-<pre class="prettyprint source lang-javascript"><code>// Update the label of the second cue point
-wav.updateLabel(2, &quot;updated label&quot;);</code></pre><h3>WaveFile.setTag()</h3><p>Create (or overwrite) a RIFF tag in the file:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.setTag(&quot;ICMT&quot;, &quot;some comments&quot;);</code></pre><h3>WaveFile.getTag()</h3><p>Return the value of a existing RIFF tag:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.getTag(&quot;ICMT&quot;);</code></pre><h3>WaveFile.deleteTag()</h3><p>Remove a tag from the file:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.deleteTag(&quot;ICMT&quot;);</code></pre><h2>The properties</h2><p>The WaveFile properties:</p>
-<pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile(fs.readFileSync(&quot;file.wav&quot;));
+<h2>RF64</h2><p><strong>wavefile</strong> have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
+<h2>API</h2><p>To create a WaveFile object:</p>
+<pre class="prettyprint source lang-javascript"><code>/**
+ * @param {?Uint8Array} bytes A wave file buffer.
+ * @throws {Error} If no &quot;RIFF&quot; chunk is found.
+ * @throws {Error} If no &quot;fmt &quot; chunk is found.
+ * @throws {Error} If no &quot;data&quot; chunk is found.
+ */
+WaveFile(bytes=null);</code></pre><h3>The WaveFile methods:</h3><pre class="prettyprint source"><code>/**
+ * Set up the WaveFile object based on the arguments passed.
+ * @param {number} numChannels The number of channels
+ *      (Integer numbers: 1 for mono, 2 stereo and so on).
+ * @param {number} sampleRate The sample rate.
+ *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
+ * @param {string} bitDepth The audio bit depth code.
+ *      One of &quot;4&quot;, &quot;8&quot;, &quot;8a&quot;, &quot;8m&quot;, &quot;16&quot;, &quot;24&quot;, &quot;32&quot;, &quot;32f&quot;, &quot;64&quot;
+ *      or any value between &quot;8&quot; and &quot;32&quot; (like &quot;12&quot;).
+ * @param {!Array&lt;number>} samples Array of samples to be written.
+ *      The samples must be in the correct range according to the
+ *      bit depth.
+ * @param {?Object} options Optional. Used to force the container
+ *      as RIFX with {&quot;container&quot;: &quot;RIFX&quot;}
+ * @throws {Error} If any argument does not meet the criteria.
+ */
+WaveFile.fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {}
 
-// The container data
-console.log(wav.container); //&quot;RIFF&quot; or &quot;RIFX&quot;
-console.log(wav.chunkSize);
-console.log(wav.format); // WAVE
+/**
+ * Set up the WaveFile object from a byte buffer.
+ * @param {!Uint8Array} bytes The buffer.
+ * @throws {Error} If container is not RIFF, RIFX or RF64.
+ * @throws {Error} If no &quot;fmt &quot; chunk is found.
+ * @throws {Error} If no &quot;data&quot; chunk is found.
+ */
+WaveFile.fromBuffer(bytes) {}
 
-// &quot;bext&quot; chunk
-console.log(wav.bext);
+/**
+ * Return a byte buffer representig the WaveFile object as a .wav file.
+ * The return value of this method can be written straight to disk.
+ * @return {!Uint8Array} A .wav file.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.toBuffer() {}
 
-// &quot;fmt &quot; chunk
-console.log(wav.fmt.chunkId);
-console.log(wav.fmt.chunkSize);
-console.log(wav.fmt.audioFormat);
-console.log(wav.fmt.numChannels);
-console.log(wav.fmt.sampleRate);
-console.log(wav.fmt.byteRate);
-console.log(wav.fmt.blockAlign);
-console.log(wav.fmt.bitsPerSample);
-// &quot;fmt &quot; extension
-console.log(wav.fmt.cbSize);
-console.log(wav.fmt.validBitsPerSample);
-console.log(wav.fmt.dwChannelMask);
-console.log(wav.fmt.subformat);
+/**
+ * Use a .wav file encoded as a base64 string to load the WaveFile object.
+ * @param {string} base64String A .wav file as a base64 string.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.fromBase64(base64String) {}
 
-// &quot;fact&quot; chunk
-console.log(wav.fact.chunkId);
-console.log(wav.fact.chunkSize);
-console.log(wav.fact.dwSampleLength);
+/**
+ * Return a base64 string representig the WaveFile object as a .wav file.
+ * @return {string} A .wav file as a base64 string.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.toBase64() {}
 
-// &quot;data&quot; chunk
-console.log(wav.data.chunkId);
-console.log(wav.data.chunkSize);
-console.log(wav.data.samples);
+/**
+ * Return a DataURI string representig the WaveFile object as a .wav file.
+ * The return of this method can be used to load the audio in browsers.
+ * @return {string} A .wav file as a DataURI.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.toDataURI() {}
 
-// &quot;cue &quot; chunk
-console.log(wav.cue.chunkId);
-console.log(wav.cue.chunkSize);
-console.log(wav.cue.dwCuePoints);
-console.log(wav.cue.points);
+/**
+ * Use a .wav file encoded as a DataURI to load the WaveFile object.
+ * @param {string} dataURI A .wav file as DataURI.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.fromDataURI(dataURI) {}
 
-// &quot;smpl&quot; chunk
-console.log(wav.smpl.chunkId);
-console.log(wav.smpl.chunkSize);
-console.log(wav.smpl.dwManufacturer);
-console.log(wav.smpl.dwProduct);
-console.log(wav.smpl.dwSamplePeriod);
-console.log(wav.smpl.dwMIDIUnityNote);
-console.log(wav.smpl.dwMIDIPitchFraction);
-console.log(wav.smpl.dwSMPTEFormat);
-console.log(wav.smpl.dwSMPTEOffset);
-console.log(wav.smpl.dwNumSampleLoops);
-console.log(wav.smpl.dwSamplerData);
-console.log(wav.smpl.loops);
+/**
+ * Force a file as RIFF.
+ */
+WaveFile.toRIFF() {}
 
-// &quot;LIST&quot; chunk
-console.log(wav.LIST);</code></pre><h3>BWF data</h3><p>BWF data (&quot;bext&quot; chunk) is stored in the <em>bext</em> property.</p>
-<pre class="prettyprint source lang-javascript"><code>WaveFile.bext = {
+/**
+ * Force a file as RIFX.
+ */
+WaveFile.toRIFX() {}
+
+/**
+ * Change the bit depth of the samples.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of &quot;8&quot; ... &quot;32&quot; (integers), &quot;32f&quot; or &quot;64&quot; (floats)
+ * @param {boolean} changeResolution A boolean indicating if the
+ *      resolution of samples should be actually changed or not.
+ * @throws {Error} If the bit depth is not valid.
+ */
+WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
+
+/**
+ * Interleave multi-channel samples.
+ */
+WaveFile.interleave() {}
+
+/**
+ * De-interleave samples into multiple channels.
+ */
+WaveFile.deInterleave() {}
+
+/**
+ * Encode a 16-bit wave file as 4-bit IMA ADPCM.
+ * @throws {Error} If sample rate is not 8000.
+ * @throws {Error} If number of channels is not 1.
+ */
+WaveFile.toIMAADPCM() {}
+
+/**
+ * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of &quot;8&quot; ... &quot;32&quot; (integers), &quot;32f&quot; or &quot;64&quot; (floats).
+ *      Optional. Default is 16.
+ */
+WaveFile.fromIMAADPCM(bitDepth=&quot;16&quot;) {}
+
+/**
+ * Encode 16-bit wave file as 8-bit A-Law.
+ */
+WaveFile.toALaw() {}
+
+/**
+ * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of &quot;8&quot; ... &quot;32&quot; (integers), &quot;32f&quot; or &quot;64&quot; (floats).
+ *      Optional. Default is 16.
+ */
+WaveFile.fromALaw(bitDepth=&quot;16&quot;) {}
+
+/**
+ * Encode 16-bit wave file as 8-bit mu-Law.
+ */
+WaveFile.toMuLaw() {}
+
+/**
+ * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of &quot;8&quot; ... &quot;32&quot; (integers), &quot;32f&quot; or &quot;64&quot; (floats).
+ *      Optional. Default is 16.
+ */
+WaveFile.fromMuLaw(bitDepth=&quot;16&quot;) {}
+
+/**
+ * Write a RIFF tag in the INFO chunk. If the tag do not exist,
+ * then it is created. It if exists, it is overwritten.
+ * @param {string} tag The tag name.
+ * @param {string} value The tag value.
+ * @throws {Error} If the tag name is not valid.
+ */
+WaveFile.setTag(tag, value) {}
+
+/**
+ * Return the value of a RIFF tag in the INFO chunk.
+ * @param {string} tag The tag name.
+ * @return {?string} The value if the tag is found, null otherwise.
+ */
+WaveFile.getTag(tag) {}
+
+/**
+ * Remove a RIFF tag in the INFO chunk.
+ * @param {string} tag The tag name.
+ * @return {boolean} True if a tag was deleted.
+ */
+WaveFile.deleteTag(tag) {}
+
+/**
+ * Create a cue point in the wave file.
+ * @param {number} position The cue point position in milliseconds.
+ * @param {string} labl The LIST adtl labl text of the marker. Optional.
+ */
+WaveFile.setCuePoint(position, labl=&quot;&quot;) {}
+
+/**
+ * Remove a cue point from a wave file.
+ * @param {number} index the index of the point. First is 1,
+ *      second is 2, and so on.
+ */
+WaveFile.deleteCuePoint(index) {}
+
+/**
+ * Update the label of a cue point.
+ * @param {number} pointIndex The ID of the cue point.
+ * @param {string} label The new text for the label.
+ */
+WaveFile.updateLabel(pointIndex, label) {}</code></pre><h3>The WaveFile properties</h3><pre class="prettyprint source lang-javascript"><code>/**
+ * The container identifier.
+ * &quot;RIFF&quot;, &quot;RIFX&quot; and &quot;RF64&quot; are supported.
+ * @type {string}
+ */
+WaveFile.container = &quot;&quot;;
+/**
+ * @type {number}
+ */
+WaveFile.chunkSize = 0;
+/**
+ * The format.
+ * Always &quot;WAVE&quot;.
+ * @type {string}
+ */
+WaveFile.format = &quot;&quot;;
+/**
+ * The data of the &quot;fmt&quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.fmt = {
+    /** @export @type {string} */
     &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
     &quot;chunkSize&quot;: 0,
-    &quot;description&quot;: &quot;&quot;,
-    &quot;originator&quot;: &quot;&quot;,
-    &quot;originatorReference&quot;: &quot;&quot;,
-    &quot;originationDate&quot;: &quot;&quot;,
-    &quot;originationTime&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;audioFormat&quot;: 0,
+    /** @export @type {number} */
+    &quot;numChannels&quot;: 0,
+    /** @export @type {number} */
+    &quot;sampleRate&quot;: 0,
+    /** @export @type {number} */
+    &quot;byteRate&quot;: 0,
+    /** @export @type {number} */
+    &quot;blockAlign&quot;: 0,
+    /** @export @type {number} */
+    &quot;bitsPerSample&quot;: 0,
+    /** @export @type {number} */
+    &quot;cbSize&quot;: 0,
+    /** @export @type {number} */
+    &quot;validBitsPerSample&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwChannelMask&quot;: 0,
+    /**
+     * 4 32-bit values representing a 128-bit ID
+     * @export @type {!Array&lt;number>}
+     */
+    &quot;subformat&quot;: []
+};
+/**
+ * The data of the &quot;fact&quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.fact = {
+    /** @export @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwSampleLength&quot;: 0
+};
+/**
+ * The data of the &quot;cue &quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.cue = {
+    /** @export @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwCuePoints&quot;: 0,
+    /** @export @type {!Array&lt;!Object>} */
+    &quot;points&quot;: [],
+};
+/**
+ * The data of the &quot;smpl&quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.smpl = {
+    /** @export @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwManufacturer&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwProduct&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwSamplePeriod&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwMIDIUnityNote&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwMIDIPitchFraction&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwSMPTEFormat&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwSMPTEOffset&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwNumSampleLoops&quot;: 0,
+    /** @export @type {number} */
+    &quot;dwSamplerData&quot;: 0,
+    /** @export @type {!Array&lt;!Object>} */
+    &quot;loops&quot;: [],
+};
+/**
+ * The data of the &quot;bext&quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.bext = {
+    /** @export @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {string} */
+    &quot;description&quot;: &quot;&quot;, //256
+    /** @export @type {string} */
+    &quot;originator&quot;: &quot;&quot;, //32
+    /** @export @type {string} */
+    &quot;originatorReference&quot;: &quot;&quot;, //32
+    /** @export @type {string} */
+    &quot;originationDate&quot;: &quot;&quot;, //10
+    /** @export @type {string} */
+    &quot;originationTime&quot;: &quot;&quot;, //8
+    /**
+     * 2 32-bit values, timeReference high and low
+     * @export @type {!Array&lt;number>}
+     */
     &quot;timeReference&quot;: [0, 0],
-    &quot;version&quot;: 0,
-    &quot;UMID&quot;: &quot;&quot;,
-    &quot;loudnessValue&quot;: 0,
-    &quot;loudnessRange&quot;: 0,
-    &quot;maxTruePeakLevel&quot;: 0,
-    &quot;maxMomentaryLoudness&quot;: 0,
-    &quot;maxShortTermLoudness&quot;: 0,
-    &quot;reserved&quot;: &quot;&quot;,
-    &quot;codingHistory&quot;: &quot;&quot;
-};</code></pre><h3>Cue points</h3><p>Items in <em>cue.points</em> are objects that look like this:</p>
+    /** @export @type {number} */
+    &quot;version&quot;: 0, //WORD
+    /** @export @type {string} */
+    &quot;UMID&quot;: &quot;&quot;, // 64 chars
+    /** @export @type {number} */
+    &quot;loudnessValue&quot;: 0, //WORD
+    /** @export @type {number} */
+    &quot;loudnessRange&quot;: 0, //WORD
+    /** @export @type {number} */
+    &quot;maxTruePeakLevel&quot;: 0, //WORD
+    /** @export @type {number} */
+    &quot;maxMomentaryLoudness&quot;: 0, //WORD
+    /** @export @type {number} */
+    &quot;maxShortTermLoudness&quot;: 0, //WORD
+    /** @export @type {string} */
+    &quot;reserved&quot;: &quot;&quot;, //180
+    /** @export @type {string} */
+    &quot;codingHistory&quot;: &quot;&quot; // string, unlimited
+};
+/**
+ * The data of the &quot;ds64&quot; chunk.
+ * Used only with RF64 files.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.ds64 = {
+    /** @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {number} */
+    &quot;riffSizeHigh&quot;: 0, // DWORD
+    /** @export @type {number} */
+    &quot;riffSizeLow&quot;: 0, // DWORD
+    /** @export @type {number} */
+    &quot;dataSizeHigh&quot;: 0, // DWORD
+    /** @export @type {number} */
+    &quot;dataSizeLow&quot;: 0, // DWORD
+    /** @export @type {number} */
+    &quot;originationTime&quot;: 0, // DWORD
+    /** @export @type {number} */
+    &quot;sampleCountHigh&quot;: 0, // DWORD
+    /** @export @type {number} */
+    &quot;sampleCountLow&quot;: 0, // DWORD
+    /** @export @type {number} */
+    //&quot;tableLength&quot;: 0, // DWORD
+    /** @export @type {!Array&lt;number>} */
+    //&quot;table&quot;: []
+};
+/**
+ * The data of the &quot;data&quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.data = {
+    /** @export @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {!Array&lt;number>} */
+    &quot;samples&quot;: []
+};
+/**
+ * The data of the &quot;LIST&quot; chunks.
+ * Each item in this list must have this signature:
+ *  {
+ *      &quot;chunkId&quot;: &quot;&quot;,
+ *      &quot;chunkSize&quot;: 0,
+ *      &quot;format&quot;: &quot;&quot;,
+ *      &quot;subChunks&quot;: []
+ *   }
+ * @type {!Array&lt;!Object>}
+ */
+WaveFile.LIST = [];
+/**
+ * The data of the &quot;junk&quot; chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.junk = {
+    /** @export @type {string} */
+    &quot;chunkId&quot;: &quot;&quot;,
+    /** @export @type {number} */
+    &quot;chunkSize&quot;: 0,
+    /** @export @type {!Array&lt;number>} */
+    &quot;chunkData&quot;: []
+};
+/**
+ * If the data in data.samples is interleaved or not.
+ * @type {boolean}
+ */
+WaveFile.isInterleaved = true;
+/**
+ * The bit depth code according to the samples.
+ * @type {string}
+ */
+WaveFile.bitDepth =  &quot;&quot;;</code></pre><h4>Cue points</h4><p>Items in <em>cue.points</em> are objects that look like this:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     &quot;dwName&quot;: 0, // a cue point ID
     &quot;dwPosition&quot;: 0,
@@ -259,7 +577,7 @@ console.log(wav.LIST);</code></pre><h3>BWF data</h3><p>BWF data (&quot;bext&quot
     &quot;dwChunkStart&quot;: 0,
     &quot;dwBlockStart&quot;: 0,
     &quot;dwSampleOffset&quot;: 0,
-}</code></pre><h3>Sample loops</h3><p>Items in <em>smpl.loops</em> are objects that look like this:</p>
+}</code></pre><h4>Sample loops</h4><p>Items in <em>smpl.loops</em> are objects that look like this:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     &quot;dwName&quot;: &quot;&quot;, // a cue point ID
     &quot;dwType&quot;: 0,
@@ -267,7 +585,7 @@ console.log(wav.LIST);</code></pre><h3>BWF data</h3><p>BWF data (&quot;bext&quot
     &quot;dwEnd&quot;: 0,
     &quot;dwFraction&quot;: 0,
     &quot;dwPlayCount&quot;: 0,
-}</code></pre><h3>LIST chunk</h3><p>&quot;LIST&quot; chunk data is stored as follows:</p>
+}</code></pre><h4>LIST chunk</h4><p>&quot;LIST&quot; chunk data is stored as follows:</p>
 <pre class="prettyprint source lang-javascript"><code>/**
  * An array of the &quot;LIST&quot; chunks present in the file.
  * @type {!Array&lt;!Object>}
@@ -292,19 +610,7 @@ WaveFile.LIST = [];</code></pre><p><em>WaveFile.LIST</em> is an array of objects
     /** @type {string} */
     &quot;value&quot;: &quot;&quot;
 }</code></pre><p>Where &quot;chunkId&quot; may be any RIFF tag:<br>https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
-<h3>ds64 chunk</h3><p><strong>wavefile</strong> have limited support of RF64 files. Changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
-<p>&quot;ds64&quot; data is stored as follows:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.ds64 = {
-    &quot;chunkId&quot;: &quot;&quot;,
-    &quot;chunkSize&quot;: 0,
-    &quot;riffSizeHigh&quot;: 0,
-    &quot;riffSizeLow&quot;: 0,
-    &quot;dataSizeHigh&quot;: 0,
-    &quot;dataSizeLow&quot;: 0,
-    &quot;originationTime&quot;: 0,
-    &quot;sampleCountHigh&quot;: 0,
-    &quot;sampleCountLow&quot;: 0
-};</code></pre><h2>The samples</h2><p>Range:</p>
+<h2>The samples</h2><p>Range:</p>
 <ul>
 <li>0 to 255 for 8-bit</li>
 <li>-32768 to 32767 for 16-bit</li>
@@ -316,7 +622,7 @@ WaveFile.LIST = [];</code></pre><p><em>WaveFile.LIST</em> is an array of objects
 <h2>Contributing to wavefile</h2><p><strong>wavefile</strong> welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.</p>
 <p>See <a href="https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for details.</p>
 <h3>Style guide</h3><p><strong>wavefile</strong> code should follow the Google JavaScript Style Guide:<br>https://google.github.io/styleguide/jsguide.html</p>
-<h3>Code of conduct</h3><p>This project adopt the <a href="https://www.contributor-covenant.org/version/1/4/code-of-conduct.html">Contributor Covenant, version 1.4</a>, available at https://<a href="http://www.contributor-covenant.org/version/1/4/code-of-conduct.html">www.contributor-covenant.org/version/1/4/code-of-conduct.html</a> as its code of conduct.</p>
+<h3>Code of conduct</h3><p>This project embraces the <a href="https://www.contributor-covenant.org/version/1/4/code-of-conduct.html">Contributor Covenant, version 1.4</a>, available at https://<a href="http://www.contributor-covenant.org/version/1/4/code-of-conduct.html">www.contributor-covenant.org/version/1/4/code-of-conduct.html</a> as its code of conduct.</p>
 <p>Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting <a href="mailto:rocha.rafaelsilva@gmail.com">rocha.rafaelsilva@gmail.com</a>.</p>
 <h2>References</h2><h3>Papers</h3><p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>https://<a href="http://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml">www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml</a><br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf<br>https://sites.google.com/site/musicgapi/technical-documents/wav-file-format<br>http://<a href="http://www.neurophys.wisc.edu/auditory/riff-format.txt">www.neurophys.wisc.edu/auditory/riff-format.txt</a><br>https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
 <h3>Software</h3><p>https://github.com/erikd/libsndfile<br>https://gist.github.com/hackNightly/3776503<br>https://github.com/chirlu/sox/blob/master/src/wav.c</p>
@@ -345,12 +651,106 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 
 
 
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        index.js
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+        
+            <div class="description">The WaveFile class.</div>
+        
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
 </div>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jun 18 2018 00:54:48 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jun 18 2018 02:15:14 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

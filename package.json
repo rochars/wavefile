@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "7.0.0-alpha.1",
+  "version": "7.0.0-alpha.2",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
@@ -12,14 +12,10 @@
     "RF64",
     "WAVE",
     "BWF",
-    "bext",
-    "LIST",
-    "INFO",
     "audio",
     "read",
     "write",
     "create",
-    "browser",
     "8-bit",
     "11-bit",
     "12-bit",
@@ -27,8 +23,6 @@
     "16-bit",
     "24-bit",
     "32-bit",
-    "40-bit",
-    "48-bit",
     "64-bit",
     "PCM",
     "ADPCM",
@@ -39,11 +33,17 @@
     "mu-Law",
     "cue",
     "smpl",
-    "ltxt"
+    "ltxt",
+    "bext",
+    "LIST",
+    "INFO"
   ],
   "repository": {
     "type": "git",
     "url": "git://github.com/rochars/wavefile.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rochars/wavefile/issues"
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",

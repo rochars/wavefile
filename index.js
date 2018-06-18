@@ -1,7 +1,32 @@
 /*
- * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ * wavefile: Read and write wav files.
  * https://github.com/rochars/wavefile
  *
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The WaveFile class.
  */
 
 /**
@@ -54,7 +79,6 @@ class WaveFile {
      * @param {?Uint8Array} bytes A wave file buffer.
      * @throws {Error} If no "RIFF" chunk is found.
      * @throws {Error} If no "fmt " chunk is found.
-     * @throws {Error} If no "fact" chunk is found and "fact" is needed.
      * @throws {Error} If no "data" chunk is found.
      */
     constructor(bytes=null) {
@@ -290,6 +314,7 @@ class WaveFile {
          */
         this.isInterleaved = true;
         /**
+         * The bit depth code according to the samples.
          * @type {string}
          * @export
          */
@@ -325,14 +350,14 @@ class WaveFile {
     }
 
     /**
-     * Set up a WaveFile object based on the arguments passed.
+     * Set up the WaveFile object based on the arguments passed.
      * @param {number} numChannels The number of channels
      *      (Integer numbers: 1 for mono, 2 stereo and so on).
      * @param {number} sampleRate The sample rate.
      *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
-     * @param {string} bitDepth The audio bit depth.
+     * @param {string} bitDepth The audio bit depth code.
      *      One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
-     *      or any value between "8" and "32".
+     *      or any value between "8" and "32" (like "12").
      * @param {!Array<number>} samples Array of samples to be written.
      *      The samples must be in the correct range according to the
      *      bit depth.
@@ -377,11 +402,10 @@ class WaveFile {
     }
 
     /**
-     * Init a WaveFile object from a byte buffer.
+     * Set up the WaveFile object from a byte buffer.
      * @param {!Uint8Array} bytes The buffer.
-     * @throws {Error} If container is not RIFF or RIFX.
+     * @throws {Error} If container is not RIFF, RIFX or RF64.
      * @throws {Error} If no "fmt " chunk is found.
-     * @throws {Error} If no "fact" chunk is found and "fact" is needed.
      * @throws {Error} If no "data" chunk is found.
      * @export
      */
@@ -1351,7 +1375,6 @@ class WaveFile {
     /**
      * Read the "fact" chunk of a wav file.
      * @param {!Array<!Object>} chunks The wav file chunks.
-     * @throws {Error} If no "fact" chunk is found.
      * @private
      */
     readFactChunk_(chunks) {
