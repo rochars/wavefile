@@ -16,10 +16,16 @@
 
 let WaveFile;
 
+// test the UMD
 if (process.argv[3] == '--dist') {
-    require('browser-env')();
-    require('../dist/wavefile.min.js');
+    WaveFile = require('../dist/wavefile.js');
+// test the browser dist
+} else if (process.argv[3] == '--dist-min') {
+	require("browser-env")();
+	require('../dist/wavefile.min.js');
     WaveFile = window.WaveFile;
+    //WaveFile = require('../dist/wavefile.min.js');
+// test the source
 } else {
 	WaveFile = require('../index.js');
 }

@@ -5,16 +5,29 @@
  */
 const ClosureCompiler = require('google-closure-compiler-js').webpack;
 module.exports = [
-  // uncompiled dist
+  // UMD
   {
     entry: './index.js',
     output: {
       filename: './dist/wavefile.js',
       library: "WaveFile",
-      libraryTarget: "window",
+      libraryTarget: "umd",
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }
+        }
+      ]
     }
   },
-  // compiled dist
+  // compiled
   {
     entry: './index.js',
     output: {
@@ -30,7 +43,8 @@ module.exports = [
           compilationLevel: 'ADVANCED',
           warningLevel: "VERBOSE",
           exportLocalPropertyDefinitions: true,
-          generateExports: true
+          generateExports: true,
+          /*processCommonJsModules: true*/
         }
       })
     ],
