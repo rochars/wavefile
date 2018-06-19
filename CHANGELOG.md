@@ -1,11 +1,9 @@
 # CHANGELOG
 
 ## version 7.0.0 (unreleased)
-- New distribution:
-	- "main": "index.js", ES6 source
-	- "module": "./dist/wavefile.js", ES5 UMD
-	- "unpkg": "./dist/wavefile.min.js", ES5 UMD minified
-	- "jsdelivr": "./dist/wavefile.min.js", ES5 UMD minified
+- Update package:
+	- "main": "./dist/wavefile.umd.js", UMD
+	- "browser": "./dist/wavefile.min.js", ES5 browser dist
 
 ## version 6.13.0 (2018-06-13)
 - feature: Add BWF data to files.

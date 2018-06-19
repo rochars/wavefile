@@ -13,3 +13,5 @@ There **must** be no errors or warnings during the build.
 The compiled browser version is generated in the *dist/* folder.
 
 The API documentation is generated in the *docs/* folder.
+
+Mind that wavefile uses Google Closure Compiler with compilation level set to ADVANCED, so properties that have not been exported will be renamed (and likely result in errors in the compiled browser version).

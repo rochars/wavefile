@@ -1,20 +1,28 @@
+/*
+ * https://github.com/rochars/wavefile
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ */
+
 /**
- * WaveFile: https://github.com/rochars/wavefile
- * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
- *
- * To test the sources:
- * npm test
- *
- * To the test the minified version:
- * npm run test-dist
+ * @fileoverview Load WaveFile according to the context of the tests.
+ * To test the sources: npm test
+ * To the test the browser dist: npm run test-browser
+ * To the test the UMD: npm run test-umd
  */
 
 let WaveFile;
 
-// test the dist
-if (process.argv[3] == '--dist') {
-    WaveFile = require('../dist/wavefile.min.js');
-// test the source
+// Browser dist
+if (process.argv[3] == '--browser') {
+	require('browser-env')();
+	require('../dist/wavefile.min.js');
+	WaveFile = window.WaveFile;
+
+// UMD dist
+} else if (process.argv[3] == '--umd') {
+    WaveFile = require('../dist/wavefile.umd.js');
+	
+// Source
 } else {
 	WaveFile = require('../index.js');
 }
