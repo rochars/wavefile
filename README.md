@@ -36,6 +36,11 @@ Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
 <script src="https://cdn.jsdelivr.net/npm/wavefile@7"></script>
 ```
 
+Or get it from [unpkg](https://www.unpkg.com):
+```html
+<script src="https://unpkg.com/wavefile@7"></script>
+```
+
 ## See it in action
 
 With **wavefile** you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by **wavefile**:

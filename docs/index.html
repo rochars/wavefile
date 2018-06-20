@@ -63,10 +63,11 @@
 <p>And more.</p>
 <h2>Install</h2><pre class="prettyprint source"><code>npm install wavefile</code></pre><h2>Browser</h2><p>Use the compiled file in the <em>/dist</em> folder:</p>
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;wavefile.min.js&quot;>&lt;/script></code></pre><p>Or get it from the <a href="https://www.jsdelivr.com">jsDelivr</a> CDN:</p>
-<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile@7&quot;>&lt;/script></code></pre><h2>See it in action</h2><p>With <strong>wavefile</strong> you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses <strong>wavefile</strong> and <strong>wavesurfer</strong> to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by <strong>wavefile</strong>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile@7&quot;>&lt;/script></code></pre><p>Or get it from <a href="https://www.unpkg.com">unpkg</a>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/wavefile@7&quot;>&lt;/script></code></pre><h2>See it in action</h2><p>With <strong>wavefile</strong> you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses <strong>wavefile</strong> and <strong>wavesurfer</strong> to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by <strong>wavefile</strong>:</p>
 <p>https://rochars.github.io/wavefile/example</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file that is encoded as 4-bit IMA ADPCM:
-var wav = new WaveFile(ADPCMFileBuffer);
+var wav = new wavefile.WaveFile(ADPCMFileBuffer);
 
 // Decode the file as 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
@@ -76,7 +77,9 @@ var wavDataURI = wav.toDataURI();
 
 // Load your new wav file into your player
 // ...</code></pre><p>Check out wavesurfer:<br>https://github.com/katspaugh/wavesurfer.js</p>
-<h2>Use</h2><pre class="prettyprint source lang-javascript"><code>// Load a wav file from disk into a WaveFile object
+<h2>Use</h2><pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile').WaveFile;
+
+// Load a wav file from disk into a WaveFile object
 let wav = new WaveFile(buffer);
 
 // Check some of the file properties
@@ -90,7 +93,7 @@ let wavBuffer = wav.toBuffer();
 
 // Call toDataURI() to get the file as a DataURI:
 let wavDataURI = wav.toDataURI();</code></pre><h3>Create wave files from scratch</h3><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order).</p>
-<h4>Mono:</h4><pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
+<h4>Mono:</h4><pre class="prettyprint source lang-javascript"><code>let wav = new wavefile.WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
@@ -147,7 +150,7 @@ wav.fromMuLaw();</code></pre><p>Decoding always result in 16-bit audio. To decod
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 24-bit:
 wav.fromMuLaw(&quot;24&quot;);</code></pre><h3>Change the bit depth</h3><p>You can change the bit depth of the audio with the <strong>toBitDepth(bitDepth)</strong> method.</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
-let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
+let wav = new wavefile.WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
 // Change the bit depth to 24-bit
 wav.toBitDepth(&quot;24&quot;);
@@ -155,7 +158,7 @@ wav.toBitDepth(&quot;24&quot;);
 // Write the new 24-bit file
 fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>Add BWF metadata</h3><p>To add BWF data to a file you can use the <strong>bext</strong> property:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with no &quot;bext&quot;
-let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
+let wav = new wavefile.WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
 // Add some BWF metadata
 wav.bext.originator = &quot;wavefile&quot;;
@@ -170,7 +173,7 @@ fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());</code></
  * @throws {Error} If no &quot;fmt &quot; chunk is found.
  * @throws {Error} If no &quot;data&quot; chunk is found.
  */
-WaveFile(bytes=null);</code></pre><h3>The WaveFile methods:</h3><pre class="prettyprint source"><code>/**
+WaveFile(bytes=null);</code></pre><h3>The WaveFile methods:</h3><pre class="prettyprint source lang-javascript"><code>/**
  * Set up the WaveFile object based on the arguments passed.
  * @param {number} numChannels The number of channels
  *      (Integer numbers: 1 for mono, 2 stereo and so on).
@@ -750,7 +753,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jun 20 2018 19:38:52 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jun 20 2018 20:18:02 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
