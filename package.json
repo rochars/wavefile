@@ -1,13 +1,17 @@
 {
   "name": "wavefile",
-  "version": "7.0.0-alpha.7",
+  "version": "7.0.0-alpha.8",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
-  "main": "./dist/wavefile.umd.js",
-  "browser": {
-    "./dist/wavefile.umd.js": "./dist/wavefile.min.js"
+  "main": "./dist/wavefile.cjs.js",
+  "module": "./main.js",
+  "browser": "./dist/wavefile.umd.js",
+  "jsdelivr": "./dist/wavefile.min.js",
+  "unpkg": "./dist/wavefile.min.js",
+  "engines": {
+    "node": ">=7"
   },
   "keywords": [
     "wav",
@@ -51,34 +55,35 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test --src --recursive",
+    "test": "node -r esm ./node_modules/mocha/bin/_mocha test --recursive",
+    "test-min": "nyc ./node_modules/mocha/bin/_mocha test --min --recursive",
+    "test-cjs": "nyc ./node_modules/mocha/bin/_mocha test --cjs --recursive",
     "test-umd": "nyc ./node_modules/mocha/bin/_mocha test --umd --recursive",
-    "test-browser": "nyc ./node_modules/mocha/bin/_mocha test --browser --recursive",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
-    "pack": "webpack && npm run test-umd && npm run test-browser",
-    "build": "npm run lint && npm test && npm run pack && npm run doc",
-    "build-ci": "npm run lint && npm run pack && npm run doc && npm test"
+    "pack": "npm test && webpack && npm run test-min && npm run test-cjs && npm run test-umd",
+    "build": "npm run lint && npm run pack && npm run doc"
   },
   "devDependencies": {
     "browser-env": "^3.2.5",
     "chai": "^4.1.2",
     "codecov": "^3.0.0",
     "docdash": "^0.4.0",
+    "esm": "^3.0.51",
     "google-closure-compiler-js": "^20180610.0.0",
     "jsdoc": "~3.5.5",
     "jshint": "^2.9.5",
     "mocha": "^3.5.3",
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^3.2.2",
-    "webpack": "^3.12.0"
+    "webpack": "^3.8.0"
   },
   "dependencies": {
     "alawmulaw": "3.0.0",
     "base64-arraybuffer": "0.1.5",
     "bitdepth": "4.0.0",
-    "byte-data": "10.0.0",
+    "byte-data": "10.1.0-alpha.1",
     "imaadpcm": "2.0.0",
-    "riff-chunks": "6.0.0"
+    "riff-chunks": "6.1.0-alpha.0"
   }
 }

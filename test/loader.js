@@ -1,30 +1,30 @@
-/*
- * https://github.com/rochars/wavefile
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
- */
-
 /**
- * @fileoverview Load WaveFile according to the context of the tests.
- * To test the sources: npm test
- * To the test the browser dist: npm run test-browser
- * To the test the UMD: npm run test-umd
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * https://github.com/rochars/wavefiles
+ *
  */
 
-let WaveFile;
+let wavefile;
 
-// Browser dist
-if (process.argv[3] == '--browser') {
-	require('browser-env')();
-	require('../dist/wavefile.min.js');
-	WaveFile = window.WaveFile;
+// Browser bundle
+if (process.argv[3] == '--min') {
+    require('browser-env')();
+    require('../dist/wavefile.min.js');
+    wavefile = window.wavefile.WaveFile;
+    //wavefile = require('../dist/wavefile.min.js').WaveFile;
 
-// UMD dist
+// UMD bundle
 } else if (process.argv[3] == '--umd') {
-    WaveFile = require('../dist/wavefile.umd.js');
-	
-// Source
+	wavefile = require('../dist/wavefile.umd.js').WaveFile;
+
+// CommonJS dist
+} else if (process.argv[3] == '--cjs') {
+	wavefile = require('../dist/wavefile.cjs.js').WaveFile;
+
+// ESM
 } else {
-	WaveFile = require('../index.js');
+	wavefile = require('../index.js').WaveFile;
+
 }
 
-module.exports = WaveFile;
+module.exports = wavefile;
