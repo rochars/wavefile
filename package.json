@@ -11,7 +11,7 @@
   "jsdelivr": "./dist/wavefile.min.js",
   "unpkg": "./dist/wavefile.min.js",
   "engines": {
-    "node": ">=7"
+    "node": ">=8"
   },
   "keywords": [
     "wav",

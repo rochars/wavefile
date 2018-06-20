@@ -285,7 +285,7 @@ WaveFile(bytes=null);
 ```
 
 ### The WaveFile methods:
-```
+```javascript
 /**
  * Set up the WaveFile object based on the arguments passed.
  * @param {number} numChannels The number of channels
