@@ -58,9 +58,9 @@ describe('errors', function() {
             wBytes[12] = 1;
             let wav = new WaveFile();
             wav.fromBuffer(wBytes);
-        }).to.throw("Could not find the 'ds64' chunk");
+        }).to.throw('Could not find the "ds64" chunk');
     });
-    it("should throw an error if there is no 'WAVE' chunk", function () {
+    it('should throw an error if there is no "WAVE" chunk', function () {
         expect(function() {
             let wBytes = fs.readFileSync(
                 path + "16-bit-8kHz-noBext-mono.wav");
@@ -68,7 +68,7 @@ describe('errors', function() {
             let wav = new WaveFile();
             wav.fromBuffer(wBytes);
 
-        }).to.throw("Could not find the 'WAVE' format identifier");
+        }).to.throw('Could not find the "WAVE" format identifier');
     });
     it("should throw an error if there is no 'fmt ' chunk when " +
         "reading", function () {
@@ -78,16 +78,16 @@ describe('errors', function() {
             wBytes[14] = 0;
             let wav = new WaveFile();
             wav.fromBuffer(wBytes);
-        }).to.throw("Could not find the 'fmt ' chunk");
+        }).to.throw('Could not find the "fmt " chunk');
     });
-    it("should throw an error if there is no 'fmt ' chunk when " +
+    it('should throw an error if there is no "fmt " chunk when ' +
         "writing", function () {
         expect(function() {
             let wav = new WaveFile(
                 fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
             wav.fmt.chunkId = "";
             wav.toBuffer();
-        }).to.throw("Could not find the 'fmt ' chunk");
+        }).to.throw('Could not find the "fmt " chunk');
     });
     it("should throw an error if there is no 'data' chunk", function () {
         expect(function() {
@@ -95,7 +95,7 @@ describe('errors', function() {
                 path + "32bit-48kHz-noBext-mono.wav");
             wBytes[36] = 0;
             let wav = new WaveFile(wBytes);
-        }).to.throw("Could not find the 'data' chunk");
+        }).to.throw('Could not find the "data" chunk');
     });
     it("should throw an error if the sample rate is < 1", function () {
         expect(function() {
