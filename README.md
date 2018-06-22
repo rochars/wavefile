@@ -772,6 +772,28 @@ Range:
 - -1.0 to 1.0 for 32-bit (float)
 - -1.0 to 1.0 for 64-bit (float)
 
+## Distribution
+This library is implemented as a ES6 module and also distributed as a CommonJS module, UMD module and a compiled script for browsers. If your system does not pick one automatically for you, you can pick one in the **dist/** folder.
+- The CommonJS is the one used by Node. It is served in the "main" field of this library's package.json
+- The UMD module is compatible with Node, AMD and browsers. It is served in the "browser" field.
+- The compiled dist is browser-only and should be the one served by CDNs.
+- The "module" field points to "./index.js" and should be the default entry point.
+
+If you are using a module bundler to compile a module that depends on this library you might need to specify what is the correct entry point as some bundlers will assume "browser". In general, you should point to "module".
+
+### webpack example:
+```javascript
+module.exports = {
+  entry: './index.js',
+  resolve: {
+    // tells webpack to use 'module' or 'main'
+    // not 'browser'
+    mainFields: ['module', 'main']
+  },
+  ...
+};
+```
+
 ## Contributing to wavefile
 **wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.
 
@@ -808,7 +830,10 @@ https://developercertificate.org/
 https://www.contributor-covenant.org/version/1/4/code-of-conduct.html  
 https://google.github.io/styleguide/jsguide.html
 
-## LICENSE
+## Legal
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large)
+
+### LICENSE
 Copyright (c) 2017-2018 Rafael da Silva Rocha.
 
 Permission is hereby granted, free of charge, to any person obtaining

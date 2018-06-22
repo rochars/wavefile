@@ -1,9 +1,7 @@
 # CHANGELOG
 
 ## version 7.0.0 (unreleased)
-- Update package:
-	- "main": "./dist/wavefile.umd.js", UMD
-	- "browser": "./dist/wavefile.min.js", ES5 browser dist
+- ES6 module.
 
 ## version 6.13.0 (2018-06-13)
 - feature: Add BWF data to files.

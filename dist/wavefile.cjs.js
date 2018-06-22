@@ -1653,7 +1653,7 @@ class WaveFile {
                     item["dwDialect"] = this.read_(subChunk["chunkData"], uInt16_);
                     item["dwCodePage"] = this.read_(subChunk["chunkData"], uInt16_);
                 }
-                item["value"] = this.readZSTR_(subChunk["chunkData"].slice(this.head_));
+                item["value"] = this.readZSTR_(subChunk["chunkData"], this.head_);
                 this.LIST[this.LIST.length - 1]["subChunks"].push(item);
             }
         // RIFF 'INFO' tags like ICRD, ISFT, ICMT
@@ -1661,8 +1661,9 @@ class WaveFile {
             this.LIST[this.LIST.length - 1]["subChunks"].push({
                 "chunkId": subChunk["chunkId"],
                 "chunkSize": subChunk["chunkSize"],
-                "value": this.readZSTR_(subChunk["chunkData"].slice(0))
+                "value": this.readZSTR_(subChunk["chunkData"],  0)
             });
+
         }
     }
 
@@ -1689,14 +1690,14 @@ class WaveFile {
      * @return {string} The string.
      * @private
      */
-    readZSTR_(bytes) {
+    readZSTR_(bytes, index) {
         /** @type {string} */
         let str = "";
-        for (let i=0; i<bytes.length; i++) {
+        for (let i=index; i<bytes.length; i++) {
             if (bytes[i] === 0) {
                 break;
             }
-            str += Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpack"])([bytes[i]], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr);
+            str += Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackFrom"])(bytes, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr, i);
         }
         return str;
     }
@@ -1712,7 +1713,7 @@ class WaveFile {
         /** @type {string} */
         let str = "";
         for (let i=0; i<maxSize; i++) {
-            str += Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpack"])([bytes[this.head_]], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr);
+            str += Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackFrom"])(bytes, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr, this.head_);
             this.head_++;
         }
         return str;
@@ -1729,8 +1730,7 @@ class WaveFile {
         /** @type {number} */
         let size = bdType["bits"] / 8;
         /** @type {number} */
-        let value = Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpack"])(
-            bytes.slice(this.head_, this.head_ + size), bdType);
+        let value = Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackFrom"])(bytes, bdType, this.head_);
         this.head_ += size;
         return value;
     }
@@ -1790,6 +1790,8 @@ class WaveFile {
     samplesFromBytes_(bytes) {
         this.data.samples = Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackArray"])(
             bytes, this.getSamplesType_());
+        //this.data.samples = unpackArrayFrom(
+        //    bytes, this.getSamplesType_());
     }
 
     /**
