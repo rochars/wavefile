@@ -55,6 +55,17 @@
   },
   "scripts": {
     "lint": "jshint index.js && jshint test",
+    "test-rf64": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/read/read-rf64.js --recursive -R min",
+    "test-bext": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/bext --recursive -R min",
+    "test-codecs": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/codecs --recursive -R min",
+    "test-cue": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/cue --recursive -R min",
+    "test-list": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/list --recursive -R min",
+    "test-from-scratch": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/from-scratch --recursive -R min",
+    "test-read": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/read --recursive -R min",
+    "test-rifx": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/rifx --recursive -R min",
+    "test-smpl": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/smpl --recursive -R min",
+    "test-to-bit-depth": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/to-bit-depth --recursive -R min",
+    "test-write": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/write --recursive -R min",
     "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R min",
     "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R min",
     "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R min",
@@ -83,8 +94,8 @@
     "alawmulaw": "3.0.0",
     "base64-arraybuffer": "0.1.5",
     "bitdepth": "4.0.0",
-    "byte-data": "11.0.0-alpha.2",
+    "byte-data": "11.0.0",
     "imaadpcm": "2.0.0",
-    "riff-chunks": "7.0.0-alpha.1"
+    "riff-chunks": "^7.0.0"
   }
 }

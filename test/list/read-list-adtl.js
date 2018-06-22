@@ -40,12 +40,13 @@ describe("read smpl_cue.wav and write to a new file", function() {
     let fileSizeInBytes2 = stats["size"];
     let wav2 = new WaveFile(
         fs.readFileSync(path + "/out/smpl_cue-out.wav"));
-    
+
     //ltxt
-    it("ltxt in wav should be same ltxt in wav2", function() {
+    it("ltxt in wav should not same ltxt in wav2 (original was broken)" + 
+        " with chunkSize = 20 (should be 25)", function() {
         wavLtxt = getLtxt_(wav);
         wav2Ltxt = getLtxt_(wav2);
-        assert.deepEqual(wavLtxt, wav2Ltxt);
+        assert.ok(wav2Ltxt.chunkSize = 25);
     });
     // Other tests
     it("wav.chunkSize should be == fileSizeInBytes1", function() {

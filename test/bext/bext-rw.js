@@ -21,7 +21,6 @@ describe('read a file with bext from disk and write to new file',
     it("bextChunkId should be 'bext'", function() {
         assert.equal(wav.bext.chunkId, 'bext');
     });
-
 });
 
 describe('bext field with less bytes than the field size ' +
