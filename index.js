@@ -29,13 +29,13 @@
  * @fileoverview The WaveFile class.
  */
 
-import {default as bitdepth} from 'bitdepth';
+import {bitdepth} from 'bitdepth';
 import {riffIndex} from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
-import {alaw, mulaw} from 'alawmulaw';
+import {alawmulaw} from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer';
-import {pack, unpack, packArray, unpackArray,
-  unpackFrom, unpackArrayFrom, types} from 'byte-data';
+import {pack, packArray, unpackFrom,
+  unpackArrayFrom, types} from 'byte-data';
 
 /**
  * @type {!Object}
@@ -320,12 +320,6 @@ class WaveFile {
      * @private
      */
     this.head_ = 0;
-    /**
-     * The bit depth code according to the samples.
-     * @type {string}
-     * @export
-     */
-    this.rfHead = 0;
     // Load a file from the buffer if one was passed
     // when creating the object
     if(bytes) {
@@ -623,7 +617,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      alaw.encode(this.data.samples),
+      alawmulaw.alaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -639,7 +633,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      alaw.decode(this.data.samples),
+      alawmulaw.alaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -657,7 +651,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      mulaw.encode(this.data.samples),
+      alawmulaw.mulaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -673,7 +667,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      mulaw.decode(this.data.samples),
+      alawmulaw.mulaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);

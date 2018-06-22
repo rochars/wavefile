@@ -711,12 +711,9 @@ function validateNotNull_(value) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WaveFile", function() { return WaveFile; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bitdepth__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bitdepth___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bitdepth__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_riff_chunks__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_imaadpcm__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_imaadpcm___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_alawmulaw__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_alawmulaw___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_alawmulaw__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_byte_data__ = __webpack_require__(0);
@@ -1041,12 +1038,6 @@ class WaveFile {
      * @private
      */
     this.head_ = 0;
-    /**
-     * The bit depth code according to the samples.
-     * @type {string}
-     * @export
-     */
-    this.rfHead = 0;
     // Load a file from the buffer if one was passed
     // when creating the object
     if(bytes) {
@@ -1240,7 +1231,7 @@ class WaveFile {
     this.assureInterleaved_();
     this.assureUncompressed_();
     this.truncateSamples();
-    __WEBPACK_IMPORTED_MODULE_0_bitdepth___default()(this.data.samples, thisBitDepth, toBitDepth);
+    Object(__WEBPACK_IMPORTED_MODULE_0_bitdepth__["a" /* bitdepth */])(this.data.samples, thisBitDepth, toBitDepth);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -1309,7 +1300,7 @@ class WaveFile {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
-        Object(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__["encode"])(this.data.samples),
+        Object(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__["b" /* encode */])(this.data.samples),
         {'container': this.correctContainer_()});
     }
   }
@@ -1326,7 +1317,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      Object(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__["decode"])(this.data.samples, this.fmt.blockAlign),
+      Object(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__["a" /* decode */])(this.data.samples, this.fmt.blockAlign),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -1344,7 +1335,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alaw"].encode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["a" /* alawmulaw */].alaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -1360,7 +1351,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alaw"].decode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["a" /* alawmulaw */].alaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -1378,7 +1369,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["mulaw"].encode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["a" /* alawmulaw */].mulaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -1394,7 +1385,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["mulaw"].decode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["a" /* alawmulaw */].mulaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -2843,8 +2834,10 @@ class WaveFile {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = bitdepth;
 /*
  * bitdepth: Change the resolution of samples to and from any bit depth.
  * https://github.com/rochars/bitdepth
@@ -2876,6 +2869,8 @@ class WaveFile {
  * @fileoverview The bitdepth() function and private helper functions.
  */
 
+/** @module bitdepth */
+
 /** @private */
 const f64f32_ = new Float32Array(1);
 
@@ -2895,7 +2890,7 @@ function bitdepth(samples, original, target, outputArray) {
   outputArray = outputArray || samples;
   /** @type {!Function} */
   let toFunction = getBitDepthFunction_(original, target);
-  /** @type {!Object} */
+  /** @type {!Object<string, number>} */
   let options = {
     oldMin: Math.pow(2, parseInt(original, 10)) / 2,
     newMin: Math.pow(2, parseInt(target, 10)) / 2,
@@ -2925,7 +2920,7 @@ function bitdepth(samples, original, target, outputArray) {
 /**
  * Change the bit depth from int to int.
  * @param {number} sample The sample.
- * @param {!Object} args Data about the original and target bit depths.
+ * @param {!Object<string, number>} args Data about the original and target bit depths.
  * @return {number}
  * @private
  */
@@ -2941,7 +2936,7 @@ function intToInt_(sample, args) {
 /**
  * Change the bit depth from float to int.
  * @param {number} sample The sample.
- * @param {!Object} args Data about the original and target bit depths.
+ * @param {!Object<string, number>} args Data about the original and target bit depths.
  * @return {number}
  * @private
  */
@@ -2953,7 +2948,7 @@ function floatToInt_(sample, args) {
 /**
  * Change the bit depth from int to float.
  * @param {number} sample The sample.
- * @param {!Object} args Data about the original and target bit depths.
+ * @param {!Object<string, number>} args Data about the original and target bit depths.
  * @return {number}
  * @private
  */
@@ -3015,8 +3010,6 @@ function validateBitDepth_(bitDepth) {
     throw new Error("Invalid bit depth.");
   }
 }
-
-module.exports = bitdepth;
 
 
 /***/ }),
@@ -3872,8 +3865,13 @@ function swap(bytes, offset, index, limit) {
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = encode;
+/* harmony export (immutable) */ __webpack_exports__["a"] = decode;
+/* unused harmony export encodeBlock */
+/* unused harmony export decodeBlock */
 /*
  * imaadpcm: IMA ADPCM codec in JavaScript.
  * https://github.com/rochars/imaadpcm
@@ -4192,20 +4190,14 @@ function blockHead_(sample) {
     return adpcmSamples;
 }
 
-/** @export */
-module.exports.encode = encode;
-/** @export */
-module.exports.decode = decode;
-/** @export */
-module.exports.encodeBlock = encodeBlock;
-/** @export */
-module.exports.decodeBlock = decodeBlock;
-
 
 /***/ }),
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_alaw__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_mulaw__ = __webpack_require__(10);
 /*
  * alawmulaw: A-Law and mu-Law codecs in JavaScript.
  * https://github.com/rochars/alawmulaw
@@ -4234,30 +4226,42 @@ module.exports.decodeBlock = decodeBlock;
  */
 
 /**
- * @fileoverview The alawmulaw public API.
+ * @fileoverview The alawmulaw API.
  */
 
 /**
  * @module alawmulaw
- * @ignore
  */
 
-/**
- * @export
- * @ignore
- */
-module.exports.alaw = __webpack_require__(9);
-/**
- * @export
- * @ignore
- */
-module.exports.mulaw = __webpack_require__(10);
+
+
+
+const alawmulaw = {
+	/**
+	 * @type {!Object}
+	 * @export
+	 */
+	'alaw': __WEBPACK_IMPORTED_MODULE_0__lib_alaw__,
+	/**
+	 * @type {!Object}
+	 * @export
+	 */
+	'mulaw': __WEBPACK_IMPORTED_MODULE_1__lib_mulaw__
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = alawmulaw;
+
 
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["encodeSample"] = encodeSample;
+/* harmony export (immutable) */ __webpack_exports__["decodeSample"] = decodeSample;
+/* harmony export (immutable) */ __webpack_exports__["encode"] = encode;
+/* harmony export (immutable) */ __webpack_exports__["decode"] = decode;
 /*
  * alawmulaw: A-Law and mu-Law codecs in JavaScript.
  * https://github.com/rochars/alawmulaw
@@ -4387,20 +4391,18 @@ function decode(samples) {
   return pcmSamples;
 }
 
-/** @export */
-module.exports.encodeSample = encodeSample;
-/** @export */
-module.exports.decodeSample = decodeSample;
-/** @export */
-module.exports.encode = encode;
-/** @export */
-module.exports.decode = decode;
-
 
 /***/ }),
 /* 10 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["encodeSample"] = encodeSample;
+/* harmony export (immutable) */ __webpack_exports__["decodeSample"] = decodeSample;
+/* harmony export (immutable) */ __webpack_exports__["encode"] = encode;
+/* harmony export (immutable) */ __webpack_exports__["decode"] = decode;
+/* harmony export (immutable) */ __webpack_exports__["segmentValue_"] = segmentValue_;
 /*
  * alawmulaw: A-Law and mu-Law codecs in JavaScript.
  * https://github.com/rochars/alawmulaw
@@ -4530,15 +4532,6 @@ function segmentValue_(sample) {
   }
   return segment;
 }
-
-/** @export */
-module.exports.encodeSample = encodeSample;
-/** @export */
-module.exports.decodeSample = decodeSample;
-/** @export */
-module.exports.encode = encode;
-/** @export */
-module.exports.decode = decode;
 
 
 /***/ }),

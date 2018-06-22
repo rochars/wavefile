@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "7.0.0-alpha.10",
+  "version": "7.0.0-alpha.11",
   "description": "Read & write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
@@ -91,11 +91,11 @@
     "webpack": "^3.12.0"
   },
   "dependencies": {
-    "alawmulaw": "3.0.0",
+    "alawmulaw": "4.0.0",
     "base64-arraybuffer": "0.1.5",
-    "bitdepth": "4.0.0",
+    "bitdepth": "5.0.0",
     "byte-data": "11.0.0",
-    "imaadpcm": "2.0.0",
-    "riff-chunks": "^7.0.0"
+    "imaadpcm": "3.0.0",
+    "riff-chunks": "7.0.0"
   }
 }

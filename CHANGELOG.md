@@ -2,6 +2,7 @@
 
 ## version 7.0.0 (unreleased)
 - ES6 module.
+- Better memory use.
 
 ## version 6.13.0 (2018-06-13)
 - feature: Add BWF data to files.

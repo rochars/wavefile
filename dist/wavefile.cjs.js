@@ -403,12 +403,6 @@ class WaveFile {
      * @private
      */
     this.head_ = 0;
-    /**
-     * The bit depth code according to the samples.
-     * @type {string}
-     * @export
-     */
-    this.rfHead = 0;
     // Load a file from the buffer if one was passed
     // when creating the object
     if(bytes) {
@@ -602,7 +596,7 @@ class WaveFile {
     this.assureInterleaved_();
     this.assureUncompressed_();
     this.truncateSamples();
-    __WEBPACK_IMPORTED_MODULE_0_bitdepth___default()(this.data.samples, thisBitDepth, toBitDepth);
+    Object(__WEBPACK_IMPORTED_MODULE_0_bitdepth__["bitdepth"])(this.data.samples, thisBitDepth, toBitDepth);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -706,7 +700,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alaw"].encode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].alaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -722,7 +716,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alaw"].decode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].alaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -740,7 +734,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["mulaw"].encode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].mulaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -756,7 +750,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["mulaw"].decode(this.data.samples),
+      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].mulaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
