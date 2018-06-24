@@ -21,14 +21,14 @@ module.exports = [
     entry: './index.js',
     output: {
       filename: './dist/wavefile.cjs.js',
-      libraryTarget: "commonjs"
+      library: "WaveFile",
+      libraryTarget: "commonjs2"
     },
     externals: {
       'byte-data': 'byte-data',
       "alawmulaw": "alawmulaw",
       "base64-arraybuffer": "base64-arraybuffer",
       "bitdepth": "bitdepth",
-      "byte-data": "byte-data",
       "imaadpcm": "imaadpcm",
       "riff-chunks": "riff-chunks"
     },
@@ -42,7 +42,7 @@ module.exports = [
     },
     output: {
       filename: './dist/wavefile.umd.js',
-      library: "wavefile",
+      library: "WaveFile",
       libraryTarget: "umd"
     }
   },
@@ -54,7 +54,7 @@ module.exports = [
     },
     output: {
       filename: './dist/wavefile.min.js',
-      library: "wavefile",
+      library: "WaveFile",
       libraryTarget: "window"
     },
     plugins: [
@@ -65,9 +65,11 @@ module.exports = [
           compilationLevel: 'ADVANCED',
           warningLevel: 'VERBOSE',
           exportLocalPropertyDefinitions: true,
-          generateExports: true
-        },
+          generateExports: true,
+          outputWrapper: '%output%window' + 
+            '["WaveFile"]=window["WaveFile"]["WaveFile"]'
+        }
       })
     ]
-  },
+  }
 ];

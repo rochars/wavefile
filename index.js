@@ -1,5 +1,5 @@
 /*
- * wavefile: Read and write wav files.
+ * wavefile: Read and write wave files.
  * https://github.com/rochars/wavefile
  *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
@@ -29,13 +29,14 @@
  * @fileoverview The WaveFile class.
  */
 
+/** @module wavefile */
+
 import {bitdepth} from 'bitdepth';
 import {riffIndex} from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
 import {alawmulaw} from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer';
-import {pack, packArray, unpackFrom,
-  unpackArrayFrom, types} from 'byte-data';
+import {pack, packArray, unpackFrom, unpackArrayFrom, types} from 'byte-data';
 
 /**
  * @type {!Object}
@@ -51,7 +52,7 @@ let uInt32_ = {'bits': 32};
 /**
  * Class representing a wav file.
  */
-class WaveFile {
+export class WaveFile {
 
   /**
    * @param {?Uint8Array} bytes A wave file buffer.
@@ -381,7 +382,7 @@ class WaveFile {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Uint8Array|!Object} bytes The buffer.
+   * @param {!Uint8Array} bytes The buffer.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
@@ -1254,7 +1255,7 @@ class WaveFile {
 
   /**
    * Find a chunk by its fourCC_ in a array of RIFF chunks.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Object} chunks The wav file chunks.
    * @param {string} chunkId The chunk fourCC_.
    * @param {boolean} multiple True if there may be multiple chunks
    *    with the same chunkId.
@@ -1301,7 +1302,8 @@ class WaveFile {
 
   /**
    * Read the 'fmt ' chunk of a wave file.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @private
    */
@@ -1326,21 +1328,21 @@ class WaveFile {
 
   /**
    * Read the 'fmt ' chunk extension.
-   * @param {!Array<number>} chunkData The 'fmt ' chunk.
+   * @param {!Uint8Array} buffer The wav file buffer.
    * @private
    */
-  readFmtExtension_(chunkData) {
+  readFmtExtension_(buffer) {
     if (this.fmt.chunkSize > 16) {
-      this.fmt.cbSize = this.read_(chunkData, uInt16_);
+      this.fmt.cbSize = this.read_(buffer, uInt16_);
       if (this.fmt.chunkSize > 18) {
-        this.fmt.validBitsPerSample = this.read_(chunkData, uInt16_);
+        this.fmt.validBitsPerSample = this.read_(buffer, uInt16_);
         if (this.fmt.chunkSize > 20) {
-          this.fmt.dwChannelMask = this.read_(chunkData, uInt32_);
+          this.fmt.dwChannelMask = this.read_(buffer, uInt32_);
           this.fmt.subformat = [
-            this.read_(chunkData, uInt32_),
-            this.read_(chunkData, uInt32_),
-            this.read_(chunkData, uInt32_),
-            this.read_(chunkData, uInt32_)];
+            this.read_(buffer, uInt32_),
+            this.read_(buffer, uInt32_),
+            this.read_(buffer, uInt32_),
+            this.read_(buffer, uInt32_)];
         }
       }
     }
@@ -1348,7 +1350,8 @@ class WaveFile {
 
   /**
    * Read the 'fact' chunk of a wav file.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readFactChunk_(buffer, signature) {
@@ -1364,7 +1367,8 @@ class WaveFile {
 
   /**
    * Read the 'cue ' chunk of a wave file.
-   * @param {!Array<!Object>} chunks The RIFF file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readCueChunk_(buffer, signature) {
@@ -1390,7 +1394,8 @@ class WaveFile {
 
   /**
    * Read the 'smpl' chunk of a wave file.
-   * @param {!Array<!Object>} chunks The RIFF file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readSmplChunk_(buffer, signature) {
@@ -1424,7 +1429,8 @@ class WaveFile {
 
   /**
    * Read the 'data' chunk of a wave file.
-   * @param {!Array<!Object>} chunks The RIFF file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @throws {Error} If no 'data' chunk is found.
    * @private
    */
@@ -1442,7 +1448,8 @@ class WaveFile {
 
   /**
    * Read the 'bext' chunk of a wav file.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readBextChunk_(buffer, signature) {
@@ -1475,7 +1482,8 @@ class WaveFile {
 
   /**
    * Read the 'ds64' chunk of a wave file.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @throws {Error} If no 'ds64' chunk is found and the file is RF64.
    * @private
    */
@@ -1508,7 +1516,8 @@ class WaveFile {
 
   /**
    * Read the 'LIST' chunks of a wave file.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readLISTChunk_(buffer, signature) {
@@ -1536,6 +1545,7 @@ class WaveFile {
    * Read the sub chunks of a 'LIST' chunk.
    * @param {!Object} subChunk The 'LIST' subchunks.
    * @param {string} format The 'LIST' format, 'adtl' or 'INFO'.
+   * @param {!Uint8Array} buffer The wav file buffer.
    * @private
    */
   readLISTSubChunks_(subChunk, format, buffer) {
@@ -1572,7 +1582,8 @@ class WaveFile {
 
   /**
    * Read the 'junk' chunk of a wave file.
-   * @param {!Array<!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readJunkChunk_(buffer, signature) {
@@ -1690,7 +1701,7 @@ class WaveFile {
 
   /**
    * Turn bytes to samples and load them in the data.samples property.
-   * @param {!Array<number>} bytes The bytes.
+   * @param {!Uint8Array} bytes The bytes.
    * @private
    */
   samplesFromBytes_(bytes, chunkData) {
@@ -2110,5 +2121,4 @@ class WaveFile {
   }
 }
 
-/** @export */
-export {WaveFile};
+this.WaveFile = WaveFile;

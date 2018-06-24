@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deInterleave">deInterleave</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#getLISTBytes_">getLISTBytes_</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#interleave">interleave</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
 </nav>
 
 <div id="main">
@@ -38,7 +38,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/*
- * wavefile: Read and write wav files.
+ * wavefile: Read and write wave files.
  * https://github.com/rochars/wavefile
  *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
@@ -68,13 +68,14 @@
  * @fileoverview The WaveFile class.
  */
 
+/** @module wavefile */
+
 import {bitdepth} from 'bitdepth';
 import {riffIndex} from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
 import {alawmulaw} from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer';
-import {pack, packArray, unpackFrom,
-  unpackArrayFrom, types} from 'byte-data';
+import {pack, packArray, unpackFrom, unpackArrayFrom, types} from 'byte-data';
 
 /**
  * @type {!Object}
@@ -90,7 +91,7 @@ let uInt32_ = {'bits': 32};
 /**
  * Class representing a wav file.
  */
-class WaveFile {
+export class WaveFile {
 
   /**
    * @param {?Uint8Array} bytes A wave file buffer.
@@ -420,7 +421,7 @@ class WaveFile {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Uint8Array|!Object} bytes The buffer.
+   * @param {!Uint8Array} bytes The buffer.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
@@ -1293,7 +1294,7 @@ class WaveFile {
 
   /**
    * Find a chunk by its fourCC_ in a array of RIFF chunks.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Object} chunks The wav file chunks.
    * @param {string} chunkId The chunk fourCC_.
    * @param {boolean} multiple True if there may be multiple chunks
    *    with the same chunkId.
@@ -1340,7 +1341,8 @@ class WaveFile {
 
   /**
    * Read the 'fmt ' chunk of a wave file.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @private
    */
@@ -1365,21 +1367,21 @@ class WaveFile {
 
   /**
    * Read the 'fmt ' chunk extension.
-   * @param {!Array&lt;number>} chunkData The 'fmt ' chunk.
+   * @param {!Uint8Array} buffer The wav file buffer.
    * @private
    */
-  readFmtExtension_(chunkData) {
+  readFmtExtension_(buffer) {
     if (this.fmt.chunkSize > 16) {
-      this.fmt.cbSize = this.read_(chunkData, uInt16_);
+      this.fmt.cbSize = this.read_(buffer, uInt16_);
       if (this.fmt.chunkSize > 18) {
-        this.fmt.validBitsPerSample = this.read_(chunkData, uInt16_);
+        this.fmt.validBitsPerSample = this.read_(buffer, uInt16_);
         if (this.fmt.chunkSize > 20) {
-          this.fmt.dwChannelMask = this.read_(chunkData, uInt32_);
+          this.fmt.dwChannelMask = this.read_(buffer, uInt32_);
           this.fmt.subformat = [
-            this.read_(chunkData, uInt32_),
-            this.read_(chunkData, uInt32_),
-            this.read_(chunkData, uInt32_),
-            this.read_(chunkData, uInt32_)];
+            this.read_(buffer, uInt32_),
+            this.read_(buffer, uInt32_),
+            this.read_(buffer, uInt32_),
+            this.read_(buffer, uInt32_)];
         }
       }
     }
@@ -1387,7 +1389,8 @@ class WaveFile {
 
   /**
    * Read the 'fact' chunk of a wav file.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readFactChunk_(buffer, signature) {
@@ -1403,7 +1406,8 @@ class WaveFile {
 
   /**
    * Read the 'cue ' chunk of a wave file.
-   * @param {!Array&lt;!Object>} chunks The RIFF file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readCueChunk_(buffer, signature) {
@@ -1429,7 +1433,8 @@ class WaveFile {
 
   /**
    * Read the 'smpl' chunk of a wave file.
-   * @param {!Array&lt;!Object>} chunks The RIFF file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readSmplChunk_(buffer, signature) {
@@ -1463,7 +1468,8 @@ class WaveFile {
 
   /**
    * Read the 'data' chunk of a wave file.
-   * @param {!Array&lt;!Object>} chunks The RIFF file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @throws {Error} If no 'data' chunk is found.
    * @private
    */
@@ -1481,7 +1487,8 @@ class WaveFile {
 
   /**
    * Read the 'bext' chunk of a wav file.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readBextChunk_(buffer, signature) {
@@ -1514,7 +1521,8 @@ class WaveFile {
 
   /**
    * Read the 'ds64' chunk of a wave file.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @throws {Error} If no 'ds64' chunk is found and the file is RF64.
    * @private
    */
@@ -1547,7 +1555,8 @@ class WaveFile {
 
   /**
    * Read the 'LIST' chunks of a wave file.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readLISTChunk_(buffer, signature) {
@@ -1575,6 +1584,7 @@ class WaveFile {
    * Read the sub chunks of a 'LIST' chunk.
    * @param {!Object} subChunk The 'LIST' subchunks.
    * @param {string} format The 'LIST' format, 'adtl' or 'INFO'.
+   * @param {!Uint8Array} buffer The wav file buffer.
    * @private
    */
   readLISTSubChunks_(subChunk, format, buffer) {
@@ -1611,7 +1621,8 @@ class WaveFile {
 
   /**
    * Read the 'junk' chunk of a wave file.
-   * @param {!Array&lt;!Object>} chunks The wav file chunks.
+   * @param {!Uint8Array} buffer The wav file buffer.
+   * @param {!Object} signature The file signature.
    * @private
    */
   readJunkChunk_(buffer, signature) {
@@ -1729,7 +1740,7 @@ class WaveFile {
 
   /**
    * Turn bytes to samples and load them in the data.samples property.
-   * @param {!Array&lt;number>} bytes The bytes.
+   * @param {!Uint8Array} bytes The bytes.
    * @private
    */
   samplesFromBytes_(bytes, chunkData) {
@@ -2149,8 +2160,7 @@ class WaveFile {
   }
 }
 
-/** @export */
-export {WaveFile};
+this.WaveFile = WaveFile;
 </code></pre>
         </article>
     </section>
@@ -2163,7 +2173,7 @@ export {WaveFile};
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 22 2018 16:48:43 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jun 24 2018 06:16:28 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

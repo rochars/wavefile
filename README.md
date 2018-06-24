@@ -25,10 +25,13 @@ And more.
 npm install wavefile
 ```
 
-## Browser
+### Browser
 Use the compiled file in the */dist* folder:
 ```html
 <script src="wavefile.min.js"></script>
+<script>
+  var WaveFile = new WaveFile();
+</script>
 ```
 
 Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
@@ -39,6 +42,16 @@ Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
 Or get it from [unpkg](https://www.unpkg.com):
 ```html
 <script src="https://unpkg.com/wavefile@7"></script>
+```
+
+#### Browser Compatibility
+**wavefile** supports all browsers that are ES5-compliant (IE8 and below are not supported).
+
+### Node
+Require WaveFile from **wavefile**:
+```javascript
+const WaveFile = require('wavefile').WaveFile;
+let wav = new WaveFile();
 ```
 
 ## See it in action
@@ -773,11 +786,12 @@ Range:
 - -1.0 to 1.0 for 64-bit (float)
 
 ## Distribution
-This library is implemented as a ES6 module and also distributed as a CommonJS module, UMD module and a compiled script for browsers. If your system does not pick one automatically for you, you can pick one in the **dist/** folder.
+This library is implemented as a ES6 module and also distributed as a CommonJS module, UMD module and a compiled script for browsers.
+
 - The CommonJS is the one used by Node. It is served in the "main" field of this library's package.json
 - The UMD module is compatible with Node, AMD and browsers. It is served in the "browser" field.
 - The compiled dist is browser-only and should be the one served by CDNs.
-- The "module" field points to "./index.js" and should be the default entry point.
+- The "module" field points to "./index.js" and should be the default entry point for ES6.
 
 If you are using a module bundler to compile a module that depends on this library you might need to specify what is the correct entry point as some bundlers will assume "browser". In general, you should point to "module".
 

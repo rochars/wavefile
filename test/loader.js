@@ -10,8 +10,7 @@ let wavefile;
 if (process.argv[3] == '--min') {
     require('browser-env')();
     require('../dist/wavefile.min.js');
-    wavefile = window.wavefile.WaveFile;
-    //wavefile = require('../dist/wavefile.min.js').WaveFile;
+    wavefile = window.WaveFile;
 
 // UMD
 } else if (process.argv[3] == '--umd') {
