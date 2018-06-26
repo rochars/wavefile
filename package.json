@@ -1,12 +1,13 @@
 {
   "name": "wavefile",
-  "version": "7.0.0-alpha.16",
+  "version": "7.0.0-alpha.19",
   "description": "Read and write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "main": "./dist/wavefile.cjs.js",
   "module": "./index.js",
+  "es2015": "./dist/wavefile.js",
   "browser": "./dist/wavefile.umd.js",
   "jsdelivr": "./dist/wavefile.min.js",
   "unpkg": "./dist/wavefile.min.js",
@@ -53,6 +54,9 @@
   "bugs": {
     "url": "https://github.com/rochars/wavefile/issues"
   },
+  "directories": {
+    "dist": "./dist"
+  },
   "scripts": {
     "lint": "jshint index.js && jshint test",
     "test-rf64": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/read/read-rf64.js --recursive -R min",
@@ -66,12 +70,13 @@
     "test-smpl": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/smpl --recursive -R min",
     "test-to-bit-depth": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/to-bit-depth --recursive -R min",
     "test-write": "nyc --require=esm ./node_modules/mocha/bin/_mocha test/write --recursive -R min",
-    "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R min",
-    "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R min",
-    "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R min",
-    "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R min",
-    "test-dist": "npm run test-min && npm run test-cjs && npm run test-umd",
-    "pack": "webpack && npm run test-dist && npm run test",
+    "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R dot",
+    "test-esm": "nyc ./node_modules/mocha/bin/_mocha test --esm --require=esm --recursive -R dot",
+    "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R dot",
+    "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R dot",
+    "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot",
+    "test-dist": "npm run test-esm && npm run test-min && npm run test-cjs && npm run test-umd",
+    "pack": "rollup --config && webpack && npm run test-dist && npm run test",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm run pack && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
@@ -88,14 +93,18 @@
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^12.0.2",
-    "webpack": "^3.12.0"
+    "rollup": "^0.61.2",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "webpack": "^4.12.1",
+    "webpack-cli": "^3.0.8"
   },
   "dependencies": {
-    "alawmulaw": "^4.0.0",
-    "base64-arraybuffer": "^0.1.5",
-    "bitdepth": "^5.0.0",
-    "byte-data": "^11.0.1",
-    "imaadpcm": "^3.0.0",
-    "riff-chunks": "^7.0.1"
+    "alawmulaw": "^4.1.0",
+    "base64-arraybuffer-es6": "^0.3.1",
+    "bitdepth": "^6.0.0",
+    "byte-data": "^11.1.0",
+    "imaadpcm": "^3.1.0",
+    "riff-chunks": "^7.1.1"
   }
 }

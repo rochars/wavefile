@@ -1,87 +1,14 @@
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+'use strict';
 
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bitdepth__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bitdepth___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bitdepth__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_riff_chunks__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_riff_chunks___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_riff_chunks__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_imaadpcm__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_imaadpcm___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_alawmulaw__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_alawmulaw___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_alawmulaw__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_byte_data__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_byte_data___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_byte_data__);
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var bitdepth = _interopDefault(require('bitdepth'));
+var riffChunks = require('riff-chunks');
+var imaadpcm = require('imaadpcm');
+var alawmulaw = _interopDefault(require('alawmulaw'));
+var base64ArraybufferEs6 = require('base64-arraybuffer-es6');
+var byteData = require('byte-data');
+
 /*
  * wavefile: Read and write wave files.
  * https://github.com/rochars/wavefile
@@ -108,19 +35,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
-/**
- * @fileoverview The WaveFile class.
- */
-
-/** @module wavefile */
-
-
-
-
-
-
-
 
 /**
  * @type {!Object}
@@ -153,7 +67,7 @@ class WaveFile {
      */
     this.container = '';
     /**
-     * @type {number}
+     * @type {number|string}
      * @export
      */
     this.chunkSize = 0;
@@ -477,7 +391,7 @@ class WaveFile {
     this.clearHeader_();
     this.readRIFFChunk_(bytes);
     /** @type {!Object} */
-    let chunk = Object(__WEBPACK_IMPORTED_MODULE_1_riff_chunks__["riffIndex"])(bytes);
+    let chunk = riffChunks.riffIndex(bytes);
     this.readDs64Chunk_(bytes, chunk['subChunks']);
     this.readFmtChunk_(bytes, chunk['subChunks']);
     this.readFactChunk_(bytes, chunk['subChunks']);
@@ -510,7 +424,7 @@ class WaveFile {
    * @export
    */
   fromBase64(base64String) {
-    this.fromBuffer(new Uint8Array(Object(__WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer__["decode"])(base64String)));
+    this.fromBuffer(new Uint8Array(base64ArraybufferEs6.decode(base64String)));
   }
 
   /**
@@ -520,7 +434,8 @@ class WaveFile {
    * @export
    */
   toBase64() {
-    return Object(__WEBPACK_IMPORTED_MODULE_4_base64_arraybuffer__["encode"])(this.toBuffer());
+    let buffer = this.toBuffer();
+    return base64ArraybufferEs6.encode(buffer, 0, buffer.length);
   }
 
   /**
@@ -598,7 +513,7 @@ class WaveFile {
     this.assureInterleaved_();
     this.assureUncompressed_();
     this.truncateSamples();
-    Object(__WEBPACK_IMPORTED_MODULE_0_bitdepth__["bitdepth"])(this.data.samples, thisBitDepth, toBitDepth);
+    bitdepth(this.data.samples, thisBitDepth, toBitDepth);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -667,7 +582,7 @@ class WaveFile {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
-        Object(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__["encode"])(this.data.samples),
+        imaadpcm.encode(this.data.samples),
         {'container': this.correctContainer_()});
     }
   }
@@ -684,7 +599,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      Object(__WEBPACK_IMPORTED_MODULE_2_imaadpcm__["decode"])(this.data.samples, this.fmt.blockAlign),
+      imaadpcm.decode(this.data.samples, this.fmt.blockAlign),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -702,7 +617,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].alaw.encode(this.data.samples),
+      alawmulaw.alaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -718,7 +633,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].alaw.decode(this.data.samples),
+      alawmulaw.alaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -736,7 +651,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].mulaw.encode(this.data.samples),
+      alawmulaw.mulaw.encode(this.data.samples),
       {'container': this.correctContainer_()});
   }
 
@@ -752,7 +667,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      __WEBPACK_IMPORTED_MODULE_3_alawmulaw__["alawmulaw"].mulaw.decode(this.data.samples),
+      alawmulaw.mulaw.decode(this.data.samples),
       {'container': this.correctContainer_()});
     if (bitDepth != '16') {
       this.toBitDepth(bitDepth);
@@ -1698,7 +1613,7 @@ class WaveFile {
       if (bytes[i] === 0) {
         break;
       }
-      str += Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackFrom"])(bytes, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr, i);
+      str += byteData.unpackFrom(bytes, byteData.types.chr, i);
     }
     return str;
   }
@@ -1714,7 +1629,7 @@ class WaveFile {
     /** @type {string} */
     let str = '';
     for (let i=0; i<maxSize; i++) {
-      str += Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackFrom"])(bytes, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr, this.head_);
+      str += byteData.unpackFrom(bytes, byteData.types.chr, this.head_);
       this.head_++;
     }
     return str;
@@ -1724,14 +1639,14 @@ class WaveFile {
    * Read a number from a chunk.
    * @param {!Array<number>|!Uint8Array} bytes The chunk bytes.
    * @param {!Object} bdType The type definition.
-   * @return {number} The number.
+   * @return {number|string} The number.
    * @private
    */
   read_(bytes, bdType) {
     /** @type {number} */
     let size = bdType['bits'] / 8;
-    /** @type {number} */
-    let value = Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackFrom"])(bytes, bdType, this.head_);
+    /** @type {number|string} */
+    let value = byteData.unpackFrom(bytes, bdType, this.head_);
     this.head_ += size;
     return value;
   }
@@ -1746,7 +1661,7 @@ class WaveFile {
    */
   writeString_(str, maxSize, push=true) {
     /** @type {!Array<number>} */   
-    let bytes = Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["packArray"])(str, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].chr);
+    let bytes = byteData.packArray(str, byteData.types.chr);
     if (push) {
       for (let i=bytes.length; i<maxSize; i++) {
         bytes.push(0);
@@ -1761,7 +1676,7 @@ class WaveFile {
    * @private
    */
   samplesToBytes_() {
-    return Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["packArray"])(
+    return byteData.packArray(
       this.data.samples, this.getSamplesType_());
   }
 
@@ -1789,7 +1704,7 @@ class WaveFile {
    * @private
    */
   samplesFromBytes_(bytes, chunkData) {
-    this.data.samples = Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["unpackArrayFrom"])(
+    this.data.samples = byteData.unpackArrayFrom(
       bytes,
       this.getSamplesType_(),
       chunkData['chunkData']['start'],
@@ -1823,22 +1738,22 @@ class WaveFile {
     this.enforceBext_();
     if (this.bext.chunkId) {
       bytes = bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(602 + this.bext.codingHistory.length, uInt32_),
+        byteData.pack(this.bext.chunkId, byteData.types.fourCC),
+        byteData.pack(602 + this.bext.codingHistory.length, uInt32_),
         this.writeString_(this.bext.description, 256),
         this.writeString_(this.bext.originator, 32),
         this.writeString_(this.bext.originatorReference, 32),
         this.writeString_(this.bext.originationDate, 10),
         this.writeString_(this.bext.originationTime, 8),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.timeReference[0], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.timeReference[1], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.version, uInt16_),
+        byteData.pack(this.bext.timeReference[0], uInt32_),
+        byteData.pack(this.bext.timeReference[1], uInt32_),
+        byteData.pack(this.bext.version, uInt16_),
         this.writeString_(this.bext.UMID, 64),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.loudnessValue, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.loudnessRange, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.maxTruePeakLevel, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.maxMomentaryLoudness, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.bext.maxShortTermLoudness, uInt16_),
+        byteData.pack(this.bext.loudnessValue, uInt16_),
+        byteData.pack(this.bext.loudnessRange, uInt16_),
+        byteData.pack(this.bext.maxTruePeakLevel, uInt16_),
+        byteData.pack(this.bext.maxMomentaryLoudness, uInt16_),
+        byteData.pack(this.bext.maxShortTermLoudness, uInt16_),
         this.writeString_(this.bext.reserved, 180),
         this.writeString_(
           this.bext.codingHistory, this.bext.codingHistory.length));
@@ -1874,15 +1789,15 @@ class WaveFile {
     let bytes = [];
     if (this.ds64.chunkId) {
       bytes = bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.chunkSize, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.riffSizeHigh, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.riffSizeLow, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.dataSizeHigh, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.dataSizeLow, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.originationTime, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.sampleCountHigh, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.ds64.sampleCountLow, uInt32_));
+        byteData.pack(this.ds64.chunkId, byteData.types.fourCC),
+        byteData.pack(this.ds64.chunkSize, uInt32_),
+        byteData.pack(this.ds64.riffSizeHigh, uInt32_),
+        byteData.pack(this.ds64.riffSizeLow, uInt32_),
+        byteData.pack(this.ds64.dataSizeHigh, uInt32_),
+        byteData.pack(this.ds64.dataSizeLow, uInt32_),
+        byteData.pack(this.ds64.originationTime, uInt32_),
+        byteData.pack(this.ds64.sampleCountHigh, uInt32_),
+        byteData.pack(this.ds64.sampleCountLow, uInt32_));
     }
     //if (this.ds64.tableLength) {
     //  ds64Bytes = ds64Bytes.concat(
@@ -1904,9 +1819,9 @@ class WaveFile {
       /** @type {!Array<number>} */
       let cuePointsBytes = this.getCuePointsBytes_();
       bytes = bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(cuePointsBytes.length + 4, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.dwCuePoints, uInt32_),
+        byteData.pack(this.cue.chunkId, byteData.types.fourCC),
+        byteData.pack(cuePointsBytes.length + 4, uInt32_),
+        byteData.pack(this.cue.dwCuePoints, uInt32_),
         cuePointsBytes);
     }
     return bytes;
@@ -1922,12 +1837,12 @@ class WaveFile {
     let points = [];
     for (let i=0; i<this.cue.dwCuePoints; i++) {
       points = points.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.points[i]['dwName'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.points[i]['dwPosition'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.points[i]['fccChunk'], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.points[i]['dwChunkStart'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.points[i]['dwBlockStart'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.cue.points[i]['dwSampleOffset'], uInt32_));
+        byteData.pack(this.cue.points[i]['dwName'], uInt32_),
+        byteData.pack(this.cue.points[i]['dwPosition'], uInt32_),
+        byteData.pack(this.cue.points[i]['fccChunk'], byteData.types.fourCC),
+        byteData.pack(this.cue.points[i]['dwChunkStart'], uInt32_),
+        byteData.pack(this.cue.points[i]['dwBlockStart'], uInt32_),
+        byteData.pack(this.cue.points[i]['dwSampleOffset'], uInt32_));
     }
     return points;
   }
@@ -1944,17 +1859,17 @@ class WaveFile {
       /** @type {!Array<number>} */
       let smplLoopsBytes = this.getSmplLoopsBytes_();
       bytes = bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(smplLoopsBytes.length + 36, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwManufacturer, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwProduct, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwSamplePeriod, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwMIDIUnityNote, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwMIDIPitchFraction, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwSMPTEFormat, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwSMPTEOffset, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwNumSampleLoops, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.dwSamplerData, uInt32_),
+        byteData.pack(this.smpl.chunkId, byteData.types.fourCC),
+        byteData.pack(smplLoopsBytes.length + 36, uInt32_),
+        byteData.pack(this.smpl.dwManufacturer, uInt32_),
+        byteData.pack(this.smpl.dwProduct, uInt32_),
+        byteData.pack(this.smpl.dwSamplePeriod, uInt32_),
+        byteData.pack(this.smpl.dwMIDIUnityNote, uInt32_),
+        byteData.pack(this.smpl.dwMIDIPitchFraction, uInt32_),
+        byteData.pack(this.smpl.dwSMPTEFormat, uInt32_),
+        byteData.pack(this.smpl.dwSMPTEOffset, uInt32_),
+        byteData.pack(this.smpl.dwNumSampleLoops, uInt32_),
+        byteData.pack(this.smpl.dwSamplerData, uInt32_),
         smplLoopsBytes);
     }
     return bytes;
@@ -1970,12 +1885,12 @@ class WaveFile {
     let loops = [];
     for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
       loops = loops.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.loops[i]['dwName'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.loops[i]['dwType'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.loops[i]['dwStart'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.loops[i]['dwEnd'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.loops[i]['dwFraction'], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.smpl.loops[i]['dwPlayCount'], uInt32_));
+        byteData.pack(this.smpl.loops[i]['dwName'], uInt32_),
+        byteData.pack(this.smpl.loops[i]['dwType'], uInt32_),
+        byteData.pack(this.smpl.loops[i]['dwStart'], uInt32_),
+        byteData.pack(this.smpl.loops[i]['dwEnd'], uInt32_),
+        byteData.pack(this.smpl.loops[i]['dwFraction'], uInt32_),
+        byteData.pack(this.smpl.loops[i]['dwPlayCount'], uInt32_));
     }
     return loops;
   }
@@ -1990,9 +1905,9 @@ class WaveFile {
     let bytes = [];
     if (this.fact.chunkId) {
       bytes = bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fact.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fact.chunkSize, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fact.dwSampleLength, uInt32_));
+        byteData.pack(this.fact.chunkId, byteData.types.fourCC),
+        byteData.pack(this.fact.chunkSize, uInt32_),
+        byteData.pack(this.fact.dwSampleLength, uInt32_));
     }
     return bytes;
   }
@@ -2006,14 +1921,14 @@ class WaveFile {
   getFmtBytes_() {
     if (this.fmt.chunkId) {
       return [].concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.chunkSize, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.audioFormat, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.numChannels, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.sampleRate, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.byteRate, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.blockAlign, uInt16_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.bitsPerSample, uInt16_),
+        byteData.pack(this.fmt.chunkId, byteData.types.fourCC),
+        byteData.pack(this.fmt.chunkSize, uInt32_),
+        byteData.pack(this.fmt.audioFormat, uInt16_),
+        byteData.pack(this.fmt.numChannels, uInt16_),
+        byteData.pack(this.fmt.sampleRate, uInt32_),
+        byteData.pack(this.fmt.byteRate, uInt32_),
+        byteData.pack(this.fmt.blockAlign, uInt16_),
+        byteData.pack(this.fmt.bitsPerSample, uInt16_),
         this.getFmtExtensionBytes_());
     }
     throw Error('Could not find the "fmt " chunk');
@@ -2029,22 +1944,22 @@ class WaveFile {
     let extension = [];
     if (this.fmt.chunkSize > 16) {
       extension = extension.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.cbSize, uInt16_));
+        byteData.pack(this.fmt.cbSize, uInt16_));
     }
     if (this.fmt.chunkSize > 18) {
       extension = extension.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.validBitsPerSample, uInt16_));
+        byteData.pack(this.fmt.validBitsPerSample, uInt16_));
     }
     if (this.fmt.chunkSize > 20) {
       extension = extension.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.dwChannelMask, uInt32_));
+        byteData.pack(this.fmt.dwChannelMask, uInt32_));
     }
     if (this.fmt.chunkSize > 24) {
       extension = extension.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.subformat[0], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.subformat[1], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.subformat[2], uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.fmt.subformat[3], uInt32_));
+        byteData.pack(this.fmt.subformat[0], uInt32_),
+        byteData.pack(this.fmt.subformat[1], uInt32_),
+        byteData.pack(this.fmt.subformat[2], uInt32_),
+        byteData.pack(this.fmt.subformat[3], uInt32_));
     }
     return extension;
   }
@@ -2062,9 +1977,9 @@ class WaveFile {
       let subChunksBytes = this.getLISTSubChunksBytes_(
           this.LIST[i]['subChunks'], this.LIST[i]['format']);
       bytes = bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.LIST[i]['chunkId'], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(subChunksBytes.length + 4, uInt32_),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.LIST[i]['format'], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
+        byteData.pack(this.LIST[i]['chunkId'], byteData.types.fourCC),
+        byteData.pack(subChunksBytes.length + 4, uInt32_),
+        byteData.pack(this.LIST[i]['format'], byteData.types.fourCC),
         subChunksBytes);
     }
     return bytes;
@@ -2084,18 +1999,18 @@ class WaveFile {
     for (let i=0; i<subChunks.length; i++) {
       if (format == 'INFO') {
         bytes = bytes.concat(
-          Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(subChunks[i]['chunkId'], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-          Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(subChunks[i]['value'].length + 1, uInt32_),
+          byteData.pack(subChunks[i]['chunkId'], byteData.types.fourCC),
+          byteData.pack(subChunks[i]['value'].length + 1, uInt32_),
           this.writeString_(
             subChunks[i]['value'], subChunks[i]['value'].length));
         bytes.push(0);
       } else if (format == 'adtl') {
         if (['labl', 'note'].indexOf(subChunks[i]['chunkId']) > -1) {
           bytes = bytes.concat(
-            Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(subChunks[i]['chunkId'], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-            Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(
+            byteData.pack(subChunks[i]['chunkId'], byteData.types.fourCC),
+            byteData.pack(
               subChunks[i]['value'].length + 4 + 1, uInt32_),
-            Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(subChunks[i]['dwName'], uInt32_),
+            byteData.pack(subChunks[i]['dwName'], uInt32_),
             this.writeString_(
               subChunks[i]['value'],
               subChunks[i]['value'].length));
@@ -2120,15 +2035,15 @@ class WaveFile {
    */
   getLtxtChunkBytes_(ltxt) {
     return [].concat(
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['chunkId'], __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['value'].length + 20, uInt32_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwName'], uInt32_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwSampleLength'], uInt32_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwPurposeID'], uInt32_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwCountry'], uInt16_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwLanguage'], uInt16_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwLanguage'], uInt16_),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(ltxt['dwCodePage'], uInt16_),
+      byteData.pack(ltxt['chunkId'], byteData.types.fourCC),
+      byteData.pack(ltxt['value'].length + 20, uInt32_),
+      byteData.pack(ltxt['dwName'], uInt32_),
+      byteData.pack(ltxt['dwSampleLength'], uInt32_),
+      byteData.pack(ltxt['dwPurposeID'], uInt32_),
+      byteData.pack(ltxt['dwCountry'], uInt16_),
+      byteData.pack(ltxt['dwLanguage'], uInt16_),
+      byteData.pack(ltxt['dwLanguage'], uInt16_),
+      byteData.pack(ltxt['dwCodePage'], uInt16_),
       this.writeString_(ltxt['value'], ltxt['value'].length));
   }
 
@@ -2142,8 +2057,8 @@ class WaveFile {
     let bytes = [];
     if (this.junk.chunkId) {
       return bytes.concat(
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.junk.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-        Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.junk.chunkData.length, uInt32_),
+        byteData.pack(this.junk.chunkId, byteData.types.fourCC),
+        byteData.pack(this.junk.chunkData.length, uInt32_),
         this.junk.chunkData);
     }
     return bytes;
@@ -2186,65 +2101,23 @@ class WaveFile {
     let samplesBytes = this.samplesToBytes_();
     /** @type {!Array<number>} */
     let fileBody = [].concat(
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.format, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
+      byteData.pack(this.format, byteData.types.fourCC),
       this.getJunkBytes_(),
       this.getDs64Bytes_(),
       this.getBextBytes_(),
       this.getFmtBytes_(),
       this.getFactBytes_(),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.data.chunkId, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(samplesBytes.length, uInt32_),
+      byteData.pack(this.data.chunkId, byteData.types.fourCC),
+      byteData.pack(samplesBytes.length, uInt32_),
       samplesBytes,
       this.getCueBytes_(),
       this.getSmplBytes_(),
       this.getLISTBytes_());
     return new Uint8Array([].concat(
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(this.container, __WEBPACK_IMPORTED_MODULE_5_byte_data__["types"].fourCC),
-      Object(__WEBPACK_IMPORTED_MODULE_5_byte_data__["pack"])(fileBody.length, uInt32_),
+      byteData.pack(this.container, byteData.types.fourCC),
+      byteData.pack(fileBody.length, uInt32_),
       fileBody));      
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["WaveFile"] = WaveFile;
 
-
-this.WaveFile = WaveFile;
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = require("bitdepth");
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = require("riff-chunks");
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-module.exports = require("imaadpcm");
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = require("alawmulaw");
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-module.exports = require("base64-arraybuffer");
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-module.exports = require("byte-data");
-
-/***/ })
-/******/ ]);
+module.exports = WaveFile;

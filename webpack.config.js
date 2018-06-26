@@ -5,59 +5,30 @@
 
 /**
  * @fileoverview webpack configuration file.
- * Three dist files are created:
- * - wavefile.cjs.js, CommonJS dist for Node. No dependencies included.
- * - wavefile.umd.js, UMD with dependencies included.
- * - wavefile.min.js, Compiled for browsers. All dependencies included.
  */
 
 const ClosureCompiler = require('google-closure-compiler-js').webpack;
+const BannerPlugin = require("webpack").BannerPlugin;
 
 module.exports = [
-  // CommonJS dist, no dependencies in the bundle.
-  // Will be the one in the "main" field of package.json.
-  {
-    target: 'node',
-    entry: './index.js',
-    output: {
-      filename: './dist/wavefile.cjs.js',
-      library: "WaveFile",
-      libraryTarget: "commonjs2"
-    },
-    externals: {
-      'byte-data': 'byte-data',
-      "alawmulaw": "alawmulaw",
-      "base64-arraybuffer": "base64-arraybuffer",
-      "bitdepth": "bitdepth",
-      "imaadpcm": "imaadpcm",
-      "riff-chunks": "riff-chunks"
-    },
-  },
-  // UMD with dependencies in the bundle.
-  // Will be the one in the "browser" field of package.json.
-  {
-    entry: './index.js',
-    resolve: {
-      mainFields: ['module', 'main']
-    },
-    output: {
-      filename: './dist/wavefile.umd.js',
-      library: "WaveFile",
-      libraryTarget: "umd"
-    }
-  },
   // Browser dist with dependencies, compiled.
   {
+    devtool: 'source-map',
     entry: './index.js',
+    mode: 'production',
     resolve: {
       mainFields: ['module', 'main']
     },
+    optimization: {minimize:false},
     output: {
-      filename: './dist/wavefile.min.js',
+      filename: 'wavefile.min.js',
       library: "WaveFile",
       libraryTarget: "window"
     },
     plugins: [
+      new BannerPlugin('wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
+          'base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, ' +
+          '2012 Niklas von Hertzen Licensed under the MIT license.'),
       new ClosureCompiler({
         options: {
           languageIn: 'ECMASCRIPT6',
@@ -66,8 +37,9 @@ module.exports = [
           warningLevel: 'VERBOSE',
           exportLocalPropertyDefinitions: true,
           generateExports: true,
-          outputWrapper: '%output%window' + 
-            '["WaveFile"]=window["WaveFile"]["WaveFile"]'
+          outputWrapper: '%output%window.' + 
+            'WaveFile=window.WaveFile.default;',
+          createSourceMap: true
         }
       })
     ]

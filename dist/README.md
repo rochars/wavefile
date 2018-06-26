@@ -1,22 +1,10 @@
 # Distribution
-This library is implemented as a ES6 module and also distributed as a CommonJS module, UMD module and a compiled script for browsers.
 
-- The CommonJS is the one used by Node. It is served in the "main" field of this library's package.json
-- The UMD module is compatible with Node, AMD and browsers. It is served in the "browser" field.
-- The compiled dist is browser-only and should be the one served by CDNs.
-- The "module" field points to "./index.js" and should be the default entry point for ES6.
+This library is a ES6 module also distributed as a CommonJS module, UMD and a compiled script for browsers.
 
-If you are using a module bundler to compile a module that depends on this library you might need to specify what is the correct entry point as some bundlers will assume "browser". In general, you should point to "module".
+- The **CommonJS** is the one used by Node. It is served in the "main" field of package.json
+- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field.
+- The **compiled dist** is browser-only and should be the one served by CDNs.
+- The **ES6** dist is **wavefile.js**, served as "module" in package.json
 
-## webpack example:
-```javascript
-module.exports = {
-  entry: './index.js',
-  resolve: {
-    // tells webpack to use 'module' or 'main'
-    // not 'browser'
-    mainFields: ['module', 'main']
-  },
-  ...
-};
-```
+You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser with ```<script>``` tags.

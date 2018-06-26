@@ -5,7 +5,6 @@ https://github.com/rochars/wavefile
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/) [![Example](https://img.shields.io/badge/example-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/example)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
-## About
 **wavefile** is a JavaScript module to work with .wav files.
 
 With **wavefile** you can:
@@ -23,6 +22,22 @@ And more.
 ## Install
 ```
 npm install wavefile
+```
+
+## Use
+
+### ES6
+import WaveFile from **wavefile.js**:
+```javascript
+import WaveFile from 'wavefile.js';
+let wav = new WaveFile();
+```
+
+### Node
+Require WaveFile from **wavefile**:
+```javascript
+const WaveFile = require('wavefile');
+let wav = new WaveFile();
 ```
 
 ### Browser
@@ -44,15 +59,16 @@ Or get it from [unpkg](https://www.unpkg.com):
 <script src="https://unpkg.com/wavefile@7"></script>
 ```
 
+Or as a ES6 module in modern browsers from [jspm](https://jspm.io):
+```html
+<script type="module">
+  import WaveFile from 'https://dev.jspm.io/wavefile';
+  // ...
+</script>
+```
+
 #### Browser Compatibility
 **wavefile** supports all browsers that are ES5-compliant (IE8 and below are not supported).
-
-### Node
-Require WaveFile from **wavefile**:
-```javascript
-const WaveFile = require('wavefile').WaveFile;
-let wav = new WaveFile();
-```
 
 ## See it in action
 
@@ -77,7 +93,7 @@ var wavDataURI = wav.toDataURI();
 Check out wavesurfer:  
 https://github.com/katspaugh/wavesurfer.js
 
-## Use
+## Example
 ```javascript
 const WaveFile = require('wavefile').WaveFile;
 
@@ -96,6 +112,8 @@ let wavBuffer = wav.toBuffer();
 // Call toDataURI() to get the file as a DataURI:
 let wavDataURI = wav.toDataURI();
 ```
+
+## Operation Manual
 
 ### Create wave files from scratch
 You must inform the number of channels, the sample rate, the bit depth and the samples (in this order).
@@ -786,27 +804,14 @@ Range:
 - -1.0 to 1.0 for 64-bit (float)
 
 ## Distribution
-This library is implemented as a ES6 module and also distributed as a CommonJS module, UMD module and a compiled script for browsers.
+This library is a ES6 module also distributed as a CommonJS module, UMD and a compiled script for browsers.
 
-- The CommonJS is the one used by Node. It is served in the "main" field of this library's package.json
-- The UMD module is compatible with Node, AMD and browsers. It is served in the "browser" field.
-- The compiled dist is browser-only and should be the one served by CDNs.
-- The "module" field points to "./index.js" and should be the default entry point for ES6.
+- The **CommonJS** is the one used by Node. It is served in the "main" field of package.json
+- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field.
+- The **compiled dist** is browser-only and should be the one served by CDNs.
+- The **ES6** dist is **wavefile.js**, served as "module" in package.json
 
-If you are using a module bundler to compile a module that depends on this library you might need to specify what is the correct entry point as some bundlers will assume "browser". In general, you should point to "module".
-
-### webpack example:
-```javascript
-module.exports = {
-  entry: './index.js',
-  resolve: {
-    // tells webpack to use 'module' or 'main'
-    // not 'browser'
-    mainFields: ['module', 'main']
-  },
-  ...
-};
-```
+You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser with ```<script>``` tags.
 
 ## Contributing to wavefile
 **wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.

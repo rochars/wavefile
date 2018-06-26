@@ -31,12 +31,13 @@
 
 /** @module wavefile */
 
-import {bitdepth} from 'bitdepth';
+import bitdepth from 'bitdepth';
 import {riffIndex} from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
-import {alawmulaw} from 'alawmulaw';
-import {encode, decode} from 'base64-arraybuffer';
-import {pack, packArray, unpackFrom, unpackArrayFrom, types} from 'byte-data';
+import alawmulaw from 'alawmulaw';
+import {encode, decode} from 'base64-arraybuffer-es6';
+import {pack, packArray, unpackFrom,
+  unpackArrayFrom, types} from 'byte-data';
 
 /**
  * @type {!Object}
@@ -52,7 +53,7 @@ let uInt32_ = {'bits': 32};
 /**
  * Class representing a wav file.
  */
-export class WaveFile {
+export default class WaveFile {
 
   /**
    * @param {?Uint8Array} bytes A wave file buffer.
@@ -69,7 +70,7 @@ export class WaveFile {
      */
     this.container = '';
     /**
-     * @type {number}
+     * @type {number|string}
      * @export
      */
     this.chunkSize = 0;
@@ -436,7 +437,8 @@ export class WaveFile {
    * @export
    */
   toBase64() {
-    return encode(this.toBuffer());
+    let buffer = this.toBuffer();
+    return encode(buffer, 0, buffer.length);
   }
 
   /**
@@ -1640,13 +1642,13 @@ export class WaveFile {
    * Read a number from a chunk.
    * @param {!Array<number>|!Uint8Array} bytes The chunk bytes.
    * @param {!Object} bdType The type definition.
-   * @return {number} The number.
+   * @return {number|string} The number.
    * @private
    */
   read_(bytes, bdType) {
     /** @type {number} */
     let size = bdType['bits'] / 8;
-    /** @type {number} */
+    /** @type {number|string} */
     let value = unpackFrom(bytes, bdType, this.head_);
     this.head_ += size;
     return value;
@@ -2120,5 +2122,3 @@ export class WaveFile {
       fileBody));      
   }
 }
-
-this.WaveFile = WaveFile;

@@ -9,12 +9,13 @@ test/
 
 # Development files
 .gitignore
-.npmignore
 .jshintrc
+.npmignore
 .travis.yml
 appveyor.yml
-webpack.config.js
+BUILDING.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
-BUILDING.md
 ROADMAP.md
+rollup.config.js
+webpack.config.js

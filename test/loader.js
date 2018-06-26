@@ -8,21 +8,30 @@ let wavefile;
 
 // Browser
 if (process.argv[3] == '--min') {
+    console.log('browser tests');
     require('browser-env')();
     require('../dist/wavefile.min.js');
     wavefile = window.WaveFile;
 
 // UMD
 } else if (process.argv[3] == '--umd') {
-	wavefile = require('../dist/wavefile.umd.js').WaveFile;
+	console.log('umd tests');
+	wavefile = require('../dist/wavefile.umd.js');
 
 // CommonJS
 } else if (process.argv[3] == '--cjs') {
-	wavefile = require('../dist/wavefile.cjs.js').WaveFile;
+	console.log('cjs tests');
+	wavefile = require('../dist/wavefile.cjs.js');
 
 // ESM
+} else if (process.argv[3] == '--esm') {
+	console.log('esm tests');
+	wavefile = require('../dist/wavefile.js').default;
+
+// Source
 } else {
-	wavefile = require('../index.js').WaveFile;
+	console.log('Source tests');
+	wavefile = require('../index.js').default;
 }
 
 module.exports = wavefile;
