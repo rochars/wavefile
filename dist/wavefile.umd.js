@@ -1,7 +1,3 @@
-// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.
-// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir,
-//   2012 Niklas von Hertzen Licensed under the MIT license.
-
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
