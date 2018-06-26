@@ -9,6 +9,7 @@
 
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import closure from 'rollup-plugin-closure-compiler-js';
 
 export default [
   // cjs
@@ -34,7 +35,7 @@ export default [
       commonjs(),
     ]
   },
-  // umd
+  // umd, es
   {
     input: 'index.js',
     output: [
@@ -45,17 +46,7 @@ export default [
         banner: '// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
           '// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, ' +
           '2012 Niklas von Hertzen Licensed under the MIT license.\n'
-      }
-    ],
-    plugins: [
-      nodeResolve(),
-      commonjs(),
-    ]
-  },
-  // esm
-  {
-    input: 'index.js',
-    output: [
+      },
       {
         file: 'dist/wavefile.js',
         format: 'es',
@@ -67,6 +58,33 @@ export default [
     plugins: [
       nodeResolve(),
       commonjs(),
+    ]
+  },
+  // browser
+  {
+    input: 'index.js',
+    output: [
+      {
+        name: 'WaveFile',
+        format: 'iife',
+        file: 'dist/wavefile.min.js',
+        banner: '// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
+          '// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, ' +
+          '2012 Niklas von Hertzen Licensed under the MIT license.\n',
+        footer: 'window["WaveFile"]=WaveFile;'
+      }
+    ],
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      closure({
+        languageIn: 'ECMASCRIPT6',
+        languageOut: 'ECMASCRIPT5',
+        compilationLevel: 'ADVANCED',
+        warningLevel: 'VERBOSE',
+        exportLocalPropertyDefinitions: true,
+        generateExports: true
+      })
     ]
   }
 ];
