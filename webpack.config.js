@@ -13,7 +13,6 @@ const BannerPlugin = require("webpack").BannerPlugin;
 module.exports = [
   // Browser dist with dependencies, compiled.
   {
-    devtool: 'source-map',
     entry: './index.js',
     mode: 'production',
     resolve: {
@@ -38,8 +37,7 @@ module.exports = [
           exportLocalPropertyDefinitions: true,
           generateExports: true,
           outputWrapper: '%output%window.' + 
-            'WaveFile=window.WaveFile.default;',
-          createSourceMap: true
+            'WaveFile=window.WaveFile.default;'
         }
       })
     ]

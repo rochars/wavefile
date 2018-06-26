@@ -305,7 +305,7 @@ fs.writeFileSync("32bit-file-with-bext.wav", wav.toBuffer());
 
 By default **wavefile** will not insert a "bext" chunk in new files or in files that do not already have a "bext" chunk unless a property of **WaveFile.bext** is changed from it's default value. See below the full list of properties in **WaveFile.bext**.
 
-## RF64
+### RF64
 **wavefile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
 
 ## API

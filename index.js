@@ -32,12 +32,12 @@
 /** @module wavefile */
 
 import bitdepth from 'bitdepth';
-import {riffIndex} from 'riff-chunks';
+import riffChunks from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
 import alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
-import {pack, packArray, unpackFrom,
-  unpackArrayFrom, types} from 'byte-data';
+import {pack, packArray, unpackFrom, unpackString,
+  unpackArrayFrom, packString, types} from 'byte-data';
 
 /**
  * @type {!Object}
@@ -70,7 +70,7 @@ export default class WaveFile {
      */
     this.container = '';
     /**
-     * @type {number|string}
+     * @type {number}
      * @export
      */
     this.chunkSize = 0;
@@ -394,7 +394,7 @@ export default class WaveFile {
     this.clearHeader_();
     this.readRIFFChunk_(bytes);
     /** @type {!Object} */
-    let chunk = riffIndex(bytes);
+    let chunk = riffChunks(bytes);
     this.readDs64Chunk_(bytes, chunk['subChunks']);
     this.readFmtChunk_(bytes, chunk['subChunks']);
     this.readFactChunk_(bytes, chunk['subChunks']);
@@ -1261,7 +1261,7 @@ export default class WaveFile {
    * @param {string} chunkId The chunk fourCC_.
    * @param {boolean} multiple True if there may be multiple chunks
    *    with the same chunkId.
-   * @return {Object|Array<!Object>|null}
+   * @return {?Array<!Object>}
    * @private
    */
   findChunk_(chunks, chunkId, multiple=false) {
@@ -1604,7 +1604,7 @@ export default class WaveFile {
 
   /**
    * Read bytes as a ZSTR string.
-   * @param {!Array<number>|!Uint8Array} bytes The bytes.
+   * @param {!Uint8Array} bytes The bytes.
    * @return {string} The string.
    * @private
    */
@@ -1616,14 +1616,14 @@ export default class WaveFile {
       if (bytes[i] === 0) {
         break;
       }
-      str += unpackFrom(bytes, types.chr, i);
+      str += unpackString(bytes, i, 1);
     }
     return str;
   }
 
   /**
    * Read bytes as a string from a RIFF chunk.
-   * @param {!Array<number>|!Uint8Array} bytes The bytes.
+   * @param {!Uint8Array} bytes The bytes.
    * @param {number} maxSize the max size of the string.
    * @return {string} The string.
    * @private
@@ -1632,7 +1632,7 @@ export default class WaveFile {
     /** @type {string} */
     let str = '';
     for (let i=0; i<maxSize; i++) {
-      str += unpackFrom(bytes, types.chr, this.head_);
+      str += unpackString(bytes, this.head_, 1);
       this.head_++;
     }
     return str;
@@ -1640,15 +1640,15 @@ export default class WaveFile {
 
   /**
    * Read a number from a chunk.
-   * @param {!Array<number>|!Uint8Array} bytes The chunk bytes.
+   * @param {!Uint8Array} bytes The chunk bytes.
    * @param {!Object} bdType The type definition.
-   * @return {number|string} The number.
+   * @return {number} The number.
    * @private
    */
   read_(bytes, bdType) {
     /** @type {number} */
     let size = bdType['bits'] / 8;
-    /** @type {number|string} */
+    /** @type {number} */
     let value = unpackFrom(bytes, bdType, this.head_);
     this.head_ += size;
     return value;
@@ -1664,7 +1664,7 @@ export default class WaveFile {
    */
   writeString_(str, maxSize, push=true) {
     /** @type {!Array<number>} */   
-    let bytes = packArray(str, types.chr);
+    let bytes = packString(str);
     if (push) {
       for (let i=bytes.length; i<maxSize; i++) {
         bytes.push(0);
@@ -1741,7 +1741,7 @@ export default class WaveFile {
     this.enforceBext_();
     if (this.bext.chunkId) {
       bytes = bytes.concat(
-        pack(this.bext.chunkId, types.fourCC),
+        packString(this.bext.chunkId),
         pack(602 + this.bext.codingHistory.length, uInt32_),
         this.writeString_(this.bext.description, 256),
         this.writeString_(this.bext.originator, 32),
@@ -1792,7 +1792,7 @@ export default class WaveFile {
     let bytes = [];
     if (this.ds64.chunkId) {
       bytes = bytes.concat(
-        pack(this.ds64.chunkId, types.fourCC),
+        packString(this.ds64.chunkId),
         pack(this.ds64.chunkSize, uInt32_),
         pack(this.ds64.riffSizeHigh, uInt32_),
         pack(this.ds64.riffSizeLow, uInt32_),
@@ -1822,7 +1822,7 @@ export default class WaveFile {
       /** @type {!Array<number>} */
       let cuePointsBytes = this.getCuePointsBytes_();
       bytes = bytes.concat(
-        pack(this.cue.chunkId, types.fourCC),
+        packString(this.cue.chunkId),
         pack(cuePointsBytes.length + 4, uInt32_),
         pack(this.cue.dwCuePoints, uInt32_),
         cuePointsBytes);
@@ -1842,7 +1842,7 @@ export default class WaveFile {
       points = points.concat(
         pack(this.cue.points[i]['dwName'], uInt32_),
         pack(this.cue.points[i]['dwPosition'], uInt32_),
-        pack(this.cue.points[i]['fccChunk'], types.fourCC),
+        packString(this.cue.points[i]['fccChunk']),
         pack(this.cue.points[i]['dwChunkStart'], uInt32_),
         pack(this.cue.points[i]['dwBlockStart'], uInt32_),
         pack(this.cue.points[i]['dwSampleOffset'], uInt32_));
@@ -1862,7 +1862,7 @@ export default class WaveFile {
       /** @type {!Array<number>} */
       let smplLoopsBytes = this.getSmplLoopsBytes_();
       bytes = bytes.concat(
-        pack(this.smpl.chunkId, types.fourCC),
+        packString(this.smpl.chunkId),
         pack(smplLoopsBytes.length + 36, uInt32_),
         pack(this.smpl.dwManufacturer, uInt32_),
         pack(this.smpl.dwProduct, uInt32_),
@@ -1908,7 +1908,7 @@ export default class WaveFile {
     let bytes = [];
     if (this.fact.chunkId) {
       bytes = bytes.concat(
-        pack(this.fact.chunkId, types.fourCC),
+        packString(this.fact.chunkId),
         pack(this.fact.chunkSize, uInt32_),
         pack(this.fact.dwSampleLength, uInt32_));
     }
@@ -1924,7 +1924,7 @@ export default class WaveFile {
   getFmtBytes_() {
     if (this.fmt.chunkId) {
       return [].concat(
-        pack(this.fmt.chunkId, types.fourCC),
+        packString(this.fmt.chunkId),
         pack(this.fmt.chunkSize, uInt32_),
         pack(this.fmt.audioFormat, uInt16_),
         pack(this.fmt.numChannels, uInt16_),
@@ -1980,9 +1980,9 @@ export default class WaveFile {
       let subChunksBytes = this.getLISTSubChunksBytes_(
           this.LIST[i]['subChunks'], this.LIST[i]['format']);
       bytes = bytes.concat(
-        pack(this.LIST[i]['chunkId'], types.fourCC),
+        packString(this.LIST[i]['chunkId']),
         pack(subChunksBytes.length + 4, uInt32_),
-        pack(this.LIST[i]['format'], types.fourCC),
+        packString(this.LIST[i]['format']),
         subChunksBytes);
     }
     return bytes;
@@ -2002,7 +2002,7 @@ export default class WaveFile {
     for (let i=0; i<subChunks.length; i++) {
       if (format == 'INFO') {
         bytes = bytes.concat(
-          pack(subChunks[i]['chunkId'], types.fourCC),
+          packString(subChunks[i]['chunkId']),
           pack(subChunks[i]['value'].length + 1, uInt32_),
           this.writeString_(
             subChunks[i]['value'], subChunks[i]['value'].length));
@@ -2010,7 +2010,7 @@ export default class WaveFile {
       } else if (format == 'adtl') {
         if (['labl', 'note'].indexOf(subChunks[i]['chunkId']) > -1) {
           bytes = bytes.concat(
-            pack(subChunks[i]['chunkId'], types.fourCC),
+            packString(subChunks[i]['chunkId']),
             pack(
               subChunks[i]['value'].length + 4 + 1, uInt32_),
             pack(subChunks[i]['dwName'], uInt32_),
@@ -2038,7 +2038,7 @@ export default class WaveFile {
    */
   getLtxtChunkBytes_(ltxt) {
     return [].concat(
-      pack(ltxt['chunkId'], types.fourCC),
+      packString(ltxt['chunkId']),
       pack(ltxt['value'].length + 20, uInt32_),
       pack(ltxt['dwName'], uInt32_),
       pack(ltxt['dwSampleLength'], uInt32_),
@@ -2060,7 +2060,7 @@ export default class WaveFile {
     let bytes = [];
     if (this.junk.chunkId) {
       return bytes.concat(
-        pack(this.junk.chunkId, types.fourCC),
+        packString(this.junk.chunkId),
         pack(this.junk.chunkData.length, uInt32_),
         this.junk.chunkData);
     }
@@ -2104,20 +2104,20 @@ export default class WaveFile {
     let samplesBytes = this.samplesToBytes_();
     /** @type {!Array<number>} */
     let fileBody = [].concat(
-      pack(this.format, types.fourCC),
+      packString(this.format),
       this.getJunkBytes_(),
       this.getDs64Bytes_(),
       this.getBextBytes_(),
       this.getFmtBytes_(),
       this.getFactBytes_(),
-      pack(this.data.chunkId, types.fourCC),
+      packString(this.data.chunkId),
       pack(samplesBytes.length, uInt32_),
       samplesBytes,
       this.getCueBytes_(),
       this.getSmplBytes_(),
       this.getLISTBytes_());
     return new Uint8Array([].concat(
-      pack(this.container, types.fourCC),
+      packString(this.container),
       pack(fileBody.length, uInt32_),
       fileBody));      
   }

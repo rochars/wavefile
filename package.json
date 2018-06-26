@@ -103,8 +103,8 @@
     "alawmulaw": "^4.1.0",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^6.0.0",
-    "byte-data": "^11.1.0",
+    "byte-data": "^12.0.0",
     "imaadpcm": "^3.1.0",
-    "riff-chunks": "^7.1.1"
+    "riff-chunks": "^8.0.0"
   }
 }
