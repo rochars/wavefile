@@ -1,5 +1,6 @@
 // wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.
-// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, 2012 Niklas von Hertzen Licensed under the MIT license.
+// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir,
+//   2012 Niklas von Hertzen Licensed under the MIT license.
 
 /*
  * bitdepth: Change the resolution of samples to and from any bit depth.

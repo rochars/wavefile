@@ -11,6 +11,11 @@ import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import closure from 'rollup-plugin-closure-compiler-js';
 
+// License notes for bundles that include dependencies
+const license = '// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
+  '// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir,\n' +
+  '//   2012 Niklas von Hertzen Licensed under the MIT license.\n'
+
 export default [
   // cjs
   {
@@ -43,16 +48,12 @@ export default [
         file: 'dist/wavefile.umd.js',
         name: 'WaveFile',
         format: 'umd',
-        banner: '// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
-          '// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, ' +
-          '2012 Niklas von Hertzen Licensed under the MIT license.\n'
+        banner: license
       },
       {
         file: 'dist/wavefile.js',
         format: 'es',
-        banner: '// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
-          '// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, ' +
-          '2012 Niklas von Hertzen Licensed under the MIT license.\n'
+        banner: license
       }
     ],
     plugins: [
@@ -68,9 +69,7 @@ export default [
         name: 'WaveFile',
         format: 'iife',
         file: 'dist/wavefile.min.js',
-        banner: '// wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
-          '// base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir, ' +
-          '2012 Niklas von Hertzen Licensed under the MIT license.\n',
+        banner: license,
         footer: 'window["WaveFile"]=WaveFile;'
       }
     ],
