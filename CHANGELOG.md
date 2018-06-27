@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 7.0.0 (unreleased)
+## version 7.0.0 (2018-06-27)
 - ES6 module.
 - Better memory use.
 - Smaller dist files.
