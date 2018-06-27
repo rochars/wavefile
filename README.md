@@ -78,7 +78,7 @@ https://rochars.github.io/wavefile/example
 
 ```javascript
 // Load a wav file that is encoded as 4-bit IMA ADPCM:
-var wav = new wavefile.WaveFile(ADPCMFileBuffer);
+var wav = new WaveFile(ADPCMFileBuffer);
 
 // Decode the file as 16-bit PCM, supported by most browsers:
 wav.fromIMAADPCM();
@@ -95,7 +95,7 @@ https://github.com/katspaugh/wavesurfer.js
 
 ## Example
 ```javascript
-const WaveFile = require('wavefile').WaveFile;
+const WaveFile = require('wavefile');
 
 // Load a wav file from disk into a WaveFile object
 let wav = new WaveFile(buffer);
@@ -120,7 +120,7 @@ You must inform the number of channels, the sample rate, the bit depth and the s
 
 #### Mono:
 ```javascript
-let wav = new wavefile.WaveFile();
+let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
@@ -281,7 +281,7 @@ wav.fromMuLaw("24");
 You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method.
 ```javascript
 // Load a wav file with 32-bit audio
-let wav = new wavefile.WaveFile(fs.readFileSync("32bit-file.wav"));
+let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
 
 // Change the bit depth to 24-bit
 wav.toBitDepth("24");
@@ -294,7 +294,7 @@ fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 To add BWF data to a file you can use the **bext** property:
 ```javascript
 // Load a wav file with no "bext"
-let wav = new wavefile.WaveFile(fs.readFileSync("32bit-file.wav"));
+let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
 
 // Add some BWF metadata
 wav.bext.originator = "wavefile";
