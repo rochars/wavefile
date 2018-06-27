@@ -45,6 +45,7 @@ export default [
   // umd, es
   {
     input: 'index.js',
+    treeshake: false,
     output: [
       {
         file: 'dist/wavefile.umd.js',
@@ -63,7 +64,7 @@ export default [
   },
   // browser
   {
-    input: 'index.js',
+    input: 'index.js',treeshake: false,
     output: [
       {
         name: 'WaveFile',

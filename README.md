@@ -59,11 +59,11 @@ Or get it from [unpkg](https://www.unpkg.com):
 <script src="https://unpkg.com/wavefile@7"></script>
 ```
 
-Or as a ES6 module in modern browsers from [jspm](https://jspm.io):
+Or as a module from [jspm](https://jspm.io):
 ```html
 <script type="module">
   import WaveFile from 'https://dev.jspm.io/wavefile';
-  // ...
+  console.log(new WaveFile());
 </script>
 ```
 
@@ -804,7 +804,7 @@ Range:
 - -1.0 to 1.0 for 64-bit (float)
 
 ## Distribution
-This library is a ES6 module also distributed as a CommonJS module, UMD and a compiled script for browsers.
+This library is a ES6 module also distributed as a CommonJS module, UMD module and a compiled script for browsers.
 
 - The **CommonJS** is the one used by Node. It is served in the "main" field of package.json
 - The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field.

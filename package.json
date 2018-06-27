@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "7.0.0-alpha.19",
+  "version": "7.0.0",
   "description": "Read and write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
@@ -75,7 +75,7 @@
     "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R dot",
     "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R dot",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot",
-    "test-dist": "npm run test-esm && npm run test-min && npm run test-cjs && npm run test-umd",
+    "test-dist": "npm run test-min && npm run test-esm && npm run test-cjs && npm run test-umd",
     "pack": "rollup --config && npm run test-dist && npm run test",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm run pack && npm run doc",
@@ -84,10 +84,10 @@
   "devDependencies": {
     "browser-env": "^3.2.5",
     "chai": "^4.1.2",
+    "google-closure-compiler-js": "^20180610.0.0",
     "codecov": "^3.0.2",
     "docdash": "^0.4.0",
     "esm": "^3.0.51",
-    "google-closure-compiler-js": "^20180610.0.0",
     "jsdoc": "^3.5.5",
     "jshint": "^2.9.5",
     "mocha": "^5.2.0",
@@ -102,8 +102,8 @@
     "alawmulaw": "^4.1.0",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^6.0.0",
-    "byte-data": "^12.0.0",
+    "byte-data": "^13.0.1",
     "imaadpcm": "^3.1.0",
-    "riff-chunks": "^8.0.0"
+    "riff-chunks": "^8.0.2"
   }
 }
