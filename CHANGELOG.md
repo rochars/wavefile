@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 7.0.1 (2018-06-27)
+- Add TypeScript declaration file.
+
 ## version 7.0.0 (2018-06-27)
 - ES6 module.
 - Better memory use.

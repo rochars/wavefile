@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Read and write wave files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
@@ -11,6 +11,7 @@
   "browser": "./dist/wavefile.umd.js",
   "jsdelivr": "./dist/wavefile.min.js",
   "unpkg": "./dist/wavefile.min.js",
+  "types": "./index.d.ts",
   "engines": {
     "node": ">=8"
   },
