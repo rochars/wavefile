@@ -29,10 +29,6 @@ declare class WaveFile {
 
     toBitDepth(bitDepth: string, changeResolution?: boolean): void;
 
-    interleave(): void;
-
-    deInterleave(): void;
-
     toIMAADPCM(): void;
 
     fromIMAADPCM(bitDepth?: string): void;

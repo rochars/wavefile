@@ -638,21 +638,6 @@ function packString(str) {
   return bytes;
 }
 
-/**
- * Write a string to a byte buffer.
- * @param {string} str The string to pack.
- * @param {!Uint8Array} bytes A byte buffer.
- * @param {number=} index The index to write in the buffer.
- * @return {number} The next index to write in the buffer.
- */
-function packStringTo(str, bytes, index=0) {
-  for (let i = 0; i < str.length; i++) {
-    bytes[index] = str.charCodeAt(i);
-    index++;
-  }
-  return index;
-}
-
 // Numbers
 /**
  * Pack a number as a byte buffer.
@@ -681,27 +666,6 @@ function packArray(values, theType) {
 }
 
 /**
- * Pack a number to a byte buffer.
- * @param {number} value The value.
- * @param {!Object} theType The type definition.
- * @param {!Uint8Array} buffer The output buffer.
- * @param {number=} index The index to write.
- * @return {number} The next index to write.
- * @throws {Error} If the type definition is not valid.
- * @throws {Error} If the value is not valid.
- */
-function packTo(value, theType, buffer, index=0) {
-  setUp_(theType);
-  return writeBytes_(value,
-    theType,
-    buffer,
-    index,
-    index + theType.offset,
-    validateNotUndefined,
-    theType.be);
-}
-
-/**
  * Pack a array of numbers to a byte buffer.
  * @param {!Array<number>} values The value.
  * @param {!Object} theType The type definition.
@@ -726,20 +690,6 @@ function packArrayTo(values, theType, buffer, index=0) {
       be);
   }
   return index;
-}
-
-/**
- * Unpack a number from a byte buffer.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @return {number}
- * @throws {Error} If the type definition is not valid
- */
-function unpack(buffer, theType) {
-  setUp_(theType);
-  let values = fromBytes_(
-    buffer.slice(0, theType.offset), theType);
-  return values[0];
 }
 
 /**
@@ -772,31 +722,6 @@ function unpackFrom(buffer, theType, index=0) {
     endianness(buffer, theType.offset, index, index + theType.offset);
   }
   return value;
-}
-
-/**
- * Unpack a array of numbers from a byte buffer by index.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @param {number=} start The start index. Assumes 0.
- * @param {?number=} end The end index. Assumes the buffer length.
- * @return {!Array<number>}
- * @throws {Error} If the type definition is not valid
- */
-function unpackArrayFrom(buffer, theType, start=0, end=null) {
-  setUp_(theType);
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
-  let len = end || buffer.length;
-  let values = [];
-  for (let i=start; i<len; i+=theType.offset) {
-    values.push(reader_(buffer, i));
-  }
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
-  return values;
 }
 
 /**
@@ -1261,11 +1186,6 @@ let encoderPredicted_ = 0;
  * @private
  */
 let encoderIndex_ = 0;
-/**
- * @type {number}
- * @private
- */
-let encoderStep_ = 7;
 /**
  * @type {number}
  * @private
@@ -2139,8 +2059,8 @@ class WaveFile {
       chunkId: '',
       /** @export @type {number} */
       chunkSize: 0,
-      /** @export @type {!Array<number>} */
-      samples: []
+      /** @export @type {!Uint8Array} */
+      samples: new Uint8Array(0)
     };
     /**
      * The data of the 'LIST' chunks.
@@ -2168,12 +2088,6 @@ class WaveFile {
       /** @export @type {!Array<number>} */
       chunkData: []
     };
-    /**
-     * If the data in data.samples is interleaved or not.
-     * @type {boolean}
-     * @export
-     */
-    this.isInterleaved = true;
     /**
      * The bit depth code according to the samples.
      * @type {string}
@@ -2205,6 +2119,7 @@ class WaveFile {
     this.head_ = 0;
     // Load a file from the buffer if one was passed
     // when creating the object
+    this.dataType = {};
     if(bytes) {
       this.fromBuffer(bytes);
     }
@@ -2219,7 +2134,7 @@ class WaveFile {
    * @param {string} bitDepth The audio bit depth code.
    *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
    *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>} samples Array of samples to be written.
+   * @param {!Array<number>|!Array<!Array<number>>} samples Array of samples to be written.
    *    The samples must be in the correct range according to the
    *    bit depth.
    * @param {?Object} options Optional. Used to force the container
@@ -2231,17 +2146,26 @@ class WaveFile {
     if (!options['container']) {
       options['container'] = 'RIFF';
     }
+    this.container = options['container'];
     this.bitDepth = bitDepth;
-    // interleave the samples if they were passed de-interleaved
-    this.data.samples = samples;
     if (samples.length > 0) {
       if (samples[0].constructor === Array) {
-        this.isInterleaved = false;
-        this.assureInterleaved_();
+        let finalSamples = [];
+        for (let i=0; i < samples[0].length; i++) {
+          for (let j=0; j < samples.length; j++) {
+            finalSamples.push(samples[j][i]);
+          }
+        }
+        samples = finalSamples;
       }
     }
     /** @type {number} */
     let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
+    // Turn the samples to bytes
+    this.updateDataType_();
+    this.data.samples = new Uint8Array(samples.length * numBytes);
+    packArrayTo(samples, this.dataType, this.data.samples);
+    // create headers
     this.createPCMHeader_(
       bitDepth, numChannels, sampleRate, numBytes, options);
     if (bitDepth == '4') {
@@ -2257,20 +2181,33 @@ class WaveFile {
     }
     // the data chunk
     this.data.chunkId = 'data';
-    this.data.chunkSize = this.data.samples.length * numBytes;
+    this.data.chunkSize = this.data.samples.length;
     this.validateHeader_();
     this.LEorBE_();
+  }
+
+  updateDataType_() {
+    let wordBitDepth = ((parseInt(this.bitDepth, 10) - 1) | 7) + 1;
+    let isFloat = this.bitDepth == '32f' || this.bitDepth == '64';
+    let isSigned = this.bitDepth != '8';
+    let isBe = this.container == 'RIFX';
+    this.dataType = {bits: wordBitDepth, float: isFloat, signed: isSigned, be: isBe};
+    if (this.bitDepth == '4' || this.bitDepth == '8a' || this.bitDepth == '8m' ) {
+      this.dataType.bits = 8;
+      this.dataType.signed = false;
+    }
   }
 
   /**
    * Set up the WaveFile object from a byte buffer.
    * @param {!Uint8Array} bytes The buffer.
+   * @param {boolean=} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    * @export
    */
-  fromBuffer(bytes) {
+  fromBuffer(bytes, samples=true) {
     this.head_ = 0;
     this.clearHeader_();
     this.readRIFFChunk_(bytes);
@@ -2282,10 +2219,11 @@ class WaveFile {
     this.readBextChunk_(bytes, chunk.subChunks);
     this.readCueChunk_(bytes, chunk.subChunks);
     this.readSmplChunk_(bytes, chunk.subChunks);
-    this.readDataChunk_(bytes, chunk.subChunks);
+    this.readDataChunk_(bytes, chunk.subChunks, samples);
     this.readJunkChunk_(bytes, chunk.subChunks);
     this.readLISTChunk_(bytes, chunk.subChunks);
     this.bitDepthFromFmt_();
+    this.updateDataType_();
   }
 
   /**
@@ -2297,7 +2235,6 @@ class WaveFile {
    */
   toBuffer() {
     this.validateHeader_();
-    this.assureInterleaved_();
     return this.createWaveFile_();
   }
 
@@ -2353,10 +2290,14 @@ class WaveFile {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         this.bitDepth,
-        this.data.samples);
+        unpackArray(this.data.samples, this.dataType));
     } else {
-      this.container = 'RIFF';
-      this.LEorBE_();
+      this.dataType.be = true;
+      this.fromScratch(
+        this.fmt.numChannels,
+        this.fmt.sampleRate,
+        this.bitDepth,
+        unpackArray(this.data.samples, this.dataType));
     }
   }
 
@@ -2370,11 +2311,15 @@ class WaveFile {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         this.bitDepth,
-        this.data.samples,
+        unpackArray(this.data.samples, this.dataType),
         {'container': 'RIFX'});
     } else {
-      this.container = 'RIFX';
-      this.LEorBE_();
+      this.fromScratch(
+        this.fmt.numChannels,
+        this.fmt.sampleRate,
+        this.bitDepth,
+        unpackArray(this.data.samples, this.dataType),
+        {'container': 'RIFX'});
     }
   }
 
@@ -2394,57 +2339,16 @@ class WaveFile {
       toBitDepth = this.realBitDepth_(bitDepth);
       thisBitDepth = this.realBitDepth_(this.bitDepth);
     }
-    this.assureInterleaved_();
     this.assureUncompressed_();
-    this.truncateSamples();
-    bitdepth(this.data.samples, thisBitDepth, toBitDepth);
+    let samples = unpackArray(this.data.samples, this.dataType);
+    this.truncateSamples(samples);
+    bitdepth(samples, thisBitDepth, toBitDepth);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       bitDepth,
-      this.data.samples,
+      samples,
       {'container': this.correctContainer_()});
-  }
-
-  /**
-   * Interleave multi-channel samples.
-   * @export
-   */
-  interleave() {
-    if (!this.isInterleaved) {
-      /** @type {!Array<number>} */
-      let finalSamples = [];
-      for (let i=0; i < this.data.samples[0].length; i++) {
-        for (let j=0; j < this.data.samples.length; j++) {
-          finalSamples.push(this.data.samples[j][i]);
-        }
-      }
-      this.data.samples = finalSamples;
-      this.isInterleaved = true;
-    }
-  }
-
-  /**
-   * De-interleave samples into multiple channels.
-   * @export
-   */
-  deInterleave() {
-    if (this.isInterleaved) {
-      /** @type {!Array<!Array<number>>} */
-      let finalSamples = [];
-      for (let i=0; i < this.fmt.numChannels; i++) {
-        finalSamples[i] = [];
-      }
-      /** @type {number} */
-      let len = this.data.samples.length;
-      for (let i=0; i < len; i+=this.fmt.numChannels) {
-        for (let j=0; j < this.fmt.numChannels; j++) {
-          finalSamples[j].push(this.data.samples[i+j]);
-        }
-      }
-      this.data.samples = finalSamples;
-      this.isInterleaved = false;
-    }
   }
 
   /**
@@ -2466,7 +2370,7 @@ class WaveFile {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
-        encode(this.data.samples),
+        encode(unpackArray(this.data.samples, this.dataType)),
         {'container': this.correctContainer_()});
     }
   }
@@ -2496,12 +2400,11 @@ class WaveFile {
    */
   toALaw() {
     this.assure16Bit_();
-    this.assureInterleaved_();
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      alawmulaw.alaw.encode(this.data.samples),
+      alawmulaw.alaw.encode(unpackArray(this.data.samples, this.dataType)),
       {'container': this.correctContainer_()});
   }
 
@@ -2530,12 +2433,12 @@ class WaveFile {
    */
   toMuLaw() {
     this.assure16Bit_();
-    this.assureInterleaved_();
+    let samples = unpackArray(this.data.samples, this.dataType);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      alawmulaw.mulaw.encode(this.data.samples),
+      alawmulaw.mulaw.encode(samples),
       {'container': this.correctContainer_()});
   }
 
@@ -2914,7 +2817,8 @@ class WaveFile {
       bitDepth, numChannels, sampleRate, numBytes, options) {
     this.createPCMHeader_(
       bitDepth, numChannels, sampleRate, numBytes, options);
-    this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
+    //this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
+    this.chunkSize = 36 + 24 + this.data.samples.length;
     this.fmt.chunkSize = 40;
     this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
     this.fmt.cbSize = 22;
@@ -2986,7 +2890,8 @@ class WaveFile {
   createPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
     this.clearHeader_();
     this.container = options['container'];
-    this.chunkSize = 36 + this.data.samples.length * numBytes;
+    //this.chunkSize = 36 + this.data.samples.length * numBytes;
+    this.chunkSize = 36 + this.data.samples.length;
     this.format = 'WAVE';
     this.fmt.chunkId = 'fmt ';
     this.fmt.chunkSize = 16;
@@ -3108,16 +3013,6 @@ class WaveFile {
       this.fromMuLaw();
     } else if (this.bitDepth == '4') {
       this.fromIMAADPCM();
-    }
-  }
-
-  /**
-   * Interleave the samples in case they are de-Interleaved.
-   * @private
-   */
-  assureInterleaved_() {
-    if (!this.isInterleaved) {
-      this.interleave();
     }
   }
 
@@ -3314,16 +3209,21 @@ class WaveFile {
    * Read the 'data' chunk of a wave file.
    * @param {!Uint8Array} buffer The wav file buffer.
    * @param {!Object} signature The file signature.
+   * @param {boolean} samples True if the samples should be loaded.
    * @throws {Error} If no 'data' chunk is found.
    * @private
    */
-  readDataChunk_(buffer, signature) {
+  readDataChunk_(buffer, signature, samples) {
     /** @type {?Object} */
     let chunk = this.findChunk_(signature, 'data');
     if (chunk) {
       this.data.chunkId = 'data';
       this.data.chunkSize = chunk.chunkSize;
-      this.samplesFromBytes_(buffer, chunk);
+      if (samples) {
+        this.data.samples = buffer.slice(
+          chunk.chunkData.start,
+          chunk.chunkData.end);
+      }
     } else {
       throw Error('Could not find the "data" chunk');
     }
@@ -3568,31 +3468,18 @@ class WaveFile {
    * Truncate float samples on over and underflow.
    * @private
    */
-  truncateSamples() {
+  truncateSamples(samples) {
     if (this.fmt.audioFormat == 3) {
       /** @type {number} */   
-      let len = this.data.samples.length;
+      let len = samples.length;
       for (let i=0; i<len; i++) {
-        if (this.data.samples[i] > 1) {
-          this.data.samples[i] = 1;
-        } else if (this.data.samples[i] < -1) {
-          this.data.samples[i] = -1;
+        if (samples[i] > 1) {
+          samples[i] = 1;
+        } else if (samples[i] < -1) {
+          samples[i] = -1;
         }
       }
     }
-  }
-
-  /**
-   * Turn bytes to samples and load them in the data.samples property.
-   * @param {!Uint8Array} bytes The bytes.
-   * @private
-   */
-  samplesFromBytes_(bytes, chunkData) {
-    this.data.samples = unpackArrayFrom(
-      bytes,
-      this.getSamplesType_(),
-      chunkData.chunkData.start,
-      chunkData.chunkData.end);
   }
 
   /**
@@ -3982,7 +3869,10 @@ class WaveFile {
    */
   createWaveFile_() {
     /** @type {!Array<number>} */
-    let samplesBytes = this.samplesToBytes_();
+    let samplesBytes = []; // tmp bridge pre-v8
+    for(let i=0; i<this.data.samples.length; i++) {
+      samplesBytes.push(this.data.samples[i]);
+    }
     /** @type {!Array<number>} */
     let fileBody = [].concat(
       packString(this.format),

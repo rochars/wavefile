@@ -6,47 +6,7 @@
   <title>wavefile &copy; 2018 Rafael da Silva Rocha. MIT License.</title>
   <!-- bootstrap -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-  <style>
-  body {
-    padding: 20px;
-  }
-  .waveform {
-    background-color: #000;
-    margin: 0 0 10px 0;
-  }
-  .drop-zone {
-    background-color: #ddd;
-    padding: 10px 20px;
-    margin: 0 0 10px 0;
-  }
-  .convert {
-    margin: 0 0 10px 0;
-    font-size: 0.9em; 
-  }
-
-  .contents {
-    margin: 0 0 20px 0;
-  }
-  .player-info h2 {
-    font-size: 1.2em;
-  }
-  .player-info {
-    font-size: 0.8em;
-    background-color: #ddd;
-  }
-  .details {
-    padding: 30px;
-  }
-  .loading {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #eee;
-    opacity: 0.5;
-  }
-  </style>
+  <link rel="stylesheet" href="default.css" />
 </head>
 <body>
   <h1>wavefile</h1>
@@ -55,13 +15,16 @@
   <!-- drop file -->
   <div id="drop-zone" class="drop-zone">
       <h2>Drop files here and click on play</h2>
+
+      <!-- waveform -->
       <div id="waveform" class="waveform">
       </div>
+      <!--/waveform -->
 
+      <!-- change the file -->
       <div class="convert">
         Convert to:
         <div class="convertBlock">
-          <!-- <input type="radio" name="bit" value="4" onclick="changeBitDepth()"> 4-bit ADPCM -->
           <label><input type="radio" name="bit" value="8a" onclick="changeBitDepth()"> 8-bit A-Law</label>
           <label><input type="radio" name="bit" value="8m" onclick="changeBitDepth()"> 8-bit mu-Law</label>
           <label><input type="radio" name="bit" value="8" onclick="changeBitDepth()"> 8-bit</label>
@@ -73,82 +36,73 @@
           <label><input type="radio" name="bit" value="32f" onclick="changeBitDepth()"> 32-bit FP</label>
           <label><input type="radio" name="bit" value="64" onclick="changeBitDepth()"> 64-bit FP</label>
         </div>
-        <!--
-        <div class="convertBlock">
-          <label><input type="radio" name="container" value="RIFF" onclick="changeContainer()"> RIFF</label>
-          <label><input type="radio" name="container" value="RIFX" onclick="changeContainer()"> RIFX</label>
-        </div>
-      -->
       </div>
+      <!--/change the file -->
 
-      <button type="button"
-              class="btn btn-primary"
-              onclick="wavesurfer.playPause()">
-          Play</button>
-      <!-- <button type="button"
-              class="btn btn-primary"
-              onclick="download()">
-          Download</button> -->
+      <button type="button" class="btn btn-primary" onclick="wavesurfer.playPause()">Play</button>
+      
   </div>
   <!--/drop file -->
 
-  <!-- -->
+  <!-- main contents -->
   <div id="contents" class="contents container-fluid">
-  <div class="row">
+    <div class="row">
 
-    <!-- file info -->
-    <div class="col-12 col-md-8 file-info details">
-      <h2>File info:</h2>
-      <ul>
-        <li>Container: <span id="chunkId"></span></li>
-        <li>Format: <span id="format"></span></li>
-        <li>Bits per sample: <span id="bitsPerSample"></span></li>
-        <li>Valid bits per sample: <span id="validBitsPerSample"></span></li>
-        <li>Audio format: <span id="audioFormat"></span></li>
-        <li>Sample rate: <span id="sampleRate"></span></li>
-        <li>Number of samples: <span id="sampleCount"></span></li>
-      </ul>
+      <!-- file info -->
+      <div class="col-12 col-md-8 file-info details">
+        <h2>File info:</h2>
+        <ul>
+          <li>Container: <span id="chunkId"></span></li>
+          <li>Format: <span id="format"></span></li>
+          <li>Bits per sample: <span id="bitsPerSample"></span></li>
+          <li>Valid bits per sample: <span id="validBitsPerSample"></span></li>
+          <li>Audio format: <span id="audioFormat"></span></li>
+          <li>Sample rate: <span id="sampleRate"></span></li>
+          <li>Number of samples: <span id="sampleCount"></span></li>
+        </ul>
+      </div>
+      <!--/file info -->
+
+      <!-- about -->
+      <div class="col-6 col-md-4 player-info details">
+        <h2>Supported bit depths:</h2>
+        <ul>
+          <li>4-bit (encoded as IMA-ADPCM)</li>
+          <li>8-bit</li>
+          <li>16-bit</li>
+          <li>24-bit</li>
+          <li>32-bit integer</li>
+          <li>Anything between 8-bit and 32-bit (11-bit, 12-bit, etc)</li>
+          <li>32-bit floating-point</li>
+          <li>64-bit floating-point</li>
+        </ul>
+
+        <h2>Supported containers:</h2>
+        <ul>
+          <li>RIFF</li>
+          <li>RIFX</li>
+          <li>RF64</li>
+        </ul>
+
+        <h2>Supported compression types:</h2>
+        <ul>
+          <li>IMA ADPCM</li>
+          <li>mu-Law</li>
+          <li>A-Law</li>
+        </ul>
+      </div>
+      <!--/about -->
+
     </div>
-    <!--/file info -->
-
-    <!-- about -->
-    <div class="col-6 col-md-4 player-info details">
-      <h2>Supported bit depths:</h2>
-      <ul>
-        <li>4-bit (encoded as IMA-ADPCM)</li>
-        <li>8-bit</li>
-        <li>16-bit</li>
-        <li>24-bit</li>
-        <li>32-bit integer</li>
-        <li>Anything between 8-bit and 32-bit (11-bit, 12-bit, etc)</li>
-        <li>32-bit floating-point</li>
-        <li>64-bit floating-point</li>
-      </ul>
-
-      <h2>Supported containers:</h2>
-      <ul>
-        <li>RIFF</li>
-        <li>RIFX</li>
-        <li>RF64</li>
-      </ul>
-
-      <h2>Supported compression types:</h2>
-      <ul>
-        <li>IMA ADPCM</li>
-        <li>mu-Law</li>
-        <li>A-Law</li>
-      </ul>
-    </div>
-    <!--/about -->
-
   </div>
-  </div>
-  <!-- -->
+  <!--/main contents -->
 
+  <!-- footer -->
   <footer>
     <p>Copyright &copy; 2017-2018 Rafael da Silva Rocha.<br>
     <a href="https://github.com/rochars/wavefile">https://github.com/rochars/wavefile</a></p>
   </footer>
+  <!--/footer -->
 
   <div class="loading"></div>
 
@@ -158,98 +112,9 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
   <!-- wavesurfer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.5/wavesurfer.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/wavefile@7"></script>
-  <script>
-    $('.loading').toggle();
-    var wav = new WaveFile();
-    var wavesurfer = WaveSurfer.create({
-              container: '#waveform',
-              waveColor: 'green',
-              progressColor: 'white'
-          });
-
-    function handleFileSelect(evt) {
-      $('.loading').toggle();
-      evt.stopPropagation();
-      evt.preventDefault();
-      var files = evt.dataTransfer.files;
-      var reader = new FileReader();
-      reader.onload = function() {
-          wav.fromBuffer(new Uint8Array(this.result));
-          loadFileInfo()
-          if (wav.bitDepth == "8m") {
-              wav.fromMuLaw();
-          } else if (wav.bitDepth == "8a") {
-              wav.fromALaw();
-          } else if (wav.bitDepth == "4") {
-              wav.fromIMAADPCM();
-          }
-          if (wav.container != "RIFF") {
-            wav.toRIFF();
-          }
-          wav.toBitDepth("16");
-          wavesurfer.load(wav.toDataURI());
-          $('.loading').toggle();
-      }
-      reader.readAsArrayBuffer(files[0]);
-    }
-
-    function handleDragOver(evt) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-    }
-
-    function changeBitDepth() {
-      var bitDepth = $('input[name=bit]:checked').val();
-      if (bitDepth == "4") {
-        wav.toIMAADPCM();
-        loadFileInfo()
-        wav.fromIMAADPCM();
-      } else if(bitDepth == "8a") {
-        wav.toALaw();
-        loadFileInfo()
-        wav.fromALaw();
-      } else if(bitDepth == "8m") {
-        wav.toMuLaw();
-        loadFileInfo()
-        wav.fromMuLaw();
-      } else {
-        wav.toBitDepth(bitDepth);
-        loadFileInfo()
-      }
-      // Always 16-bit linear PCM so it can play in the browser
-      wav.toBitDepth("16");
-      wavesurfer.load(wav.toDataURI());
-    }
-
-    function changeContainer() {
-      var container = $('input[name=container]:checked').val();
-      if (container == "RIFX" && wav.container != "RIFX") {
-        wav.toRIFX();
-        loadFileInfo()
-        wav.toRIFF();
-      } else if (container == "RIFF") {
-        wav.toRIFF();
-        loadFileInfo()
-      }
-      wavesurfer.load(wav.toDataURI());
-    }
-
-    function loadFileInfo() {
-        $("#chunkId").text(wav.container);
-        $("#format").text(wav.format);
-        $("#bitsPerSample").text(wav.fmt.bitsPerSample);
-        $("#validBitsPerSample").text(wav.fmt.validBitsPerSample ? wav.fmt.validBitsPerSample : "Not applicable");
-        $("#audioFormat").text(wav.fmt.audioFormat);
-        $("#sampleRate").text(wav.fmt.sampleRate);
-        $("#sampleCount").text(wav.data.samples.length);
-    }
-
-    // Setup the dnd listeners.
-    var dropZone = document.getElementById('drop-zone');
-    dropZone.addEventListener('dragover', handleDragOver, false);
-    dropZone.addEventListener('drop', handleFileSelect, false);
-  </script>
+  <!-- wavefile -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/wavefile@7"></script> -->
+  <!-- the example player -->
+  <script src="player.js"></script>
 </body>
 </html>

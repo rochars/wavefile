@@ -2,26 +2,21 @@
  * WaveFile: https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  *
- * Test the toBitDepth() method to convert an 64-bit file to 8-bit.
- * The 64-bit file have values > 1, so after the conversion the
- * values will cause overflow when packed to 8-bit. WaveFile should
- * truncate the values.
- *
+ * Test reading 24-bit files.
+ * 
  */
-
 
 const assert = require("assert");
 const fs = require("fs");
-const WaveFile = require("../test/loader.js");
+const WaveFile = require("../../test/loader.js");
 const path = "test/files/";
-describe("32-bit IEEE from file to 8-bit", function() {
-    
-    let wav = new WaveFile(
-        fs.readFileSync(path + "64bit-48kHz-noBext-mono-overflow.wav"));
-    wav.data.samples[0] = -1.5;
-    wav.toBitDepth("8");
-    fs.writeFileSync(
-        path + "/out/to-bit-depth/64-to-8-overflow.wav", wav.toBuffer());
+
+describe("Read only the metadata of the file", function() {
+
+    let wBytes = fs.readFileSync(path + "24bit-16kHz-bext-mono.wav");
+    let wav = new WaveFile();
+    wav.fromBuffer(wBytes, false);
+    let wav2 = new WaveFile(wBytes);
 
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav.container, "RIFF");
@@ -41,17 +36,17 @@ describe("32-bit IEEE from file to 8-bit", function() {
     it("numChannels should be 1", function() {
         assert.equal(wav.fmt.numChannels, 1);
     });
-    it("sampleRate should be 48000", function() {
-        assert.equal(wav.fmt.sampleRate, 48000);
+    it("sampleRate should be 16000", function() {
+        assert.equal(wav.fmt.sampleRate, 16000);
     });
-    it("byteRate be 48000", function() {
+    it("byteRate should be 48000", function() {
         assert.equal(wav.fmt.byteRate, 48000);
     });
-    it("blockAlign should be 1", function() {
-        assert.equal(wav.fmt.blockAlign, 1);
+    it("blockAlign should be 3", function() {
+        assert.equal(wav.fmt.blockAlign, 3);
     });
-    it("bitsPerSample should be 8", function() {
-        assert.equal(wav.fmt.bitsPerSample, 8);
+    it("bitsPerSample should be 24", function() {
+        assert.equal(wav.fmt.bitsPerSample, 24);
     });
     it("dataChunkId should be 'data'", function() {
         assert.equal(wav.data.chunkId, 'data');
@@ -59,7 +54,10 @@ describe("32-bit IEEE from file to 8-bit", function() {
     it("dataChunkSize should be > 0", function() {
         assert.ok(wav.data.chunkSize > 0);
     });
-    it("samples.length should be > 0", function() {
-        assert.ok(wav.data.samples.length > 0);
+    it("samples.length should be == 0", function() {
+        assert.equal(wav.data.samples.length, 0);
+    });
+    it("wav.data.chunkSize (meta) == wav.data.chunkSize (samples)", function() {
+        assert.equal(wav.data.chunkSize, wav2.data.chunkSize);
     });
 });

@@ -113,6 +113,30 @@ let wavBuffer = wav.toBuffer();
 let wavDataURI = wav.toDataURI();
 ```
 
+## Table of Contents
+- [Operation Manual](#operation-manual)
+  * [Create wave files from scratch](#create-wave-files-from-scratch)
+  * [Add RIFF tags to files](#add-riff-tags-to-files)
+  * [Add cue points to files](#add-cue-points-to-files)
+  * [RIFX](#rifx)
+  * [IMA-ADPCM](#ima-adpcm)
+  * [A-Law](#a-law)
+  * [mu-Law](#mu-law)
+  * [Change the bit depth](#change-the-bit-depth)
+  * [Add BWF metadata](#add-bwf-metadata)
+  * [RF64](#rf64)
+- [API](#api)
+  * [The WaveFile methods:](#the-wavefile-methods-)
+  * [The WaveFile properties](#the-wavefile-properties)
+    + [Cue points](#cue-points)
+    + [Sample loops](#sample-loops)
+    + [LIST chunk](#list-chunk)
+- [The samples](#the-samples)
+- [Distribution](#distribution)
+- [Contributing to wavefile](#contributing-to-wavefile)
+- [References](#references)
+- [Legal](#legal)
+
 ## Operation Manual
 
 ### Create wave files from scratch
@@ -153,21 +177,6 @@ You can also use any bit depth between "8" and "53", like **"11", "12", "17", "2
 
 #### A word on bit depth
 Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.
-
-### Interleave and de-interleave stereo samples
-Samples in WaveFile objects are interleaved by default, even when you create a WaveFile object using de-interleaved samples.
-
-You can de-interleave them:
-```javascript
-// De-interleave the samples into multiple channels
-wav.deInterleave();
-```
-
-To interleave them:
-```javascript
-// Interleave stereo samples
-wav.interleave();
-```
 
 ### Add RIFF tags to files
 You can create (or overwrite) tags on files with the **WaveFile.setTag()** method.
@@ -320,7 +329,7 @@ To create a WaveFile object:
 WaveFile(bytes=null);
 ```
 
-### The WaveFile methods:
+### The WaveFile methods
 ```javascript
 /**
  * Set up the WaveFile object based on the arguments passed.
@@ -405,16 +414,6 @@ WaveFile.toRIFX() {}
  * @throws {Error} If the bit depth is not valid.
  */
 WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
-
-/**
- * Interleave multi-channel samples.
- */
-WaveFile.interleave() {}
-
-/**
- * De-interleave samples into multiple channels.
- */
-WaveFile.deInterleave() {}
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.
@@ -718,11 +717,6 @@ WaveFile.junk = {
     "chunkData": []
 };
 /**
- * If the data in data.samples is interleaved or not.
- * @type {boolean}
- */
-WaveFile.isInterleaved = true;
-/**
  * The bit depth code according to the samples.
  * @type {string}
  */
@@ -804,14 +798,23 @@ Range:
 - -1.0 to 1.0 for 64-bit (float)
 
 ## Distribution
-This library is a ES6 module also distributed as a CommonJS module, UMD module and a compiled script for browsers.
+This library is a ES6 module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed via NPM.
 
-- The **CommonJS** is the one used by Node. It is served in the "main" field of package.json
-- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field.
-- The **compiled dist** is browser-only and should be the one served by CDNs.
-- The **ES6** dist is **wavefile.js**, served as "module" in package.json
+### If you are using **wavefile** in a browser:
 
-You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser with ```<script>``` tags.
+You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser with ```<script>``` tags. Ideally you should use **wavefile.min.js**. It is also available via https://unpkg.com and https://www.jsdelivr.com/ CDNs.
+
+### If you are using **wavefile** as a dependency:
+
+- The **CommonJS** is the dist file used by Node. It is served in the "main" field of package.json. It includes all the source but no dependencies. Dependencies will be imported from your node_modules folder.
+
+- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field. It includes all dependencies. This file is not compiled as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.
+
+- The **compiled dist** is browser-only and should be the one served by CDNs. It includes all the dependencies. It is used in the "unpkg" and "jsdelivr" fields of package.json.
+
+- The **ES6 dist** is **wavefile.js**, served as "es2015" in package.json. It includes all the dependencies.
+
+- **./index.js** is served as "module". Its should be used by systems that support ES6 and are aware of Node's module path resolution (a module bundler, for instance). This should be the entry point for bundlers in most cases - this will avoid code duplication in the case of shared dependencies (as opposed to using "browser" as the entry point).
 
 ## Contributing to wavefile
 **wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.
@@ -823,9 +826,7 @@ See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTI
 https://google.github.io/styleguide/jsguide.html
 
 ### Code of conduct
-This project embraces the [Contributor Covenant, version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting rocha.rafaelsilva@gmail.com.
+This project is bound by a Code of Conduct: The [Contributor Covenant, version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 
 ## References
 

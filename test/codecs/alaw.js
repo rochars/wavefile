@@ -6,6 +6,7 @@
  * 
  */
 
+
 const assert = require('assert');
 const fs = require("fs");
 const WaveFile = require("../../test/loader.js");
