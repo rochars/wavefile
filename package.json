@@ -1,7 +1,7 @@
 {
   "name": "wavefile",
-  "version": "8.0.0-alpha.0",
-  "description": "Read and write wave files.",
+  "version": "8.0.0-alpha.1",
+  "description": "Read and write huge wav files, fast. Small ones too.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",

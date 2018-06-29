@@ -674,19 +674,6 @@
   }
 
   /**
-   * Pack an array of numbers as a byte buffer.
-   * @param {!Array<number>} values The values.
-   * @param {!Object} theType The type definition.
-   * @return {!Array<number>} The packed values.
-   * @throws {Error} If the type definition is not valid.
-   * @throws {Error} If any of the values are not valid.
-   */
-  function packArray(values, theType) {
-    setUp_(theType);
-    return toBytes_(values, theType);
-  }
-
-  /**
    * Pack a number to a byte buffer.
    * @param {number} value The value.
    * @param {!Object} theType The type definition.
@@ -2190,17 +2177,7 @@
       }
       this.container = options['container'];
       this.bitDepth = bitDepth;
-      if (samples.length > 0) {
-        if (samples[0].constructor === Array) {
-          let finalSamples = [];
-          for (let i=0; i < samples[0].length; i++) {
-            for (let j=0; j < samples.length; j++) {
-              finalSamples.push(samples[j][i]);
-            }
-          }
-          samples = finalSamples;
-        }
-      }
+      samples = this.interleave_(samples);
       /** @type {number} */
       let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
       // Turn the samples to bytes
@@ -2228,16 +2205,41 @@
       this.LEorBE_();
     }
 
+    /**
+     * Update the type definition used to read and write the samples.
+     */
     updateDataType_() {
-      let wordBitDepth = ((parseInt(this.bitDepth, 10) - 1) | 7) + 1;
-      let isFloat = this.bitDepth == '32f' || this.bitDepth == '64';
-      let isSigned = this.bitDepth != '8';
-      let isBe = this.container == 'RIFX';
-      this.dataType = {bits: wordBitDepth, float: isFloat, signed: isSigned, be: isBe};
-      if (this.bitDepth == '4' || this.bitDepth == '8a' || this.bitDepth == '8m' ) {
+      /** @type {!Object} */
+      this.dataType = {
+        bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+        float: this.bitDepth == '32f' || this.bitDepth == '64',
+        signed: this.bitDepth != '8',
+        be: this.container == 'RIFX'
+      };
+      if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
         this.dataType.bits = 8;
         this.dataType.signed = false;
       }
+    }
+
+    /**
+     * Set up the WaveFile object from a byte buffer.
+     * @param {!Array<number>|!Array<!Array<number>>} samples The samples.
+     */
+    interleave_(samples) {
+      if (samples.length > 0) {
+        if (samples[0].constructor === Array) {
+          /** @type {!Array<number>} */
+          let finalSamples = [];
+          for (let i=0; i < samples[0].length; i++) {
+            for (let j=0; j < samples.length; j++) {
+              finalSamples.push(samples[j][i]);
+            }
+          }
+          samples = finalSamples;
+        }
+      }
+      return samples;
     }
 
     /**
@@ -2297,6 +2299,7 @@
      * @export
      */
     toBase64() {
+      /** @type {Uint8Array} */
       let buffer = this.toBuffer();
       return encode$3(buffer, 0, buffer.length);
     }
@@ -2375,13 +2378,16 @@
      * @export
      */
     toBitDepth(bitDepth, changeResolution=true) {
+      /** @type {string} */
       let toBitDepth = bitDepth;
+      /** @type {string} */
       let thisBitDepth = this.bitDepth;
       if (!changeResolution) {
         toBitDepth = this.realBitDepth_(bitDepth);
         thisBitDepth = this.realBitDepth_(this.bitDepth);
       }
       this.assureUncompressed_();
+      /** @type {!Array<number>} */
       let samples = unpackArray(this.data.samples, this.dataType);
       this.truncateSamples(samples);
       bitdepth(samples, thisBitDepth, toBitDepth);
@@ -2475,6 +2481,7 @@
      */
     toMuLaw() {
       this.assure16Bit_();
+      /** @type {Array<number>} */
       let samples = unpackArray(this.data.samples, this.dataType);
       this.fromScratch(
         this.fmt.numChannels,
@@ -3497,16 +3504,6 @@
     }
 
     /**
-     * Turn the samples to bytes.
-     * @return {!Array<number>} The bytes.
-     * @private
-     */
-    samplesToBytes_() {
-      return packArray(
-        this.data.samples, this.getSamplesType_());
-    }
-
-    /**
      * Truncate float samples on over and underflow.
      * @private
      */
@@ -3522,22 +3519,6 @@
           }
         }
       }
-    }
-
-    /**
-     * Get the data type definition for the samples.
-     * @return {!Object<string, number|boolean>} The type definition.
-     * @private
-     */
-    getSamplesType_() {
-      /** @type {!Object<string, number|boolean>} */
-      let bdType = {
-        be: this.container === 'RIFX',
-        bits: this.fmt.bitsPerSample == 4 ? 8 : this.fmt.bitsPerSample,
-        float: this.fmt.audioFormat == 3 ? true : false
-      };
-      bdType.signed = bdType.bits == 8 ? false : true;
-      return bdType;
     }
 
     /**
@@ -3910,56 +3891,36 @@
      * @private
      */
     createWaveFile_() {
-      let junkBytes = this.getJunkBytes_();
-      let ds64Bytes = this.getDs64Bytes_();
-      let bextBytes = this.getBextBytes_();
-      let fmtBytes = this.getFmtBytes_();
-      let factBytes = this.getFactBytes_();
-      let dataChunkIdBytes = packString(this.data.chunkId);
-      let dataChunkLengthBytes = pack(this.data.samples.length, uInt32_$1);
-      let cueBytes = this.getCueBytes_();
-      let smplBytes = this.getSmplBytes_();
-      let LISTBytes = this.getLISTBytes_();
-      let fileBodyLength = junkBytes.length + 
-        ds64Bytes.length + 
-        bextBytes.length + 
-        fmtBytes.length + 
-        factBytes.length + 
-        dataChunkIdBytes.length + 
-        dataChunkLengthBytes.length + 
-        this.data.samples.length + 
-        cueBytes.length + 
-        smplBytes.length + 
-        LISTBytes.length;
+      // @type {!Array<Array<number>|Uint8Array>}
+      let fileBody = [
+        this.getJunkBytes_(),
+        this.getDs64Bytes_(),
+        this.getBextBytes_(),
+        this.getFmtBytes_(),
+        this.getFactBytes_(),
+        packString(this.data.chunkId),
+        pack(this.data.samples.length, uInt32_$1),
+        this.data.samples,
+        this.getCueBytes_(),
+        this.getSmplBytes_(),
+        this.getLISTBytes_()
+      ];
+      // @type {number}
+      let fileBodyLength = 0;
+      for (let i=0; i<fileBody.length; i++) {
+        fileBodyLength += fileBody[i].length;
+      }
+      // @type {!Uint8Array}
       let file = new Uint8Array(fileBodyLength + 12);
+      // @type {number}
       let index = 0;
-      packStringTo(this.container, file, index);
-      index += 4;
-      packTo(fileBodyLength + 4, uInt32_$1, file, index);
-      index += 4;
-      packStringTo(this.format, file, index);
-      index += 4;
-      file.set(junkBytes, index);
-      index += junkBytes.length;
-      file.set(ds64Bytes, index);
-      index += ds64Bytes.length;
-      file.set(bextBytes, index);
-      index += bextBytes.length;
-      file.set(fmtBytes, index);
-      index += fmtBytes.length;
-      file.set(factBytes, index);
-      index += factBytes.length;
-      file.set(dataChunkIdBytes, index);
-      index += dataChunkIdBytes.length;
-      file.set(dataChunkLengthBytes, index);
-      index += dataChunkLengthBytes.length;
-      file.set(this.data.samples, index);
-      index += this.data.samples.length;
-      file.set(cueBytes, index);
-      index += cueBytes.length;
-      file.set(smplBytes, index);
-      index += smplBytes.length;
-      file.set(LISTBytes, index);
+      index = packStringTo(this.container, file, index);
+      index = packTo(fileBodyLength + 4, uInt32_$1, file, index);
+      index = packStringTo(this.format, file, index);
+      for (let i=0; i<fileBody.length; i++) {
+        file.set(fileBody[i], index);
+        index += fileBody[i].length;
+      }
       return file;
     }
   }

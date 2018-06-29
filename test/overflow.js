@@ -18,7 +18,14 @@ describe("32-bit IEEE from file to 8-bit", function() {
     
     let wav = new WaveFile(
         fs.readFileSync(path + "64bit-48kHz-noBext-mono-overflow.wav"));
-    wav.data.samples[0] = -1.5;
+    wav.data.samples[0] = 0;
+    wav.data.samples[1] = 0;
+    wav.data.samples[2] = 0;
+    wav.data.samples[3] = 0;
+    wav.data.samples[4] = 0;
+    wav.data.samples[5] = 0;
+    wav.data.samples[6] = 248;
+    wav.data.samples[7] = 191;
     wav.toBitDepth("8");
     fs.writeFileSync(
         path + "/out/to-bit-depth/64-to-8-overflow.wav", wav.toBuffer());

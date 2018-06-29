@@ -7,17 +7,49 @@ https://github.com/rochars/wavefile
 
 **wavefile** is a JavaScript module to work with .wav files.
 
-With **wavefile** you can:
+- **Works out of the box in the browser**
+- **Works out of the box in Node**
+- **Works with huge wave files**
 - Create wave files from scratch
 - Read existing .wav files
 - Read and write tags on .wav files
 - Set and delete cue points and their labels
 - Encode/decode files as ADPCM, A-Law and μ-Law
 - Turn RIFF files to RIFX and RIFX files to RIFF
-- Create or edit BWF metadata ("bext" chunk)
+- **Create or edit BWF metadata** ("bext" chunk)
 - Change the bit depth of the audio
+- Just 7 dependencies, and they are **all MIT-licensed**
+- Less than 10kb minified + compressed, less than 30kb minified
 
 And more.
+
+## Table of Contents
+- [Install](#install)
+- [Use](#use)
+- [See it in action](#see-it-in-action)
+- [Example](#example)
+- [Operation Manual](#operation-manual)
+  * [Create wave files from scratch](#create-wave-files-from-scratch)
+  * [Add RIFF tags to files](#add-riff-tags-to-files)
+  * [Add cue points to files](#add-cue-points-to-files)
+  * [RIFX](#rifx)
+  * [IMA-ADPCM](#ima-adpcm)
+  * [A-Law](#a-law)
+  * [mu-Law](#mu-law)
+  * [Change the bit depth](#change-the-bit-depth)
+  * [Add BWF metadata](#add-bwf-metadata)
+  * [RF64](#rf64)
+- [API](#api)
+  * [The WaveFile methods:](#the-wavefile-methods-)
+  * [The WaveFile properties](#the-wavefile-properties)
+    + [Cue points](#cue-points)
+    + [Sample loops](#sample-loops)
+    + [LIST chunk](#list-chunk)
+- [The samples](#the-samples)
+- [Distribution](#distribution)
+- [Contributing to wavefile](#contributing-to-wavefile)
+- [References](#references)
+- [Legal](#legal)
 
 ## Install
 ```
@@ -112,30 +144,6 @@ let wavBuffer = wav.toBuffer();
 // Call toDataURI() to get the file as a DataURI:
 let wavDataURI = wav.toDataURI();
 ```
-
-## Table of Contents
-- [Operation Manual](#operation-manual)
-  * [Create wave files from scratch](#create-wave-files-from-scratch)
-  * [Add RIFF tags to files](#add-riff-tags-to-files)
-  * [Add cue points to files](#add-cue-points-to-files)
-  * [RIFX](#rifx)
-  * [IMA-ADPCM](#ima-adpcm)
-  * [A-Law](#a-law)
-  * [mu-Law](#mu-law)
-  * [Change the bit depth](#change-the-bit-depth)
-  * [Add BWF metadata](#add-bwf-metadata)
-  * [RF64](#rf64)
-- [API](#api)
-  * [The WaveFile methods:](#the-wavefile-methods-)
-  * [The WaveFile properties](#the-wavefile-properties)
-    + [Cue points](#cue-points)
-    + [Sample loops](#sample-loops)
-    + [LIST chunk](#list-chunk)
-- [The samples](#the-samples)
-- [Distribution](#distribution)
-- [Contributing to wavefile](#contributing-to-wavefile)
-- [References](#references)
-- [Legal](#legal)
 
 ## Operation Manual
 
