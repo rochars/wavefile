@@ -21,7 +21,8 @@ if (process.argv[3] == '--min') {
 // CommonJS
 } else if (process.argv[3] == '--cjs') {
 	console.log('cjs tests');
-	wavefile = require('../dist/wavefile.cjs.js');
+	wavefile = require('../dist/wavefile.cjs.js').default;
+	console.log(wavefile);
 
 // ESM
 } else if (process.argv[3] == '--esm') {

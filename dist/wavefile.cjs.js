@@ -2093,3 +2093,4 @@ class WaveFile {
 }
 
 module.exports = WaveFile;
+module.exports.default = WaveFile

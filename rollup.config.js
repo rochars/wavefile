@@ -33,7 +33,8 @@ export default [
     output: [
       {
         file: 'dist/wavefile.cjs.js',
-        name: 'wavefile',
+        name: 'wavefile.default',
+        footer: 'module.exports.default = WaveFile',
         format: 'cjs'
       }
     ],

@@ -36,8 +36,8 @@ import riffChunks from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
 import alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
-import {pack, packArray, unpackFrom, unpackString, packStringTo,
-  packTo, packString, unpackArray, packArrayTo} from 'byte-data';
+import {pack, unpackFrom, unpackString, packStringTo, packTo,
+  packString, unpackArray, packArrayTo} from 'byte-data';
 
 /**
  * @type {!Object}
