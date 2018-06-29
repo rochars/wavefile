@@ -36,7 +36,7 @@ import riffChunks from 'riff-chunks';
 import {decode as decodeADPCM, encode as encodeADPCM} from 'imaadpcm';
 import alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
-import {pack, packArray, unpackFrom, unpackString,
+import {pack, packArray, unpackFrom, unpackString, packStringTo, packTo,
   unpackArrayFrom, packString, unpackArray, packArrayTo} from 'byte-data';
 
 /**
@@ -1871,7 +1871,7 @@ export default class WaveFile {
    * @private
    */
   getFactBytes_() {
-    /** @type {!Array<number>} */
+    // @type {!Array<number>} 
     let bytes = [];
     if (this.fact.chunkId) {
       bytes = bytes.concat(
@@ -2067,28 +2067,56 @@ export default class WaveFile {
    * @private
    */
   createWaveFile_() {
-    /** @type {!Array<number>} */
-    let samplesBytes = []; // tmp bridge pre-v8
-    for(let i=0; i<this.data.samples.length; i++) {
-      samplesBytes.push(this.data.samples[i]);
-    }
-    /** @type {!Array<number>} */
-    let fileBody = [].concat(
-      packString(this.format),
-      this.getJunkBytes_(),
-      this.getDs64Bytes_(),
-      this.getBextBytes_(),
-      this.getFmtBytes_(),
-      this.getFactBytes_(),
-      packString(this.data.chunkId),
-      pack(samplesBytes.length, uInt32_),
-      samplesBytes,
-      this.getCueBytes_(),
-      this.getSmplBytes_(),
-      this.getLISTBytes_());
-    return new Uint8Array([].concat(
-      packString(this.container),
-      pack(fileBody.length, uInt32_),
-      fileBody));      
+    let junkBytes = this.getJunkBytes_();
+    let ds64Bytes = this.getDs64Bytes_();
+    let bextBytes = this.getBextBytes_();
+    let fmtBytes = this.getFmtBytes_();
+    let factBytes = this.getFactBytes_();
+    let dataChunkIdBytes = packString(this.data.chunkId);
+    let dataChunkLengthBytes = pack(this.data.samples.length, uInt32_);
+    let cueBytes = this.getCueBytes_();
+    let smplBytes = this.getSmplBytes_();
+    let LISTBytes = this.getLISTBytes_();
+    let fileBodyLength = junkBytes.length + 
+      ds64Bytes.length + 
+      bextBytes.length + 
+      fmtBytes.length + 
+      factBytes.length + 
+      dataChunkIdBytes.length + 
+      dataChunkLengthBytes.length + 
+      this.data.samples.length + 
+      cueBytes.length + 
+      smplBytes.length + 
+      LISTBytes.length;
+    let file = new Uint8Array(fileBodyLength + 12);
+    let index = 0;
+    packStringTo(this.container, file, index);
+    index += 4;
+    packTo(fileBodyLength + 4, uInt32_, file, index);
+    index += 4;
+    packStringTo(this.format, file, index);
+    index += 4;
+    file.set(junkBytes, index);
+    index += junkBytes.length;
+    file.set(ds64Bytes, index);
+    index += ds64Bytes.length;
+    file.set(bextBytes, index);
+    index += bextBytes.length;
+    file.set(fmtBytes, index);
+    index += fmtBytes.length;
+    file.set(factBytes, index);
+    index += factBytes.length;
+    file.set(dataChunkIdBytes, index);
+    index += dataChunkIdBytes.length;
+    file.set(dataChunkLengthBytes, index);
+    index += dataChunkLengthBytes.length;
+    file.set(this.data.samples, index);
+    index += this.data.samples.length;
+    file.set(cueBytes, index);
+    index += cueBytes.length;
+    file.set(smplBytes, index);
+    index += smplBytes.length;
+    file.set(LISTBytes, index);
+    return file;
   }
 }

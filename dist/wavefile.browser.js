@@ -647,6 +647,21 @@ var WaveFile = (function () {
     return bytes;
   }
 
+  /**
+   * Write a string to a byte buffer.
+   * @param {string} str The string to pack.
+   * @param {!Uint8Array} bytes A byte buffer.
+   * @param {number=} index The index to write in the buffer.
+   * @return {number} The next index to write in the buffer.
+   */
+  function packStringTo(str, bytes, index=0) {
+    for (let i = 0; i < str.length; i++) {
+      bytes[index] = str.charCodeAt(i);
+      index++;
+    }
+    return index;
+  }
+
   // Numbers
   /**
    * Pack a number as a byte buffer.
@@ -672,6 +687,27 @@ var WaveFile = (function () {
   function packArray(values, theType) {
     setUp_(theType);
     return toBytes_(values, theType);
+  }
+
+  /**
+   * Pack a number to a byte buffer.
+   * @param {number} value The value.
+   * @param {!Object} theType The type definition.
+   * @param {!Uint8Array} buffer The output buffer.
+   * @param {number=} index The index to write.
+   * @return {number} The next index to write.
+   * @throws {Error} If the type definition is not valid.
+   * @throws {Error} If the value is not valid.
+   */
+  function packTo(value, theType, buffer, index=0) {
+    setUp_(theType);
+    return writeBytes_(value,
+      theType,
+      buffer,
+      index,
+      index + theType.offset,
+      validateNotUndefined,
+      theType.be);
   }
 
   /**
@@ -3681,7 +3717,7 @@ var WaveFile = (function () {
      * @private
      */
     getFactBytes_() {
-      /** @type {!Array<number>} */
+      // @type {!Array<number>} 
       let bytes = [];
       if (this.fact.chunkId) {
         bytes = bytes.concat(
@@ -3877,29 +3913,57 @@ var WaveFile = (function () {
      * @private
      */
     createWaveFile_() {
-      /** @type {!Array<number>} */
-      let samplesBytes = []; // tmp bridge pre-v8
-      for(let i=0; i<this.data.samples.length; i++) {
-        samplesBytes.push(this.data.samples[i]);
-      }
-      /** @type {!Array<number>} */
-      let fileBody = [].concat(
-        packString(this.format),
-        this.getJunkBytes_(),
-        this.getDs64Bytes_(),
-        this.getBextBytes_(),
-        this.getFmtBytes_(),
-        this.getFactBytes_(),
-        packString(this.data.chunkId),
-        pack(samplesBytes.length, uInt32_$1),
-        samplesBytes,
-        this.getCueBytes_(),
-        this.getSmplBytes_(),
-        this.getLISTBytes_());
-      return new Uint8Array([].concat(
-        packString(this.container),
-        pack(fileBody.length, uInt32_$1),
-        fileBody));      
+      let junkBytes = this.getJunkBytes_();
+      let ds64Bytes = this.getDs64Bytes_();
+      let bextBytes = this.getBextBytes_();
+      let fmtBytes = this.getFmtBytes_();
+      let factBytes = this.getFactBytes_();
+      let dataChunkIdBytes = packString(this.data.chunkId);
+      let dataChunkLengthBytes = pack(this.data.samples.length, uInt32_$1);
+      let cueBytes = this.getCueBytes_();
+      let smplBytes = this.getSmplBytes_();
+      let LISTBytes = this.getLISTBytes_();
+      let fileBodyLength = junkBytes.length + 
+        ds64Bytes.length + 
+        bextBytes.length + 
+        fmtBytes.length + 
+        factBytes.length + 
+        dataChunkIdBytes.length + 
+        dataChunkLengthBytes.length + 
+        this.data.samples.length + 
+        cueBytes.length + 
+        smplBytes.length + 
+        LISTBytes.length;
+      let file = new Uint8Array(fileBodyLength + 12);
+      let index = 0;
+      packStringTo(this.container, file, index);
+      index += 4;
+      packTo(fileBodyLength + 4, uInt32_$1, file, index);
+      index += 4;
+      packStringTo(this.format, file, index);
+      index += 4;
+      file.set(junkBytes, index);
+      index += junkBytes.length;
+      file.set(ds64Bytes, index);
+      index += ds64Bytes.length;
+      file.set(bextBytes, index);
+      index += bextBytes.length;
+      file.set(fmtBytes, index);
+      index += fmtBytes.length;
+      file.set(factBytes, index);
+      index += factBytes.length;
+      file.set(dataChunkIdBytes, index);
+      index += dataChunkIdBytes.length;
+      file.set(dataChunkLengthBytes, index);
+      index += dataChunkLengthBytes.length;
+      file.set(this.data.samples, index);
+      index += this.data.samples.length;
+      file.set(cueBytes, index);
+      index += cueBytes.length;
+      file.set(smplBytes, index);
+      index += smplBytes.length;
+      file.set(LISTBytes, index);
+      return file;
     }
   }
 
