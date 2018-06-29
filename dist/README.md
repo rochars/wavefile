@@ -7,12 +7,12 @@ You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser wit
 
 [unpkg](https://www.unpkg.com):
 ```html
-<script src="https://unpkg.com/wavefile@7"></script>
+<script src="https://unpkg.com/wavefile"></script>
 ```
 
 [jsDelivr](https://www.jsdelivr.com):
 ```html
-<script src="https://cdn.jsdelivr.net/npm/wavefile@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
 ```
 
 ## If you are using this lib as a dependency:

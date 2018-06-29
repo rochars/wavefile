@@ -55,13 +55,6 @@ export default [
       {
         file: 'dist/wavefile.js',
         format: 'es'
-      },
-      {
-        name: 'WaveFile',
-        format: 'iife',
-        file: 'dist/wavefile.browser.js',
-        banner: license,
-        footer: 'window["WaveFile"]=WaveFile;'
       }
     ],
     plugins: [
