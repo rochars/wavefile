@@ -1,0 +1,397 @@
+/**
+ * @fileoverview Externs for wavefile 8.0
+ *
+ * @see https://github.com/rochars/wavefile
+ * @externs
+ */
+
+var WaveFile;
+
+/**
+ * Set up the WaveFile object based on the arguments passed.
+ * @param {number} numChannels The number of channels
+ *      (Integer numbers: 1 for mono, 2 stereo and so on).
+ * @param {number} sampleRate The sample rate.
+ *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
+ * @param {string} bitDepth The audio bit depth code.
+ *      One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
+ *      or any value between "8" and "32" (like "12").
+ * @param {!Array<number>} samples Array of samples to be written.
+ *      The samples must be in the correct range according to the
+ *      bit depth.
+ * @param {?Object} options Optional. Used to force the container
+ *      as RIFX with {"container": "RIFX"}
+ * @throws {Error} If any argument does not meet the criteria.
+ */
+WaveFile.fromScratch = function(numChannels, sampleRate, bitDepth, samples, options={}) {}
+
+/**
+ * Set up the WaveFile object from a byte buffer.
+ * @param {!Uint8Array} bytes The buffer.
+ * @param {boolean=} samples True if the samples should be loaded.
+ * @throws {Error} If container is not RIFF, RIFX or RF64.
+ * @throws {Error} If no "fmt " chunk is found.
+ * @throws {Error} If no "data" chunk is found.
+ */
+WaveFile.fromBuffer = function(bytes, samples=true) {}
+
+/**
+ * Return a byte buffer representig the WaveFile object as a .wav file.
+ * The return value of this method can be written straight to disk.
+ * @return {!Uint8Array} A .wav file.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.toBuffer = function() {}
+
+/**
+ * Use a .wav file encoded as a base64 string to load the WaveFile object.
+ * @param {string} base64String A .wav file as a base64 string.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.fromBase64 = function(base64String) {}
+
+/**
+ * Return a base64 string representig the WaveFile object as a .wav file.
+ * @return {string} A .wav file as a base64 string.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.toBase64 = function() {}
+
+/**
+ * Return a DataURI string representig the WaveFile object as a .wav file.
+ * The return of this method can be used to load the audio in browsers.
+ * @return {string} A .wav file as a DataURI.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.toDataURI = function() {}
+
+/**
+ * Use a .wav file encoded as a DataURI to load the WaveFile object.
+ * @param {string} dataURI A .wav file as DataURI.
+ * @throws {Error} If any property of the object appears invalid.
+ */
+WaveFile.fromDataURI = function(dataURI) {}
+
+/**
+ * Force a file as RIFF.
+ */
+WaveFile.toRIFF = function() {}
+
+/**
+ * Force a file as RIFX.
+ */
+WaveFile.toRIFX = function() {}
+
+/**
+ * Change the bit depth of the samples.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of "8" ... "32" (integers), "32f" or "64" (floats)
+ * @param {boolean} changeResolution A boolean indicating if the
+ *      resolution of samples should be actually changed or not.
+ * @throws {Error} If the bit depth is not valid.
+ */
+WaveFile.toBitDepth = function(bitDepth, changeResolution=true) {}
+
+/**
+ * Encode a 16-bit wave file as 4-bit IMA ADPCM.
+ * @throws {Error} If sample rate is not 8000.
+ * @throws {Error} If number of channels is not 1.
+ */
+WaveFile.toIMAADPCM = function() {}
+
+/**
+ * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of "8" ... "32" (integers), "32f" or "64" (floats).
+ *      Optional. Default is 16.
+ */
+WaveFile.fromIMAADPCM = function(bitDepth="16") {}
+
+/**
+ * Encode 16-bit wave file as 8-bit A-Law.
+ */
+WaveFile.toALaw = function() {}
+
+/**
+ * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of "8" ... "32" (integers), "32f" or "64" (floats).
+ *      Optional. Default is 16.
+ */
+WaveFile.fromALaw = function(bitDepth="16") {}
+
+/**
+ * Encode 16-bit wave file as 8-bit mu-Law.
+ */
+WaveFile.toMuLaw = function() {}
+
+/**
+ * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+ * @param {string} bitDepth The new bit depth of the samples.
+ *      One of "8" ... "32" (integers), "32f" or "64" (floats).
+ *      Optional. Default is 16.
+ */
+WaveFile.fromMuLaw = function(bitDepth="16") {}
+
+/**
+ * Write a RIFF tag in the INFO chunk. If the tag do not exist,
+ * then it is created. It if exists, it is overwritten.
+ * @param {string} tag The tag name.
+ * @param {string} value The tag value.
+ * @throws {Error} If the tag name is not valid.
+ */
+WaveFile.setTag = function(tag, value) {}
+
+/**
+ * Return the value of a RIFF tag in the INFO chunk.
+ * @param {string} tag The tag name.
+ * @return {?string} The value if the tag is found, null otherwise.
+ */
+WaveFile.getTag = function(tag) {}
+
+/**
+ * Remove a RIFF tag in the INFO chunk.
+ * @param {string} tag The tag name.
+ * @return {boolean} True if a tag was deleted.
+ */
+WaveFile.deleteTag = function(tag) {}
+
+/**
+ * Create a cue point in the wave file.
+ * @param {number} position The cue point position in milliseconds.
+ * @param {string} labl The LIST adtl labl text of the marker. Optional.
+ */
+WaveFile.setCuePoint = function(position, labl="") {}
+
+/**
+ * Remove a cue point from a wave file.
+ * @param {number} index the index of the point. First is 1,
+ *      second is 2, and so on.
+ */
+WaveFile.deleteCuePoint = function(index) {}
+
+/**
+ * Update the label of a cue point.
+ * @param {number} pointIndex The ID of the cue point.
+ * @param {string} label The new text for the label.
+ */
+WaveFile.updateLabel = function(pointIndex, label) {}
+
+/**
+ * The container identifier.
+ * "RIFF", "RIFX" and "RF64" are supported.
+ * @type {string}
+ */
+WaveFile.container = "";
+/**
+ * @type {number}
+ */
+WaveFile.chunkSize = 0;
+/**
+ * The format.
+ * Always "WAVE".
+ * @type {string}
+ */
+WaveFile.format = "";
+/**
+ * The data of the "fmt" chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.fmt = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {number} */
+    "audioFormat": 0,
+    /** @export @type {number} */
+    "numChannels": 0,
+    /** @export @type {number} */
+    "sampleRate": 0,
+    /** @export @type {number} */
+    "byteRate": 0,
+    /** @export @type {number} */
+    "blockAlign": 0,
+    /** @export @type {number} */
+    "bitsPerSample": 0,
+    /** @export @type {number} */
+    "cbSize": 0,
+    /** @export @type {number} */
+    "validBitsPerSample": 0,
+    /** @export @type {number} */
+    "dwChannelMask": 0,
+    /**
+     * 4 32-bit values representing a 128-bit ID
+     * @export @type {!Array<number>}
+     */
+    "subformat": []
+};
+/**
+ * The data of the "fact" chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.fact = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {number} */
+    "dwSampleLength": 0
+};
+/**
+ * The data of the "cue " chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.cue = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {number} */
+    "dwCuePoints": 0,
+    /** @export @type {!Array<!Object>} */
+    "points": [],
+};
+/**
+ * The data of the "smpl" chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.smpl = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {number} */
+    "dwManufacturer": 0,
+    /** @export @type {number} */
+    "dwProduct": 0,
+    /** @export @type {number} */
+    "dwSamplePeriod": 0,
+    /** @export @type {number} */
+    "dwMIDIUnityNote": 0,
+    /** @export @type {number} */
+    "dwMIDIPitchFraction": 0,
+    /** @export @type {number} */
+    "dwSMPTEFormat": 0,
+    /** @export @type {number} */
+    "dwSMPTEOffset": 0,
+    /** @export @type {number} */
+    "dwNumSampleLoops": 0,
+    /** @export @type {number} */
+    "dwSamplerData": 0,
+    /** @export @type {!Array<!Object>} */
+    "loops": [],
+};
+/**
+ * The data of the "bext" chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.bext = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {string} */
+    "description": "", //256
+    /** @export @type {string} */
+    "originator": "", //32
+    /** @export @type {string} */
+    "originatorReference": "", //32
+    /** @export @type {string} */
+    "originationDate": "", //10
+    /** @export @type {string} */
+    "originationTime": "", //8
+    /**
+     * 2 32-bit values, timeReference high and low
+     * @export @type {!Array<number>}
+     */
+    "timeReference": [0, 0],
+    /** @export @type {number} */
+    "version": 0, //WORD
+    /** @export @type {string} */
+    "UMID": "", // 64 chars
+    /** @export @type {number} */
+    "loudnessValue": 0, //WORD
+    /** @export @type {number} */
+    "loudnessRange": 0, //WORD
+    /** @export @type {number} */
+    "maxTruePeakLevel": 0, //WORD
+    /** @export @type {number} */
+    "maxMomentaryLoudness": 0, //WORD
+    /** @export @type {number} */
+    "maxShortTermLoudness": 0, //WORD
+    /** @export @type {string} */
+    "reserved": "", //180
+    /** @export @type {string} */
+    "codingHistory": "" // string, unlimited
+};
+/**
+ * The data of the "ds64" chunk.
+ * Used only with RF64 files.
+ * @type {!Object<string, *>}
+ */
+WaveFile.ds64 = {
+    /** @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {number} */
+    "riffSizeHigh": 0, // DWORD
+    /** @export @type {number} */
+    "riffSizeLow": 0, // DWORD
+    /** @export @type {number} */
+    "dataSizeHigh": 0, // DWORD
+    /** @export @type {number} */
+    "dataSizeLow": 0, // DWORD
+    /** @export @type {number} */
+    "originationTime": 0, // DWORD
+    /** @export @type {number} */
+    "sampleCountHigh": 0, // DWORD
+    /** @export @type {number} */
+    "sampleCountLow": 0, // DWORD
+    /** @export @type {number} */
+    //"tableLength": 0, // DWORD
+    /** @export @type {!Array<number>} */
+    //"table": []
+};
+/**
+ * The data of the "data" chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.data = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {!Array<number>} */
+    "samples": []
+};
+/**
+ * The data of the "LIST" chunks.
+ * Each item in this list must have this signature:
+ *  {
+ *      "chunkId": "",
+ *      "chunkSize": 0,
+ *      "format": "",
+ *      "subChunks": []
+ *   }
+ * @type {!Array<!Object>}
+ */
+WaveFile.LIST = [];
+/**
+ * The data of the "junk" chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.junk = {
+    /** @export @type {string} */
+    "chunkId": "",
+    /** @export @type {number} */
+    "chunkSize": 0,
+    /** @export @type {!Array<number>} */
+    "chunkData": []
+};
+/**
+ * The bit depth code according to the samples.
+ * @type {string}
+ */
+WaveFile.bitDepth =  "";
