@@ -4,6 +4,15 @@
  *
  */
 
+/**
+ * @fileoverview wavefile test loader.
+ *
+ * Run the tests against the dist files or source
+ * according to the args.
+ *
+ */
+
+/** @type {Object} */
 let wavefile;
 
 // Browser
@@ -21,7 +30,11 @@ if (process.argv[3] == '--min') {
 // CommonJS
 } else if (process.argv[3] == '--cjs') {
 	console.log('cjs tests');
-	wavefile = require('../dist/wavefile.cjs.js').default;
+	wavefile = require('../dist/wavefile.cjs.js');
+	wavefileDefault = require('../dist/wavefile.cjs.js').default;
+	if (wavefile != wavefileDefault) {
+		throw('CommonJS dist should export as default and as .default.');
+	}
 
 // ESM
 } else if (process.argv[3] == '--esm') {

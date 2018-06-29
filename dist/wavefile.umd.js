@@ -1764,14 +1764,12 @@
   var alawmulaw = {
   	/**
   	 * @type {!Object}
-  	 * @export
   	 */
-  	'alaw': alaw,
+  	alaw: alaw,
   	/**
   	 * @type {!Object}
-  	 * @export
   	 */
-  	'mulaw': mulaw
+  	mulaw: mulaw
   };
 
   /*
@@ -1870,17 +1868,6 @@
    */
 
   /**
-   * @type {!Object}
-   * @private
-   */
-  let uInt16_ = {bits: 16};
-  /**
-   * @type {!Object}
-   * @private
-   */
-  let uInt32_$1 = {bits: 32};
-
-  /**
    * Class representing a wav file.
    */
   class WaveFile {
@@ -1892,6 +1879,16 @@
      * @throws {Error} If no 'data' chunk is found.
      */
     constructor(bytes=null) {
+      /**
+       * @type {!Object}
+       * @private
+       */
+      this.uInt16_ = {bits: 16, be: false};
+      /**
+       * @type {!Object}
+       * @private
+       */
+      this.uInt32_ = {bits: 32, be: false};
       /**
        * The container identifier.
        * 'RIFF', 'RIFX' and 'RF64' are supported.
@@ -1995,7 +1992,7 @@
         /** @type {number} */
         dwSamplerData: 0,
         /** @type {!Array<!Object>} */
-        loops: [],
+        loops: []
       };
       /**
        * The data of the 'bext' chunk.
@@ -2063,7 +2060,7 @@
         /** @type {number} */
         sampleCountHigh: 0, // DWORD
         /** @type {number} */
-        sampleCountLow: 0, // DWORD
+        sampleCountLow: 0 // DWORD
         /** @type {number} */
         //'tableLength': 0, // DWORD
         /** @type {!Array<number>} */
@@ -2083,7 +2080,13 @@
       };
       /**
        * The data of the 'LIST' chunks.
-       * Each item in this list must have this signature:
+       * Each item in this list look like this:
+       *  {
+       *      chunkId: '',
+       *      chunkSize: 0,
+       *      format: '',
+       *      subChunks: []
+       *   }
        * @type {!Array<!Object>}
        */
       this.LIST = [];
@@ -2127,9 +2130,13 @@
        * @private
        */
       this.head_ = 0;
+      /**
+       * @type {!Object}
+       * @private
+       */
+      this.dataType = {};
       // Load a file from the buffer if one was passed
       // when creating the object
-      this.dataType = {};
       if(bytes) {
         this.fromBuffer(bytes);
       }
@@ -2183,43 +2190,6 @@
       this.data.chunkSize = this.data.samples.length;
       this.validateHeader_();
       this.LEorBE_();
-    }
-
-    /**
-     * Update the type definition used to read and write the samples.
-     */
-    updateDataType_() {
-      /** @type {!Object} */
-      this.dataType = {
-        bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-        float: this.bitDepth == '32f' || this.bitDepth == '64',
-        signed: this.bitDepth != '8',
-        be: this.container == 'RIFX'
-      };
-      if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
-        this.dataType.bits = 8;
-        this.dataType.signed = false;
-      }
-    }
-
-    /**
-     * Set up the WaveFile object from a byte buffer.
-     * @param {!Array<number>|!Array<!Array<number>>} samples The samples.
-     */
-    interleave_(samples) {
-      if (samples.length > 0) {
-        if (samples[0].constructor === Array) {
-          /** @type {!Array<number>} */
-          let finalSamples = [];
-          for (let i=0; i < samples[0].length; i++) {
-            for (let j=0; j < samples.length; j++) {
-              finalSamples.push(samples[j][i]);
-            }
-          }
-          samples = finalSamples;
-        }
-      }
-      return samples;
     }
 
     /**
@@ -2624,6 +2594,45 @@
           }
         }
       }
+    }
+
+    /**
+     * Update the type definition used to read and write the samples.
+     * @private
+     */
+    updateDataType_() {
+      /** @type {!Object} */
+      this.dataType = {
+        bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+        float: this.bitDepth == '32f' || this.bitDepth == '64',
+        signed: this.bitDepth != '8',
+        be: this.container == 'RIFX'
+      };
+      if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
+        this.dataType.bits = 8;
+        this.dataType.signed = false;
+      }
+    }
+
+    /**
+     * Set up the WaveFile object from a byte buffer.
+     * @param {!Array<number>|!Array<!Array<number>>} samples The samples.
+     * @private
+     */
+    interleave_(samples) {
+      if (samples.length > 0) {
+        if (samples[0].constructor === Array) {
+          /** @type {!Array<number>} */
+          let finalSamples = [];
+          for (let i=0; i < samples[0].length; i++) {
+            for (let j=0; j < samples.length; j++) {
+              finalSamples.push(samples[j][i]);
+            }
+          }
+          samples = finalSamples;
+        }
+      }
+      return samples;
     }
 
     /**
@@ -3034,8 +3043,8 @@
     LEorBE_() {
       /** @type {boolean} */
       let bigEndian = this.container === 'RIFX';
-      uInt16_.be = bigEndian;
-      uInt32_$1.be = bigEndian;
+      this.uInt16_.be = bigEndian;
+      this.uInt32_.be = bigEndian;
       return bigEndian;
     }
 
@@ -3079,7 +3088,7 @@
         throw Error('Not a supported format.');
       }
       this.LEorBE_();
-      this.chunkSize = this.read_(bytes, uInt32_$1);
+      this.chunkSize = this.read_(bytes, this.uInt32_);
       this.format = this.readString_(bytes, 4);
       if (this.format != 'WAVE') {
         throw Error('Could not find the "WAVE" format identifier');
@@ -3100,12 +3109,12 @@
         this.head_ = chunk.chunkData.start;
         this.fmt.chunkId = chunk.chunkId;
         this.fmt.chunkSize = chunk.chunkSize;
-        this.fmt.audioFormat = this.read_(buffer, uInt16_);
-        this.fmt.numChannels = this.read_(buffer, uInt16_);
-        this.fmt.sampleRate = this.read_(buffer, uInt32_$1);
-        this.fmt.byteRate = this.read_(buffer, uInt32_$1);
-        this.fmt.blockAlign = this.read_(buffer, uInt16_);
-        this.fmt.bitsPerSample = this.read_(buffer, uInt16_);
+        this.fmt.audioFormat = this.read_(buffer, this.uInt16_);
+        this.fmt.numChannels = this.read_(buffer, this.uInt16_);
+        this.fmt.sampleRate = this.read_(buffer, this.uInt32_);
+        this.fmt.byteRate = this.read_(buffer, this.uInt32_);
+        this.fmt.blockAlign = this.read_(buffer, this.uInt16_);
+        this.fmt.bitsPerSample = this.read_(buffer, this.uInt16_);
         this.readFmtExtension_(buffer);
       } else {
         throw Error('Could not find the "fmt " chunk');
@@ -3119,16 +3128,16 @@
      */
     readFmtExtension_(buffer) {
       if (this.fmt.chunkSize > 16) {
-        this.fmt.cbSize = this.read_(buffer, uInt16_);
+        this.fmt.cbSize = this.read_(buffer, this.uInt16_);
         if (this.fmt.chunkSize > 18) {
-          this.fmt.validBitsPerSample = this.read_(buffer, uInt16_);
+          this.fmt.validBitsPerSample = this.read_(buffer, this.uInt16_);
           if (this.fmt.chunkSize > 20) {
-            this.fmt.dwChannelMask = this.read_(buffer, uInt32_$1);
+            this.fmt.dwChannelMask = this.read_(buffer, this.uInt32_);
             this.fmt.subformat = [
-              this.read_(buffer, uInt32_$1),
-              this.read_(buffer, uInt32_$1),
-              this.read_(buffer, uInt32_$1),
-              this.read_(buffer, uInt32_$1)];
+              this.read_(buffer, this.uInt32_),
+              this.read_(buffer, this.uInt32_),
+              this.read_(buffer, this.uInt32_),
+              this.read_(buffer, this.uInt32_)];
           }
         }
       }
@@ -3147,7 +3156,7 @@
         this.head_ = chunk.chunkData.start;
         this.fact.chunkId = chunk.chunkId;
         this.fact.chunkSize = chunk.chunkSize;
-        this.fact.dwSampleLength = this.read_(buffer, uInt32_$1);
+        this.fact.dwSampleLength = this.read_(buffer, this.uInt32_);
       }
     }
 
@@ -3164,15 +3173,15 @@
         this.head_ = chunk.chunkData.start;
         this.cue.chunkId = chunk.chunkId;
         this.cue.chunkSize = chunk.chunkSize;
-        this.cue.dwCuePoints = this.read_(buffer, uInt32_$1);
+        this.cue.dwCuePoints = this.read_(buffer, this.uInt32_);
         for (let i=0; i<this.cue.dwCuePoints; i++) {
           this.cue.points.push({
-            'dwName': this.read_(buffer, uInt32_$1),
-            'dwPosition': this.read_(buffer, uInt32_$1),
+            'dwName': this.read_(buffer, this.uInt32_),
+            'dwPosition': this.read_(buffer, this.uInt32_),
             'fccChunk': this.readString_(buffer, 4),
-            'dwChunkStart': this.read_(buffer, uInt32_$1),
-            'dwBlockStart': this.read_(buffer, uInt32_$1),
-            'dwSampleOffset': this.read_(buffer, uInt32_$1),
+            'dwChunkStart': this.read_(buffer, this.uInt32_),
+            'dwBlockStart': this.read_(buffer, this.uInt32_),
+            'dwSampleOffset': this.read_(buffer, this.uInt32_),
           });
         }
       }
@@ -3191,23 +3200,23 @@
         this.head_ = chunk.chunkData.start;
         this.smpl.chunkId = chunk.chunkId;
         this.smpl.chunkSize = chunk.chunkSize;
-        this.smpl.dwManufacturer = this.read_(buffer, uInt32_$1);
-        this.smpl.dwProduct = this.read_(buffer, uInt32_$1);
-        this.smpl.dwSamplePeriod = this.read_(buffer, uInt32_$1);
-        this.smpl.dwMIDIUnityNote = this.read_(buffer, uInt32_$1);
-        this.smpl.dwMIDIPitchFraction = this.read_(buffer, uInt32_$1);
-        this.smpl.dwSMPTEFormat = this.read_(buffer, uInt32_$1);
-        this.smpl.dwSMPTEOffset = this.read_(buffer, uInt32_$1);
-        this.smpl.dwNumSampleLoops = this.read_(buffer, uInt32_$1);
-        this.smpl.dwSamplerData = this.read_(buffer, uInt32_$1);
+        this.smpl.dwManufacturer = this.read_(buffer, this.uInt32_);
+        this.smpl.dwProduct = this.read_(buffer, this.uInt32_);
+        this.smpl.dwSamplePeriod = this.read_(buffer, this.uInt32_);
+        this.smpl.dwMIDIUnityNote = this.read_(buffer, this.uInt32_);
+        this.smpl.dwMIDIPitchFraction = this.read_(buffer, this.uInt32_);
+        this.smpl.dwSMPTEFormat = this.read_(buffer, this.uInt32_);
+        this.smpl.dwSMPTEOffset = this.read_(buffer, this.uInt32_);
+        this.smpl.dwNumSampleLoops = this.read_(buffer, this.uInt32_);
+        this.smpl.dwSamplerData = this.read_(buffer, this.uInt32_);
         for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
           this.smpl.loops.push({
-            'dwName': this.read_(buffer, uInt32_$1),
-            'dwType': this.read_(buffer, uInt32_$1),
-            'dwStart': this.read_(buffer, uInt32_$1),
-            'dwEnd': this.read_(buffer, uInt32_$1),
-            'dwFraction': this.read_(buffer, uInt32_$1),
-            'dwPlayCount': this.read_(buffer, uInt32_$1),
+            'dwName': this.read_(buffer, this.uInt32_),
+            'dwType': this.read_(buffer, this.uInt32_),
+            'dwStart': this.read_(buffer, this.uInt32_),
+            'dwEnd': this.read_(buffer, this.uInt32_),
+            'dwFraction': this.read_(buffer, this.uInt32_),
+            'dwPlayCount': this.read_(buffer, this.uInt32_),
           });
         }
       }
@@ -3256,15 +3265,15 @@
         this.bext.originationDate = this.readString_(buffer, 10);
         this.bext.originationTime = this.readString_(buffer, 8);
         this.bext.timeReference = [
-          this.read_(buffer, uInt32_$1),
-          this.read_(buffer, uInt32_$1)];
-        this.bext.version = this.read_(buffer, uInt16_);
+          this.read_(buffer, this.uInt32_),
+          this.read_(buffer, this.uInt32_)];
+        this.bext.version = this.read_(buffer, this.uInt16_);
         this.bext.UMID = this.readString_(buffer, 64);
-        this.bext.loudnessValue = this.read_(buffer, uInt16_);
-        this.bext.loudnessRange = this.read_(buffer, uInt16_);
-        this.bext.maxTruePeakLevel = this.read_(buffer, uInt16_);
-        this.bext.maxMomentaryLoudness = this.read_(buffer, uInt16_);
-        this.bext.maxShortTermLoudness = this.read_(buffer, uInt16_);
+        this.bext.loudnessValue = this.read_(buffer, this.uInt16_);
+        this.bext.loudnessRange = this.read_(buffer, this.uInt16_);
+        this.bext.maxTruePeakLevel = this.read_(buffer, this.uInt16_);
+        this.bext.maxMomentaryLoudness = this.read_(buffer, this.uInt16_);
+        this.bext.maxShortTermLoudness = this.read_(buffer, this.uInt16_);
         this.bext.reserved = this.readString_(buffer, 180);
         this.bext.codingHistory = this.readString_(
           buffer, this.bext.chunkSize - 602);
@@ -3285,16 +3294,16 @@
         this.head_ = chunk.chunkData.start;
         this.ds64.chunkId = chunk.chunkId;
         this.ds64.chunkSize = chunk.chunkSize;
-        this.ds64.riffSizeHigh = this.read_(buffer, uInt32_$1);
-        this.ds64.riffSizeLow = this.read_(buffer, uInt32_$1);
-        this.ds64.dataSizeHigh = this.read_(buffer, uInt32_$1);
-        this.ds64.dataSizeLow = this.read_(buffer, uInt32_$1);
-        this.ds64.originationTime = this.read_(buffer, uInt32_$1);
-        this.ds64.sampleCountHigh = this.read_(buffer, uInt32_$1);
-        this.ds64.sampleCountLow = this.read_(buffer, uInt32_$1);
+        this.ds64.riffSizeHigh = this.read_(buffer, this.uInt32_);
+        this.ds64.riffSizeLow = this.read_(buffer, this.uInt32_);
+        this.ds64.dataSizeHigh = this.read_(buffer, this.uInt32_);
+        this.ds64.dataSizeLow = this.read_(buffer, this.uInt32_);
+        this.ds64.originationTime = this.read_(buffer, this.uInt32_);
+        this.ds64.sampleCountHigh = this.read_(buffer, this.uInt32_);
+        this.ds64.sampleCountLow = this.read_(buffer, this.uInt32_);
         //if (this.ds64.chunkSize > 28) {
         //  this.ds64.tableLength = unpack(
-        //    chunkData.slice(28, 32), uInt32_);
+        //    chunkData.slice(28, 32), this.uInt32_);
         //  this.ds64.table = chunkData.slice(
         //     32, 32 + this.ds64.tableLength); 
         //}
@@ -3347,15 +3356,15 @@
           let item = {
             'chunkId': subChunk.chunkId,
             'chunkSize': subChunk.chunkSize,
-            'dwName': this.read_(buffer, uInt32_$1)
+            'dwName': this.read_(buffer, this.uInt32_)
           };
           if (subChunk.chunkId == 'ltxt') {
-            item['dwSampleLength'] = this.read_(buffer, uInt32_$1);
-            item['dwPurposeID'] = this.read_(buffer, uInt32_$1);
-            item['dwCountry'] = this.read_(buffer, uInt16_);
-            item['dwLanguage'] = this.read_(buffer, uInt16_);
-            item['dwDialect'] = this.read_(buffer, uInt16_);
-            item['dwCodePage'] = this.read_(buffer, uInt16_);
+            item['dwSampleLength'] = this.read_(buffer, this.uInt32_);
+            item['dwPurposeID'] = this.read_(buffer, this.uInt32_);
+            item['dwCountry'] = this.read_(buffer, this.uInt16_);
+            item['dwLanguage'] = this.read_(buffer, this.uInt16_);
+            item['dwDialect'] = this.read_(buffer, this.uInt16_);
+            item['dwCodePage'] = this.read_(buffer, this.uInt16_);
           }
           item['value'] = this.readZSTR_(buffer, this.head_);
           this.LIST[this.LIST.length - 1]['subChunks'].push(item);
@@ -3492,21 +3501,21 @@
       if (this.bext.chunkId) {
         bytes = bytes.concat(
           packString(this.bext.chunkId),
-          pack(602 + this.bext.codingHistory.length, uInt32_$1),
+          pack(602 + this.bext.codingHistory.length, this.uInt32_),
           this.writeString_(this.bext.description, 256),
           this.writeString_(this.bext.originator, 32),
           this.writeString_(this.bext.originatorReference, 32),
           this.writeString_(this.bext.originationDate, 10),
           this.writeString_(this.bext.originationTime, 8),
-          pack(this.bext.timeReference[0], uInt32_$1),
-          pack(this.bext.timeReference[1], uInt32_$1),
-          pack(this.bext.version, uInt16_),
+          pack(this.bext.timeReference[0], this.uInt32_),
+          pack(this.bext.timeReference[1], this.uInt32_),
+          pack(this.bext.version, this.uInt16_),
           this.writeString_(this.bext.UMID, 64),
-          pack(this.bext.loudnessValue, uInt16_),
-          pack(this.bext.loudnessRange, uInt16_),
-          pack(this.bext.maxTruePeakLevel, uInt16_),
-          pack(this.bext.maxMomentaryLoudness, uInt16_),
-          pack(this.bext.maxShortTermLoudness, uInt16_),
+          pack(this.bext.loudnessValue, this.uInt16_),
+          pack(this.bext.loudnessRange, this.uInt16_),
+          pack(this.bext.maxTruePeakLevel, this.uInt16_),
+          pack(this.bext.maxMomentaryLoudness, this.uInt16_),
+          pack(this.bext.maxShortTermLoudness, this.uInt16_),
           this.writeString_(this.bext.reserved, 180),
           this.writeString_(
             this.bext.codingHistory, this.bext.codingHistory.length));
@@ -3543,18 +3552,18 @@
       if (this.ds64.chunkId) {
         bytes = bytes.concat(
           packString(this.ds64.chunkId),
-          pack(this.ds64.chunkSize, uInt32_$1),
-          pack(this.ds64.riffSizeHigh, uInt32_$1),
-          pack(this.ds64.riffSizeLow, uInt32_$1),
-          pack(this.ds64.dataSizeHigh, uInt32_$1),
-          pack(this.ds64.dataSizeLow, uInt32_$1),
-          pack(this.ds64.originationTime, uInt32_$1),
-          pack(this.ds64.sampleCountHigh, uInt32_$1),
-          pack(this.ds64.sampleCountLow, uInt32_$1));
+          pack(this.ds64.chunkSize, this.uInt32_),
+          pack(this.ds64.riffSizeHigh, this.uInt32_),
+          pack(this.ds64.riffSizeLow, this.uInt32_),
+          pack(this.ds64.dataSizeHigh, this.uInt32_),
+          pack(this.ds64.dataSizeLow, this.uInt32_),
+          pack(this.ds64.originationTime, this.uInt32_),
+          pack(this.ds64.sampleCountHigh, this.uInt32_),
+          pack(this.ds64.sampleCountLow, this.uInt32_));
       }
       //if (this.ds64.tableLength) {
       //  ds64Bytes = ds64Bytes.concat(
-      //    pack(this.ds64.tableLength, uInt32_),
+      //    pack(this.ds64.tableLength, this.uInt32_),
       //    this.ds64.table);
       //}
       return bytes;
@@ -3573,8 +3582,8 @@
         let cuePointsBytes = this.getCuePointsBytes_();
         bytes = bytes.concat(
           packString(this.cue.chunkId),
-          pack(cuePointsBytes.length + 4, uInt32_$1),
-          pack(this.cue.dwCuePoints, uInt32_$1),
+          pack(cuePointsBytes.length + 4, this.uInt32_),
+          pack(this.cue.dwCuePoints, this.uInt32_),
           cuePointsBytes);
       }
       return bytes;
@@ -3590,12 +3599,12 @@
       let points = [];
       for (let i=0; i<this.cue.dwCuePoints; i++) {
         points = points.concat(
-          pack(this.cue.points[i]['dwName'], uInt32_$1),
-          pack(this.cue.points[i]['dwPosition'], uInt32_$1),
+          pack(this.cue.points[i]['dwName'], this.uInt32_),
+          pack(this.cue.points[i]['dwPosition'], this.uInt32_),
           packString(this.cue.points[i]['fccChunk']),
-          pack(this.cue.points[i]['dwChunkStart'], uInt32_$1),
-          pack(this.cue.points[i]['dwBlockStart'], uInt32_$1),
-          pack(this.cue.points[i]['dwSampleOffset'], uInt32_$1));
+          pack(this.cue.points[i]['dwChunkStart'], this.uInt32_),
+          pack(this.cue.points[i]['dwBlockStart'], this.uInt32_),
+          pack(this.cue.points[i]['dwSampleOffset'], this.uInt32_));
       }
       return points;
     }
@@ -3613,16 +3622,16 @@
         let smplLoopsBytes = this.getSmplLoopsBytes_();
         bytes = bytes.concat(
           packString(this.smpl.chunkId),
-          pack(smplLoopsBytes.length + 36, uInt32_$1),
-          pack(this.smpl.dwManufacturer, uInt32_$1),
-          pack(this.smpl.dwProduct, uInt32_$1),
-          pack(this.smpl.dwSamplePeriod, uInt32_$1),
-          pack(this.smpl.dwMIDIUnityNote, uInt32_$1),
-          pack(this.smpl.dwMIDIPitchFraction, uInt32_$1),
-          pack(this.smpl.dwSMPTEFormat, uInt32_$1),
-          pack(this.smpl.dwSMPTEOffset, uInt32_$1),
-          pack(this.smpl.dwNumSampleLoops, uInt32_$1),
-          pack(this.smpl.dwSamplerData, uInt32_$1),
+          pack(smplLoopsBytes.length + 36, this.uInt32_),
+          pack(this.smpl.dwManufacturer, this.uInt32_),
+          pack(this.smpl.dwProduct, this.uInt32_),
+          pack(this.smpl.dwSamplePeriod, this.uInt32_),
+          pack(this.smpl.dwMIDIUnityNote, this.uInt32_),
+          pack(this.smpl.dwMIDIPitchFraction, this.uInt32_),
+          pack(this.smpl.dwSMPTEFormat, this.uInt32_),
+          pack(this.smpl.dwSMPTEOffset, this.uInt32_),
+          pack(this.smpl.dwNumSampleLoops, this.uInt32_),
+          pack(this.smpl.dwSamplerData, this.uInt32_),
           smplLoopsBytes);
       }
       return bytes;
@@ -3638,12 +3647,12 @@
       let loops = [];
       for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
         loops = loops.concat(
-          pack(this.smpl.loops[i]['dwName'], uInt32_$1),
-          pack(this.smpl.loops[i]['dwType'], uInt32_$1),
-          pack(this.smpl.loops[i]['dwStart'], uInt32_$1),
-          pack(this.smpl.loops[i]['dwEnd'], uInt32_$1),
-          pack(this.smpl.loops[i]['dwFraction'], uInt32_$1),
-          pack(this.smpl.loops[i]['dwPlayCount'], uInt32_$1));
+          pack(this.smpl.loops[i]['dwName'], this.uInt32_),
+          pack(this.smpl.loops[i]['dwType'], this.uInt32_),
+          pack(this.smpl.loops[i]['dwStart'], this.uInt32_),
+          pack(this.smpl.loops[i]['dwEnd'], this.uInt32_),
+          pack(this.smpl.loops[i]['dwFraction'], this.uInt32_),
+          pack(this.smpl.loops[i]['dwPlayCount'], this.uInt32_));
       }
       return loops;
     }
@@ -3659,8 +3668,8 @@
       if (this.fact.chunkId) {
         bytes = bytes.concat(
           packString(this.fact.chunkId),
-          pack(this.fact.chunkSize, uInt32_$1),
-          pack(this.fact.dwSampleLength, uInt32_$1));
+          pack(this.fact.chunkSize, this.uInt32_),
+          pack(this.fact.dwSampleLength, this.uInt32_));
       }
       return bytes;
     }
@@ -3675,13 +3684,13 @@
       if (this.fmt.chunkId) {
         return [].concat(
           packString(this.fmt.chunkId),
-          pack(this.fmt.chunkSize, uInt32_$1),
-          pack(this.fmt.audioFormat, uInt16_),
-          pack(this.fmt.numChannels, uInt16_),
-          pack(this.fmt.sampleRate, uInt32_$1),
-          pack(this.fmt.byteRate, uInt32_$1),
-          pack(this.fmt.blockAlign, uInt16_),
-          pack(this.fmt.bitsPerSample, uInt16_),
+          pack(this.fmt.chunkSize, this.uInt32_),
+          pack(this.fmt.audioFormat, this.uInt16_),
+          pack(this.fmt.numChannels, this.uInt16_),
+          pack(this.fmt.sampleRate, this.uInt32_),
+          pack(this.fmt.byteRate, this.uInt32_),
+          pack(this.fmt.blockAlign, this.uInt16_),
+          pack(this.fmt.bitsPerSample, this.uInt16_),
           this.getFmtExtensionBytes_());
       }
       throw Error('Could not find the "fmt " chunk');
@@ -3697,22 +3706,22 @@
       let extension = [];
       if (this.fmt.chunkSize > 16) {
         extension = extension.concat(
-          pack(this.fmt.cbSize, uInt16_));
+          pack(this.fmt.cbSize, this.uInt16_));
       }
       if (this.fmt.chunkSize > 18) {
         extension = extension.concat(
-          pack(this.fmt.validBitsPerSample, uInt16_));
+          pack(this.fmt.validBitsPerSample, this.uInt16_));
       }
       if (this.fmt.chunkSize > 20) {
         extension = extension.concat(
-          pack(this.fmt.dwChannelMask, uInt32_$1));
+          pack(this.fmt.dwChannelMask, this.uInt32_));
       }
       if (this.fmt.chunkSize > 24) {
         extension = extension.concat(
-          pack(this.fmt.subformat[0], uInt32_$1),
-          pack(this.fmt.subformat[1], uInt32_$1),
-          pack(this.fmt.subformat[2], uInt32_$1),
-          pack(this.fmt.subformat[3], uInt32_$1));
+          pack(this.fmt.subformat[0], this.uInt32_),
+          pack(this.fmt.subformat[1], this.uInt32_),
+          pack(this.fmt.subformat[2], this.uInt32_),
+          pack(this.fmt.subformat[3], this.uInt32_));
       }
       return extension;
     }
@@ -3730,7 +3739,7 @@
             this.LIST[i]['subChunks'], this.LIST[i]['format']);
         bytes = bytes.concat(
           packString(this.LIST[i]['chunkId']),
-          pack(subChunksBytes.length + 4, uInt32_$1),
+          pack(subChunksBytes.length + 4, this.uInt32_),
           packString(this.LIST[i]['format']),
           subChunksBytes);
       }
@@ -3752,7 +3761,7 @@
         if (format == 'INFO') {
           bytes = bytes.concat(
             packString(subChunks[i]['chunkId']),
-            pack(subChunks[i]['value'].length + 1, uInt32_$1),
+            pack(subChunks[i]['value'].length + 1, this.uInt32_),
             this.writeString_(
               subChunks[i]['value'], subChunks[i]['value'].length));
           bytes.push(0);
@@ -3761,8 +3770,8 @@
             bytes = bytes.concat(
               packString(subChunks[i]['chunkId']),
               pack(
-                subChunks[i]['value'].length + 4 + 1, uInt32_$1),
-              pack(subChunks[i]['dwName'], uInt32_$1),
+                subChunks[i]['value'].length + 4 + 1, this.uInt32_),
+              pack(subChunks[i]['dwName'], this.uInt32_),
               this.writeString_(
                 subChunks[i]['value'],
                 subChunks[i]['value'].length));
@@ -3788,14 +3797,14 @@
     getLtxtChunkBytes_(ltxt) {
       return [].concat(
         packString(ltxt['chunkId']),
-        pack(ltxt['value'].length + 20, uInt32_$1),
-        pack(ltxt['dwName'], uInt32_$1),
-        pack(ltxt['dwSampleLength'], uInt32_$1),
-        pack(ltxt['dwPurposeID'], uInt32_$1),
-        pack(ltxt['dwCountry'], uInt16_),
-        pack(ltxt['dwLanguage'], uInt16_),
-        pack(ltxt['dwLanguage'], uInt16_),
-        pack(ltxt['dwCodePage'], uInt16_),
+        pack(ltxt['value'].length + 20, this.uInt32_),
+        pack(ltxt['dwName'], this.uInt32_),
+        pack(ltxt['dwSampleLength'], this.uInt32_),
+        pack(ltxt['dwPurposeID'], this.uInt32_),
+        pack(ltxt['dwCountry'], this.uInt16_),
+        pack(ltxt['dwLanguage'], this.uInt16_),
+        pack(ltxt['dwLanguage'], this.uInt16_),
+        pack(ltxt['dwCodePage'], this.uInt16_),
         this.writeString_(ltxt['value'], ltxt['value'].length));
     }
 
@@ -3810,7 +3819,7 @@
       if (this.junk.chunkId) {
         return bytes.concat(
           packString(this.junk.chunkId),
-          pack(this.junk.chunkData.length, uInt32_$1),
+          pack(this.junk.chunkData.length, this.uInt32_),
           this.junk.chunkData);
       }
       return bytes;
@@ -3857,7 +3866,7 @@
         this.getFmtBytes_(),
         this.getFactBytes_(),
         packString(this.data.chunkId),
-        pack(this.data.samples.length, uInt32_$1),
+        pack(this.data.samples.length, this.uInt32_),
         this.data.samples,
         this.getCueBytes_(),
         this.getSmplBytes_(),
@@ -3873,7 +3882,7 @@
       // @type {number}
       let index = 0;
       index = packStringTo(this.container, file, index);
-      index = packTo(fileBodyLength + 4, uInt32_$1, file, index);
+      index = packTo(fileBodyLength + 4, this.uInt32_, file, index);
       index = packStringTo(this.format, file, index);
       for (let i=0; i<fileBody.length; i++) {
         file.set(fileBody[i], index);

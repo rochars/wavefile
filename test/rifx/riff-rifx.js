@@ -11,6 +11,32 @@ const fs = require("fs");
 const WaveFile = require("../../test/loader.js");
 const path = "test/files/";
 
+describe("Handle instances of RIFF and RIFX at the same time", function() {
+
+    // Read a RIFX file
+    let rifxwav = new WaveFile(
+        fs.readFileSync(path + "RIFX-16bit-mono.wav"));
+
+    // Read a RIFF file and make a buffer from it,
+    // then read the same RIFF file again
+    let riffwav1 = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+    let riffBuffer1 = riffwav1.toBuffer();
+    let riffwav2 = new WaveFile(
+        fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
+
+    // Again read a RIFX
+    rifxwav = new WaveFile(
+        fs.readFileSync(path + "RIFX-16bit-mono.wav"));
+
+    // turn the second RIFF to a buffer
+    let riffBuffer2 = riffwav2.toBuffer();
+
+    it("firsr RIFF buffer should be == second RIFF buffer", function() {
+        assert.deepEqual(riffBuffer1, riffBuffer2);
+    });
+});
+
 describe('create 16-bit wave files from scratch', function() {
     
     let wav = new WaveFile();

@@ -1,5 +1,5 @@
 /*
- * https://github.com/rochars/byte-data
+ * https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  */
 
@@ -14,8 +14,6 @@ import closure from 'rollup-plugin-closure-compiler-js';
 // Read externs definitions
 const fs = require('fs');
 let externsSrc = fs.readFileSync('./externs.js', 'utf8');
-
-// Add for tests
 externsSrc += 'WaveFile.getLISTBytes_ = function() {};'
 
 // License notes for bundles that include dependencies
@@ -40,14 +38,14 @@ export default [
     output: [
       {
         file: 'dist/wavefile.cjs.js',
-        name: 'wavefile.default',
+        name: 'wavefile',
         footer: 'module.exports.default = WaveFile;',
         format: 'cjs'
       }
     ],
     plugins: [
       nodeResolve(),
-      commonjs(),
+      commonjs()
     ]
   },
   // umd, es
@@ -66,7 +64,7 @@ export default [
     ],
     plugins: [
       nodeResolve(),
-      commonjs(),
+      commonjs()
     ]
   },
   // browser
@@ -89,8 +87,6 @@ export default [
         languageOut: 'ECMASCRIPT5',
         compilationLevel: 'ADVANCED',
         warningLevel: 'VERBOSE',
-        exportLocalPropertyDefinitions: true,
-        generateExports: true,
         externs: [{src:externsSrc}]
       })
     ]

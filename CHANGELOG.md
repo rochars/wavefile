@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.0.2 (2018-06-29)
+- Fix: Handle multiple instances of RIFX and RIFF.
+
 ## version 8.0.1 (2018-06-29)
 - Remove @export tags
 - Add externs file for the Closure Compiler

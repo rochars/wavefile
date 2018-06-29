@@ -19,7 +19,7 @@ https://github.com/rochars/wavefile
 - **Create or edit BWF metadata** ("bext" chunk)
 - Change the bit depth of the audio
 - Just 7 dependencies, **all MIT-licensed**
-- Less than 10kb minified + compressed, less than 30kb minified
+- Less than 10kb minified + compressed, less than 32kb minified
 - Made with Closure Compiler in mind (works great with others, too)
 
 And more.
