@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## version 8.0.0 (2018-06-29)
+- Read and write huge files.
+- Fix: CommonJS dist to be compatible with TypeScript declaration file.
+- Remove interleave() and deInterleave() from the API.
+
 ## version 7.0.1 (2018-06-27)
 - Add TypeScript declaration file.
 

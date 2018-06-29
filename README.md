@@ -9,6 +9,7 @@ https://github.com/rochars/wavefile
 
 - **Works out of the box in the browser**
 - **Works out of the box in Node**
+- **Works out of the box with TypeScript**
 - **Works with huge wave files**
 - Create wave files from scratch
 - Read existing .wav files
@@ -72,6 +73,12 @@ const WaveFile = require('wavefile');
 let wav = new WaveFile();
 ```
 
+This also works:
+```javascript
+const WaveFile = require('wavefile').default;
+let wav = new WaveFile();
+```
+
 ### Browser
 Use the compiled file in the */dist* folder:
 ```html
@@ -83,12 +90,12 @@ Use the compiled file in the */dist* folder:
 
 Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
 ```html
-<script src="https://cdn.jsdelivr.net/npm/wavefile@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
 ```
 
 Or get it from [unpkg](https://www.unpkg.com):
 ```html
-<script src="https://unpkg.com/wavefile@7"></script>
+<script src="https://unpkg.com/wavefile"></script>
 ```
 
 Or as a module from [jspm](https://jspm.io):
