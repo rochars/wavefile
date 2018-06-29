@@ -11,6 +11,13 @@ import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import closure from 'rollup-plugin-closure-compiler-js';
 
+// Read externs definitions
+const fs = require('fs');
+let externsSrc = fs.readFileSync('./externs.js', 'utf8');
+
+// Add for tests
+externsSrc += 'WaveFile.getLISTBytes_ = function() {};'
+
 // License notes for bundles that include dependencies
 const license = '/*!\n'+
   ' * wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
@@ -67,11 +74,11 @@ export default [
     input: 'index.js',
     output: [
       {
-        name: 'WaveFile',
+        name: 'wavefile',
         format: 'iife',
         file: 'dist/wavefile.min.js',
         banner: license,
-        footer: 'window["WaveFile"]=WaveFile;'
+        footer: 'window["WaveFile"]=wavefile;'
       }
     ],
     plugins: [
@@ -83,7 +90,8 @@ export default [
         compilationLevel: 'ADVANCED',
         warningLevel: 'VERBOSE',
         exportLocalPropertyDefinitions: true,
-        generateExports: true
+        generateExports: true,
+        externs: [{src:externsSrc}]
       })
     ]
   }

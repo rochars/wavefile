@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## version 8.0.1 (2018-06-29)
+- Remove @export tags
+- Add externs file for the Closure Compiler
+- Update TypeScript declaration with fromBuffer() optional argument
+
 ## version 8.0.0 (2018-06-29)
 - Read and write huge files.
 - Fix: CommonJS dist to be compatible with TypeScript declaration file.

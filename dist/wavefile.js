@@ -1890,231 +1890,212 @@ class WaveFile {
      * The container identifier.
      * 'RIFF', 'RIFX' and 'RF64' are supported.
      * @type {string}
-     * @export
      */
     this.container = '';
     /**
      * @type {number}
-     * @export
      */
     this.chunkSize = 0;
     /**
      * The format.
      * Always 'WAVE'.
      * @type {string}
-     * @export
      */
     this.format = '';
     /**
      * The data of the 'fmt' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.fmt = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       audioFormat: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       numChannels: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       sampleRate: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       byteRate: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       blockAlign: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       bitsPerSample: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       cbSize: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       validBitsPerSample: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwChannelMask: 0,
       /**
        * 4 32-bit values representing a 128-bit ID
-       * @export @type {!Array<number>}
+       * @type {!Array<number>}
        */
       subformat: []
     };
     /**
      * The data of the 'fact' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.fact = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwSampleLength: 0
     };
     /**
      * The data of the 'cue ' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.cue = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwCuePoints: 0,
-      /** @export @type {!Array<!Object>} */
+      /** @type {!Array<!Object>} */
       points: [],
     };
     /**
      * The data of the 'smpl' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.smpl = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwManufacturer: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwProduct: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwSamplePeriod: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwMIDIUnityNote: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwMIDIPitchFraction: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwSMPTEFormat: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwSMPTEOffset: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwNumSampleLoops: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       dwSamplerData: 0,
-      /** @export @type {!Array<!Object>} */
+      /** @type {!Array<!Object>} */
       loops: [],
     };
     /**
      * The data of the 'bext' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.bext = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {string} */
+      /** @type {string} */
       description: '', //256
-      /** @export @type {string} */
+      /** @type {string} */
       originator: '', //32
-      /** @export @type {string} */
+      /** @type {string} */
       originatorReference: '', //32
-      /** @export @type {string} */
+      /** @type {string} */
       originationDate: '', //10
-      /** @export @type {string} */
+      /** @type {string} */
       originationTime: '', //8
       /**
        * 2 32-bit values, timeReference high and low
-       * @export @type {!Array<number>}
+       * @type {!Array<number>}
        */
       timeReference: [0, 0],
-      /** @export @type {number} */
+      /** @type {number} */
       version: 0, //WORD
-      /** @export @type {string} */
+      /** @type {string} */
       UMID: '', // 64 chars
-      /** @export @type {number} */
+      /** @type {number} */
       loudnessValue: 0, //WORD
-      /** @export @type {number} */
+      /** @type {number} */
       loudnessRange: 0, //WORD
-      /** @export @type {number} */
+      /** @type {number} */
       maxTruePeakLevel: 0, //WORD
-      /** @export @type {number} */
+      /** @type {number} */
       maxMomentaryLoudness: 0, //WORD
-      /** @export @type {number} */
+      /** @type {number} */
       maxShortTermLoudness: 0, //WORD
-      /** @export @type {string} */
+      /** @type {string} */
       reserved: '', //180
-      /** @export @type {string} */
+      /** @type {string} */
       codingHistory: '' // string, unlimited
     };
     /**
      * The data of the 'ds64' chunk.
      * Used only with RF64 files.
      * @type {!Object<string, *>}
-     * @export
      */
     this.ds64 = {
       /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {number} */
+      /** @type {number} */
       riffSizeHigh: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       riffSizeLow: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       dataSizeHigh: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       dataSizeLow: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       originationTime: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       sampleCountHigh: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       sampleCountLow: 0, // DWORD
-      /** @export @type {number} */
+      /** @type {number} */
       //'tableLength': 0, // DWORD
-      /** @export @type {!Array<number>} */
+      /** @type {!Array<number>} */
       //'table': []
     };
     /**
      * The data of the 'data' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.data = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {!Uint8Array} */
+      /** @type {!Uint8Array} */
       samples: new Uint8Array(0)
     };
     /**
      * The data of the 'LIST' chunks.
      * Each item in this list must have this signature:
-     *  {
-     *    'chunkId': '',
-     *    'chunkSize': 0,
-     *    'format': '',
-     *    'subChunks': []
-     *   }
      * @type {!Array<!Object>}
-     * @export
      */
     this.LIST = [];
     /**
      * The data of the 'junk' chunk.
      * @type {!Object<string, *>}
-     * @export
      */
     this.junk = {
-      /** @export @type {string} */
+      /** @type {string} */
       chunkId: '',
-      /** @export @type {number} */
+      /** @type {number} */
       chunkSize: 0,
-      /** @export @type {!Array<number>} */
+      /** @type {!Array<number>} */
       chunkData: []
     };
     /**
      * The bit depth code according to the samples.
      * @type {string}
-     * @export
      */
     this.bitDepth = '0';
     /**
@@ -2163,7 +2144,6 @@ class WaveFile {
    * @param {?Object} options Optional. Used to force the container
    *    as RIFX with {'container': 'RIFX'}
    * @throws {Error} If any argument does not meet the criteria.
-   * @export
    */
   fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
     if (!options['container']) {
@@ -2243,7 +2223,6 @@ class WaveFile {
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
-   * @export
    */
   fromBuffer(bytes, samples=true) {
     this.head_ = 0;
@@ -2269,7 +2248,6 @@ class WaveFile {
    * The return value of this method can be written straight to disk.
    * @return {!Uint8Array} A .wav file.
    * @throws {Error} If any property of the object appears invalid.
-   * @export
    */
   toBuffer() {
     this.validateHeader_();
@@ -2280,7 +2258,6 @@ class WaveFile {
    * Use a .wav file encoded as a base64 string to load the WaveFile object.
    * @param {string} base64String A .wav file as a base64 string.
    * @throws {Error} If any property of the object appears invalid.
-   * @export
    */
   fromBase64(base64String) {
     this.fromBuffer(new Uint8Array(decode$3(base64String)));
@@ -2290,7 +2267,6 @@ class WaveFile {
    * Return a base64 string representig the WaveFile object as a .wav file.
    * @return {string} A .wav file as a base64 string.
    * @throws {Error} If any property of the object appears invalid.
-   * @export
    */
   toBase64() {
     /** @type {Uint8Array} */
@@ -2303,7 +2279,6 @@ class WaveFile {
    * The return of this method can be used to load the audio in browsers.
    * @return {string} A .wav file as a DataURI.
    * @throws {Error} If any property of the object appears invalid.
-   * @export
    */
   toDataURI() {
     return 'data:audio/wav;base64,' + this.toBase64();
@@ -2313,7 +2288,6 @@ class WaveFile {
    * Use a .wav file encoded as a DataURI to load the WaveFile object.
    * @param {string} dataURI A .wav file as DataURI.
    * @throws {Error} If any property of the object appears invalid.
-   * @export
    */
   fromDataURI(dataURI) {
     this.fromBase64(dataURI.replace('data:audio/wav;base64,', ''));
@@ -2321,7 +2295,6 @@ class WaveFile {
 
   /**
    * Force a file as RIFF.
-   * @export
    */
   toRIFF() {
     if (this.container == 'RF64') {
@@ -2342,7 +2315,6 @@ class WaveFile {
 
   /**
    * Force a file as RIFX.
-   * @export
    */
   toRIFX() {
     if (this.container == 'RF64') {
@@ -2369,7 +2341,6 @@ class WaveFile {
    * @param {boolean} changeResolution A boolean indicating if the
    *    resolution of samples should be actually changed or not.
    * @throws {Error} If the bit depth is not valid.
-   * @export
    */
   toBitDepth(bitDepth, changeResolution=true) {
     /** @type {string} */
@@ -2397,7 +2368,6 @@ class WaveFile {
    * Encode a 16-bit wave file as 4-bit IMA ADPCM.
    * @throws {Error} If sample rate is not 8000.
    * @throws {Error} If number of channels is not 1.
-   * @export
    */
   toIMAADPCM() {
     if (this.fmt.sampleRate != 8000) {
@@ -2422,7 +2392,6 @@ class WaveFile {
    * @param {string} bitDepth The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
    *    Optional. Default is 16.
-   * @export
    */
   fromIMAADPCM(bitDepth='16') {
     this.fromScratch(
@@ -2438,7 +2407,6 @@ class WaveFile {
 
   /**
    * Encode 16-bit wave file as 8-bit A-Law.
-   * @export
    */
   toALaw() {
     this.assure16Bit_();
@@ -2455,7 +2423,6 @@ class WaveFile {
    * @param {string} bitDepth The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
    *    Optional. Default is 16.
-   * @export
    */
   fromALaw(bitDepth='16') {
     this.fromScratch(
@@ -2471,7 +2438,6 @@ class WaveFile {
 
   /**
    * Encode 16-bit wave file as 8-bit mu-Law.
-   * @export
    */
   toMuLaw() {
     this.assure16Bit_();
@@ -2490,7 +2456,6 @@ class WaveFile {
    * @param {string} bitDepth The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
    *    Optional. Default is 16.
-   * @export
    */
   fromMuLaw(bitDepth='16') {
     this.fromScratch(
@@ -2510,7 +2475,6 @@ class WaveFile {
    * @param {string} tag The tag name.
    * @param {string} value The tag value.
    * @throws {Error} If the tag name is not valid.
-   * @export
    */
   setTag(tag, value) {
     tag = this.fixTagName_(tag);
@@ -2542,7 +2506,6 @@ class WaveFile {
    * Return the value of a RIFF tag in the INFO chunk.
    * @param {string} tag The tag name.
    * @return {?string} The value if the tag is found, null otherwise.
-   * @export
    */
   getTag(tag) {
     /** @type {!Object} */
@@ -2557,7 +2520,6 @@ class WaveFile {
    * Remove a RIFF tag in the INFO chunk.
    * @param {string} tag The tag name.
    * @return {boolean} True if a tag was deleted.
-   * @export
    */
   deleteTag(tag) {
     /** @type {!Object} */
@@ -2573,7 +2535,6 @@ class WaveFile {
    * Create a cue point in the wave file.
    * @param {number} position The cue point position in milliseconds.
    * @param {string} labl The LIST adtl labl text of the marker. Optional.
-   * @export
    */
   setCuePoint(position, labl='') {
     this.cue.chunkId = 'cue ';
@@ -2615,7 +2576,6 @@ class WaveFile {
    * Remove a cue point from a wave file.
    * @param {number} index the index of the point. First is 1,
    *    second is 2, and so on.
-   * @export
    */
   deleteCuePoint(index) {
     this.cue.chunkId = 'cue ';
@@ -2646,7 +2606,6 @@ class WaveFile {
    * Update the label of a cue point.
    * @param {number} pointIndex The ID of the cue point.
    * @param {string} label The new text for the label.
-   * @export
    */
   updateLabel(pointIndex, label) {
     /** @type {?number} */
@@ -3755,7 +3714,6 @@ class WaveFile {
   /**
    * Return the bytes of the 'LIST' chunk.
    * @return {!Array<number>} The 'LIST' chunk bytes.
-   * @export for tests
    */
   getLISTBytes_() {
     /** @type {!Array<number>} */
