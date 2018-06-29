@@ -55,14 +55,13 @@
 <li><strong>Works out of the box with TypeScript</strong></li>
 <li><strong>Works with huge wave files</strong></li>
 <li>Create wave files from scratch</li>
-<li>Read existing .wav files</li>
 <li>Read and write tags on .wav files</li>
 <li>Set and delete cue points and their labels</li>
 <li>Encode/decode files as ADPCM, A-Law and μ-Law</li>
 <li>Turn RIFF files to RIFX and RIFX files to RIFF</li>
 <li><strong>Create or edit BWF metadata</strong> (&quot;bext&quot; chunk)</li>
 <li>Change the bit depth of the audio</li>
-<li>Just 7 dependencies, and they are <strong>all MIT-licensed</strong></li>
+<li>Just 7 dependencies, <strong>all MIT-licensed</strong></li>
 <li>Less than 10kb minified + compressed, less than 30kb minified</li>
 </ul>
 <p>And more.</p>
@@ -655,20 +654,23 @@ WaveFile.LIST = [];</code></pre><p><em>WaveFile.LIST</em> is an array of objects
 <li>-1.0 to 1.0 for 32-bit (float)</li>
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
-<h2>Distribution</h2><p>This library is a ES6 module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed via NPM.</p>
-<h3>If you are using <strong>wavefile</strong> in a browser:</h3><p>You may load both <strong>wavefile.umd.js</strong> and <strong>wavefile.min.js</strong> in the browser with <code>&lt;script&gt;</code> tags. Ideally you should use <strong>wavefile.min.js</strong>. It is also available via https://unpkg.com and https://<a href="http://www.jsdelivr.com/">www.jsdelivr.com/</a> CDNs.</p>
-<h3>If you are using <strong>wavefile</strong> as a dependency:</h3><ul>
-<li><p>The <strong>CommonJS</strong> is the dist file used by Node. It is served in the &quot;main&quot; field of package.json. It includes all the source but no dependencies. Dependencies will be imported from your node_modules folder.</p>
+<h2>Distribution</h2><p>This library is a ES6 module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with <code>npm install wavefile</code>.</p>
+<h3>If you are using this lib in a browser:</h3><p>You may load both <strong>wavefile.umd.js</strong> and <strong>wavefile.min.js</strong> in the browser with <code>&lt;script&gt;</code> tags. Ideally you should use <strong>wavefile.min.js</strong>. You can load it via the https://unpkg.com and https://<a href="http://www.jsdelivr.com/">www.jsdelivr.com/</a> CDNs:</p>
+<p><a href="https://www.unpkg.com">unpkg</a>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/wavefile&quot;>&lt;/script></code></pre><p><a href="https://www.jsdelivr.com">jsDelivr</a>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile&quot;>&lt;/script></code></pre><h3>If you are using this lib as a dependency:</h3><ul>
+<li><p>The <strong>CommonJS</strong> is the dist file used by Node. It is served in the &quot;main&quot; field of package.json. It includes all the sources but no dependencies. Dependencies will be imported from the <strong>node_modules</strong> folder. This is the source you are running when you <strong>npm install wavefile</strong>.</p>
 </li>
-<li><p>The <strong>UMD</strong> module is compatible with Node, AMD and browsers. It is served in the &quot;browser&quot; field. It includes all dependencies. This file is not compiled as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.</p>
+<li><p>The <strong>UMD</strong> module is compatible with Node, AMD and browsers. It is served in the &quot;browser&quot; field of package.json. It includes all dependencies. This file is not compiled/minified as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.</p>
 </li>
 <li><p>The <strong>compiled dist</strong> is browser-only and should be the one served by CDNs. It includes all the dependencies. It is used in the &quot;unpkg&quot; and &quot;jsdelivr&quot; fields of package.json.</p>
 </li>
-<li><p>The <strong>ES6 dist</strong> is <strong>wavefile.js</strong>, served as &quot;es2015&quot; in package.json. It includes all the dependencies.</p>
+<li><p>The <strong>ES6 dist</strong> is <strong>wavefile.js</strong>, served as &quot;es2015&quot; in package.json. It includes all the dependencies. It is not compiled/minified.</p>
 </li>
-<li><p><strong>./index.js</strong> is served as &quot;module&quot;. Its should be used by systems that support ES6 and are aware of Node's module path resolution (a module bundler, for instance). This should be the entry point for bundlers in most cases - this will avoid code duplication in the case of shared dependencies (as opposed to using &quot;browser&quot; as the entry point).</p>
+<li><p><strong>./index.js</strong> is served as &quot;module&quot; in package.json. It should be used by systems that support ES modules and are aware of Node's module path resolution (a module bundler, for instance). This should be the entry point for bundlers in most cases - this will avoid code duplication in the case of shared dependencies (as opposed to using &quot;browser&quot; as the entry point).</p>
 </li>
 </ul>
+<p>If your module bundler is using &quot;browser&quot; as the entry point <strong>your dist should work the same</strong> but will be a larger file.</p>
 <h2>Contributing to wavefile</h2><p><strong>wavefile</strong> welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.</p>
 <p>See <a href="https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for details.</p>
 <h3>Style guide</h3><p><strong>wavefile</strong> code should follow the Google JavaScript Style Guide:<br>https://google.github.io/styleguide/jsguide.html</p>
@@ -800,7 +802,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 29 2018 01:25:39 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 29 2018 01:43:39 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
