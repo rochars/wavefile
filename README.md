@@ -20,6 +20,7 @@ https://github.com/rochars/wavefile
 - Change the bit depth of the audio
 - Just 7 dependencies, **all MIT-licensed**
 - Less than 10kb minified + compressed, less than 30kb minified
+- Made with Closure Compiler in mind (works great with others, too)
 
 And more.
 
