@@ -207,7 +207,7 @@ WaveFile.data = {
   /** @type {number} */
   chunkSize: 0,
   /** @type {!Uint8Array} */
-  samples: new Uint8Array(0)
+  samples: null //
 };
 /**
  * The data of the LIST chunks.
