@@ -704,8 +704,8 @@ WaveFile.data = {
     "chunkId": "",
     /** @export @type {number} */
     "chunkSize": 0,
-    /** @export @type {!Array<number>} */
-    "samples": []
+    /** @export @type {!Uint8Array} */
+    "samples": new Uint8Array(0)
 };
 /**
  * The data of the "LIST" chunks.
@@ -804,6 +804,7 @@ Where "chunkId" may be any RIFF tag:
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
 ## The samples
+Samples are stored in WaveFile.data.samples as a Uint8Array.
 Range:
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit

@@ -1150,9 +1150,9 @@
 
   /*
    * imaadpcm: IMA ADPCM codec in JavaScript.
-   * https://github.com/rochars/imaadpcm
-   *
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   * Derived from https://github.com/acida/pyima  
+   * Copyright (c) 2016 acida. MIT License.  
+   * Copyright (c) 2018 Rafael da Silva Rocha.
    *
    * Permission is hereby granted, free of charge, to any person obtaining
    * a copy of this software and associated documentation files (the
@@ -1176,7 +1176,7 @@
    */
 
   /**
-   * @fileoverview imaadpcm public API and private methods.
+   * @fileoverview imaadpcm API and private methods.
    */
 
   /** @module imaadpcm */
@@ -1233,43 +1233,49 @@
 
   /**
    * Encode 16-bit PCM samples into 4-bit IMA ADPCM samples.
-   * @param {!Array<number>} samples A array of samples.
-   * @return {!Array<number>}
+   * @param {!Int16Array} samples A array of samples.
+   * @return {!Uint8Array}
    */
   function encode(samples) {
-      /** @type {!Array<number>} */
-      let adpcmSamples = [];
-      /** @type {Array<number>} */
-      let block = [];
-      for (let i=0; i<samples.length; i++) {
-          block.push(samples[i]);
-          if ((i % 505 == 0 && i != 0) || i == samples.length - 1) {
-              adpcmSamples = adpcmSamples.concat(encodeBlock(block));
-              block = [];
-          }
+    /** @type {!Uint8Array} */
+    let adpcmSamples = new Uint8Array((samples.length));
+    /** @type {!Array<number>} */
+    let block = [];
+    /** @type {number} */
+    let fileIndex = 0;
+    for (let i=0; i<samples.length; i++) {
+      if ((i % 505 == 0 && i != 0)) {
+        adpcmSamples.set(encodeBlock(block), fileIndex);
+        fileIndex += 256;
+        block = [];
       }
-      return adpcmSamples;
+      block.push(samples[i]);
+    }
+    return adpcmSamples;
   }
 
   /**
    * Decode IMA ADPCM samples into 16-bit PCM samples.
-   * @param {!Array<number>} adpcmSamples A array of ADPCM samples.
+   * @param {!Uint8Array} adpcmSamples A array of ADPCM samples.
    * @param {number} blockAlign The block size.
-   * @return {!Array<number>}
+   * @return {!Int16Array}
    */
   function decode(adpcmSamples, blockAlign=256) {
-      /** @type {!Array<number>} */
-      let samples = [];
-      /** @type {!Array<number>} */
-      let block = [];
-      for (let i=0; i<adpcmSamples.length; i++) {
-          if (i % blockAlign == 0 && i != 0) {            
-              samples = samples.concat(decodeBlock(block));
-              block = [];
-          }
-          block.push(adpcmSamples[i]);
+    /** @type {!Int16Array} */
+    let samples = new Int16Array(adpcmSamples.length * 2);
+    /** @type {!Array<number>} */
+    let block = [];
+    /** @type {number} */
+    let fileIndex = 0;
+    for (let i=0; i<adpcmSamples.length; i++) {
+      if (i % blockAlign == 0 && i != 0) {            
+        samples.set(decodeBlock(block), fileIndex);
+        fileIndex += blockAlign * 2;
+        block = [];
       }
-      return samples;
+      block.push(adpcmSamples[i]);
+    }
+    return samples;
   }
 
   /**
@@ -1278,19 +1284,19 @@
    * @return {!Array<number>}
    */
   function encodeBlock(block) {
-      /** @type {!Array<number>} */
-      let adpcmSamples = blockHead_(block[0]);
-      for (let i=3; i<block.length; i+=2) {
-          /** @type {number} */
-          let sample2 = encodeSample_(block[i]);
-          /** @type {number} */
-          let sample = encodeSample_(block[i + 1]);
-          adpcmSamples.push((sample << 4) | sample2);
-      }
-      while (adpcmSamples.length < 256) {
-          adpcmSamples.push(0);
-      }
-      return adpcmSamples;
+    /** @type {!Array<number>} */
+    let adpcmSamples = blockHead_(block[0]);
+    for (let i=3; i<block.length; i+=2) {
+      /** @type {number} */
+      let sample2 = encodeSample_(block[i]);
+      /** @type {number} */
+      let sample = encodeSample_(block[i + 1]);
+      adpcmSamples.push((sample << 4) | sample2);
+    }
+    while (adpcmSamples.length < 256) {
+      adpcmSamples.push(0);
+    }
+    return adpcmSamples;
   }
 
   /**
@@ -1299,25 +1305,25 @@
    * @return {!Array<number>}
    */
   function decodeBlock(block) {
-      decoderPredicted_ = sign_((block[1] << 8) | block[0]);
-      decoderIndex_ = block[2];
-      decoderStep_ = STEP_TABLE[decoderIndex_];
-      /** @type {!Array<number>} */
-      let result = [
-              decoderPredicted_,
-              sign_((block[3] << 8) | block[2])
-          ];
-      for (let i=4; i<block.length; i++) {
-          /** @type {number} */
-          let original_sample = block[i];
-          /** @type {number} */
-          let second_sample = original_sample >> 4;
-          /** @type {number} */
-          let first_sample = (second_sample << 4) ^ original_sample;
-          result.push(decodeSample_(first_sample));
-          result.push(decodeSample_(second_sample));
-      }
-      return result;
+    decoderPredicted_ = sign_((block[1] << 8) | block[0]);
+    decoderIndex_ = block[2];
+    decoderStep_ = STEP_TABLE[decoderIndex_];
+    /** @type {!Array<number>} */
+    let result = [
+        decoderPredicted_,
+        sign_((block[3] << 8) | block[2])
+      ];
+    for (let i=4; i<block.length; i++) {
+      /** @type {number} */
+      let original_sample = block[i];
+      /** @type {number} */
+      let second_sample = original_sample >> 4;
+      /** @type {number} */
+      let first_sample = (second_sample << 4) ^ original_sample;
+      result.push(decodeSample_(first_sample));
+      result.push(decodeSample_(second_sample));
+    }
+    return result;
   }
 
   /**
@@ -1327,7 +1333,7 @@
    * @private
    */
   function sign_(num) {
-      return num > 32768 ? num - 65536 : num;
+    return num > 32768 ? num - 65536 : num;
   }
 
   /**
@@ -1337,38 +1343,38 @@
    * @private
    */
   function encodeSample_(sample) {
-      /** @type {number} */
-      let delta = sample - encoderPredicted_;
-      /** @type {number} */
-      let value = 0;
-      if (delta >= 0) {
-          value = 0;
-      } else {
-          value = 8;
-          delta = -delta;
-      }
-      /** @type {number} */
-      let step = STEP_TABLE[encoderIndex_];
-      /** @type {number} */
-      let diff = step >> 3;
-      if (delta > step) {
-          value |= 4;
-          delta -= step;
-          diff += step;
-      }
-      step >>= 1;
-      if (delta > step) {
-          value |= 2;
-          delta -= step;
-          diff += step;
-      }
-      step >>= 1;
-      if (delta > step) {
-          value |= 1;
-          diff += step;
-      }
-      updateEncoder_(value, diff);
-      return value;
+    /** @type {number} */
+    let delta = sample - encoderPredicted_;
+    /** @type {number} */
+    let value = 0;
+    if (delta >= 0) {
+      value = 0;
+    } else {
+      value = 8;
+      delta = -delta;
+    }
+    /** @type {number} */
+    let step = STEP_TABLE[encoderIndex_];
+    /** @type {number} */
+    let diff = step >> 3;
+    if (delta > step) {
+      value |= 4;
+      delta -= step;
+      diff += step;
+    }
+    step >>= 1;
+    if (delta > step) {
+      value |= 2;
+      delta -= step;
+      diff += step;
+    }
+    step >>= 1;
+    if (delta > step) {
+      value |= 1;
+      diff += step;
+    }
+    updateEncoder_(value, diff);
+    return value;
   }
 
   /**
@@ -1379,22 +1385,22 @@
    * @private
    */
   function updateEncoder_(value, diff) {
-      if (value & 8) {
-          encoderPredicted_ -= diff;
-      } else {
-          encoderPredicted_ += diff;
-      }
-      if (encoderPredicted_ < -0x8000) {
-          encoderPredicted_ = -0x8000;
-      } else if (encoderPredicted_ > 0x7fff) {
-          encoderPredicted_ = 0x7fff;
-      }
-      encoderIndex_ += INDEX_TABLE[value & 7];
-      if (encoderIndex_ < 0) {
-          encoderIndex_ = 0;
-      } else if (encoderIndex_ > 88) {
-          encoderIndex_ = 88;
-      }
+    if (value & 8) {
+      encoderPredicted_ -= diff;
+    } else {
+      encoderPredicted_ += diff;
+    }
+    if (encoderPredicted_ < -0x8000) {
+      encoderPredicted_ = -0x8000;
+    } else if (encoderPredicted_ > 0x7fff) {
+      encoderPredicted_ = 0x7fff;
+    }
+    encoderIndex_ += INDEX_TABLE[value & 7];
+    if (encoderIndex_ < 0) {
+      encoderIndex_ = 0;
+    } else if (encoderIndex_ > 88) {
+      encoderIndex_ = 88;
+    }
   }
 
   /**
@@ -1404,29 +1410,29 @@
    * @private
    */
   function decodeSample_(nibble) {
-      /** @type {number} */
-      let difference = 0;
-      if (nibble & 4) {
-          difference += decoderStep_;
-      }
-      if (nibble & 2) {
-          difference += decoderStep_ >> 1;
-      }
-      if (nibble & 1) {
-          difference += decoderStep_ >> 2;
-      }
-      difference += decoderStep_ >> 3;
-      if (nibble & 8) {
-          difference = -difference;
-      }
-      decoderPredicted_ += difference;
-      if (decoderPredicted_ > 32767) {
-          decoderPredicted_ = 32767;
-      } else if (decoderPredicted_ < -32767) {
-          decoderPredicted_ = -32767;
-      }
-      updateDecoder_(nibble);
-      return decoderPredicted_;
+    /** @type {number} */
+    let difference = 0;
+    if (nibble & 4) {
+      difference += decoderStep_;
+    }
+    if (nibble & 2) {
+      difference += decoderStep_ >> 1;
+    }
+    if (nibble & 1) {
+      difference += decoderStep_ >> 2;
+    }
+    difference += decoderStep_ >> 3;
+    if (nibble & 8) {
+      difference = -difference;
+    }
+    decoderPredicted_ += difference;
+    if (decoderPredicted_ > 32767) {
+      decoderPredicted_ = 32767;
+    } else if (decoderPredicted_ < -32767) {
+      decoderPredicted_ = -32767;
+    }
+    updateDecoder_(nibble);
+    return decoderPredicted_;
   }
 
   /**
@@ -1435,13 +1441,13 @@
    * @private
    */
   function updateDecoder_(nibble) {
-      decoderIndex_ += INDEX_TABLE[nibble];
-      if (decoderIndex_ < 0) {
-          decoderIndex_ = 0;
-      } else if (decoderIndex_ > 88) {
-          decoderIndex_ = 88;
-      }
-      decoderStep_ = STEP_TABLE[decoderIndex_];
+    decoderIndex_ += INDEX_TABLE[nibble];
+    if (decoderIndex_ < 0) {
+      decoderIndex_ = 0;
+    } else if (decoderIndex_ > 88) {
+      decoderIndex_ = 88;
+    }
+    decoderStep_ = STEP_TABLE[decoderIndex_];
   }
 
   /**
@@ -1451,21 +1457,21 @@
    * @private
    */
   function blockHead_(sample) {
-      encodeSample_(sample);
-      /** @type {!Array<number>} */
-      let adpcmSamples = [];
-      adpcmSamples.push(sample & 0xFF);
-      adpcmSamples.push((sample >> 8) & 0xFF);
-      adpcmSamples.push(encoderIndex_);
-      adpcmSamples.push(0);
-      return adpcmSamples;
+    encodeSample_(sample);
+    /** @type {!Array<number>} */
+    let adpcmSamples = [];
+    adpcmSamples.push(sample & 0xFF);
+    adpcmSamples.push((sample >> 8) & 0xFF);
+    adpcmSamples.push(encoderIndex_);
+    adpcmSamples.push(0);
+    return adpcmSamples;
   }
 
   /*
    * alawmulaw: A-Law and mu-Law codecs in JavaScript.
    * https://github.com/rochars/alawmulaw
    *
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   * Copyright (c) 2018 Rafael da Silva Rocha.
    *
    * Permission is hereby granted, free of charge, to any person obtaining
    * a copy of this software and associated documentation files (the
@@ -1490,9 +1496,6 @@
 
   /**
    * @fileoverview A-Law codec.
-   * References:
-   * https://github.com/deftio/companders
-   * http://dystopiancode.blogspot.com.br/2012/02/pcm-law-and-u-law-companding-algorithms.html
    */
 
   /** @module alawmulaw/alaw */
@@ -1507,7 +1510,7 @@
 
   /**
    * Encode a 16-bit linear PCM sample as 8-bit A-Law.
-   * @param {number} sample A 16-bit linear PCM sample
+   * @param {number} sample A 16-bit PCM sample
    * @return {number}
    */
   function encodeSample(sample) {
@@ -1535,7 +1538,7 @@
   }
 
   /**
-   * Decode a 8-bit A-Law sample as 16-bit linear PCM.
+   * Decode a 8-bit A-Law sample as 16-bit PCM.
    * @param {number} aLawSample The 8-bit A-Law sample
    * @return {number}
    */
@@ -1563,45 +1566,38 @@
   }
 
   /**
-   * Encode 16-bit linear PCM samples into 8-bit A-Law samples.
-   * @param {!Array<number>} samples A array of 16-bit PCM samples.
-   * @return {!Array<number>}
+   * Encode 16-bit linear PCM samples as 8-bit A-Law samples.
+   * @param {!Int16Array} samples A array of 16-bit PCM samples.
+   * @return {!Uint8Array}
    */
   function encode$1(samples) {
-    /** @type {!Array<number>} */
-    let aLawSamples = [];
+    /** @type {!Uint8Array} */
+    let aLawSamples = new Uint8Array(samples.length);
     for (let i=0; i<samples.length; i++) {
-      aLawSamples.push(encodeSample(samples[i]));
+      aLawSamples[i] = encodeSample(samples[i]);
     }
     return aLawSamples;
   }
 
   /**
    * Decode 8-bit A-Law samples into 16-bit linear PCM samples.
-   * @param {!Array<number>} samples A array of 8-bit A-Law samples.
-   * @return {!Array<number>}
+   * @param {!Uint8Array} samples A array of 8-bit A-Law samples.
+   * @return {!Int16Array}
    */
   function decode$1(samples) {
-    /** @type {!Array<number>} */
-    let pcmSamples = [];
+    /** @type {!Int16Array} */
+    let pcmSamples = new Int16Array(samples.length);
     for (let i=0; i<samples.length; i++) {
-      pcmSamples.push(decodeSample(samples[i]));
+      pcmSamples[i] = decodeSample(samples[i]);
     }
     return pcmSamples;
   }
-
-  var alaw = /*#__PURE__*/Object.freeze({
-    encodeSample: encodeSample,
-    decodeSample: decodeSample,
-    encode: encode$1,
-    decode: decode$1
-  });
 
   /*
    * alawmulaw: A-Law and mu-Law codecs in JavaScript.
    * https://github.com/rochars/alawmulaw
    *
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   * Copyright (c) 2018 Rafael da Silva Rocha.
    *
    * Permission is hereby granted, free of charge, to any person obtaining
    * a copy of this software and associated documentation files (the
@@ -1626,8 +1622,6 @@
 
   /**
    * @fileoverview mu-Law codec.
-   * References:
-   * https://github.com/torvalds/linux/blob/master/sound/core/oss/mulaw.c
    */
 
   /** @module alawmulaw/mulaw */
@@ -1640,30 +1634,30 @@
 
   /**
    * Encode a 16-bit linear PCM sample as 8-bit mu-Law.
-   * @param {number} pcmSample A 16-bit sample
+   * @param {number} sample A 16-bit PCM sample
    * @return {number}
    */
-  function encodeSample$1(pcmSample) {
+  function encodeSample$1(sample) {
     /** @type {number} */
     let mask = 0xFF;
-    if (pcmSample < 0) {
-      pcmSample = BIAS - pcmSample;
+    if (sample < 0) {
+      sample = BIAS - sample;
       mask = 0x7F;
     } else {
-      pcmSample += BIAS;
+      sample += BIAS;
     }
-    if (pcmSample > 0x7FFF) {
-      pcmSample = 0x7FFF;
+    if (sample > 0x7FFF) {
+      sample = 0x7FFF;
     }
     /** @type {number} */
-    let seg = segmentValue_(pcmSample);
+    let seg = segmentValue_(sample);
     /** @type {number} */
-    let uval = (seg << 4) | ((pcmSample >> (seg + 3)) & 0xF);
+    let uval = (seg << 4) | ((sample >> (seg + 3)) & 0xF);
     return uval ^ mask;
   }
 
   /**
-   * Decode a 8-bit mu-Law sample as 16-bit linear PCM.
+   * Decode a 8-bit mu-Law sample as 16-bit PCM.
    * @param {number} muLawSample The 8-bit mu-Law sample
    * @return {number}
    */
@@ -1677,28 +1671,28 @@
 
   /**
    * Encode 16-bit linear PCM samples into 8-bit mu-Law samples.
-   * @param {!Array<number>} samples A array of 16-bit linear PCM samples.
-   * @return {!Array<number>}
+   * @param {!Int16Array} samples A array of 16-bit PCM samples.
+   * @return {!Uint8Array}
    */
   function encode$2(samples) {
-    /** @type {!Array<number>} */
-    let muLawSamples = [];
+    /** @type {!Uint8Array} */
+    let muLawSamples = new Uint8Array(samples.length);
     for (let i=0; i<samples.length; i++) {
-      muLawSamples.push(encodeSample$1(samples[i]));
+      muLawSamples[i] = encodeSample$1(samples[i]);
     }
     return muLawSamples;
   }
 
   /**
-   * Decode 8-bit mu-Law samples into 16-bit linear PCM samples.
-   * @param {!Array<number>} samples A array of 8-bit mu-Law samples.
-   * @return {!Array<number>}
+   * Decode 8-bit mu-Law samples into 16-bit PCM samples.
+   * @param {!Uint8Array} samples A array of 8-bit mu-Law samples.
+   * @return {!Int16Array}
    */
   function decode$2(samples) {
-    /** @type {!Array<number>} */
-    let pcmSamples = [];
+    /** @type {!Int16Array} */
+    let pcmSamples = new Int16Array(samples.length);
     for (let i=0; i<samples.length; i++) {
-      pcmSamples.push(decodeSample$1(samples[i]));
+      pcmSamples[i] = decodeSample$1(samples[i]);
     }
     return pcmSamples;
   }
@@ -1727,18 +1721,11 @@
     return segment;
   }
 
-  var mulaw = /*#__PURE__*/Object.freeze({
-    encodeSample: encodeSample$1,
-    decodeSample: decodeSample$1,
-    encode: encode$2,
-    decode: decode$2
-  });
-
   /*
    * alawmulaw: A-Law and mu-Law codecs in JavaScript.
    * https://github.com/rochars/alawmulaw
    *
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   * Copyright (c) 2018 Rafael da Silva Rocha.
    *
    * Permission is hereby granted, free of charge, to any person obtaining
    * a copy of this software and associated documentation files (the
@@ -1760,17 +1747,6 @@
    * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    *
    */
-
-  var alawmulaw = {
-  	/**
-  	 * @type {!Object}
-  	 */
-  	alaw: alaw,
-  	/**
-  	 * @type {!Object}
-  	 */
-  	mulaw: mulaw
-  };
 
   /*
    * base64-arraybuffer
@@ -2151,18 +2127,17 @@
      * @param {string} bitDepth The audio bit depth code.
      *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
      *    or any value between '8' and '32' (like '12').
-     * @param {!Array<number>|!Array<!Array<number>>} samples Array of samples to be written.
-     *    The samples must be in the correct range according to the
-     *    bit depth.
+     * @param {!Array<number>|!Array<!Array<number>>|!Int16Array} samples
+     *    The samples. Must be in the correct range according to the bit depth.
      * @param {?Object} options Optional. Used to force the container
      *    as RIFX with {'container': 'RIFX'}
      * @throws {Error} If any argument does not meet the criteria.
      */
     fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {
-      if (!options['container']) {
-        options['container'] = 'RIFF';
+      if (!options.container) {
+        options.container = 'RIFF';
       }
-      this.container = options['container'];
+      this.container = options.container;
       this.bitDepth = bitDepth;
       samples = this.interleave_(samples);
       /** @type {number} */
@@ -2299,14 +2274,14 @@
           this.fmt.sampleRate,
           this.bitDepth,
           unpackArray(this.data.samples, this.dataType),
-          {'container': 'RIFX'});
+          {container: 'RIFX'});
       } else {
         this.fromScratch(
           this.fmt.numChannels,
           this.fmt.sampleRate,
           this.bitDepth,
           unpackArray(this.data.samples, this.dataType),
-          {'container': 'RIFX'});
+          {container: 'RIFX'});
       }
     }
 
@@ -2337,7 +2312,7 @@
         this.fmt.sampleRate,
         bitDepth,
         samples,
-        {'container': this.correctContainer_()});
+        {container: this.correctContainer_()});
     }
 
     /**
@@ -2358,8 +2333,9 @@
           this.fmt.numChannels,
           this.fmt.sampleRate,
           '4',
+          //imaadpcm.encode(new Int16Array(this.data.samples,)),
           encode(unpackArray(this.data.samples, this.dataType)),
-          {'container': this.correctContainer_()});
+          {container: this.correctContainer_()});
       }
     }
 
@@ -2375,14 +2351,14 @@
         this.fmt.sampleRate,
         '16',
         decode(this.data.samples, this.fmt.blockAlign),
-        {'container': this.correctContainer_()});
+        {container: this.correctContainer_()});
       if (bitDepth != '16') {
         this.toBitDepth(bitDepth);
       }
     }
 
     /**
-     * Encode 16-bit wave file as 8-bit A-Law.
+     * Encode a 16-bit wave file as 8-bit A-Law.
      */
     toALaw() {
       this.assure16Bit_();
@@ -2390,8 +2366,9 @@
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '8a',
-        alawmulaw.alaw.encode(unpackArray(this.data.samples, this.dataType)),
-        {'container': this.correctContainer_()});
+        //alawmulaw.alaw.encode(new Int16Array(this.data.samples.buffer)),
+        encode$1(unpackArray(this.data.samples, this.dataType)),
+        {container: this.correctContainer_()});
     }
 
     /**
@@ -2405,8 +2382,8 @@
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '16',
-        alawmulaw.alaw.decode(this.data.samples),
-        {'container': this.correctContainer_()});
+        decode$1(this.data.samples),
+        {container: this.correctContainer_()});
       if (bitDepth != '16') {
         this.toBitDepth(bitDepth);
       }
@@ -2417,14 +2394,13 @@
      */
     toMuLaw() {
       this.assure16Bit_();
-      /** @type {Array<number>} */
-      let samples = unpackArray(this.data.samples, this.dataType);
       this.fromScratch(
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '8m',
-        alawmulaw.mulaw.encode(samples),
-        {'container': this.correctContainer_()});
+        //alawmulaw.mulaw.encode(new Int16Array(this.data.samples.buffer)),
+        encode$2(unpackArray(this.data.samples, this.dataType)),
+        {container: this.correctContainer_()});
     }
 
     /**
@@ -2438,8 +2414,8 @@
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '16',
-        alawmulaw.mulaw.decode(this.data.samples),
-        {'container': this.correctContainer_()});
+        decode$2(this.data.samples),
+        {container: this.correctContainer_()});
       if (bitDepth != '16') {
         this.toBitDepth(bitDepth);
       }
@@ -2457,24 +2433,24 @@
       /** @type {!Object} */
       let index = this.getTagIndex_(tag);
       if (index.TAG !== null) {
-        this.LIST[index.LIST]['subChunks'][index.TAG]['chunkSize'] =
+        this.LIST[index.LIST].subChunks[index.TAG].chunkSize =
           value.length + 1;
-        this.LIST[index.LIST]['subChunks'][index.TAG]['value'] = value;
+        this.LIST[index.LIST].subChunks[index.TAG].value = value;
       } else if (index.LIST !== null) {
-        this.LIST[index.LIST]['subChunks'].push({
-          'chunkId': tag,
-          'chunkSize': value.length + 1,
-          'value': value});
+        this.LIST[index.LIST].subChunks.push({
+          chunkId: tag,
+          chunkSize: value.length + 1,
+          value: value});
       } else {
         this.LIST.push({
-          'chunkId': 'LIST',
-          'chunkSize': 8 + value.length + 1,
-          'format': 'INFO',
-          'subChunks': []});
-        this.LIST[this.LIST.length - 1]['subChunks'].push({
-          'chunkId': tag,
-          'chunkSize': value.length + 1,
-          'value': value});
+          chunkId: 'LIST',
+          chunkSize: 8 + value.length + 1,
+          format: 'INFO',
+          subChunks: []});
+        this.LIST[this.LIST.length - 1].subChunks.push({
+          chunkId: tag,
+          chunkSize: value.length + 1,
+          value: value});
       }
     }
 
@@ -2487,7 +2463,7 @@
       /** @type {!Object} */
       let index = this.getTagIndex_(tag);
       if (index.TAG !== null) {
-        return this.LIST[index.LIST]['subChunks'][index.TAG]['value'];
+        return this.LIST[index.LIST].subChunks[index.TAG].value;
       }
       return null;
     }
@@ -2501,7 +2477,7 @@
       /** @type {!Object} */
       let index = this.getTagIndex_(tag);
       if (index.TAG !== null) {
-        this.LIST[index.LIST]['subChunks'].splice(index.TAG, 1);
+        this.LIST[index.LIST].subChunks.splice(index.TAG, 1);
         return true;
       }
       return false;
@@ -2527,18 +2503,18 @@
         this.setCuePoint_(position, 1, labl);
       } else {
         for (let i=0; i<len; i++) {
-          if (existingPoints[i]['dwPosition'] > position && !hasSet) {
+          if (existingPoints[i].dwPosition > position && !hasSet) {
             this.setCuePoint_(position, i + 1, labl);
             this.setCuePoint_(
-              existingPoints[i]['dwPosition'],
+              existingPoints[i].dwPosition,
               i + 2,
-              existingPoints[i]['label']);
+              existingPoints[i].label);
             hasSet = true;
           } else {
             this.setCuePoint_(
-              existingPoints[i]['dwPosition'],
+              existingPoints[i].dwPosition,
               i + 1,
-              existingPoints[i]['label']);
+              existingPoints[i].label);
           }
         }
         if (!hasSet) {
@@ -2564,9 +2540,9 @@
       for (let i=0; i<len; i++) {
         if (i + 1 != index) {
           this.setCuePoint_(
-            existingPoints[i]['dwPosition'],
+            existingPoints[i].dwPosition,
             i + 1,
-            existingPoints[i]['label']);
+            existingPoints[i].label);
         }
       }
       this.cue.dwCuePoints = this.cue.points.length;
@@ -2587,10 +2563,10 @@
       /** @type {?number} */
       let adtlIndex = this.getAdtlChunk_();
       if (adtlIndex !== null) {
-        for (let i=0; i<this.LIST[adtlIndex]['subChunks'].length; i++) {
-          if (this.LIST[adtlIndex]['subChunks'][i]['dwName'] ==
+        for (let i=0; i<this.LIST[adtlIndex].subChunks.length; i++) {
+          if (this.LIST[adtlIndex].subChunks[i].dwName ==
               pointIndex) {
-            this.LIST[adtlIndex]['subChunks'][i]['value'] = label;
+            this.LIST[adtlIndex].subChunks[i].value = label;
           }
         }
       }
@@ -2643,12 +2619,12 @@
      */
     setCuePoint_(position, dwName, label) {
       this.cue.points.push({
-        'dwName': dwName,
-        'dwPosition': position,
-        'fccChunk': 'data',
-        'dwChunkStart': 0,
-        'dwBlockStart': 0,
-        'dwSampleOffset': position,
+        dwName: dwName,
+        dwPosition: position,
+        fccChunk: 'data',
+        dwChunkStart: 0,
+        dwBlockStart: 0,
+        dwSampleOffset: position,
       });
       this.setLabl_(dwName, label);
     }
@@ -2663,9 +2639,9 @@
       let points = [];
       for (let i=0; i<this.cue.points.length; i++) {
         points.push({
-          'dwPosition': this.cue.points[i]['dwPosition'],
-          'label': this.getLabelForCuePoint_(
-            this.cue.points[i]['dwName'])});
+          dwPosition: this.cue.points[i].dwPosition,
+          label: this.getLabelForCuePoint_(
+            this.cue.points[i].dwName)});
       }
       return points;
     }
@@ -2680,10 +2656,10 @@
       /** @type {?number} */
       let adtlIndex = this.getAdtlChunk_();
       if (adtlIndex !== null) {
-        for (let i=0; i<this.LIST[adtlIndex]['subChunks'].length; i++) {
-          if (this.LIST[adtlIndex]['subChunks'][i]['dwName'] ==
+        for (let i=0; i<this.LIST[adtlIndex].subChunks.length; i++) {
+          if (this.LIST[adtlIndex].subChunks[i].dwName ==
               pointDwName) {
-            return this.LIST[adtlIndex]['subChunks'][i]['value'];
+            return this.LIST[adtlIndex].subChunks[i].value;
           }
         }
       }
@@ -2696,7 +2672,7 @@
      */
     clearLISTadtl_() {
       for (let i=0; i<this.LIST.length; i++) {
-        if (this.LIST[i]['format'] == 'adtl') {
+        if (this.LIST[i].format == 'adtl') {
           this.LIST.splice(i);
         }
       }
@@ -2713,10 +2689,10 @@
       let adtlIndex = this.getAdtlChunk_();
       if (adtlIndex === null) {
         this.LIST.push({
-          'chunkId': 'LIST',
-          'chunkSize': 4,
-          'format': 'adtl',
-          'subChunks': []});
+          chunkId: 'LIST',
+          chunkSize: 4,
+          format: 'adtl',
+          subChunks: []});
         adtlIndex = this.LIST.length - 1;
       }
       this.setLabelText_(adtlIndex === null ? 0 : adtlIndex, dwName, label);
@@ -2730,13 +2706,13 @@
      * @private
      */
     setLabelText_(adtlIndex, dwName, label) {
-      this.LIST[adtlIndex]['subChunks'].push({
-        'chunkId': 'labl',
-        'chunkSize': label.length,
-        'dwName': dwName,
-        'value': label
+      this.LIST[adtlIndex].subChunks.push({
+        chunkId: 'labl',
+        chunkSize: label.length,
+        dwName: dwName,
+        value: label
       });
-      this.LIST[adtlIndex]['chunkSize'] += label.length + 4 + 4 + 4 + 1;
+      this.LIST[adtlIndex].chunkSize += label.length + 4 + 4 + 4 + 1;
     }
 
     /**
@@ -2746,7 +2722,7 @@
      */
     getAdtlChunk_() {
       for (let i=0; i<this.LIST.length; i++) {
-        if(this.LIST[i]['format'] == 'adtl') {
+        if(this.LIST[i].format == 'adtl') {
           return i;
         }
       }
@@ -2765,10 +2741,10 @@
       /** @type {!Object<string, ?number>} */
       let index = {LIST: null, TAG: null};
       for (let i=0; i<this.LIST.length; i++) {
-        if (this.LIST[i]['format'] == 'INFO') {
+        if (this.LIST[i].format == 'INFO') {
           index.LIST = i;
-          for (let j=0; j<this.LIST[i]['subChunks'].length; j++) {
-            if (this.LIST[i]['subChunks'][j]['chunkId'] == tag) {
+          for (let j=0; j<this.LIST[i].subChunks.length; j++) {
+            if (this.LIST[i].subChunks[j].chunkId == tag) {
               index.TAG = j;
               break;
             }
@@ -2906,7 +2882,7 @@
      */
     createPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
       this.clearHeader_();
-      this.container = options['container'];
+      this.container = options.container;
       //this.chunkSize = 36 + this.data.samples.length * numBytes;
       this.chunkSize = 36 + this.data.samples.length;
       this.format = 'WAVE';
@@ -3176,12 +3152,12 @@
         this.cue.dwCuePoints = this.read_(buffer, this.uInt32_);
         for (let i=0; i<this.cue.dwCuePoints; i++) {
           this.cue.points.push({
-            'dwName': this.read_(buffer, this.uInt32_),
-            'dwPosition': this.read_(buffer, this.uInt32_),
-            'fccChunk': this.readString_(buffer, 4),
-            'dwChunkStart': this.read_(buffer, this.uInt32_),
-            'dwBlockStart': this.read_(buffer, this.uInt32_),
-            'dwSampleOffset': this.read_(buffer, this.uInt32_),
+            dwName: this.read_(buffer, this.uInt32_),
+            dwPosition: this.read_(buffer, this.uInt32_),
+            fccChunk: this.readString_(buffer, 4),
+            dwChunkStart: this.read_(buffer, this.uInt32_),
+            dwBlockStart: this.read_(buffer, this.uInt32_),
+            dwSampleOffset: this.read_(buffer, this.uInt32_),
           });
         }
       }
@@ -3211,12 +3187,12 @@
         this.smpl.dwSamplerData = this.read_(buffer, this.uInt32_);
         for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
           this.smpl.loops.push({
-            'dwName': this.read_(buffer, this.uInt32_),
-            'dwType': this.read_(buffer, this.uInt32_),
-            'dwStart': this.read_(buffer, this.uInt32_),
-            'dwEnd': this.read_(buffer, this.uInt32_),
-            'dwFraction': this.read_(buffer, this.uInt32_),
-            'dwPlayCount': this.read_(buffer, this.uInt32_),
+            dwName: this.read_(buffer, this.uInt32_),
+            dwType: this.read_(buffer, this.uInt32_),
+            dwStart: this.read_(buffer, this.uInt32_),
+            dwEnd: this.read_(buffer, this.uInt32_),
+            dwFraction: this.read_(buffer, this.uInt32_),
+            dwPlayCount: this.read_(buffer, this.uInt32_),
           });
         }
       }
@@ -3330,10 +3306,10 @@
         /** @type {!Object} */
         let subChunk = listChunks[j];
         this.LIST.push({
-          'chunkId': subChunk.chunkId,
-          'chunkSize': subChunk.chunkSize,
-          'format': subChunk.format,
-          'subChunks': []});
+          chunkId: subChunk.chunkId,
+          chunkSize: subChunk.chunkSize,
+          format: subChunk.format,
+          subChunks: []});
         for (let x=0; x<subChunk.subChunks.length; x++) {
           this.readLISTSubChunks_(subChunk.subChunks[x],
             subChunk.format, buffer);
@@ -3354,28 +3330,28 @@
           this.head_ = subChunk.chunkData.start;
           /** @type {!Object<string, string|number>} */
           let item = {
-            'chunkId': subChunk.chunkId,
-            'chunkSize': subChunk.chunkSize,
-            'dwName': this.read_(buffer, this.uInt32_)
+            chunkId: subChunk.chunkId,
+            chunkSize: subChunk.chunkSize,
+            dwName: this.read_(buffer, this.uInt32_)
           };
           if (subChunk.chunkId == 'ltxt') {
-            item['dwSampleLength'] = this.read_(buffer, this.uInt32_);
-            item['dwPurposeID'] = this.read_(buffer, this.uInt32_);
-            item['dwCountry'] = this.read_(buffer, this.uInt16_);
-            item['dwLanguage'] = this.read_(buffer, this.uInt16_);
-            item['dwDialect'] = this.read_(buffer, this.uInt16_);
-            item['dwCodePage'] = this.read_(buffer, this.uInt16_);
+            item.dwSampleLength = this.read_(buffer, this.uInt32_);
+            item.dwPurposeID = this.read_(buffer, this.uInt32_);
+            item.dwCountry = this.read_(buffer, this.uInt16_);
+            item.dwLanguage = this.read_(buffer, this.uInt16_);
+            item.dwDialect = this.read_(buffer, this.uInt16_);
+            item.dwCodePage = this.read_(buffer, this.uInt16_);
           }
-          item['value'] = this.readZSTR_(buffer, this.head_);
-          this.LIST[this.LIST.length - 1]['subChunks'].push(item);
+          item.value = this.readZSTR_(buffer, this.head_);
+          this.LIST[this.LIST.length - 1].subChunks.push(item);
         }
       // RIFF INFO tags like ICRD, ISFT, ICMT
       } else if(format == 'INFO') {
         this.head_ = subChunk.chunkData.start;
-        this.LIST[this.LIST.length - 1]['subChunks'].push({
-          'chunkId': subChunk.chunkId,
-          'chunkSize': subChunk.chunkSize,
-          'value': this.readZSTR_(buffer,  this.head_)
+        this.LIST[this.LIST.length - 1].subChunks.push({
+          chunkId: subChunk.chunkId,
+          chunkSize: subChunk.chunkSize,
+          value: this.readZSTR_(buffer,  this.head_)
         });
       }
     }
@@ -3391,9 +3367,9 @@
       let chunk = this.findChunk_(signature, 'junk');
       if (chunk) {
         this.junk = {
-          'chunkId': chunk.chunkId,
-          'chunkSize': chunk.chunkSize,
-          'chunkData': [].slice.call(buffer.slice(
+          chunkId: chunk.chunkId,
+          chunkSize: chunk.chunkSize,
+          chunkData: [].slice.call(buffer.slice(
             chunk.chunkData.start,
             chunk.chunkData.end))
         };
@@ -3599,12 +3575,12 @@
       let points = [];
       for (let i=0; i<this.cue.dwCuePoints; i++) {
         points = points.concat(
-          pack(this.cue.points[i]['dwName'], this.uInt32_),
-          pack(this.cue.points[i]['dwPosition'], this.uInt32_),
-          packString(this.cue.points[i]['fccChunk']),
-          pack(this.cue.points[i]['dwChunkStart'], this.uInt32_),
-          pack(this.cue.points[i]['dwBlockStart'], this.uInt32_),
-          pack(this.cue.points[i]['dwSampleOffset'], this.uInt32_));
+          pack(this.cue.points[i].dwName, this.uInt32_),
+          pack(this.cue.points[i].dwPosition, this.uInt32_),
+          packString(this.cue.points[i].fccChunk),
+          pack(this.cue.points[i].dwChunkStart, this.uInt32_),
+          pack(this.cue.points[i].dwBlockStart, this.uInt32_),
+          pack(this.cue.points[i].dwSampleOffset, this.uInt32_));
       }
       return points;
     }
@@ -3647,12 +3623,12 @@
       let loops = [];
       for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
         loops = loops.concat(
-          pack(this.smpl.loops[i]['dwName'], this.uInt32_),
-          pack(this.smpl.loops[i]['dwType'], this.uInt32_),
-          pack(this.smpl.loops[i]['dwStart'], this.uInt32_),
-          pack(this.smpl.loops[i]['dwEnd'], this.uInt32_),
-          pack(this.smpl.loops[i]['dwFraction'], this.uInt32_),
-          pack(this.smpl.loops[i]['dwPlayCount'], this.uInt32_));
+          pack(this.smpl.loops[i].dwName, this.uInt32_),
+          pack(this.smpl.loops[i].dwType, this.uInt32_),
+          pack(this.smpl.loops[i].dwStart, this.uInt32_),
+          pack(this.smpl.loops[i].dwEnd, this.uInt32_),
+          pack(this.smpl.loops[i].dwFraction, this.uInt32_),
+          pack(this.smpl.loops[i].dwPlayCount, this.uInt32_));
       }
       return loops;
     }
@@ -3736,11 +3712,11 @@
       for (let i=0; i<this.LIST.length; i++) {
         /** @type {!Array<number>} */
         let subChunksBytes = this.getLISTSubChunksBytes_(
-            this.LIST[i]['subChunks'], this.LIST[i]['format']);
+            this.LIST[i].subChunks, this.LIST[i].format);
         bytes = bytes.concat(
-          packString(this.LIST[i]['chunkId']),
+          packString(this.LIST[i].chunkId),
           pack(subChunksBytes.length + 4, this.uInt32_),
-          packString(this.LIST[i]['format']),
+          packString(this.LIST[i].format),
           subChunksBytes);
       }
       return bytes;
@@ -3760,23 +3736,23 @@
       for (let i=0; i<subChunks.length; i++) {
         if (format == 'INFO') {
           bytes = bytes.concat(
-            packString(subChunks[i]['chunkId']),
-            pack(subChunks[i]['value'].length + 1, this.uInt32_),
+            packString(subChunks[i].chunkId),
+            pack(subChunks[i].value.length + 1, this.uInt32_),
             this.writeString_(
-              subChunks[i]['value'], subChunks[i]['value'].length));
+              subChunks[i].value, subChunks[i].value.length));
           bytes.push(0);
         } else if (format == 'adtl') {
-          if (['labl', 'note'].indexOf(subChunks[i]['chunkId']) > -1) {
+          if (['labl', 'note'].indexOf(subChunks[i].chunkId) > -1) {
             bytes = bytes.concat(
-              packString(subChunks[i]['chunkId']),
+              packString(subChunks[i].chunkId),
               pack(
-                subChunks[i]['value'].length + 4 + 1, this.uInt32_),
-              pack(subChunks[i]['dwName'], this.uInt32_),
+                subChunks[i].value.length + 4 + 1, this.uInt32_),
+              pack(subChunks[i].dwName, this.uInt32_),
               this.writeString_(
-                subChunks[i]['value'],
-                subChunks[i]['value'].length));
+                subChunks[i].value,
+                subChunks[i].value.length));
             bytes.push(0);
-          } else if (subChunks[i]['chunkId'] == 'ltxt') {
+          } else if (subChunks[i].chunkId == 'ltxt') {
             bytes = bytes.concat(
               this.getLtxtChunkBytes_(subChunks[i]));
           }
@@ -3796,16 +3772,16 @@
      */
     getLtxtChunkBytes_(ltxt) {
       return [].concat(
-        packString(ltxt['chunkId']),
-        pack(ltxt['value'].length + 20, this.uInt32_),
-        pack(ltxt['dwName'], this.uInt32_),
-        pack(ltxt['dwSampleLength'], this.uInt32_),
-        pack(ltxt['dwPurposeID'], this.uInt32_),
-        pack(ltxt['dwCountry'], this.uInt16_),
-        pack(ltxt['dwLanguage'], this.uInt16_),
-        pack(ltxt['dwLanguage'], this.uInt16_),
-        pack(ltxt['dwCodePage'], this.uInt16_),
-        this.writeString_(ltxt['value'], ltxt['value'].length));
+        packString(ltxt.chunkId),
+        pack(ltxt.value.length + 20, this.uInt32_),
+        pack(ltxt.dwName, this.uInt32_),
+        pack(ltxt.dwSampleLength, this.uInt32_),
+        pack(ltxt.dwPurposeID, this.uInt32_),
+        pack(ltxt.dwCountry, this.uInt16_),
+        pack(ltxt.dwLanguage, this.uInt16_),
+        pack(ltxt.dwDialect, this.uInt16_),
+        pack(ltxt.dwCodePage, this.uInt16_),
+        this.writeString_(ltxt.value, ltxt.value.length));
     }
 
     /**

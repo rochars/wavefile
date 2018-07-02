@@ -59,16 +59,16 @@
     "dist": "./dist"
   },
   "scripts": {
-    "lint": "jshint index.js && jshint test",
+    "lint": "jshint index.js externs.js",
     "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R dot",
     "test-esm": "nyc ./node_modules/mocha/bin/_mocha test --esm --require=esm --recursive -R dot",
     "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R dot",
     "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R dot",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot",
     "test-dist": "npm run test-min && npm run test-esm && npm run test-cjs && npm run test-umd",
-    "pack": "rollup --config && npm run test-dist && npm run test",
+    "bundle": "rollup --config && npm run test-dist && npm run test",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
-    "build": "npm run lint && npm run pack && npm run doc",
+    "build": "npm run lint && npm run bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
@@ -89,11 +89,11 @@
     "rollup-plugin-node-resolve": "^3.3.0"
   },
   "dependencies": {
-    "alawmulaw": "^4.1.0",
+    "alawmulaw": "^5.0.0",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^6.0.0",
     "byte-data": "^13.0.1",
-    "imaadpcm": "^3.1.0",
+    "imaadpcm": "^4.0.0",
     "riff-chunks": "^8.0.2"
   }
 }

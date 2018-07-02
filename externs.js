@@ -29,132 +29,148 @@ WaveFile.format = '';
  * @type {!Object<string, *>}
  */
 WaveFile.fmt = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    audioFormat: 0,
-    /** @type {number} */
-    numChannels: 0,
-    /** @type {number} */
-    sampleRate: 0,
-    /** @type {number} */
-    byteRate: 0,
-    /** @type {number} */
-    blockAlign: 0,
-    /** @type {number} */
-    bitsPerSample: 0,
-    /** @type {number} */
-    cbSize: 0,
-    /** @type {number} */
-    validBitsPerSample: 0,
-    /** @type {number} */
-    dwChannelMask: 0,
-    /**
-     * 4 32-bit values representing a 128-bit ID
-     * @type {!Array<number>}
-     */
-    subformat: []
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  audioFormat: 0,
+  /** @type {number} */
+  numChannels: 0,
+  /** @type {number} */
+  sampleRate: 0,
+  /** @type {number} */
+  byteRate: 0,
+  /** @type {number} */
+  blockAlign: 0,
+  /** @type {number} */
+  bitsPerSample: 0,
+  /** @type {number} */
+  cbSize: 0,
+  /** @type {number} */
+  validBitsPerSample: 0,
+  /** @type {number} */
+  dwChannelMask: 0,
+  /**
+   * 4 32-bit values representing a 128-bit ID
+   * @type {!Array<number>}
+   */
+  subformat: []
 };
 /**
  * The data of the fact chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.fact = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    dwSampleLength: 0
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  dwSampleLength: 0
 };
 /**
  * The data of the cue  chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.cue = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    dwCuePoints: 0,
-    /** @type {!Array<!Object>} */
-    points: [],
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  dwCuePoints: 0,
+  /** @type {!Array<!Object>} */
+  points: [{
+    dwName: 0, // a cue point ID
+    dwPosition: 0,
+    fccChunk: 0,
+    dwChunkStart: 0,
+    dwBlockStart: 0,
+    dwSampleOffset: 0
+  }],
 };
 /**
  * The data of the smpl chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.smpl = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    dwManufacturer: 0,
-    /** @type {number} */
-    dwProduct: 0,
-    /** @type {number} */
-    dwSamplePeriod: 0,
-    /** @type {number} */
-    dwMIDIUnityNote: 0,
-    /** @type {number} */
-    dwMIDIPitchFraction: 0,
-    /** @type {number} */
-    dwSMPTEFormat: 0,
-    /** @type {number} */
-    dwSMPTEOffset: 0,
-    /** @type {number} */
-    dwNumSampleLoops: 0,
-    /** @type {number} */
-    dwSamplerData: 0,
-    /** @type {!Array<!Object>} */
-    loops: [],
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  dwManufacturer: 0,
+  /** @type {number} */
+  dwProduct: 0,
+  /** @type {number} */
+  dwSamplePeriod: 0,
+  /** @type {number} */
+  dwMIDIUnityNote: 0,
+  /** @type {number} */
+  dwMIDIPitchFraction: 0,
+  /** @type {number} */
+  dwSMPTEFormat: 0,
+  /** @type {number} */
+  dwSMPTEOffset: 0,
+  /** @type {number} */
+  dwNumSampleLoops: 0,
+  /** @type {number} */
+  dwSamplerData: 0,
+  /** @type {!Array<!Object>} */
+  loops: [
+    {
+      dwName: '', // a cue point ID
+      dwType: 0,
+      dwStart: 0,
+      dwEnd: 0,
+      dwFraction: 0,
+      dwPlayCount: 0
+    }
+  ],
 };
 /**
  * The data of the bext chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.bext = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {string} */
-    description: '',
-    /** @type {string} */
-    originator: '',
-    /** @type {string} */
-    originatorReference: '',
-    /** @type {string} */
-    originationDate: '',
-    /** @type {string} */
-    originationTime: '',
-    /**
-     * 2 32-bit values, timeReference high and low
-     * @type {!Array<number>}
-     */
-    timeReference: [0, 0],
-    /** @type {number} */
-    version: 0,
-    /** @type {string} */
-    UMID: '',
-    /** @type {number} */
-    loudnessValue: 0,
-    /** @type {number} */
-    loudnessRange: 0,
-    /** @type {number} */
-    maxTruePeakLevel: 0,
-    /** @type {number} */
-    maxMomentaryLoudness: 0,
-    /** @type {number} */
-    maxShortTermLoudness: 0,
-    /** @type {string} */
-    reserved: '',
-    /** @type {string} */
-    codingHistory: ''
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {string} */
+  description: '',
+  /** @type {string} */
+  originator: '',
+  /** @type {string} */
+  originatorReference: '',
+  /** @type {string} */
+  originationDate: '',
+  /** @type {string} */
+  originationTime: '',
+  /**
+   * 2 32-bit values, timeReference high and low
+   * @type {!Array<number>}
+   */
+  timeReference: [0, 0],
+  /** @type {number} */
+  version: 0,
+  /** @type {string} */
+  UMID: '',
+  /** @type {number} */
+  loudnessValue: 0,
+  /** @type {number} */
+  loudnessRange: 0,
+  /** @type {number} */
+  maxTruePeakLevel: 0,
+  /** @type {number} */
+  maxMomentaryLoudness: 0,
+  /** @type {number} */
+  maxShortTermLoudness: 0,
+  /** @type {string} */
+  reserved: '',
+  /** @type {string} */
+  codingHistory: ''
 };
 /**
  * The data of the ds64 chunk.
@@ -162,60 +178,86 @@ WaveFile.bext = {
  * @type {!Object<string, *>}
  */
 WaveFile.ds64 = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    riffSizeHigh: 0,
-    /** @type {number} */
-    riffSizeLow: 0,
-    /** @type {number} */
-    dataSizeHigh: 0,
-    /** @type {number} */
-    dataSizeLow: 0,
-    /** @type {number} */
-    originationTime: 0,
-    /** @type {number} */
-    sampleCountHigh: 0,
-    /** @type {number} */
-    sampleCountLow: 0,
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  riffSizeHigh: 0,
+  /** @type {number} */
+  riffSizeLow: 0,
+  /** @type {number} */
+  dataSizeHigh: 0,
+  /** @type {number} */
+  dataSizeLow: 0,
+  /** @type {number} */
+  originationTime: 0,
+  /** @type {number} */
+  sampleCountHigh: 0,
+  /** @type {number} */
+  sampleCountLow: 0
 };
 /**
  * The data of the data chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.data = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {!Array<number>} */
-    samples: []
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {!Uint8Array} */
+  samples: new Uint8Array(0)
 };
 /**
  * The data of the LIST chunks.
- * Each item in this list look like this:
- *  {
- *      chunkId: '',
- *      chunkSize: 0,
- *      format: '',
- *      subChunks: []
- *   }
  * @type {!Array<!Object>}
  */
-WaveFile.LIST = [];
+WaveFile.LIST = [
+  {
+    chunkId: '',
+    chunkSize: 0,
+    format: '',
+    subChunks: [
+      // For format 'INFO'
+      {
+        chunkId: '',
+        chunkSize: 0,
+        value: ''
+      },
+      // For format 'adtl' types 'labl' or 'note'
+      {
+        chunkId: '',
+        chunkSize: 0,
+        dwName: 0,
+        value: ''
+      },
+      // For format 'adtl' type 'ltxt'
+      {
+        chunkId: '',
+        value: 0,
+        dwName: 0,
+        dwSampleLength: 0,
+        dwPurposeID: 0,
+        dwCountry: 0,
+        dwLanguage: 0,
+        dwDialect: 0,
+        dwCodePage: 0
+      }
+    ]
+  }
+];
 /**
  * The data of the junk chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.junk = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {!Array<number>} */
-    chunkData: []
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {!Array<number>} */
+  chunkData: []
 };
 /**
  * The bit depth code according to the samples.
@@ -240,7 +282,7 @@ WaveFile.bitDepth = '';
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.fromScratch = function(
-    numChannels, sampleRate, bitDepth, samples, options={}) {}
+  numChannels, sampleRate, bitDepth, samples, options={container:'RIFF'}) {};
 
 /**
  * Set up the WaveFile object from a byte buffer.
@@ -250,7 +292,7 @@ WaveFile.fromScratch = function(
  * @throws {Error} If no fmt  chunk is found.
  * @throws {Error} If no data chunk is found.
  */
-WaveFile.fromBuffer = function(bytes, samples=true) {}
+WaveFile.fromBuffer = function(bytes, samples=true) {};
 
 /**
  * Return a byte buffer representig the WaveFile object as a .wav file.
@@ -258,21 +300,21 @@ WaveFile.fromBuffer = function(bytes, samples=true) {}
  * @return {!Uint8Array} A .wav file.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.toBuffer = function() {}
+WaveFile.toBuffer = function() {};
 
 /**
  * Use a .wav file encoded as a base64 string to load the WaveFile object.
  * @param {string} base64String A .wav file as a base64 string.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.fromBase64 = function(base64String) {}
+WaveFile.fromBase64 = function(base64String) {};
 
 /**
  * Return a base64 string representig the WaveFile object as a .wav file.
  * @return {string} A .wav file as a base64 string.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.toBase64 = function() {}
+WaveFile.toBase64 = function() {};
 
 /**
  * Return a DataURI string representig the WaveFile object as a .wav file.
@@ -280,24 +322,24 @@ WaveFile.toBase64 = function() {}
  * @return {string} A .wav file as a DataURI.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.toDataURI = function() {}
+WaveFile.toDataURI = function() {};
 
 /**
  * Use a .wav file encoded as a DataURI to load the WaveFile object.
  * @param {string} dataURI A .wav file as DataURI.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.fromDataURI = function(dataURI) {}
+WaveFile.fromDataURI = function(dataURI) {};
 
 /**
  * Force a file as RIFF.
  */
-WaveFile.toRIFF = function() {}
+WaveFile.toRIFF = function() {};
 
 /**
  * Force a file as RIFX.
  */
-WaveFile.toRIFX = function() {}
+WaveFile.toRIFX = function() {};
 
 /**
  * Change the bit depth of the samples.
@@ -307,14 +349,14 @@ WaveFile.toRIFX = function() {}
  *      resolution of samples should be actually changed or not.
  * @throws {Error} If the bit depth is not valid.
  */
-WaveFile.toBitDepth = function(bitDepth, changeResolution=true) {}
+WaveFile.toBitDepth = function(bitDepth, changeResolution=true) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.
  * @throws {Error} If sample rate is not 8000.
  * @throws {Error} If number of channels is not 1.
  */
-WaveFile.toIMAADPCM = function() {}
+WaveFile.toIMAADPCM = function() {};
 
 /**
  * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
@@ -322,12 +364,12 @@ WaveFile.toIMAADPCM = function() {}
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromIMAADPCM = function(bitDepth='16') {}
+WaveFile.fromIMAADPCM = function(bitDepth='16') {};
 
 /**
  * Encode 16-bit wave file as 8-bit A-Law.
  */
-WaveFile.toALaw = function() {}
+WaveFile.toALaw = function() {};
 
 /**
  * Decode a 8-bit A-Law wave file into a 16-bit wave file.
@@ -335,12 +377,12 @@ WaveFile.toALaw = function() {}
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromALaw = function(bitDepth='16') {}
+WaveFile.fromALaw = function(bitDepth='16') {};
 
 /**
  * Encode 16-bit wave file as 8-bit mu-Law.
  */
-WaveFile.toMuLaw = function() {}
+WaveFile.toMuLaw = function() {};
 
 /**
  * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
@@ -348,7 +390,7 @@ WaveFile.toMuLaw = function() {}
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromMuLaw = function(bitDepth='16') {}
+WaveFile.fromMuLaw = function(bitDepth='16') {};
 
 /**
  * Write a RIFF tag in the INFO chunk. If the tag do not exist,
@@ -357,39 +399,39 @@ WaveFile.fromMuLaw = function(bitDepth='16') {}
  * @param {string} value The tag value.
  * @throws {Error} If the tag name is not valid.
  */
-WaveFile.setTag = function(tag, value) {}
+WaveFile.setTag = function(tag, value) {};
 
 /**
  * Return the value of a RIFF tag in the INFO chunk.
  * @param {string} tag The tag name.
  * @return {?string} The value if the tag is found, null otherwise.
  */
-WaveFile.getTag = function(tag) {}
+WaveFile.getTag = function(tag) {};
 
 /**
  * Remove a RIFF tag in the INFO chunk.
  * @param {string} tag The tag name.
  * @return {boolean} True if a tag was deleted.
  */
-WaveFile.deleteTag = function(tag) {}
+WaveFile.deleteTag = function(tag) {};
 
 /**
  * Create a cue point in the wave file.
  * @param {number} position The cue point position in milliseconds.
  * @param {string} labl The LIST adtl labl text of the marker. Optional.
  */
-WaveFile.setCuePoint = function(position, labl='') {}
+WaveFile.setCuePoint = function(position, labl='') {};
 
 /**
  * Remove a cue point from a wave file.
  * @param {number} index the index of the point. First is 1,
  *      second is 2, and so on.
  */
-WaveFile.deleteCuePoint = function(index) {}
+WaveFile.deleteCuePoint = function(index) {};
 
 /**
  * Update the label of a cue point.
  * @param {number} pointIndex The ID of the cue point.
  * @param {string} label The new text for the label.
  */
-WaveFile.updateLabel = function(pointIndex, label) {}
+WaveFile.updateLabel = function(pointIndex, label) {};
