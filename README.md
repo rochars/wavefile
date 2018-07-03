@@ -18,7 +18,7 @@ https://github.com/rochars/wavefile
 - Turn RIFF files to RIFX and RIFX files to RIFF
 - **Create or edit BWF metadata** ("bext" chunk)
 - Change the bit depth of the audio
-- Just 7 dependencies, **all MIT-licensed**
+- **All MIT-licensed**
 - Less than 10kb minified + compressed, less than 32kb minified
 - Made with Closure Compiler in mind (works great with others, too)
 

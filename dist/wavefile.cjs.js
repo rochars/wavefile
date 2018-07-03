@@ -498,12 +498,13 @@ class WaveFile {
     // @type {number}
     let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
     // @type {!Float64Array}
-    let typedSamplesInput = new Float64Array(sampleCount + 512);
+    let typedSamplesInput = new Float64Array(sampleCount + 1);
     // @type {!Float64Array}
-    let typedSamplesOutput = new Float64Array(sampleCount + 512);
+    let typedSamplesOutput = new Float64Array(sampleCount + 1);
     byteData.unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
     this.truncateSamples(typedSamplesInput);
-    bitDepthLib(typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
+    bitDepthLib(
+      typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
