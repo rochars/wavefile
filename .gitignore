@@ -1,5 +1,12 @@
-*.log
-*.reapeaks
 *.DS_Store
+
+# Development folders
 .nyc_output
 node_modules
+
+# Development files
+*.log
+*.reapeaks
+
+# GitHub do not allow big files
+test/large-files

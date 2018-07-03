@@ -31,13 +31,13 @@
 
 /** @module wavefile */
 
-import bitdepth from 'bitdepth';
+import bitDepthLib from 'bitdepth';
 import riffChunks from 'riff-chunks';
 import * as imaadpcm from 'imaadpcm';
 import * as alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
 import {pack, unpackFrom, unpackString, packStringTo, packTo,
-  packString, unpackArray, packArrayTo} from 'byte-data';
+  packString, unpackArray, packArrayTo, unpackArrayTo} from 'byte-data';
 
 /**
  * Class representing a wav file.
@@ -323,7 +323,7 @@ export default class WaveFile {
    * @param {string} bitDepth The audio bit depth code.
    *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
    *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>|!Array<!Array<number>>|!Int16Array} samples
+   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
    *    The samples. Must be in the correct range according to the bit depth.
    * @param {?Object} options Optional. Used to force the container
    *    as RIFX with {'container': 'RIFX'}
@@ -338,7 +338,6 @@ export default class WaveFile {
     samples = this.interleave_(samples);
     /** @type {number} */
     let numBytes = (((parseInt(bitDepth, 10) - 1) | 7) + 1) / 8;
-    // Turn the samples to bytes
     this.updateDataType_();
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
@@ -416,7 +415,7 @@ export default class WaveFile {
    * @throws {Error} If any property of the object appears invalid.
    */
   toBase64() {
-    /** @type {Uint8Array} */
+    /** @type {!Uint8Array} */
     let buffer = this.toBuffer();
     return encode(buffer, 0, buffer.length);
   }
@@ -489,25 +488,32 @@ export default class WaveFile {
    *    resolution of samples should be actually changed or not.
    * @throws {Error} If the bit depth is not valid.
    */
-  toBitDepth(bitDepth, changeResolution=true) {
-    /** @type {string} */
-    let toBitDepth = bitDepth;
-    /** @type {string} */
+  toBitDepth(newBitDepth, changeResolution=true) {
+    // @type {string}
+    let toBitDepth = newBitDepth;
+    // @type {string}
     let thisBitDepth = this.bitDepth;
     if (!changeResolution) {
-      toBitDepth = this.realBitDepth_(bitDepth);
+      toBitDepth = this.realBitDepth_(newBitDepth);
       thisBitDepth = this.realBitDepth_(this.bitDepth);
     }
     this.assureUncompressed_();
-    /** @type {!Array<number>} */
-    let samples = unpackArray(this.data.samples, this.dataType);
-    this.truncateSamples(samples);
-    bitdepth(samples, thisBitDepth, toBitDepth);
+    // @type {number}
+    let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
+    // @type {number}
+    let toBitDepthNumber = parseInt(toBitDepth, 10);
+    // @type {!Float64Array}
+    let typedSamplesInput = new Float64Array(sampleCount + 512);
+    // @type {!Float64Array}
+    let typedSamplesOutput = new Float64Array(sampleCount + 512);
+    unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
+    this.truncateSamples(typedSamplesInput);
+    bitDepthLib(typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
-      bitDepth,
-      samples,
+      newBitDepth,
+      typedSamplesOutput,
       {container: this.correctContainer_()});
   }
 
@@ -525,12 +531,13 @@ export default class WaveFile {
         'Only mono files can be compressed as IMA-ADPCM.');
     } else {
       this.assure16Bit_();
+      let output = new Int16Array(this.data.samples.length / 2);
+      unpackArrayTo(this.data.samples, this.dataType, output);
       this.fromScratch(
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
-        //imaadpcm.encode(new Int16Array(this.data.samples,)),
-        imaadpcm.encode(unpackArray(this.data.samples, this.dataType)),
+        imaadpcm.encode(output),
         {container: this.correctContainer_()});
     }
   }
@@ -558,12 +565,13 @@ export default class WaveFile {
    */
   toALaw() {
     this.assure16Bit_();
+    let output = new Int16Array(this.data.samples.length / 2);
+    unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      //alawmulaw.alaw.encode(new Int16Array(this.data.samples.buffer)),
-      alawmulaw.alaw.encode(unpackArray(this.data.samples, this.dataType)),
+      alawmulaw.alaw.encode(output),
       {container: this.correctContainer_()});
   }
 
@@ -590,12 +598,13 @@ export default class WaveFile {
    */
   toMuLaw() {
     this.assure16Bit_();
+    let output = new Int16Array(this.data.samples.length / 2);
+    unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      //alawmulaw.mulaw.encode(new Int16Array(this.data.samples.buffer)),
-      alawmulaw.mulaw.encode(unpackArray(this.data.samples, this.dataType)),
+      alawmulaw.mulaw.encode(output),
       {container: this.correctContainer_()});
   }
 
@@ -788,7 +797,7 @@ export default class WaveFile {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Array<number>|!Array<!Array<number>>} samples The samples.
+   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples The samples.
    * @private
    */
   interleave_(samples) {
@@ -1006,7 +1015,6 @@ export default class WaveFile {
       bitDepth, numChannels, sampleRate, numBytes, options) {
     this.createPCMHeader_(
       bitDepth, numChannels, sampleRate, numBytes, options);
-    //this.chunkSize = 36 + 24 + this.data.samples.length * numBytes;
     this.chunkSize = 36 + 24 + this.data.samples.length;
     this.fmt.chunkSize = 40;
     this.fmt.bitsPerSample = ((parseInt(bitDepth, 10) - 1) | 7) + 1;
@@ -1079,7 +1087,6 @@ export default class WaveFile {
   createPCMHeader_(bitDepth, numChannels, sampleRate, numBytes, options) {
     this.clearHeader_();
     this.container = options.container;
-    //this.chunkSize = 36 + this.data.samples.length * numBytes;
     this.chunkSize = 36 + this.data.samples.length;
     this.format = 'WAVE';
     this.fmt.chunkId = 'fmt ';
@@ -1835,7 +1842,7 @@ export default class WaveFile {
    * @private
    */
   getFactBytes_() {
-    // @type {!Array<number>} 
+    /** @type {!Array<number>} */
     let bytes = [];
     if (this.fact.chunkId) {
       bytes = bytes.concat(
@@ -1853,8 +1860,10 @@ export default class WaveFile {
    * @private
    */
   getFmtBytes_() {
+    /** @type {!Array<number>} */
+    let fmtBytes = [];
     if (this.fmt.chunkId) {
-      return [].concat(
+      return fmtBytes.concat(
         packString(this.fmt.chunkId),
         pack(this.fmt.chunkSize, this.uInt32_),
         pack(this.fmt.audioFormat, this.uInt16_),
@@ -2030,7 +2039,7 @@ export default class WaveFile {
    * @private
    */
   createWaveFile_() {
-    // @type {!Array<Array<number>|Uint8Array>}
+    /** @type {!Array<!Array<number>>} */
     let fileBody = [
       this.getJunkBytes_(),
       this.getDs64Bytes_(),
@@ -2044,14 +2053,14 @@ export default class WaveFile {
       this.getSmplBytes_(),
       this.getLISTBytes_()
     ];
-    // @type {number}
+    /** @type {number} */
     let fileBodyLength = 0;
     for (let i=0; i<fileBody.length; i++) {
       fileBodyLength += fileBody[i].length;
     }
-    // @type {!Uint8Array}
+    /** @type {!Uint8Array} */
     let file = new Uint8Array(fileBodyLength + 12);
-    // @type {number}
+    /** @type {number} */
     let index = 0;
     index = packStringTo(this.container, file, index);
     index = packTo(fileBodyLength + 4, this.uInt32_, file, index);
