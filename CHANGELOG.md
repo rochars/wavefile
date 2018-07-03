@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.0.3 (2018-06-29)
+- Fix: Change the bit depth and apply compression to huge files.
+
 ## version 8.0.2 (2018-06-29)
 - Fix: Handle multiple instances of RIFX and RIFF.
 
