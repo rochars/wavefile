@@ -18,9 +18,12 @@ externsSrc += 'WaveFile.getLISTBytes_ = function() {};'
 
 // License notes for bundles that include dependencies
 const license = '/*!\n'+
-  ' * wavefile Copyright (c) 2017-2018 Rafael da Silva Rocha.\n'+
-  ' * base64-arraybuffer-es6 Copyright (c) 2017 Brett Zamir,\n' +
-  ' *   2012 Niklas von Hertzen Licensed under the MIT license.\n' +
+  ' * wavefile\n'+
+  ' *   Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.\n'+
+  ' * base64-arraybuffer-es6\n' +
+  ' *   Copyright (c) 2017 Brett Zamir, 2012 Niklas von Hertzen. MIT License.\n' +
+  ' * imaadpcm\n' +
+  ' *   Copyright (c) 2016 acida, 2018 Rafael da Silva Rocha. MIT License.\n' +
   ' */\n';
 
 export default [
