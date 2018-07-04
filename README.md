@@ -11,6 +11,7 @@ https://github.com/rochars/wavefile
 - **Works out of the box in Node**
 - **Works out of the box with TypeScript**
 - **Works with huge wave files**
+- **Works as a command line tool**
 - Create wave files from scratch
 - Read and write tags on .wav files
 - Set and delete cue points and their labels
@@ -21,7 +22,6 @@ https://github.com/rochars/wavefile
 - **All MIT-licensed**
 - Less than 10kb minified + compressed, less than 32kb minified
 - Made with Closure Compiler in mind (works great with others, too)
-- **CLI to manipulate wave files from the command line**
 
 And more.
 
@@ -60,7 +60,7 @@ To use it in your programs:
 npm install wavefile
 ```
 
-To use it from the command line:
+To use it from the command line, install it globally:
 ```
 npm install wavefile -g
 ```
@@ -347,7 +347,7 @@ By default **wavefile** will not insert a "bext" chunk in new files or in files 
 **wavefile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
 
 ### CLI Usage
-**wavefile** can run from the CLI. To use it from the command line install it with **-g**:
+**wavefile** can run as a command line tool. To use **wavefile** from the command line, install it globally:
 ```
 npm install wavefile -g
 ```
