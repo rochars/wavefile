@@ -1,5 +1,5 @@
 /**
- * @fileoverview Externs for wavefile 8.0
+ * @fileoverview Externs for wavefile 8.1
  *
  * @see https://github.com/rochars/wavefile
  * @externs
