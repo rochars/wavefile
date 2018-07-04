@@ -7,11 +7,11 @@ https://github.com/rochars/wavefile
 
 **wavefile** is a JavaScript module to work with .wav files.
 
-- **Works out of the box in the browser**
-- **Works out of the box in Node**
-- **Works out of the box with TypeScript**
-- **Works with huge wave files**
-- **Works as a command line tool**
+- **Use it out of the box in the browser**
+- **Use it out of the box in Node**
+- **Use it out of the box with TypeScript**
+- **Handle wave files up to 2GB**
+- **Use it as a command line tool**
 - Create wave files from scratch
 - Read and write tags on .wav files
 - Set and delete cue points and their labels
@@ -20,10 +20,79 @@ https://github.com/rochars/wavefile
 - **Create or edit BWF metadata** ("bext" chunk)
 - Change the bit depth of the audio
 - **All MIT-licensed**
-- Less than 10kb minified + compressed, less than 32kb minified
+- **Less than 10kb minified + compressed, less than 32kb minified**
 - Made with Closure Compiler in mind (works great with others, too)
 
 And more.
+
+## Install
+To use it in your programs:
+```
+npm install wavefile
+```
+
+To use it from the command line, install it globally:
+```
+npm install wavefile -g
+```
+
+And then to see the available options:
+```
+wavefile --help
+```
+Read more about the [command line interface](#cli-usage) below.
+
+## Use
+
+### Node
+Require WaveFile from **wavefile**:
+```javascript
+const WaveFile = require('wavefile');
+let wav = new WaveFile();
+```
+
+This also works:
+```javascript
+const WaveFile = require('wavefile').default;
+let wav = new WaveFile();
+```
+
+### ES module
+import WaveFile from **wavefile.js**:
+```javascript
+import WaveFile from './dist/wavefile.js';
+let wav = new WaveFile();
+```
+
+### Browser
+Use the compiled file in the */dist* folder:
+```html
+<script src="./dist/wavefile.min.js"></script>
+<script>
+  var WaveFile = new WaveFile();
+</script>
+```
+
+Or get it from the [jsDelivr](https://cdn.jsdelivr.net/npm/wavefile) CDN:
+```html
+<script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
+```
+
+Or get it from [unpkg](https://unpkg.com/wavefile):
+```html
+<script src="https://unpkg.com/wavefile"></script>
+```
+
+Or as a module from [jspm](https://jspm.io):
+```html
+<script type="module">
+  import WaveFile from 'https://dev.jspm.io/wavefile';
+  console.log(new WaveFile());
+</script>
+```
+
+#### Browser Compatibility
+**wavefile** supports all browsers that are ES5-compliant (IE8 and below are not supported).
 
 ## Table of Contents
 - [Install](#install)
@@ -53,75 +122,6 @@ And more.
 - [Contributing to wavefile](#contributing-to-wavefile)
 - [References](#references)
 - [Legal](#legal)
-
-## Install
-To use it in your programs:
-```
-npm install wavefile
-```
-
-To use it from the command line, install it globally:
-```
-npm install wavefile -g
-```
-
-And then to see the available options:
-```
-wavefile --help
-```
-Read more about the [command line interface](#cli-usage) below.
-
-## Use
-
-### ES6
-import WaveFile from **wavefile.js**:
-```javascript
-import WaveFile from 'wavefile.js';
-let wav = new WaveFile();
-```
-
-### Node
-Require WaveFile from **wavefile**:
-```javascript
-const WaveFile = require('wavefile');
-let wav = new WaveFile();
-```
-
-This also works:
-```javascript
-const WaveFile = require('wavefile').default;
-let wav = new WaveFile();
-```
-
-### Browser
-Use the compiled file in the */dist* folder:
-```html
-<script src="wavefile.min.js"></script>
-<script>
-  var WaveFile = new WaveFile();
-</script>
-```
-
-Or get it from the [jsDelivr](https://www.jsdelivr.com) CDN:
-```html
-<script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
-```
-
-Or get it from [unpkg](https://www.unpkg.com):
-```html
-<script src="https://unpkg.com/wavefile"></script>
-```
-
-Or as a module from [jspm](https://jspm.io):
-```html
-<script type="module">
-  import WaveFile from 'https://dev.jspm.io/wavefile';
-  console.log(new WaveFile());
-</script>
-```
-
-#### Browser Compatibility
-**wavefile** supports all browsers that are ES5-compliant (IE8 and below are not supported).
 
 ## See it in action
 
@@ -468,7 +468,7 @@ WaveFile.toIMAADPCM() {}
  *      One of "8" ... "32" (integers), "32f" or "64" (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromIMAADPCM(bitDepth="16") {}
+WaveFile.fromIMAADPCM(bitDepth='16') {}
 
 /**
  * Encode 16-bit wave file as 8-bit A-Law.
@@ -481,7 +481,7 @@ WaveFile.toALaw() {}
  *      One of "8" ... "32" (integers), "32f" or "64" (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromALaw(bitDepth="16") {}
+WaveFile.fromALaw(bitDepth='16') {}
 
 /**
  * Encode 16-bit wave file as 8-bit mu-Law.
@@ -494,7 +494,7 @@ WaveFile.toMuLaw() {}
  *      One of "8" ... "32" (integers), "32f" or "64" (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromMuLaw(bitDepth="16") {}
+WaveFile.fromMuLaw(bitDepth='16') {}
 
 /**
  * Write a RIFF tag in the INFO chunk. If the tag do not exist,
@@ -524,7 +524,7 @@ WaveFile.deleteTag(tag) {}
  * @param {number} position The cue point position in milliseconds.
  * @param {string} labl The LIST adtl labl text of the marker. Optional.
  */
-WaveFile.setCuePoint(position, labl="") {}
+WaveFile.setCuePoint(position, labl='') {}
 
 /**
  * Remove a cue point from a wave file.
@@ -548,49 +548,49 @@ WaveFile.updateLabel(pointIndex, label) {}
  * "RIFF", "RIFX" and "RF64" are supported.
  * @type {string}
  */
-WaveFile.container = "";
+WaveFile.container = '';
 /**
  * @type {number}
  */
 WaveFile.chunkSize = 0;
 /**
  * The format.
- * Always "WAVE".
+ * Always 'WAVE'.
  * @type {string}
  */
-WaveFile.format = "";
+WaveFile.format = '';
 /**
  * The data of the "fmt" chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.fmt = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {number} */
-    "audioFormat": 0,
+    audioFormat: 0,
     /** @export @type {number} */
-    "numChannels": 0,
+    numChannels: 0,
     /** @export @type {number} */
-    "sampleRate": 0,
+    sampleRate: 0,
     /** @export @type {number} */
-    "byteRate": 0,
+    byteRate: 0,
     /** @export @type {number} */
-    "blockAlign": 0,
+    blockAlign: 0,
     /** @export @type {number} */
-    "bitsPerSample": 0,
+    bitsPerSample: 0,
     /** @export @type {number} */
-    "cbSize": 0,
+    cbSize: 0,
     /** @export @type {number} */
-    "validBitsPerSample": 0,
+    validBitsPerSample: 0,
     /** @export @type {number} */
-    "dwChannelMask": 0,
+    dwChannelMask: 0,
     /**
      * 4 32-bit values representing a 128-bit ID
      * @export @type {!Array<number>}
      */
-    "subformat": []
+    subformat: []
 };
 /**
  * The data of the "fact" chunk.
@@ -598,11 +598,11 @@ WaveFile.fmt = {
  */
 WaveFile.fact = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {number} */
-    "dwSampleLength": 0
+    dwSampleLength: 0
 };
 /**
  * The data of the "cue " chunk.
@@ -610,13 +610,13 @@ WaveFile.fact = {
  */
 WaveFile.cue = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {number} */
-    "dwCuePoints": 0,
+    dwCuePoints: 0,
     /** @export @type {!Array<!Object>} */
-    "points": [],
+    points: [],
 };
 /**
  * The data of the "smpl" chunk.
@@ -624,29 +624,29 @@ WaveFile.cue = {
  */
 WaveFile.smpl = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {number} */
-    "dwManufacturer": 0,
+    dwManufacturer: 0,
     /** @export @type {number} */
-    "dwProduct": 0,
+    dwProduct: 0,
     /** @export @type {number} */
-    "dwSamplePeriod": 0,
+    dwSamplePeriod: 0,
     /** @export @type {number} */
-    "dwMIDIUnityNote": 0,
+    dwMIDIUnityNote: 0,
     /** @export @type {number} */
-    "dwMIDIPitchFraction": 0,
+    dwMIDIPitchFraction: 0,
     /** @export @type {number} */
-    "dwSMPTEFormat": 0,
+    dwSMPTEFormat: 0,
     /** @export @type {number} */
-    "dwSMPTEOffset": 0,
+    dwSMPTEOffset: 0,
     /** @export @type {number} */
-    "dwNumSampleLoops": 0,
+    dwNumSampleLoops: 0,
     /** @export @type {number} */
-    "dwSamplerData": 0,
+    dwSamplerData: 0,
     /** @export @type {!Array<!Object>} */
-    "loops": [],
+    loops: [],
 };
 /**
  * The data of the "bext" chunk.
@@ -654,42 +654,42 @@ WaveFile.smpl = {
  */
 WaveFile.bext = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {string} */
-    "description": "", //256
+    description: '', //256
     /** @export @type {string} */
-    "originator": "", //32
+    originator: '', //32
     /** @export @type {string} */
-    "originatorReference": "", //32
+    originatorReference: '', //32
     /** @export @type {string} */
-    "originationDate": "", //10
+    originationDate: '', //10
     /** @export @type {string} */
-    "originationTime": "", //8
+    originationTime: '', //8
     /**
      * 2 32-bit values, timeReference high and low
      * @export @type {!Array<number>}
      */
-    "timeReference": [0, 0],
+    timeReference: [0, 0],
     /** @export @type {number} */
-    "version": 0, //WORD
+    version: 0, //WORD
     /** @export @type {string} */
-    "UMID": "", // 64 chars
+    UMID: '', // 64 chars
     /** @export @type {number} */
-    "loudnessValue": 0, //WORD
+    loudnessValue: 0, //WORD
     /** @export @type {number} */
-    "loudnessRange": 0, //WORD
+    loudnessRange: 0, //WORD
     /** @export @type {number} */
-    "maxTruePeakLevel": 0, //WORD
+    maxTruePeakLevel: 0, //WORD
     /** @export @type {number} */
-    "maxMomentaryLoudness": 0, //WORD
+    maxMomentaryLoudness: 0, //WORD
     /** @export @type {number} */
-    "maxShortTermLoudness": 0, //WORD
+    maxShortTermLoudness: 0, //WORD
     /** @export @type {string} */
-    "reserved": "", //180
+    reserved: '', //180
     /** @export @type {string} */
-    "codingHistory": "" // string, unlimited
+    codingHistory: '' // string, unlimited
 };
 /**
  * The data of the "ds64" chunk.
@@ -698,23 +698,23 @@ WaveFile.bext = {
  */
 WaveFile.ds64 = {
     /** @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {number} */
-    "riffSizeHigh": 0, // DWORD
+    riffSizeHigh: 0, // DWORD
     /** @export @type {number} */
-    "riffSizeLow": 0, // DWORD
+    riffSizeLow: 0, // DWORD
     /** @export @type {number} */
-    "dataSizeHigh": 0, // DWORD
+    dataSizeHigh: 0, // DWORD
     /** @export @type {number} */
-    "dataSizeLow": 0, // DWORD
+    dataSizeLow: 0, // DWORD
     /** @export @type {number} */
-    "originationTime": 0, // DWORD
+    originationTime: 0, // DWORD
     /** @export @type {number} */
-    "sampleCountHigh": 0, // DWORD
+    sampleCountHigh: 0, // DWORD
     /** @export @type {number} */
-    "sampleCountLow": 0, // DWORD
+    sampleCountLow: 0, // DWORD
     /** @export @type {number} */
     //"tableLength": 0, // DWORD
     /** @export @type {!Array<number>} */
@@ -726,20 +726,20 @@ WaveFile.ds64 = {
  */
 WaveFile.data = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {!Uint8Array} */
-    "samples": new Uint8Array(0)
+    samples: new Uint8Array(0)
 };
 /**
  * The data of the "LIST" chunks.
- * Each item in this list must have this signature:
+ * Each item in this list look like this:
  *  {
- *      "chunkId": "",
- *      "chunkSize": 0,
- *      "format": "",
- *      "subChunks": []
+ *      chunkId: '',
+ *      chunkSize: 0,
+ *      format: '',
+ *      subChunks: []
  *   }
  * @type {!Array<!Object>}
  */
@@ -750,29 +750,35 @@ WaveFile.LIST = [];
  */
 WaveFile.junk = {
     /** @export @type {string} */
-    "chunkId": "",
+    chunkId: '',
     /** @export @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @export @type {!Array<number>} */
-    "chunkData": []
+    chunkData: []
 };
 /**
  * The bit depth code according to the samples.
  * @type {string}
  */
-WaveFile.bitDepth =  "";
+WaveFile.bitDepth =  '';
 ```
 
 #### Cue points
 Items in *cue.points* are objects that look like this:
 ```javascript
 {
-    "dwName": 0, // a cue point ID
-    "dwPosition": 0,
-    "fccChunk": 0,
-    "dwChunkStart": 0,
-    "dwBlockStart": 0,
-    "dwSampleOffset": 0,
+    /** @type {number} */
+    dwName: 0, // a cue point ID
+    /** @type {number} */
+    dwPosition: 0,
+    /** @type {number} */
+    fccChunk: 0,
+    /** @type {number} */
+    dwChunkStart: 0,
+    /** @type {number} */
+    dwBlockStart: 0,
+    /** @type {number} */
+    dwSampleOffset: 0
 }
 ```
 
@@ -780,12 +786,18 @@ Items in *cue.points* are objects that look like this:
 Items in *smpl.loops* are objects that look like this:
 ```javascript
 {
-    "dwName": "", // a cue point ID
-    "dwType": 0,
-    "dwStart": 0,
-    "dwEnd": 0,
-    "dwFraction": 0,
-    "dwPlayCount": 0,
+    /** @type {string} */
+    dwName: '', // a cue point ID
+    /** @type {number} */
+    dwType: 0,
+    /** @type {number} */
+    dwStart: 0,
+    /** @type {number} */
+    dwEnd: 0,
+    /** @type {number} */
+    dwFraction: 0,
+    /** @type {number} */
+    dwPlayCount: 0
 }
 ```
 
@@ -799,30 +811,30 @@ Items in *smpl.loops* are objects that look like this:
 WaveFile.LIST = [];
 ```
 
-*WaveFile.LIST* is an array of objects with this signature:
+Items in *WaveFile.LIST* are objects that look like this:
 ```javascript
 {
     /** @type {string} */
-    "chunkId": "", // always 'LIST'
+    chunkId: '', // always 'LIST'
     /** @type {number} */
-    "chunkSize": 0,
+    chunkSize: 0,
     /** @type {string} */
-    "format": "", // 'adtl' or 'INFO'
+    format: '', // 'adtl' or 'INFO'
     /** @type {!Array<!Object>} */
-    "subChunks": []
+    subChunks: []
 };
 ```
 Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. **wavefile** can read and write "LIST" chunks of format "INFO" and "adtl".
 
-For "LIST" chunks with the "INFO" format, "subChunks" will be an array of objects with this signature:
+For "LIST" chunks with the "INFO" format, "subChunks" will be an array of objects like this:
 ```javascript
 {
     /** @type {string} */
-    "chunkId": "" // some RIFF tag
+    chunkId: '', // some RIFF tag
     /** @type {number} */
-    "chunkSize" 0,
+    chunkSize 0,
     /** @type {string} */
-    "value": ""
+    value: ''
 }
 ```
 Where "chunkId" may be any RIFF tag:  
@@ -839,18 +851,18 @@ Range:
 - -1.0 to 1.0 for 64-bit (float)
 
 ## Distribution
-This library is a ES6 module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with ```npm install wavefile```.
+This library is a ES module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with ```npm install wavefile```.
 
 ### If you are using this lib in a browser:
 
 You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser with ```<script>``` tags. Ideally you should use **wavefile.min.js**. You can load it via the https://unpkg.com and https://www.jsdelivr.com/ CDNs:
 
-[unpkg](https://www.unpkg.com):
+[unpkg](https://unpkg.com/wavefile):
 ```html
 <script src="https://unpkg.com/wavefile"></script>
 ```
 
-[jsDelivr](https://www.jsdelivr.com):
+[jsDelivr](https://cdn.jsdelivr.net/npm/wavefile):
 ```html
 <script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
 ```

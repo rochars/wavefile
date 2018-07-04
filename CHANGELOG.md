@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.1.1 (2018-07-04)
+- Fix documentation issues.
+
 ## version 8.1.0 (2018-07-04)
 - Add CLI to manipulate wave files from the command line.
 
