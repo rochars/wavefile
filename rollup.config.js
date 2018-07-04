@@ -27,6 +27,22 @@ const license = '/*!\n'+
   ' */\n';
 
 export default [
+  // cjs
+  {
+    input: 'index.js',
+    output: [
+      {
+        file: 'dist/wavefile.cjs.js',
+        name: 'wavefile',
+        footer: 'module.exports.default = WaveFile;',
+        format: 'cjs'
+      }
+    ],
+    plugins: [
+      nodeResolve(),
+      commonjs()
+    ]
+  },
   // umd, es
   {
     input: 'index.js',

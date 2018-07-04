@@ -27,6 +27,15 @@ if (process.argv[3] == '--min') {
 	console.log('umd tests');
 	wavefile = require('../dist/wavefile.umd.js');
 
+// CommonJS
+} else if (process.argv[3] == '--cjs') {
+	console.log('cjs tests');
+	wavefile = require('../dist/wavefile.cjs.js');
+	wavefileDefault = require('../dist/wavefile.cjs.js').default;
+	if (wavefile != wavefileDefault) {
+		throw('CommonJS dist should export as default and as .default.');
+	}
+
 // ESM
 } else if (process.argv[3] == '--esm') {
 	console.log('esm tests');
