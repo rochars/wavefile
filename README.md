@@ -21,6 +21,7 @@ https://github.com/rochars/wavefile
 - **All MIT-licensed**
 - Less than 10kb minified + compressed, less than 32kb minified
 - Made with Closure Compiler in mind (works great with others, too)
+- **CLI to manipulate wave files from the command line**
 
 And more.
 
@@ -40,6 +41,7 @@ And more.
   * [Change the bit depth](#change-the-bit-depth)
   * [Add BWF metadata](#add-bwf-metadata)
   * [RF64](#rf64)
+  * [Command line interface](#cli-usage)
 - [API](#api)
   * [The WaveFile methods:](#the-wavefile-methods-)
   * [The WaveFile properties](#the-wavefile-properties)
@@ -53,9 +55,21 @@ And more.
 - [Legal](#legal)
 
 ## Install
+To use it in your programs:
 ```
 npm install wavefile
 ```
+
+To use it from the command line:
+```
+npm install wavefile -g
+```
+
+And then to see the available options:
+```
+wavefile --help
+```
+Read more about the [command line interface](#cli-usage) below.
 
 ## Use
 
@@ -331,6 +345,17 @@ By default **wavefile** will not insert a "bext" chunk in new files or in files 
 
 ### RF64
 **wavefile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
+
+### CLI Usage
+**wavefile** can run from the CLI. To use it from the command line install it with **-g**:
+```
+npm install wavefile -g
+```
+
+To see the available options:
+```
+wavefile --help
+```
 
 ## API
 To create a WaveFile object:

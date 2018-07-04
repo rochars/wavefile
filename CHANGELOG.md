@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.1.0 (unreleased)
+- Add CLI to manipulate wave files from the command line.
+
 ## version 8.0.3 (2018-07-03)
 - Fix: Change the bit depth and apply compression to huge files.
 

@@ -1,7 +1,7 @@
 {
   "name": "wavefile",
-  "version": "8.0.3",
-  "description": "Read and write huge wav files. Small ones too.",
+  "version": "8.1.0-alpha.0",
+  "description": "Read and write huge .wav files.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael S. Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
@@ -12,6 +12,9 @@
   "jsdelivr": "./dist/wavefile.min.js",
   "unpkg": "./dist/wavefile.min.js",
   "types": "./index.d.ts",
+  "bin": {
+    "wavefile": "cli.js"
+  },
   "engines": {
     "node": ">=8"
   },
@@ -59,13 +62,14 @@
     "dist": "./dist"
   },
   "scripts": {
-    "lint": "jshint index.js externs.js",
+    "lint": "jshint index.js externs.js cli.js",
     "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=120000",
     "test-esm": "nyc ./node_modules/mocha/bin/_mocha test --esm --require=esm --recursive -R dot --timeout=120000",
     "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R dot --timeout=120000",
     "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R dot --timeout=120000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot --timeout=120000",
-    "test-dist": "npm run test-min && npm run test-esm && npm run test-cjs && npm run test-umd",
+    "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
+    "test-dist": "npm run test-min && npm run test-esm && npm run test-cjs && npm run test-umd && npm run test-cli",
     "bundle": "rollup --config && npm run test-dist && npm run test",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm run bundle && npm run doc",

@@ -10,9 +10,6 @@ var base64ArraybufferEs6 = require('base64-arraybuffer-es6');
 var byteData = require('byte-data');
 
 /*
- * wavefile: Read and write wave files.
- * https://github.com/rochars/wavefile
- *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
