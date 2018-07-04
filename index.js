@@ -1,7 +1,4 @@
 /*
- * wavefile: Read and write wave files.
- * https://github.com/rochars/wavefile
- *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -27,6 +24,7 @@
 
 /**
  * @fileoverview The WaveFile class.
+ * @see https://github.com/rochars/wavefile
  */
 
 /** @module wavefile */
