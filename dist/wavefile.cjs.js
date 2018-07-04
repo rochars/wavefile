@@ -2139,7 +2139,7 @@ class WaveFile {
    *    (Integer numbers: 1 for mono, 2 stereo and so on).
    * @param {number} sampleRate The sample rate.
    *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
-   * @param {string} bitDepth The audio bit depth code.
+   * @param {string} bitDepthCode The audio bit depth code.
    *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
    *    or any value between '8' and '32' (like '12').
    * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
@@ -2148,31 +2148,31 @@ class WaveFile {
    *    as RIFX with {'container': 'RIFX'}
    * @throws {Error} If any argument does not meet the criteria.
    */
-  fromScratch(numChannels, sampleRate, bitDepth$$1, samples, options={}) {
+  fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
     if (!options.container) {
       options.container = 'RIFF';
     }
     this.container = options.container;
-    this.bitDepth = bitDepth$$1;
+    this.bitDepth = bitDepthCode;
     samples = this.interleave_(samples);
     /** @type {number} */
-    let numBytes = (((parseInt(bitDepth$$1, 10) - 1) | 7) + 1) / 8;
+    let numBytes = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1) / 8;
     this.updateDataType_();
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
     // create headers
     this.createPCMHeader_(
-      bitDepth$$1, numChannels, sampleRate, numBytes, options);
-    if (bitDepth$$1 == '4') {
+      bitDepthCode, numChannels, sampleRate, numBytes, options);
+    if (bitDepthCode == '4') {
       this.createADPCMHeader_(
-        bitDepth$$1, numChannels, sampleRate, numBytes, options);
-    } else if (bitDepth$$1 == '8a' || bitDepth$$1 == '8m') {
+        bitDepthCode, numChannels, sampleRate, numBytes, options);
+    } else if (bitDepthCode == '8a' || bitDepthCode == '8m') {
       this.createALawMulawHeader_(
-        bitDepth$$1, numChannels, sampleRate, numBytes, options);
-    } else if(Object.keys(this.audioFormats_).indexOf(bitDepth$$1) == -1 ||
+        bitDepthCode, numChannels, sampleRate, numBytes, options);
+    } else if(Object.keys(this.audioFormats_).indexOf(bitDepthCode) == -1 ||
         this.fmt.numChannels > 2) {
       this.createExtensibleHeader_(
-        bitDepth$$1, numChannels, sampleRate, numBytes, options);
+        bitDepthCode, numChannels, sampleRate, numBytes, options);
     }
     // the data chunk
     this.data.chunkId = 'data';
@@ -2301,7 +2301,7 @@ class WaveFile {
 
   /**
    * Change the bit depth of the samples.
-   * @param {string} bitDepth The new bit depth of the samples.
+   * @param {string} newBitDepth The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats)
    * @param {boolean} changeResolution A boolean indicating if the
    *    resolution of samples should be actually changed or not.
@@ -2362,19 +2362,19 @@ class WaveFile {
 
   /**
    * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
-   * @param {string} bitDepth The new bit depth of the samples.
+   * @param {string} bitDepthCode The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
    *    Optional. Default is 16.
    */
-  fromIMAADPCM(bitDepth$$1='16') {
+  fromIMAADPCM(bitDepthCode='16') {
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
       decode(this.data.samples, this.fmt.blockAlign),
       {container: this.correctContainer_()});
-    if (bitDepth$$1 != '16') {
-      this.toBitDepth(bitDepth$$1);
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
     }
   }
 
@@ -2395,19 +2395,19 @@ class WaveFile {
 
   /**
    * Decode a 8-bit A-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepth The new bit depth of the samples.
+   * @param {string} bitDepthCode The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
    *    Optional. Default is 16.
    */
-  fromALaw(bitDepth$$1='16') {
+  fromALaw(bitDepthCode='16') {
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
       decode$1(this.data.samples),
       {container: this.correctContainer_()});
-    if (bitDepth$$1 != '16') {
-      this.toBitDepth(bitDepth$$1);
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
     }
   }
 
@@ -2428,19 +2428,19 @@ class WaveFile {
 
   /**
    * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepth The new bit depth of the samples.
+   * @param {string} bitDepthCode The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
    *    Optional. Default is 16.
    */
-  fromMuLaw(bitDepth$$1='16') {
+  fromMuLaw(bitDepthCode='16') {
     this.fromScratch(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
       decode$2(this.data.samples),
       {container: this.correctContainer_()});
-    if (bitDepth$$1 != '16') {
-      this.toBitDepth(bitDepth$$1);
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
     }
   }
 
@@ -2797,16 +2797,16 @@ class WaveFile {
 
   /**
    * Create the header of a ADPCM wave file.
-   * @param {string} bitDepth The audio bit depth
+   * @param {string} bitDepthCode The audio bit depth
    * @param {number} numChannels The number of channels
    * @param {number} sampleRate The sample rate.
    * @param {number} numBytes The number of bytes each sample use.
    * @param {!Object} options The extra options, like container defintion.
    * @private
    */
-  createADPCMHeader_(bitDepth$$1, numChannels, sampleRate, numBytes, options) {
+  createADPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options) {
     this.createPCMHeader_(
-      bitDepth$$1, numChannels, sampleRate, numBytes, options);
+      bitDepthCode, numChannels, sampleRate, numBytes, options);
     this.chunkSize = 40 + this.data.samples.length;
     this.fmt.chunkSize = 20;
     this.fmt.byteRate = 4055;
@@ -2822,7 +2822,7 @@ class WaveFile {
 
   /**
    * Create the header of WAVE_FORMAT_EXTENSIBLE file.
-   * @param {string} bitDepth The audio bit depth
+   * @param {string} bitDepthCode The audio bit depth
    * @param {number} numChannels The number of channels
    * @param {number} sampleRate The sample rate.
    * @param {number} numBytes The number of bytes each sample use.
@@ -2830,14 +2830,14 @@ class WaveFile {
    * @private
    */
   createExtensibleHeader_(
-      bitDepth$$1, numChannels, sampleRate, numBytes, options) {
+      bitDepthCode, numChannels, sampleRate, numBytes, options) {
     this.createPCMHeader_(
-      bitDepth$$1, numChannels, sampleRate, numBytes, options);
+      bitDepthCode, numChannels, sampleRate, numBytes, options);
     this.chunkSize = 36 + 24 + this.data.samples.length;
     this.fmt.chunkSize = 40;
-    this.fmt.bitsPerSample = ((parseInt(bitDepth$$1, 10) - 1) | 7) + 1;
+    this.fmt.bitsPerSample = ((parseInt(bitDepthCode, 10) - 1) | 7) + 1;
     this.fmt.cbSize = 22;
-    this.fmt.validBitsPerSample = parseInt(bitDepth$$1, 10);
+    this.fmt.validBitsPerSample = parseInt(bitDepthCode, 10);
     this.fmt.dwChannelMask = this.getDwChannelMask_();
     // subformat 128-bit GUID as 4 32-bit values
     // only supports uncompressed integer PCM samples
@@ -2873,7 +2873,7 @@ class WaveFile {
 
   /**
    * Create the header of mu-Law and A-Law wave files.
-   * @param {string} bitDepth The audio bit depth
+   * @param {string} bitDepthCode The audio bit depth
    * @param {number} numChannels The number of channels
    * @param {number} sampleRate The sample rate.
    * @param {number} numBytes The number of bytes each sample use.
@@ -2881,9 +2881,9 @@ class WaveFile {
    * @private
    */
   createALawMulawHeader_(
-      bitDepth$$1, numChannels, sampleRate, numBytes, options) {
+      bitDepthCode, numChannels, sampleRate, numBytes, options) {
     this.createPCMHeader_(
-      bitDepth$$1, numChannels, sampleRate, numBytes, options);
+      bitDepthCode, numChannels, sampleRate, numBytes, options);
     this.chunkSize = 40 + this.data.samples.length;
     this.fmt.chunkSize = 20;
     this.fmt.cbSize = 2;
@@ -2895,14 +2895,14 @@ class WaveFile {
 
   /**
    * Create the header of a linear PCM wave file.
-   * @param {string} bitDepth The audio bit depth
+   * @param {string} bitDepthCode The audio bit depth
    * @param {number} numChannels The number of channels
    * @param {number} sampleRate The sample rate.
    * @param {number} numBytes The number of bytes each sample use.
    * @param {!Object} options The extra options, like container defintion.
    * @private
    */
-  createPCMHeader_(bitDepth$$1, numChannels, sampleRate, numBytes, options) {
+  createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options) {
     this.clearHeader_();
     this.container = options.container;
     this.chunkSize = 36 + this.data.samples.length;
@@ -2911,11 +2911,11 @@ class WaveFile {
     this.fmt.chunkSize = 16;
     this.fmt.byteRate = (numChannels * numBytes) * sampleRate;
     this.fmt.blockAlign = numChannels * numBytes;
-    this.fmt.audioFormat = this.audioFormats_[bitDepth$$1] ?
-      this.audioFormats_[bitDepth$$1] : 65534;
+    this.fmt.audioFormat = this.audioFormats_[bitDepthCode] ?
+      this.audioFormats_[bitDepthCode] : 65534;
     this.fmt.numChannels = numChannels;
     this.fmt.sampleRate = sampleRate;
-    this.fmt.bitsPerSample = parseInt(bitDepth$$1, 10);
+    this.fmt.bitsPerSample = parseInt(bitDepthCode, 10);
     this.fmt.cbSize = 0;
     this.fmt.validBitsPerSample = 0;
   }
@@ -2923,15 +2923,15 @@ class WaveFile {
   /**
    * Return the closest greater number of bits for a number of bits that
    * do not fill a full sequence of bytes.
-   * @param {string} bitDepth The bit depth.
+   * @param {string} bitDepthCode The bit depth.
    * @return {string}
    * @private
    */
-  realBitDepth_(bitDepth$$1) {
-    if (bitDepth$$1 != '32f') {
-      bitDepth$$1 = (((parseInt(bitDepth$$1, 10) - 1) | 7) + 1).toString();
+  realBitDepth_(bitDepthCode) {
+    if (bitDepthCode != '32f') {
+      bitDepthCode = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1).toString();
     }
-    return bitDepth$$1;
+    return bitDepthCode;
   }
 
   /**

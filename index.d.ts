@@ -9,7 +9,7 @@ declare class WaveFile {
     
     constructor(bytes?: Uint8Array);
 
-    fromScratch(numChannels: number, sampleRate: number, bitDepth: string, samples: Array<number>, options?: object): void;
+    fromScratch(numChannels: number, sampleRate: number, bitDepthCode: string, samples: Array<number>, options?: object): void;
 
     fromBuffer(bytes: Uint8Array, samples?:boolean): void;
 
@@ -27,19 +27,19 @@ declare class WaveFile {
 
     toRIFX(): void;
 
-    toBitDepth(bitDepth: string, changeResolution?: boolean): void;
+    toBitDepth(newBitDepth: string, changeResolution?: boolean): void;
 
     toIMAADPCM(): void;
 
-    fromIMAADPCM(bitDepth?: string): void;
+    fromIMAADPCM(bitDepthCode?: string): void;
 
     toALaw(): void;
 
-    fromALaw(bitDepth?: string): void;
+    fromALaw(bitDepthCode?: string): void;
 
     toMuLaw(): void;
 
-    fromMuLaw(bitDepth?: string): void;
+    fromMuLaw(bitDepthCode?: string): void;
 
     setTag(tag: string, value: string): void;
 

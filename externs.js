@@ -271,7 +271,7 @@ WaveFile.bitDepth = '';
  *      (Integer numbers: 1 for mono, 2 stereo and so on).
  * @param {number} sampleRate The sample rate.
  *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
- * @param {string} bitDepth The audio bit depth code.
+ * @param {string} bitDepthCode The audio bit depth code.
  *      One of 4, 8, 8a, 8m, 16, 24, 32, 32f, 64
  *      or any value between 8 and 32 (like 12).
  * @param {!Array<number>} samples Array of samples to be written.
@@ -282,7 +282,7 @@ WaveFile.bitDepth = '';
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.fromScratch = function(
-  numChannels, sampleRate, bitDepth, samples, options={container:'RIFF'}) {};
+  numChannels, sampleRate, bitDepthCode, samples, options={container:'RIFF'}) {};
 
 /**
  * Set up the WaveFile object from a byte buffer.
@@ -343,13 +343,13 @@ WaveFile.toRIFX = function() {};
 
 /**
  * Change the bit depth of the samples.
- * @param {string} bitDepth The new bit depth of the samples.
+ * @param {string} newBitDepth The new bit depth of the samples.
  *      One of 8 ... 32 (integers), 32f or 64 (floats)
  * @param {boolean} changeResolution A boolean indicating if the
  *      resolution of samples should be actually changed or not.
  * @throws {Error} If the bit depth is not valid.
  */
-WaveFile.toBitDepth = function(bitDepth, changeResolution=true) {};
+WaveFile.toBitDepth = function(newBitDepth, changeResolution=true) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.
@@ -360,11 +360,11 @@ WaveFile.toIMAADPCM = function() {};
 
 /**
  * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
- * @param {string} bitDepth The new bit depth of the samples.
+ * @param {string} bitDepthCode The new bit depth of the samples.
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromIMAADPCM = function(bitDepth='16') {};
+WaveFile.fromIMAADPCM = function(bitDepthCode='16') {};
 
 /**
  * Encode 16-bit wave file as 8-bit A-Law.
@@ -373,11 +373,11 @@ WaveFile.toALaw = function() {};
 
 /**
  * Decode a 8-bit A-Law wave file into a 16-bit wave file.
- * @param {string} bitDepth The new bit depth of the samples.
+ * @param {string} bitDepthCode The new bit depth of the samples.
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromALaw = function(bitDepth='16') {};
+WaveFile.fromALaw = function(bitDepthCode='16') {};
 
 /**
  * Encode 16-bit wave file as 8-bit mu-Law.
@@ -386,11 +386,11 @@ WaveFile.toMuLaw = function() {};
 
 /**
  * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
- * @param {string} bitDepth The new bit depth of the samples.
+ * @param {string} bitDepthCode The new bit depth of the samples.
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromMuLaw = function(bitDepth='16') {};
+WaveFile.fromMuLaw = function(bitDepthCode='16') {};
 
 /**
  * Write a RIFF tag in the INFO chunk. If the tag do not exist,
