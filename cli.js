@@ -5,7 +5,7 @@
  * @see https://github.com/rochars/wavefile
  */
 
-const WaveFile = require('./dist/wavefile.cjs.js');
+const WaveFile = require('./dist/wavefile.umd.js');
 const fs = require('fs');
 
 /** @type {string} */

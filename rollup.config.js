@@ -27,30 +27,6 @@ const license = '/*!\n'+
   ' */\n';
 
 export default [
-  // cjs
-  {
-    input: 'index.js',
-    external: [
-      'byte-data',
-      'alawmulaw',
-      'base64-arraybuffer-es6',
-      'bitdepth',
-      'imaadpcm',
-      'riff-chunks'
-    ],
-    output: [
-      {
-        file: 'dist/wavefile.cjs.js',
-        name: 'wavefile',
-        footer: 'module.exports.default = WaveFile;',
-        format: 'cjs'
-      }
-    ],
-    plugins: [
-      nodeResolve(),
-      commonjs()
-    ]
-  },
   // umd, es
   {
     input: 'index.js',
