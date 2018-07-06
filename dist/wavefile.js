@@ -170,9 +170,74 @@ function validateBitDepth_(bitDepth) {
 }
 
 /*
- * byte-data: Pack and unpack binary data.
- * https://github.com/rochars/byte-data
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview A function to swap endianness in byte buffers.
+ * @see https://github.com/rochars/endianness
+ */
+
+/**
+ * Swap the byte ordering in a buffer. The buffer is modified in place.
+ * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
+ * @param {number} offset The byte offset.
+ * @param {number=} index The start index. Assumes 0.
+ * @param {?number=} end The end index. Assumes the buffer length.
+ * @throws {Error} If the buffer length is not valid.
+ */
+function endianness(bytes, offset, index=0, end=null) {
+  let len = end || bytes.length;
+  let limit = parseInt(offset / 2, 10);
+  if (len % offset) {
+    throw new Error("Bad buffer length.");
+  }
+  while (index < len) {
+    swap(bytes, offset, index, limit);
+    index += offset;
+  }
+}
+
+/**
+ * Swap the byte order of a value in a buffer. The buffer is modified in place.
+ * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
+ * @param {number} offset The byte offset.
+ * @param {number} index The start index.
+ * @private
+ */
+function swap(bytes, offset, index, limit) {
+  let x = 0;
+  let y = offset - 1;
+  while(x < limit) {
+    let theByte = bytes[index + x];
+    bytes[index + x] = bytes[index + y];
+    bytes[index + y] = theByte;
+    x++;
+    y--;
+  }
+}
+
+/*
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -198,6 +263,7 @@ function validateBitDepth_(bitDepth) {
 
 /**
  * @fileoverview Pack and unpack two's complement ints and unsigned ints.
+ * @see https://github.com/rochars/byte-data
  */
 
 /**
@@ -214,26 +280,31 @@ class Integer {
     /**
      * The max number of bits used by the data.
      * @type {number}
+     * @private
      */
     this.bits = bits;
     /**
      * If this type it is signed or not.
      * @type {boolean}
+     * @private
      */
     this.signed = signed;
     /**
      * The number of bytes used by the data.
      * @type {number}
+     * @private
      */
     this.offset = 0;
     /**
      * Min value for numbers of this type.
      * @type {number}
+     * @private
      */
     this.min = -Infinity;
     /**
      * Max value for numbers of this type.
      * @type {number}
+     * @private
      */
     this.max = Infinity;
     /**
@@ -424,84 +495,6 @@ class Integer {
 }
 
 /*
- * endianness: Swap endianness in byte arrays.
- * https://github.com/rochars/endianness
- *
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * @fileoverview A function to swap endianness in byte buffers.
- */
-
-/**
- * @module endianness
- */
-
-/**
- * Swap the byte ordering in a buffer. The buffer is modified in place.
- * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
- * @param {number} offset The byte offset.
- * @param {number=} start The start index. Assumes 0.
- * @param {?number=} end The end index. Assumes the buffer length.
- * @throws {Error} If the buffer length is not valid.
- */
-function endianness(bytes, offset, start=0, end=null) {
-    let len = end || bytes.length;
-    let limit = parseInt(offset / 2, 10);
-    if (len % offset) {
-        throw new Error("Bad buffer length.");
-    }
-    let i = start;
-    while (i < len) {
-        swap(bytes, offset, i, limit);
-        i += offset;
-    }
-}
-
-/**
- * Swap the byte order of a value in a buffer. The buffer is modified in place.
- * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
- * @param {number} offset The byte offset.
- * @param {number} index The start index.
- * @private
- */
-function swap(bytes, offset, index, limit) {
-    let x = 0;
-    let y = offset - 1;
-    while(x < limit) {
-        let theByte = bytes[index + x];
-        bytes[index + x] = bytes[index + y];
-        bytes[index + y] = theByte;
-        x++;
-        y--;
-    }
-}
-
-/*
- * byte-data: Pack and unpack binary data.
- * https://github.com/rochars/byte-data
- *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -527,11 +520,24 @@ function swap(bytes, offset, index, limit) {
 
 /**
  * @fileoverview Functions to validate input.
+ * @see https://github.com/rochars/byte-data
  */
+
+/**
+ * Validate that the code is a valid ASCII code.
+ * @param {number} code The code.
+ * @throws {Error} If the code is not a valid ASCII code.
+ */
+function validateASCIICode(code) {
+  if (code > 127) {
+    throw new Error ('Bad ASCII code.');
+  }
+}
 
 /**
  * Validate that the value is not null or undefined.
  * @param {number} value The value.
+ * @throws {Error} If the value is of type undefined.
  */
 function validateNotUndefined(value) {
   if (value === undefined) {
@@ -580,9 +586,6 @@ function validateIntType_(theType) {
 }
 
 /*
- * byte-data: Pack and unpack binary data.
- * https://github.com/rochars/byte-data
- *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -605,168 +608,6 @@ function validateIntType_(theType) {
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
-// Strings
-/**
- * Read a string from a byte buffer.
- * @param {!Uint8Array} bytes A byte buffer.
- * @param {number=} index The index to read.
- * @param {?number=} len The number of bytes to read.
- * @return {string}
- */
-function unpackString(bytes, index=0, len=null) {
-  let chrs = '';
-  len = len || bytes.length - index;
-  for(let j = 0; j < len; j++) {
-    chrs += String.fromCharCode(bytes[index+j]);
-  }
-  return chrs;
-}
-
-/**
- * Write a string as a byte buffer.
- * @param {string} str The string to pack.
- * @return {!Array<number>} The next index to write on the buffer.
- */
-function packString(str) {
-  let bytes = [];
-  for (let i = 0; i < str.length; i++) {
-    bytes[i] = str.charCodeAt(i);
-  }
-  return bytes;
-}
-
-/**
- * Write a string to a byte buffer.
- * @param {string} str The string to pack.
- * @param {!Uint8Array} bytes A byte buffer.
- * @param {number=} index The index to write in the buffer.
- * @return {number} The next index to write in the buffer.
- */
-function packStringTo(str, bytes, index=0) {
-  for (let i = 0; i < str.length; i++) {
-    bytes[index] = str.charCodeAt(i);
-    index++;
-  }
-  return index;
-}
-
-// Numbers
-/**
- * Pack a number as a byte buffer.
- * @param {number} value The number.
- * @param {!Object} theType The type definition.
- * @return {!Array<number>} The packed value.
- * @throws {Error} If the type definition is not valid.
- * @throws {Error} If the value is not valid.
- */
-function pack(value, theType) {
-  setUp_(theType);
-  return toBytes_([value], theType);
-}
-
-/**
- * Pack a number to a byte buffer.
- * @param {number} value The value.
- * @param {!Object} theType The type definition.
- * @param {!Uint8Array} buffer The output buffer.
- * @param {number=} index The index to write.
- * @return {number} The next index to write.
- * @throws {Error} If the type definition is not valid.
- * @throws {Error} If the value is not valid.
- */
-function packTo(value, theType, buffer, index=0) {
-  setUp_(theType);
-  return writeBytes_(value,
-    theType,
-    buffer,
-    index,
-    index + theType.offset,
-    validateNotUndefined,
-    theType.be);
-}
-
-/**
- * Pack a array of numbers to a byte buffer.
- * @param {!Array<number>} values The value.
- * @param {!Object} theType The type definition.
- * @param {!Uint8Array} buffer The output buffer.
- * @param {number=} index The buffer index to write.
- * @return {number} The next index to write.
- * @throws {Error} If the type definition is not valid.
- * @throws {Error} If the value is not valid.
- */
-function packArrayTo(values, theType, buffer, index=0) {
-  setUp_(theType);
-  let be = theType.be;
-  let offset = theType.offset;
-  for (let i=0; i<values.length; i++) {
-    index = writeBytes_(
-      values[i],
-      theType,
-      buffer,
-      index,
-      index + offset,
-      validateNotUndefined,
-      be);
-  }
-  return index;
-}
-
-/**
- * Unpack an array of numbers from a byte buffer.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @return {!Array<number>}
- * @throws {Error} If the type definition is not valid.
- */
-function unpackArray(buffer, theType) {
-  setUp_(theType);
-  return fromBytes_(buffer, theType);
-}
-
-/**
- * Unpack a number from a byte buffer by index.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @param {number=} index The buffer index to read.
- * @return {number}
- * @throws {Error} If the type definition is not valid
- */
-function unpackFrom(buffer, theType, index=0) {
-  setUp_(theType);
-  if (theType.be) {
-    endianness(buffer, theType.offset, index, index + theType.offset);
-  }
-  let value = reader_(buffer, index);
-  if (theType.be) {
-    endianness(buffer, theType.offset, index, index + theType.offset);
-  }
-  return value;
-}
-
-/**
- * Unpack a array of numbers to a typed array.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @param {!TypedArray} output The output array.
- * @throws {Error} If the type definition is not valid
- */
-function unpackArrayTo(buffer, theType, output) {
-  setUp_(theType);
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
-  let len = buffer.length;
-  let outputIndex = 0;
-  for (let i=0; i<len; i+=theType.offset) {
-    output.set([reader_(buffer, i)], outputIndex);
-    outputIndex++;
-  }
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
-}
 
 /**
  * @type {!Int8Array}
@@ -805,10 +646,27 @@ let writer_;
 let gInt_ = {};
 
 /**
+ * Validate the type and set up the packing/unpacking functions.
+ * @param {!Object} theType The type definition.
+ * @throws {Error} If the type definition is not valid.
+ * @private
+ */
+function setUp_(theType) {
+  validateType(theType);
+  theType.offset = theType.bits < 8 ? 1 : Math.ceil(theType.bits / 8);
+  theType.be = theType.be || false;
+  setReader(theType);
+  setWriter(theType);
+  gInt_ = new Integer(
+    theType.bits == 64 ? 32 : theType.bits,
+    theType.float ? false : theType.signed);
+}
+
+/**
  * Turn numbers to bytes.
  * @param {number} value The value to be packed.
  * @param {!Object} theType The type definition.
- * @param {!Uint8Array} buffer The buffer to write the bytes to.
+ * @param {!Uint8Array|!Array<number>} buffer The buffer to write the bytes to.
  * @param {number} index The index to start writing.
  * @param {number} len The end index.
  * @param {!Function} validate The function used to validate input.
@@ -826,47 +684,6 @@ function writeBytes_(value, theType, buffer, index, len, validate, be) {
       buffer, theType.offset, index - theType.offset, index);
   }
   return index;
-}
-
-/**
- * Turn a byte buffer into what the bytes represent.
- * @param {!Uint8Array} buffer An array of bytes.
- * @param {!Object} theType The type definition.
- * @return {!Array<number>}
- * @private
- */
-function fromBytes_(buffer, theType) {
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
-  let len = buffer.length;
-  let values = [];
-  len = len - (theType.offset - 1);
-  for (let i=0; i<len; i+=theType.offset) {
-    values.push(reader_(buffer, i));
-  }
-  return values;
-}
-
-/**
- * Turn numbers to bytes.
- * @param {!Array<number>} values The data.
- * @param {!Object} theType The type definition.
- * @return {!Array<number>} the data as a byte buffer.
- * @private
- */
-function toBytes_(values, theType) {
-  let j = 0;
-  let bytes = [];
-  let len = values.length;
-  for(let i=0; i < len; i++) {
-    validateNotUndefined(values[i]);
-    j = writer_(bytes, values[i], j);
-  }
-  if (theType.be) {
-    endianness(bytes, theType.offset);
-  }
-  return bytes;
 }
 
 /**
@@ -1027,21 +844,237 @@ function setWriter(theType) {
   }   
 }
 
-/**
- * Validate the type and set up the packing/unpacking functions.
- * @param {!Object} theType The type definition.
- * @throws {Error} If the type definition is not valid.
- * @private
+/*
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
-function setUp_(theType) {
-  validateType(theType);
-  theType.offset = theType.bits < 8 ? 1 : Math.ceil(theType.bits / 8);
-  theType.be = theType.be || false;
-  setReader(theType);
-  setWriter(theType);
-  gInt_ = new Integer(
-    theType.bits == 64 ? 32 : theType.bits,
-    theType.float ? false : theType.signed);
+
+// ASCII characters
+/**
+ * Read a string of ASCII characters from a byte buffer.
+ * @param {!Uint8Array} bytes A byte buffer.
+ * @param {number=} index The index to read.
+ * @param {?number=} len The number of bytes to read.
+ * @return {string}
+ * @throws {Error} If a character in the string is not valid ASCII.
+ */
+function unpackString(bytes, index=0, len=null) {
+  let chrs = '';
+  len = len ? index + len : bytes.length;
+  while (index < len) {
+    validateASCIICode(bytes[index]);
+    chrs += String.fromCharCode(bytes[index]);
+    index++;
+  }
+  return chrs;
+}
+
+/**
+ * Write a string of ASCII characters as a byte buffer.
+ * @param {string} str The string to pack.
+ * @return {!Array<number>} The next index to write on the buffer.
+ * @throws {Error} If a character in the string is not valid ASCII.
+ */
+function packString(str) {
+  let bytes = [];
+  for (let i = 0; i < str.length; i++) {
+    let code = str.charCodeAt(i);
+    validateASCIICode(code);
+    bytes[i] = code;
+  }
+  return bytes;
+}
+
+/**
+ * Write a string of ASCII characters to a byte buffer.
+ * @param {string} str The string to pack.
+ * @param {!Uint8Array|!Array<number>} buffer The output buffer.
+ * @param {number=} index The index to write in the buffer.
+ * @return {number} The next index to write in the buffer.
+ * @throws {Error} If a character in the string is not valid ASCII.
+ */
+function packStringTo(str, buffer, index=0) {
+  for (let i = 0; i < str.length; i++) {
+    let code = str.charCodeAt(i);
+    validateASCIICode(code);
+    buffer[index] = code;
+    index++;
+  }
+  return index;
+}
+
+// Numbers
+/**
+ * Pack a number as a byte buffer.
+ * @param {number} value The number.
+ * @param {!Object} theType The type definition.
+ * @return {!Array<number>} The packed value.
+ * @throws {Error} If the type definition is not valid.
+ * @throws {Error} If the value is not valid.
+ */
+function pack(value, theType) {
+  let output = [];
+  packTo(value, theType, output);
+  return output;
+}
+
+/**
+ * Pack a number to a byte buffer.
+ * @param {number} value The value.
+ * @param {!Object} theType The type definition.
+ * @param {!Uint8Array|!Array<number>} buffer The output buffer.
+ * @param {number=} index The index to write.
+ * @return {number} The next index to write.
+ * @throws {Error} If the type definition is not valid.
+ * @throws {Error} If the value is not valid.
+ */
+function packTo(value, theType, buffer, index=0) {
+  setUp_(theType);
+  return writeBytes_(value,
+    theType,
+    buffer,
+    index,
+    index + theType.offset,
+    validateNotUndefined,
+    theType.be);
+}
+
+/**
+ * Pack a array of numbers to a byte buffer.
+ * @param {!Array<number>|!TypedArray} values The value.
+ * @param {!Object} theType The type definition.
+ * @param {!Uint8Array|!Array<number>} buffer The output buffer.
+ * @param {number=} index The buffer index to write.
+ * @return {number} The next index to write.
+ * @throws {Error} If the type definition is not valid.
+ * @throws {Error} If the value is not valid.
+ */
+function packArrayTo(values, theType, buffer, index=0) {
+  setUp_(theType);
+  let be = theType.be;
+  let offset = theType.offset;
+  let len = values.length;
+  for (let i=0; i<len; i++) {
+    index = writeBytes_(
+      values[i],
+      theType,
+      buffer,
+      index,
+      index + offset,
+      validateNotUndefined,
+      be);
+  }
+  return index;
+}
+
+/**
+ * Unpack an array of numbers from a byte buffer.
+ * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Object} theType The type definition.
+ * @return {!Array<number>}
+ * @throws {Error} If the type definition is not valid.
+ */
+function unpackArray(buffer, theType) {
+  return unpackArrayFrom(buffer, theType);
+}
+
+/**
+ * Unpack a number from a byte buffer by index.
+ * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Object} theType The type definition.
+ * @param {number=} index The buffer index to read.
+ * @return {number}
+ * @throws {Error} If the type definition is not valid
+ */
+function unpackFrom(buffer, theType, index=0) {
+  setUp_(theType);
+  if (theType.be) {
+    endianness(buffer, theType.offset, index, index + theType.offset);
+  }
+  let value = reader_(buffer, index);
+  if (theType.be) {
+    endianness(buffer, theType.offset, index, index + theType.offset);
+  }
+  return value;
+}
+
+/**
+ * Unpack a array of numbers from a byte buffer by index.
+ * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Object} theType The type definition.
+ * @param {number=} index The start index. Assumes 0.
+ * @param {?number=} end The end index. Assumes the buffer length.
+ * @return {!Array<number>}
+ * @throws {Error} If the type definition is not valid
+ */
+function unpackArrayFrom(buffer, theType, index=0, end=null) {
+  setUp_(theType);
+  if (theType.be) {
+    endianness(buffer, theType.offset);
+  }
+  let len = end || buffer.length;
+  while ((len - index) % theType.offset) {
+    len--;
+  }
+  let values = [];
+  let step = theType.offset;
+  while (index < len) {
+    values.push(reader_(buffer, index));
+    index += step;
+  }
+  if (theType.be) {
+    endianness(buffer, theType.offset);
+  }
+  return values;
+}
+
+/**
+ * Unpack a array of numbers to a typed array.
+ * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Object} theType The type definition.
+ * @param {!TypedArray} output The output array.
+ * @param {number=} index The start index. Assumes 0.
+ * @param {?number=} end The end index. Assumes the buffer length.
+ * @throws {Error} If the type definition is not valid
+ */
+function unpackArrayTo(buffer, theType, output, index=0, end=null) {
+  setUp_(theType);
+  if (theType.be) {
+    endianness(buffer, theType.offset);
+  }
+  let len = end || buffer.length;
+  while ((len - index) % theType.offset) {
+    len--;
+  }
+  let outputIndex = 0;
+  let step = theType.offset;
+  while (index < len) {
+    output.set([reader_(buffer, index)], outputIndex);
+    outputIndex++;
+    index += step;
+  }
+  if (theType.be) {
+    endianness(buffer, theType.offset);
+  }
 }
 
 /*

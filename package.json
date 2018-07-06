@@ -52,10 +52,10 @@
   "scripts": {
     "lint": "jshint index.js externs.js cli.js",
     "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=240000",
-    "test-esm": "nyc ./node_modules/mocha/bin/_mocha test --esm --require=esm --recursive -R dot --timeout=240000",
-    "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R dot --timeout=240000",
-    "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R dot --timeout=240000",
-    "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot --timeout=240000",
+    "test-esm": "nyc ./node_modules/mocha/bin/_mocha test/dist --esm --require=esm --recursive -R dot --timeout=240000",
+    "test-min": "node ./node_modules/mocha/bin/_mocha test/dist --min --recursive -R dot --timeout=240000",
+    "test-cjs": "node ./node_modules/mocha/bin/_mocha test/dist --cjs --recursive -R dot --timeout=240000",
+    "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist --umd --recursive -R dot --timeout=240000",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-min && npm run test-esm && npm run test-cjs && npm run test-umd && npm run test-cli",
     "bundle": "rollup --config && npm run test-dist && npm run test",
@@ -84,7 +84,7 @@
     "alawmulaw": "^5.0.0",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.0",
-    "byte-data": "^13.1.0",
+    "byte-data": "^13.2.1",
     "imaadpcm": "^4.0.1",
     "riff-chunks": "^8.0.2"
   }

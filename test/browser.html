@@ -1,0 +1,44 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>WaveFile: browser tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/mocha@4.0.1/mocha.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+</head>
+<body>
+
+	<div class="container">
+		<h1>wavefile</h1>
+		<p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>
+			https://github.com/rochars/wavefile</p>
+		<p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rochars.github.io/wavefile/example"><img src="https://img.shields.io/badge/example-online-blue.svg?style=for-the-badge" alt="Example"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
+
+		<p>The tests in the browser run against <strong>./dist/wavefile.umd.js</strong>.</p>
+		<p>The original WaveFile tests need to read and write files to disk; those are not loaded here.</p>
+		<p>To run all the tests, <em>git clone https://github.com/rochars/wavefile</em>, <em>npm install</em> it and <em>npm test</em> it.
+	</div>
+
+	<!-- Load Mocha -->
+	<div class="container">
+		<div id="mocha"></div>
+	</div>
+
+	<script src="https://unpkg.com/chai@4.1.2/chai.js"></script>
+	<script src="https://unpkg.com/mocha@4.0.1/mocha.js"></script>
+	<script>mocha.setup('bdd')</script>
+
+	<!-- Load browser dist -->
+	<script src="../dist/wavefile.umd.js"></script>
+
+	<!-- Load the tests -->
+	<script src="src/interface.js"></script>
+
+	<!-- Run the tests -->
+	<script>
+	    mocha.checkLeaks();
+	    mocha.run();
+	</script>
+
+</body>
+</html>
