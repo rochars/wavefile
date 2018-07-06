@@ -10,7 +10,7 @@ https://github.com/rochars/wavefile
 - **Use it out of the box in the browser**
 - **Use it out of the box in Node**
 - **Use it out of the box with TypeScript**
-- **Handle wave files up to 2GB**
+- **Handle files up to 2GB**
 - **Use it as a command line tool**
 - Create wave files from scratch
 - Read and write tags on .wav files
@@ -564,31 +564,31 @@ WaveFile.format = '';
  * @type {!Object<string, *>}
  */
 WaveFile.fmt = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     audioFormat: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     numChannels: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     sampleRate: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     byteRate: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     blockAlign: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     bitsPerSample: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     cbSize: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     validBitsPerSample: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwChannelMask: 0,
     /**
      * 4 32-bit values representing a 128-bit ID
-     * @export @type {!Array<number>}
+     * @type {!Array<number>}
      */
     subformat: []
 };
@@ -597,11 +597,11 @@ WaveFile.fmt = {
  * @type {!Object<string, *>}
  */
 WaveFile.fact = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwSampleLength: 0
 };
 /**
@@ -609,13 +609,13 @@ WaveFile.fact = {
  * @type {!Object<string, *>}
  */
 WaveFile.cue = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwCuePoints: 0,
-    /** @export @type {!Array<!Object>} */
+    /** @type {!Array<!Object>} */
     points: [],
 };
 /**
@@ -623,29 +623,29 @@ WaveFile.cue = {
  * @type {!Object<string, *>}
  */
 WaveFile.smpl = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwManufacturer: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwProduct: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwSamplePeriod: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwMIDIUnityNote: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwMIDIPitchFraction: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwSMPTEFormat: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwSMPTEOffset: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwNumSampleLoops: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     dwSamplerData: 0,
-    /** @export @type {!Array<!Object>} */
+    /** @type {!Array<!Object>} */
     loops: [],
 };
 /**
@@ -653,42 +653,42 @@ WaveFile.smpl = {
  * @type {!Object<string, *>}
  */
 WaveFile.bext = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {string} */
+    /** @type {string} */
     description: '', //256
-    /** @export @type {string} */
+    /** @type {string} */
     originator: '', //32
-    /** @export @type {string} */
+    /** @type {string} */
     originatorReference: '', //32
-    /** @export @type {string} */
+    /** @type {string} */
     originationDate: '', //10
-    /** @export @type {string} */
+    /** @type {string} */
     originationTime: '', //8
     /**
      * 2 32-bit values, timeReference high and low
-     * @export @type {!Array<number>}
+     * @type {!Array<number>}
      */
     timeReference: [0, 0],
-    /** @export @type {number} */
+    /** @type {number} */
     version: 0, //WORD
-    /** @export @type {string} */
+    /** @type {string} */
     UMID: '', // 64 chars
-    /** @export @type {number} */
+    /** @type {number} */
     loudnessValue: 0, //WORD
-    /** @export @type {number} */
+    /** @type {number} */
     loudnessRange: 0, //WORD
-    /** @export @type {number} */
+    /** @type {number} */
     maxTruePeakLevel: 0, //WORD
-    /** @export @type {number} */
+    /** @type {number} */
     maxMomentaryLoudness: 0, //WORD
-    /** @export @type {number} */
+    /** @type {number} */
     maxShortTermLoudness: 0, //WORD
-    /** @export @type {string} */
+    /** @type {string} */
     reserved: '', //180
-    /** @export @type {string} */
+    /** @type {string} */
     codingHistory: '' // string, unlimited
 };
 /**
@@ -699,25 +699,25 @@ WaveFile.bext = {
 WaveFile.ds64 = {
     /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {number} */
+    /** @type {number} */
     riffSizeHigh: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     riffSizeLow: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     dataSizeHigh: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     dataSizeLow: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     originationTime: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     sampleCountHigh: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     sampleCountLow: 0, // DWORD
-    /** @export @type {number} */
+    /** @type {number} */
     //"tableLength": 0, // DWORD
-    /** @export @type {!Array<number>} */
+    /** @type {!Array<number>} */
     //"table": []
 };
 /**
@@ -725,11 +725,11 @@ WaveFile.ds64 = {
  * @type {!Object<string, *>}
  */
 WaveFile.data = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {!Uint8Array} */
+    /** @type {!Uint8Array} */
     samples: new Uint8Array(0)
 };
 /**
@@ -749,11 +749,11 @@ WaveFile.LIST = [];
  * @type {!Object<string, *>}
  */
 WaveFile.junk = {
-    /** @export @type {string} */
+    /** @type {string} */
     chunkId: '',
-    /** @export @type {number} */
+    /** @type {number} */
     chunkSize: 0,
-    /** @export @type {!Array<number>} */
+    /** @type {!Array<number>} */
     chunkData: []
 };
 /**
