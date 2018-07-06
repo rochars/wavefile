@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.1.2 (2018-07-06)
+- Fix: update bext.chunkSize on object after toBuffer() is called.
+
 ## version 8.1.1 (2018-07-04)
 - Fix documentation issues.
 

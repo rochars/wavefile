@@ -3527,6 +3527,7 @@ class WaveFile {
     let bytes = [];
     this.enforceBext_();
     if (this.bext.chunkId) {
+      this.bext.chunkSize = 602 + this.bext.codingHistory.length;
       bytes = bytes.concat(
         packString(this.bext.chunkId),
         pack(602 + this.bext.codingHistory.length, this.uInt32_),

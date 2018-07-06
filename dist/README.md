@@ -1,9 +1,11 @@
 # Distribution
-This library is a ES module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with ```npm install wavefile```.
+This library is a ES module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with ```npm install wavefile```. It includes a TypeScript definition file.
+
+If you use the [Closure Compiler](https://github.com/google/closure-compiler), this package includes a externs file: **./externs.js**.
 
 ## If you are using this lib in a browser:
 
-You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser with ```<script>``` tags. Ideally you should use **wavefile.min.js**. You can load it via the https://unpkg.com and https://www.jsdelivr.com/ CDNs:
+You may load both **./dist/wavefile.umd.js** and **./dist/wavefile.min.js** in the browser with ```<script>``` tags. Ideally you should use **wavefile.min.js**. You can load it via the https://unpkg.com and https://www.jsdelivr.com/ CDNs:
 
 [unpkg](https://unpkg.com/wavefile):
 ```html
@@ -17,15 +19,15 @@ You may load both **wavefile.umd.js** and **wavefile.min.js** in the browser wit
 
 ## If you are using this lib as a dependency:
 
-- The **CommonJS** is the dist file used by Node. It is served in the "main" field of package.json. It includes all the sources but no dependencies. Dependencies will be imported from the **node_modules** folder. This is the source you are running when you **npm install wavefile**.
+- The **CommonJS** is the dist file used by Node. It is served in the "main" field of package.json. This is the source you are running when you **npm install wavefile**.
 
-- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field of package.json. It includes all dependencies. This file is not compiled/minified as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.
+- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field of package.json. This file is not compiled/minified as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.
 
-- The **compiled dist** is browser-only and should be the one served by CDNs. It includes all the dependencies. It is used in the "unpkg" and "jsdelivr" fields of package.json.
+- The **compiled dist** is browser-only and should be the one served by CDNs. It is used in the "unpkg" and "jsdelivr" fields of package.json.
 
-- The **ES6 dist** is **wavefile.js**, served as "es2015" in package.json. It includes all the dependencies. It is not compiled/minified.
+- The **ES6 dist** is **./dist/wavefile.js**, served as "es2015" in package.json. It is not compiled/minified.
 
-- **./index.js** is served as "module" in package.json. It should be used by systems that support ES modules and are aware of Node's module path resolution (a module bundler, for instance). This should be the entry point for bundlers in most cases - this will avoid code duplication in the case of shared dependencies (as opposed to using "browser" as the entry point).
+- **./index.js** is served as "module" in package.json. This should be the entry point for bundlers.
 
 If your module bundler is using "browser" as the entry point **your dist should work the same** but will be a larger file.
 

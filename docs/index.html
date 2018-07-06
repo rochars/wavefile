@@ -48,7 +48,7 @@
     <section class="readme">
         <article><h1>wavefile</h1><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>https://github.com/rochars/wavefile</p>
 <p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rawgit.com/rochars/wavefile/master/test/browser.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
-<p><strong>wavefile</strong> is a JavaScript module to work with .wav files.</p>
+<p><strong>wavefile</strong> is a JavaScript module to create, read and write wave files.</p>
 <ul>
 <li><strong>Use it out of the box in the browser</strong></li>
 <li><strong>Use it out of the box in Node</strong></li>
@@ -676,20 +676,21 @@ Range:</p>
 <li>-1.0 to 1.0 for 32-bit (float)</li>
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
-<h2>Distribution</h2><p>This library is a ES module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with <code>npm install wavefile</code>.</p>
-<h3>If you are using this lib in a browser:</h3><p>You may load both <strong>wavefile.umd.js</strong> and <strong>wavefile.min.js</strong> in the browser with <code>&lt;script&gt;</code> tags. Ideally you should use <strong>wavefile.min.js</strong>. You can load it via the https://unpkg.com and https://<a href="http://www.jsdelivr.com/">www.jsdelivr.com/</a> CDNs:</p>
+<h2>Distribution</h2><p>This library is a ES module also distributed as a CommonJS module, UMD module and a compiled script for browsers. It works out of the box in Node when installed with <code>npm install wavefile</code>. It includes a TypeScript definition file.</p>
+<p>If you use the <a href="https://github.com/google/closure-compiler">Closure Compiler</a>, this package includes a externs file: <strong>./externs.js</strong>.</p>
+<h3>If you are using this lib in a browser:</h3><p>You may load both <strong>./dist/wavefile.umd.js</strong> and <strong>./dist/wavefile.min.js</strong> in the browser with <code>&lt;script&gt;</code> tags. Ideally you should use <strong>wavefile.min.js</strong>. You can load it via the https://unpkg.com and https://<a href="http://www.jsdelivr.com/">www.jsdelivr.com/</a> CDNs:</p>
 <p><a href="https://unpkg.com/wavefile">unpkg</a>:</p>
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/wavefile&quot;>&lt;/script></code></pre><p><a href="https://cdn.jsdelivr.net/npm/wavefile">jsDelivr</a>:</p>
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile&quot;>&lt;/script></code></pre><h3>If you are using this lib as a dependency:</h3><ul>
-<li><p>The <strong>CommonJS</strong> is the dist file used by Node. It is served in the &quot;main&quot; field of package.json. It includes all the sources but no dependencies. Dependencies will be imported from the <strong>node_modules</strong> folder. This is the source you are running when you <strong>npm install wavefile</strong>.</p>
+<li><p>The <strong>CommonJS</strong> is the dist file used by Node. It is served in the &quot;main&quot; field of package.json. This is the source you are running when you <strong>npm install wavefile</strong>.</p>
 </li>
-<li><p>The <strong>UMD</strong> module is compatible with Node, AMD and browsers. It is served in the &quot;browser&quot; field of package.json. It includes all dependencies. This file is not compiled/minified as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.</p>
+<li><p>The <strong>UMD</strong> module is compatible with Node, AMD and browsers. It is served in the &quot;browser&quot; field of package.json. This file is not compiled/minified as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.</p>
 </li>
-<li><p>The <strong>compiled dist</strong> is browser-only and should be the one served by CDNs. It includes all the dependencies. It is used in the &quot;unpkg&quot; and &quot;jsdelivr&quot; fields of package.json.</p>
+<li><p>The <strong>compiled dist</strong> is browser-only and should be the one served by CDNs. It is used in the &quot;unpkg&quot; and &quot;jsdelivr&quot; fields of package.json.</p>
 </li>
-<li><p>The <strong>ES6 dist</strong> is <strong>wavefile.js</strong>, served as &quot;es2015&quot; in package.json. It includes all the dependencies. It is not compiled/minified.</p>
+<li><p>The <strong>ES6 dist</strong> is <strong>./dist/wavefile.js</strong>, served as &quot;es2015&quot; in package.json. It is not compiled/minified.</p>
 </li>
-<li><p><strong>./index.js</strong> is served as &quot;module&quot; in package.json. It should be used by systems that support ES modules and are aware of Node's module path resolution (a module bundler, for instance). This should be the entry point for bundlers in most cases - this will avoid code duplication in the case of shared dependencies (as opposed to using &quot;browser&quot; as the entry point).</p>
+<li><p><strong>./index.js</strong> is served as &quot;module&quot; in package.json. This should be the entry point for bundlers.</p>
 </li>
 </ul>
 <p>If your module bundler is using &quot;browser&quot; as the entry point <strong>your dist should work the same</strong> but will be a larger file.</p>
@@ -831,7 +832,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 06 2018 06:05:39 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 06 2018 07:01:16 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
