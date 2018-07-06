@@ -8,7 +8,6 @@
 
 var chai = chai || require('chai');
 var WaveFile = WaveFile || require('../loader.js');
-
 var assert = chai.assert;
 
 describe('API properties', function() {
