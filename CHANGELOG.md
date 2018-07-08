@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 8.1.3 (2018-07-06)
+## version 8.1.3 (2018-07-08)
 - Fix: UMD dist transpiled to ES5.
 
 ## version 8.1.2 (2018-07-06)
