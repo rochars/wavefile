@@ -16,7 +16,7 @@ const fs = require('fs');
 let externsSrc = fs.readFileSync('./externs.js', 'utf8');
 externsSrc += 'WaveFile.getLISTBytes_ = function() {};'
 
-// License notes for bundles that include dependencies
+// License notes
 const license = '/*!\n'+
   ' * wavefile\n'+
   ' *   Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.\n'+
@@ -25,6 +25,14 @@ const license = '/*!\n'+
   ' * imaadpcm\n' +
   ' *   Copyright (c) 2016 acida, 2018 Rafael da Silva Rocha. MIT License.\n' +
   ' */\n';
+
+let UMDBanner = "(function (global, factory) {" +
+  "typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :" +
+  "typeof define === 'function' && define.amd ? define(factory) :" +
+  "(global.WaveFile = factory());" +
+  "}(this, (function () { 'use strict';"
+
+let UMDFooter = 'return WaveFile; })));';
 
 export default [
   // cjs
@@ -36,21 +44,6 @@ export default [
         name: 'wavefile',
         footer: 'module.exports.default = WaveFile;',
         format: 'cjs'
-      }
-    ],
-    plugins: [
-      nodeResolve(),
-      commonjs()
-    ]
-  },
-  // umd, es
-  {
-    input: 'index.js',
-    output: [
-      {
-        file: 'dist/wavefile.umd.js',
-        name: 'WaveFile',
-        format: 'umd'
       },
       {
         file: 'dist/wavefile.js',
@@ -60,6 +53,30 @@ export default [
     plugins: [
       nodeResolve(),
       commonjs()
+    ]
+  },
+  // umd
+  {
+    input: 'index.js',
+    output: [
+      {
+        file: 'dist/wavefile.umd.js',
+        name: 'WaveFile',
+        format: 'iife',
+      }
+    ],
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      closure({
+        languageIn: 'ECMASCRIPT6',
+        languageOut: 'ECMASCRIPT5',
+        compilationLevel: 'WHITESPACE_ONLY',
+        warningLevel: 'VERBOSE',
+        preserveTypeAnnotations: true,
+        createSourceMap: false,
+        outputWrapper: UMDBanner + '%output%' + UMDFooter
+      })
     ]
   },
   // browser

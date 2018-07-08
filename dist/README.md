@@ -19,11 +19,11 @@ You may load both **./dist/wavefile.umd.js** and **./dist/wavefile.min.js** in t
 
 ## If you are using this lib as a dependency:
 
-- The **CommonJS** is the dist file used by Node. It is served in the "main" field of package.json. This is the source you are running when you **npm install wavefile**.
+- The **CommonJS** dist is **./dist/wavefile.cjs.js**. It is the dist file used by Node. It is served in the "main" field of package.json and is the source you are running when you **npm install wavefile**. It is not compiled or minified.
 
-- The **UMD** module is compatible with Node, AMD and browsers. It is served in the "browser" field of package.json. This file is not compiled/minified as it may be used by module bundlers. Compilation/minification should be up to the bundler consuming this file.
+- The **UMD** module is **./dist/wavefile.umd.js**. It is transpiled to ES5 and compatible with Node, AMD and browsers. It is served in the "browser" field of package.json.
 
-- The **compiled dist** is browser-only and should be the one served by CDNs. It is used in the "unpkg" and "jsdelivr" fields of package.json.
+- The **browser-only** dist is **./dist/wavefile.min.js**. It is transpiled to ES5 and compiled. It is used in the "unpkg" and "jsdelivr" fields of package.json.
 
 - The **ES6 dist** is **./dist/wavefile.js**, served as "es2015" in package.json. It is not compiled/minified.
 

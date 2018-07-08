@@ -610,6 +610,14 @@ function validateIntType_(theType) {
  */
 
 /**
+ * Use a Typed Array to check if the host is BE or LE. This will impact
+ * on how 64-bit floating point numbers are handled.
+ * @type {boolean}
+ * @private
+ */
+let HOST_BE_ = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+
+/**
  * @type {!Int8Array}
  * @private
  */
@@ -739,8 +747,13 @@ function read32F_(bytes, i) {
  * @private
  */
 function read64F_(bytes, i) {
-  ui32_[0] = gInt_.read(bytes, i);
-  ui32_[1] = gInt_.read(bytes, i + 4);
+  if (HOST_BE_) {
+    ui32_[1] = gInt_.read(bytes, i);
+    ui32_[0] = gInt_.read(bytes, i + 4);
+  } else {
+    ui32_[0] = gInt_.read(bytes, i);
+    ui32_[1] = gInt_.read(bytes, i + 4);
+  }
   return f64_[0];
 }
 
@@ -802,8 +815,14 @@ function write32F_(bytes, number, j) {
  */
 function write64F_(bytes, number, j) {
   f64_[0] = number;
-  j = gInt_.write(bytes, ui32_[0], j);
-  return gInt_.write(bytes, ui32_[1], j);
+  if (HOST_BE_) {
+    j = gInt_.write(bytes, ui32_[1], j);
+    j = gInt_.write(bytes, ui32_[0], j);
+  } else {
+    j = gInt_.write(bytes, ui32_[0], j);
+    j = gInt_.write(bytes, ui32_[1], j);
+  }
+  return j;
 }
 
 /**
@@ -1680,6 +1699,37 @@ function decode$1(samples) {
  * @private
  */
 const BIAS = 0x84;
+/**
+ * @type {number}
+ * @private
+ */
+const CLIP = 32635;
+/**
+ * @type {Array<number>}
+ * @private
+ */
+const encodeTable = [
+    0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,
+    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7];
+/**
+ * @type {Array<number>}
+ * @private
+ */
+const decodeTable = [0,132,396,924,1980,4092,8316,16764];
 
 /**
  * Encode a 16-bit linear PCM sample as 8-bit mu-Law.
@@ -1688,21 +1738,24 @@ const BIAS = 0x84;
  */
 function encodeSample$1(sample) {
   /** @type {number} */
-  let mask = 0xFF;
-  if (sample < 0) {
-    sample = BIAS - sample;
-    mask = 0x7F;
-  } else {
-    sample += BIAS;
-  }
-  if (sample > 0x7FFF) {
-    sample = 0x7FFF;
-  }
+  let sign;
   /** @type {number} */
-  let seg = segmentValue_(sample);
+  let exponent;
   /** @type {number} */
-  let uval = (seg << 4) | ((sample >> (seg + 3)) & 0xF);
-  return uval ^ mask;
+  let mantissa;
+  /** @type {number} */
+  let muLawSample;
+  /** get the sample into sign-magnitude **/
+  sign = (sample >> 8) & 0x80;
+  if (sign != 0) sample = -sample;
+  if (sample > CLIP) sample = CLIP;
+  /** convert from 16 bit linear to ulaw **/
+  sample = sample + BIAS;
+  exponent = encodeTable[(sample>>7) & 0xFF];
+  mantissa = (sample >> (exponent+3)) & 0x0F;
+  muLawSample = ~(sign | (exponent << 4) | mantissa);
+  /** return the result **/
+  return muLawSample;
 }
 
 /**
@@ -1711,11 +1764,21 @@ function encodeSample$1(sample) {
  * @return {number}
  */
 function decodeSample$1(muLawSample) {
-  muLawSample = ~muLawSample;
   /** @type {number} */
-  let t = ((muLawSample & 0xf) << 3) + BIAS;
-  t <<= (muLawSample & 0x70) >> 4;
-  return ((muLawSample & 0x80) ? (BIAS - t) : (t - BIAS));
+  let sign;
+  /** @type {number} */
+  let exponent;
+  /** @type {number} */
+  let mantissa;
+  /** @type {number} */
+  let sample;
+  muLawSample = ~muLawSample;
+  sign = (muLawSample & 0x80);
+  exponent = (muLawSample >> 4) & 0x07;
+  mantissa = muLawSample & 0x0F;
+  sample = decodeTable[exponent] + (mantissa << (exponent+3));
+  if (sign != 0) sample = -sample;
+  return sample;
 }
 
 /**
@@ -1744,30 +1807,6 @@ function decode$2(samples) {
     pcmSamples[i] = decodeSample$1(samples[i]);
   }
   return pcmSamples;
-}
-
-/**
- * Return the segment value of a PCM sample.
- * @param {number} sample
- * @return {number}
- * @private
- */
-function segmentValue_(sample) {
-  /** @type {number} */
-  let segment = 0;
-  sample >>= 7;
-  if (sample & 0xf0) {
-    sample >>= 4;
-    segment += 4;
-  }
-  if (sample & 0x0c) {
-    sample >>= 2;
-    segment += 2;
-  }
-  if (sample & 0x02) {
-    segment += 1;
-  }
-  return segment;
 }
 
 /*
