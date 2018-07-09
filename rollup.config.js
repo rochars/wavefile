@@ -10,6 +10,7 @@
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import closure from 'rollup-plugin-closure-compiler-js';
+import babel from 'rollup-plugin-babel';
 
 // Read externs definitions
 const fs = require('fs');
@@ -26,7 +27,7 @@ const license = '/*!\n'+
   ' *   Copyright (c) 2016 acida, 2018 Rafael da Silva Rocha. MIT License.\n' +
   ' */\n';
 
-let UMDBanner = "(function (global, factory) {" +
+let UMDBanner = "var WaveFile = (function (global, factory) {" +
   "typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :" +
   "typeof define === 'function' && define.amd ? define(factory) :" +
   "(global.WaveFile = factory());" +
@@ -62,21 +63,23 @@ export default [
       {
         file: 'dist/wavefile.umd.js',
         name: 'WaveFile',
-        format: 'iife',
+        format: 'umd',
       }
     ],
     plugins: [
       nodeResolve(),
       commonjs(),
-      closure({
+      babel()
+      /*closure({
         languageIn: 'ECMASCRIPT6',
         languageOut: 'ECMASCRIPT5',
-        compilationLevel: 'WHITESPACE_ONLY',
+        compilationLevel: 'SIMPLE',
         warningLevel: 'VERBOSE',
         preserveTypeAnnotations: true,
         createSourceMap: false,
         outputWrapper: UMDBanner + '%output%' + UMDFooter
-      })
+
+      })*/
     ]
   },
   // browser

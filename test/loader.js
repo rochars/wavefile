@@ -26,6 +26,9 @@ if (process.argv[3] == '--min') {
 } else if (process.argv[3] == '--umd') {
 	console.log('umd tests');
 	wavefile = require('../dist/wavefile.umd.js');
+	if (wavefile.toString().slice(0, 5) === "class") {
+		throw new Error('WaveFile in UMD dist should not be a ES6 class.');
+	}
 
 // CommonJS
 } else if (process.argv[3] == '--cjs') {
@@ -33,7 +36,7 @@ if (process.argv[3] == '--min') {
 	wavefile = require('../dist/wavefile.cjs.js');
 	wavefileDefault = require('../dist/wavefile.cjs.js').default;
 	if (wavefile != wavefileDefault) {
-		throw('CommonJS dist should export as default and as .default.');
+		throw new Error('CommonJS dist should export as default and as .default.');
 	}
 
 // ESM
