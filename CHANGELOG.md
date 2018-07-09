@@ -2,6 +2,7 @@
 
 ## version 8.1.3 (2018-07-08)
 - Fix: UMD dist transpiled to ES5.
+- Use updated alawmulaw module to avoid license issues
 
 ## version 8.1.2 (2018-07-06)
 - Fix: update bext.chunkSize on object after toBuffer() is called.
