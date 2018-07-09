@@ -701,7 +701,7 @@ export default class WaveFile {
     this.cue.points = [];
     /** @type {boolean} */
     let hasSet = false;
-    if (len == 0) {
+    if (len === 0) {
       this.setCuePoint_(position, 1, labl);
     } else {
       for (let i=0; i<len; i++) {
@@ -1032,19 +1032,19 @@ export default class WaveFile {
     /** @type {number} */
     let dwChannelMask = 0;
     // mono = FC
-    if (this.fmt.numChannels == 1) {
+    if (this.fmt.numChannels === 1) {
       dwChannelMask = 0x4;
     // stereo = FL, FR
-    } else if (this.fmt.numChannels == 2) {
+    } else if (this.fmt.numChannels === 2) {
       dwChannelMask = 0x3;
     // quad = FL, FR, BL, BR
-    } else if (this.fmt.numChannels == 4) {
+    } else if (this.fmt.numChannels === 4) {
       dwChannelMask = 0x33;
     // 5.1 = FL, FR, FC, LF, BL, BR
-    } else if (this.fmt.numChannels == 6) {
+    } else if (this.fmt.numChannels === 6) {
       dwChannelMask = 0x3F;
     // 7.1 = FL, FR, FC, LF, BL, BR, SL, SR
-    } else if (this.fmt.numChannels == 8) {
+    } else if (this.fmt.numChannels === 8) {
       dwChannelMask = 0x63F;
     }
     return dwChannelMask;
@@ -1652,7 +1652,7 @@ export default class WaveFile {
    * @private
    */
   truncateSamples(samples) {
-    if (this.fmt.audioFormat == 3) {
+    if (this.fmt.audioFormat === 3) {
       /** @type {number} */   
       let len = samples.length;
       for (let i=0; i<len; i++) {
@@ -2019,11 +2019,11 @@ export default class WaveFile {
    * @private
    */
   bitDepthFromFmt_() {
-    if (this.fmt.audioFormat == 3 && this.fmt.bitsPerSample == 32) {
+    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
       this.bitDepth = '32f';
-    } else if (this.fmt.audioFormat == 6) {
+    } else if (this.fmt.audioFormat === 6) {
       this.bitDepth = '8a';
-    } else if (this.fmt.audioFormat == 7) {
+    } else if (this.fmt.audioFormat === 7) {
       this.bitDepth = '8m';
     } else {
       this.bitDepth = this.fmt.bitsPerSample.toString();

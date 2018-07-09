@@ -469,7 +469,7 @@ WaveFile.prototype.deleteTag=function(tag){/** @type {!Object} */ var index=this
  @param {number} position
  @param {string} labl
  */
-WaveFile.prototype.setCuePoint=function(position,labl){labl=labl===undefined?"":labl;this.cue.chunkId="cue ";position=position*this.fmt.sampleRate/1E3;/** @type {!Array<!Object>} */ var existingPoints=this.getCuePoints_();this.clearLISTadtl_();/** @type {number} */ var len=this.cue.points.length;this.cue.points=[];/** @type {boolean} */ var hasSet=false;if(len==0)this.setCuePoint_(position,1,labl);else{for(var i$4=0;i$4<len;i$4++)if(existingPoints[i$4].dwPosition>position&&!hasSet){this.setCuePoint_(position,
+WaveFile.prototype.setCuePoint=function(position,labl){labl=labl===undefined?"":labl;this.cue.chunkId="cue ";position=position*this.fmt.sampleRate/1E3;/** @type {!Array<!Object>} */ var existingPoints=this.getCuePoints_();this.clearLISTadtl_();/** @type {number} */ var len=this.cue.points.length;this.cue.points=[];/** @type {boolean} */ var hasSet=false;if(len===0)this.setCuePoint_(position,1,labl);else{for(var i$4=0;i$4<len;i$4++)if(existingPoints[i$4].dwPosition>position&&!hasSet){this.setCuePoint_(position,
 i$4+1,labl);this.setCuePoint_(existingPoints[i$4].dwPosition,i$4+2,existingPoints[i$4].label);hasSet=true}else this.setCuePoint_(existingPoints[i$4].dwPosition,i$4+1,existingPoints[i$4].label);if(!hasSet)this.setCuePoint_(position,this.cue.points.length+1,labl)}this.cue.dwCuePoints=this.cue.points.length};/**
  @param {number} index
  */
@@ -543,7 +543,7 @@ WaveFile.prototype.createExtensibleHeader_=function(bitDepthCode,numChannels,sam
  @private
  @return {number}
  */
-WaveFile.prototype.getDwChannelMask_=function(){/** @type {number} */ var dwChannelMask=0;if(this.fmt.numChannels==1)dwChannelMask=4;else if(this.fmt.numChannels==2)dwChannelMask=3;else if(this.fmt.numChannels==4)dwChannelMask=51;else if(this.fmt.numChannels==6)dwChannelMask=63;else if(this.fmt.numChannels==8)dwChannelMask=1599;return dwChannelMask};/**
+WaveFile.prototype.getDwChannelMask_=function(){/** @type {number} */ var dwChannelMask=0;if(this.fmt.numChannels===1)dwChannelMask=4;else if(this.fmt.numChannels===2)dwChannelMask=3;else if(this.fmt.numChannels===4)dwChannelMask=51;else if(this.fmt.numChannels===6)dwChannelMask=63;else if(this.fmt.numChannels===8)dwChannelMask=1599;return dwChannelMask};/**
  @private
  @param {string} bitDepthCode
  @param {number} numChannels
@@ -687,7 +687,7 @@ WaveFile.prototype.read_=function(bytes,bdType){/** @type {number} */ var size=b
  @param {number} maxSize
  @return {!Array<number>}
  */
-WaveFile.prototype.writeString_=function(str,maxSize,push){push=push===undefined?true:push;/** @type {!Array<number>} */ var bytes=packString(str);if(push)for(var i$19=bytes.length;i$19<maxSize;i$19++)bytes.push(0);return bytes};/** @private */ WaveFile.prototype.truncateSamples=function(samples){if(this.fmt.audioFormat==3){/** @type {number} */ var len=samples.length;for(var i$20=0;i$20<len;i$20++)if(samples[i$20]>1)samples[i$20]=1;else if(samples[i$20]<-1)samples[i$20]=-1}};/**
+WaveFile.prototype.writeString_=function(str,maxSize,push){push=push===undefined?true:push;/** @type {!Array<number>} */ var bytes=packString(str);if(push)for(var i$19=bytes.length;i$19<maxSize;i$19++)bytes.push(0);return bytes};/** @private */ WaveFile.prototype.truncateSamples=function(samples){if(this.fmt.audioFormat===3){/** @type {number} */ var len=samples.length;for(var i$20=0;i$20<len;i$20++)if(samples[i$20]>1)samples[i$20]=1;else if(samples[i$20]<-1)samples[i$20]=-1}};/**
  @private
  @return {!Array<number>}
  */
@@ -753,7 +753,7 @@ WaveFile.prototype.getJunkBytes_=function(){/** @type {!Array<number>} */ var by
  @private
  @return {string}
  */
-WaveFile.prototype.correctContainer_=function(){return this.container=="RF64"?"RIFF":this.container};/** @private */ WaveFile.prototype.bitDepthFromFmt_=function(){if(this.fmt.audioFormat==3&&this.fmt.bitsPerSample==32)this.bitDepth="32f";else if(this.fmt.audioFormat==6)this.bitDepth="8a";else if(this.fmt.audioFormat==7)this.bitDepth="8m";else this.bitDepth=this.fmt.bitsPerSample.toString()};/**
+WaveFile.prototype.correctContainer_=function(){return this.container=="RF64"?"RIFF":this.container};/** @private */ WaveFile.prototype.bitDepthFromFmt_=function(){if(this.fmt.audioFormat===3&&this.fmt.bitsPerSample===32)this.bitDepth="32f";else if(this.fmt.audioFormat===6)this.bitDepth="8a";else if(this.fmt.audioFormat===7)this.bitDepth="8m";else this.bitDepth=this.fmt.bitsPerSample.toString()};/**
  @private
  @return {!Uint8Array}
  */
