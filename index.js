@@ -498,8 +498,6 @@ export default class WaveFile {
     this.assureUncompressed_();
     // @type {number}
     let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
-    // @type {number}
-    let toBitDepthNumber = parseInt(toBitDepth, 10);
     // @type {!Float64Array}
     let typedSamplesInput = new Float64Array(sampleCount + 1);
     // @type {!Float64Array}
