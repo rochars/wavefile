@@ -520,10 +520,10 @@ export default class WaveFile {
    * @throws {Error} If number of channels is not 1.
    */
   toIMAADPCM() {
-    if (this.fmt.sampleRate != 8000) {
+    if (this.fmt.sampleRate !== 8000) {
       throw new Error(
         'Only 8000 Hz files can be compressed as IMA-ADPCM.');
-    } else if(this.fmt.numChannels != 1) {
+    } else if(this.fmt.numChannels !== 1) {
       throw new Error(
         'Only mono files can be compressed as IMA-ADPCM.');
     } else {
@@ -740,7 +740,7 @@ export default class WaveFile {
     let len = this.cue.points.length;
     this.cue.points = [];
     for (let i=0; i<len; i++) {
-      if (i + 1 != index) {
+      if (i + 1 !== index) {
         this.setCuePoint_(
           existingPoints[i].dwPosition,
           i + 1,
