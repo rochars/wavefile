@@ -29,10 +29,10 @@
 
 /** @module wavefile */
 
-import bitDepthLib from 'bitdepth';
-import riffChunks from 'riff-chunks';
-import * as imaadpcm from 'imaadpcm';
-import * as alawmulaw from 'alawmulaw';
+import bitDepthLib from './lib/bitdepth.js';
+import riffChunks from './lib/riff-chunks.js';
+import * as imaadpcm from './lib/imaadpcm.js';
+import * as alawmulaw from './lib/alawmulaw.js';
 import {encode, decode} from 'base64-arraybuffer-es6';
 import {pack, unpackFrom, unpackString, packStringTo, packTo,
   packString, unpackArray, packArrayTo, unpackArrayTo} from 'byte-data';

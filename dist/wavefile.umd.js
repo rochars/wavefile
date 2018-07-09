@@ -263,7 +263,7 @@ function unpackFrom(buffer,theType,index){index=index===undefined?0:index;setUp_
  @return {!Array<number>}
  @throws {Error}
  */
-function unpackArrayFrom(buffer,theType,index,end){index=index===undefined?0:index;end=end===undefined?null:end;setUp_(theType);if(theType.be)endianness(buffer,theType.offset);var len=end||buffer.length;while((len-index)%theType.offset)len--;var values=[];var step=theType.offset;while(index<len){values.push(reader_(buffer,index));index+=step}if(theType.be)endianness(buffer,theType.offset);return values}/**
+function unpackArrayFrom(buffer,theType,index,end){index=index===undefined?0:index;end=end===undefined?null:end;setUp_(theType);var len=end||buffer.length;while((len-index)%theType.offset)len--;if(theType.be)endianness(buffer,theType.offset,index,len);var values=[];var step=theType.offset;for(var i=index;i<len;i+=step)values.push(reader_(buffer,i));if(theType.be)endianness(buffer,theType.offset,index,len);return values}/**
  @param {!Uint8Array} buffer
  @param {!Object} theType
  @param {!TypedArray} output
@@ -271,7 +271,7 @@ function unpackArrayFrom(buffer,theType,index,end){index=index===undefined?0:ind
  @param {?number=} end
  @throws {Error}
  */
-function unpackArrayTo(buffer,theType,output,index,end){index=index===undefined?0:index;end=end===undefined?null:end;setUp_(theType);if(theType.be)endianness(buffer,theType.offset);var len=end||buffer.length;while((len-index)%theType.offset)len--;var outputIndex=0;var step=theType.offset;while(index<len){output.set([reader_(buffer,index)],outputIndex);outputIndex++;index+=step}if(theType.be)endianness(buffer,theType.offset)}/** @private @const */ var uInt32_={bits:32};/** @type {number} */ var head_=
+function unpackArrayTo(buffer,theType,output,index,end){index=index===undefined?0:index;end=end===undefined?null:end;setUp_(theType);var len=end||buffer.length;while((len-index)%theType.offset)len--;if(theType.be)endianness(buffer,theType.offset,index,len);var outputIndex=0;var step=theType.offset;for(var i=index;i<len;i+=step){output.set([reader_(buffer,i)],outputIndex);outputIndex++}if(theType.be)endianness(buffer,theType.offset,index,len)}/** @private @const */ var uInt32_={bits:32};/** @type {number} */ var head_=
 0;/**
  @param {!Uint8Array} buffer
  @return {!Object}
@@ -364,8 +364,9 @@ function encode$1(samples){/** @type {!Uint8Array} */ var aLawSamples=new Uint8A
  @param {!Uint8Array} samples
  @return {!Int16Array}
  */
-function decode$1(samples){/** @type {!Int16Array} */ var pcmSamples=new Int16Array(samples.length);for(var i=0;i<samples.length;i++)pcmSamples[i]=decodeSample(samples[i]);return pcmSamples}/** @private @const @type {number} */ var BIAS=132;/** @private @const @type {number} */ var CLIP=32635;/** @private @const @type {Array<number>} */ var encodeTable=[0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,
-6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7];/** @private @const @type {Array<number>} */ var decodeTable=[0,132,396,924,1980,4092,8316,16764];/**
+function decode$1(samples){/** @type {!Int16Array} */ var pcmSamples=new Int16Array(samples.length);for(var i=0;i<samples.length;i++)pcmSamples[i]=decodeSample(samples[i]);return pcmSamples}var alaw=Object.freeze({encodeSample:encodeSample,decodeSample:decodeSample,encode:encode$1,decode:decode$1});/** @private @const @type {number} */ var BIAS=132;/** @private @const @type {number} */ var CLIP=32635;/** @private @const @type {Array<number>} */ var encodeTable=[0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,
+4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7];/** @private @const @type {Array<number>} */ var decodeTable=
+[0,132,396,924,1980,4092,8316,16764];/**
  @param {number} sample
  @return {number}
  */
@@ -377,14 +378,14 @@ function decodeSample$1(muLawSample){/** @type {number} */ var sign;/** @type {n
  @param {!Int16Array} samples
  @return {!Uint8Array}
  */
-function encode$2(samples){/** @type {!Uint8Array} */ var muLawSamples=new Uint8Array(samples.length);for(var i=0;i<samples.length;i++)muLawSamples[i]=encodeSample$1(samples[i]);return muLawSamples}/**
+function encode$1$1(samples){/** @type {!Uint8Array} */ var muLawSamples=new Uint8Array(samples.length);for(var i=0;i<samples.length;i++)muLawSamples[i]=encodeSample$1(samples[i]);return muLawSamples}/**
  @param {!Uint8Array} samples
  @return {!Int16Array}
  */
-function decode$2(samples){/** @type {!Int16Array} */ var pcmSamples=new Int16Array(samples.length);for(var i=0;i<samples.length;i++)pcmSamples[i]=decodeSample$1(samples[i]);return pcmSamples}/** @const */ var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";/** @const */ var lookup=new Uint8Array(256);for(var i=0;i<chars.length;i++)lookup[chars.charCodeAt(i)]=i;/** @const */ var encode$3=function(arraybuffer,byteOffset,length){/** @const */ var bytes=new Uint8Array(arraybuffer,
-byteOffset,length);/** @const */ var len=bytes.length;var base64="";for(var i$2=0;i$2<len;i$2+=3){base64+=chars[bytes[i$2]>>2];base64+=chars[(bytes[i$2]&3)<<4|bytes[i$2+1]>>4];base64+=chars[(bytes[i$2+1]&15)<<2|bytes[i$2+2]>>6];base64+=chars[bytes[i$2+2]&63]}if(len%3===2)base64=base64.substring(0,base64.length-1)+"\x3d";else if(len%3===1)base64=base64.substring(0,base64.length-2)+"\x3d\x3d";return base64};/** @const */ var decode$3=function(base64){/** @const */ var len=base64.length;var bufferLength=
-base64.length*.75;var p=0;var encoded1;var encoded2;var encoded3;var encoded4;if(base64[base64.length-1]==="\x3d"){bufferLength--;if(base64[base64.length-2]==="\x3d")bufferLength--}/** @const */ var arraybuffer=new ArrayBuffer(bufferLength);/** @const */ var bytes=new Uint8Array(arraybuffer);for(var i$3=0;i$3<len;i$3+=4){encoded1=lookup[base64.charCodeAt(i$3)];encoded2=lookup[base64.charCodeAt(i$3+1)];encoded3=lookup[base64.charCodeAt(i$3+2)];encoded4=lookup[base64.charCodeAt(i$3+3)];bytes[p++]=encoded1<<
-2|encoded2>>4;bytes[p++]=(encoded2&15)<<4|encoded3>>2;bytes[p++]=(encoded3&3)<<6|encoded4&63}return arraybuffer};/**
+function decode$1$1(samples){/** @type {!Int16Array} */ var pcmSamples=new Int16Array(samples.length);for(var i=0;i<samples.length;i++)pcmSamples[i]=decodeSample$1(samples[i]);return pcmSamples}var mulaw=Object.freeze({encodeSample:encodeSample$1,decodeSample:decodeSample$1,encode:encode$1$1,decode:decode$1$1});/** @const */ var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";/** @const */ var lookup=new Uint8Array(256);for(var i=0;i<chars.length;i++)lookup[chars.charCodeAt(i)]=
+i;/** @const */ var encode$2=function(arraybuffer,byteOffset,length){/** @const */ var bytes=new Uint8Array(arraybuffer,byteOffset,length);/** @const */ var len=bytes.length;var base64="";for(var i$2=0;i$2<len;i$2+=3){base64+=chars[bytes[i$2]>>2];base64+=chars[(bytes[i$2]&3)<<4|bytes[i$2+1]>>4];base64+=chars[(bytes[i$2+1]&15)<<2|bytes[i$2+2]>>6];base64+=chars[bytes[i$2+2]&63]}if(len%3===2)base64=base64.substring(0,base64.length-1)+"\x3d";else if(len%3===1)base64=base64.substring(0,base64.length-2)+
+"\x3d\x3d";return base64};/** @const */ var decode$2=function(base64){/** @const */ var len=base64.length;var bufferLength=base64.length*.75;var p=0;var encoded1;var encoded2;var encoded3;var encoded4;if(base64[base64.length-1]==="\x3d"){bufferLength--;if(base64[base64.length-2]==="\x3d")bufferLength--}/** @const */ var arraybuffer=new ArrayBuffer(bufferLength);/** @const */ var bytes=new Uint8Array(arraybuffer);for(var i$3=0;i$3<len;i$3+=4){encoded1=lookup[base64.charCodeAt(i$3)];encoded2=lookup[base64.charCodeAt(i$3+
+1)];encoded3=lookup[base64.charCodeAt(i$3+2)];encoded4=lookup[base64.charCodeAt(i$3+3)];bytes[p++]=encoded1<<2|encoded2>>4;bytes[p++]=(encoded2&15)<<4|encoded3>>2;bytes[p++]=(encoded3&3)<<6|encoded4&63}return arraybuffer};/**
  @struct
  @constructor
  @param {?Uint8Array} bytes
@@ -420,11 +421,11 @@ WaveFile.prototype.toBuffer=function(){this.validateHeader_();return this.create
  @param {string} base64String
  @throws {Error}
  */
-WaveFile.prototype.fromBase64=function(base64String){this.fromBuffer(new Uint8Array(decode$3(base64String)))};/**
+WaveFile.prototype.fromBase64=function(base64String){this.fromBuffer(new Uint8Array(decode$2(base64String)))};/**
  @return {string}
  @throws {Error}
  */
-WaveFile.prototype.toBase64=function(){/** @type {!Uint8Array} */ var buffer=this.toBuffer();return encode$3(buffer,0,buffer.length)};/**
+WaveFile.prototype.toBase64=function(){/** @type {!Uint8Array} */ var buffer=this.toBuffer();return encode$2(buffer,0,buffer.length)};/**
  @return {string}
  @throws {Error}
  */
@@ -444,14 +445,14 @@ else{this.assure16Bit_();var output=new Int16Array(this.data.samples.length/2);u
  @param {string} bitDepthCode
  */
 WaveFile.prototype.fromIMAADPCM=function(bitDepthCode){bitDepthCode=bitDepthCode===undefined?"16":bitDepthCode;this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,"16",decode(this.data.samples,this.fmt.blockAlign),{container:this.correctContainer_()});if(bitDepthCode!="16")this.toBitDepth(bitDepthCode)};WaveFile.prototype.toALaw=function(){this.assure16Bit_();var output=new Int16Array(this.data.samples.length/2);unpackArrayTo(this.data.samples,this.dataType,output);this.fromScratch(this.fmt.numChannels,
-this.fmt.sampleRate,"8a",encode$1(output),{container:this.correctContainer_()})};/**
+this.fmt.sampleRate,"8a",alaw.encode(output),{container:this.correctContainer_()})};/**
  @param {string} bitDepthCode
  */
-WaveFile.prototype.fromALaw=function(bitDepthCode){bitDepthCode=bitDepthCode===undefined?"16":bitDepthCode;this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,"16",decode$1(this.data.samples),{container:this.correctContainer_()});if(bitDepthCode!="16")this.toBitDepth(bitDepthCode)};WaveFile.prototype.toMuLaw=function(){this.assure16Bit_();var output=new Int16Array(this.data.samples.length/2);unpackArrayTo(this.data.samples,this.dataType,output);this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,
-"8m",encode$2(output),{container:this.correctContainer_()})};/**
+WaveFile.prototype.fromALaw=function(bitDepthCode){bitDepthCode=bitDepthCode===undefined?"16":bitDepthCode;this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,"16",alaw.decode(this.data.samples),{container:this.correctContainer_()});if(bitDepthCode!="16")this.toBitDepth(bitDepthCode)};WaveFile.prototype.toMuLaw=function(){this.assure16Bit_();var output=new Int16Array(this.data.samples.length/2);unpackArrayTo(this.data.samples,this.dataType,output);this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,
+"8m",mulaw.encode(output),{container:this.correctContainer_()})};/**
  @param {string} bitDepthCode
  */
-WaveFile.prototype.fromMuLaw=function(bitDepthCode){bitDepthCode=bitDepthCode===undefined?"16":bitDepthCode;this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,"16",decode$2(this.data.samples),{container:this.correctContainer_()});if(bitDepthCode!="16")this.toBitDepth(bitDepthCode)};/**
+WaveFile.prototype.fromMuLaw=function(bitDepthCode){bitDepthCode=bitDepthCode===undefined?"16":bitDepthCode;this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,"16",mulaw.decode(this.data.samples),{container:this.correctContainer_()});if(bitDepthCode!="16")this.toBitDepth(bitDepthCode)};/**
  @param {string} tag
  @param {string} value
  @throws {Error}

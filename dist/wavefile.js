@@ -1047,21 +1047,20 @@ function unpackFrom(buffer, theType, index=0) {
  */
 function unpackArrayFrom(buffer, theType, index=0, end=null) {
   setUp_(theType);
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
   let len = end || buffer.length;
   while ((len - index) % theType.offset) {
     len--;
   }
+  if (theType.be) {
+    endianness(buffer, theType.offset, index, len);
+  }
   let values = [];
   let step = theType.offset;
-  while (index < len) {
-    values.push(reader_(buffer, index));
-    index += step;
+  for (let i=index; i < len; i+=step) {
+    values.push(reader_(buffer, i));
   }
   if (theType.be) {
-    endianness(buffer, theType.offset);
+    endianness(buffer, theType.offset, index, len);
   }
   return values;
 }
@@ -1077,22 +1076,21 @@ function unpackArrayFrom(buffer, theType, index=0, end=null) {
  */
 function unpackArrayTo(buffer, theType, output, index=0, end=null) {
   setUp_(theType);
-  if (theType.be) {
-    endianness(buffer, theType.offset);
-  }
   let len = end || buffer.length;
   while ((len - index) % theType.offset) {
     len--;
   }
+  if (theType.be) {
+    endianness(buffer, theType.offset, index, len);
+  }
   let outputIndex = 0;
   let step = theType.offset;
-  while (index < len) {
-    output.set([reader_(buffer, index)], outputIndex);
+  for (let i=index; i < len; i+=step) {
+    output.set([reader_(buffer, i)], outputIndex);
     outputIndex++;
-    index += step;
   }
   if (theType.be) {
-    endianness(buffer, theType.offset);
+    endianness(buffer, theType.offset, index, len);
   }
 }
 
@@ -1661,6 +1659,13 @@ function decode$1(samples) {
   return pcmSamples;
 }
 
+var alaw = /*#__PURE__*/Object.freeze({
+  encodeSample: encodeSample,
+  decodeSample: decodeSample,
+  encode: encode$1,
+  decode: decode$1
+});
+
 /*
  * alawmulaw: A-Law and mu-Law codecs in JavaScript.
  * https://github.com/rochars/alawmulaw
@@ -1786,7 +1791,7 @@ function decodeSample$1(muLawSample) {
  * @param {!Int16Array} samples A array of 16-bit PCM samples.
  * @return {!Uint8Array}
  */
-function encode$2(samples) {
+function encode$1$1(samples) {
   /** @type {!Uint8Array} */
   let muLawSamples = new Uint8Array(samples.length);
   for (let i=0; i<samples.length; i++) {
@@ -1800,7 +1805,7 @@ function encode$2(samples) {
  * @param {!Uint8Array} samples A array of 8-bit mu-Law samples.
  * @return {!Int16Array}
  */
-function decode$2(samples) {
+function decode$1$1(samples) {
   /** @type {!Int16Array} */
   let pcmSamples = new Int16Array(samples.length);
   for (let i=0; i<samples.length; i++) {
@@ -1809,32 +1814,12 @@ function decode$2(samples) {
   return pcmSamples;
 }
 
-/*
- * alawmulaw: A-Law and mu-Law codecs in JavaScript.
- * https://github.com/rochars/alawmulaw
- *
- * Copyright (c) 2018 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
+var mulaw = /*#__PURE__*/Object.freeze({
+  encodeSample: encodeSample$1,
+  decodeSample: decodeSample$1,
+  encode: encode$1$1,
+  decode: decode$1$1
+});
 
 /*
  * base64-arraybuffer
@@ -1852,7 +1837,7 @@ for (let i = 0; i < chars.length; i++) {
     lookup[chars.charCodeAt(i)] = i;
 }
 
-const encode$3 = function (arraybuffer, byteOffset, length) {
+const encode$2 = function (arraybuffer, byteOffset, length) {
     const bytes = new Uint8Array(arraybuffer, byteOffset, length),
         len = bytes.length;
     let base64 = '';
@@ -1873,7 +1858,7 @@ const encode$3 = function (arraybuffer, byteOffset, length) {
     return base64;
 };
 
-const decode$3 = function (base64) {
+const decode$2 = function (base64) {
     const len = base64.length;
 
     let bufferLength = base64.length * 0.75;
@@ -2295,7 +2280,7 @@ class WaveFile {
    * @throws {Error} If any property of the object appears invalid.
    */
   fromBase64(base64String) {
-    this.fromBuffer(new Uint8Array(decode$3(base64String)));
+    this.fromBuffer(new Uint8Array(decode$2(base64String)));
   }
 
   /**
@@ -2306,7 +2291,7 @@ class WaveFile {
   toBase64() {
     /** @type {!Uint8Array} */
     let buffer = this.toBuffer();
-    return encode$3(buffer, 0, buffer.length);
+    return encode$2(buffer, 0, buffer.length);
   }
 
   /**
@@ -2459,7 +2444,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      encode$1(output),
+      alaw.encode(output),
       {container: this.correctContainer_()});
   }
 
@@ -2474,7 +2459,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      decode$1(this.data.samples),
+      alaw.decode(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -2492,7 +2477,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      encode$2(output),
+      mulaw.encode(output),
       {container: this.correctContainer_()});
   }
 
@@ -2507,7 +2492,7 @@ class WaveFile {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      decode$2(this.data.samples),
+      mulaw.decode(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);

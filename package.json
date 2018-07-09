@@ -81,11 +81,7 @@
     "rollup-plugin-node-resolve": "^3.3.0"
   },
   "dependencies": {
-    "alawmulaw": "^5.0.2",
     "base64-arraybuffer-es6": "^0.3.1",
-    "bitdepth": "^7.0.1",
-    "byte-data": "^13.2.3",
-    "imaadpcm": "^4.0.1",
-    "riff-chunks": "^8.0.2"
+    "byte-data": "^13.2.4"
   }
 }
