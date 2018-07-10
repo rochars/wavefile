@@ -231,7 +231,6 @@ export default class WaveFile extends WavIO {
     // @type {!Float64Array}
     let typedSamplesOutput = new Float64Array(sampleCount + 1);
     unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
-    this.truncateSamples(typedSamplesInput);
     bitDepthLib(
       typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
     this.fromScratch(

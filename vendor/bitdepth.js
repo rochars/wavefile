@@ -63,6 +63,9 @@ function bitDepth(input, original, target, output) {
       output[i] = input[i] -= 128;
     }
   }
+  if (original == "32f" || original == "64") {
+    truncateSamples(input)
+  }
   // change the resolution of the samples
   for (let i=0; i<len; i++) {        
     output[i] = toFunction(input[i], options);
@@ -166,6 +169,22 @@ function validateBitDepth_(bitDepth) {
   if ((bitDepth != "32f" && bitDepth != "64") &&
       (parseInt(bitDepth, 10) < "8" || parseInt(bitDepth, 10) > "53")) {
     throw new Error("Invalid bit depth.");
+  }
+}
+
+/**
+ * Truncate float samples on over and underflow.
+ * @private
+ */
+function truncateSamples(samples) {
+  /** @type {number} */   
+  let len = samples.length;
+  for (let i=0; i<len; i++) {
+    if (samples[i] > 1) {
+      samples[i] = 1;
+    } else if (samples[i] < -1) {
+      samples[i] = -1;
+    }
   }
 }
 
