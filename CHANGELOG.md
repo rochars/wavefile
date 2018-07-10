@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## version 8.1.5 (2018-07-10)
+- Fix: Remove unecessary files from the dist.
+- Update documentation.
+
 ## version 8.1.4 (2018-07-09)
 - No dependencies.
 

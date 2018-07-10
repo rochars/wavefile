@@ -7,10 +7,7 @@
  * @fileoverview rollup configuration file.
  */
 
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
 import closure from 'rollup-plugin-closure-compiler-js';
-import babel from 'rollup-plugin-babel';
 
 // Read externs definitions
 const fs = require('fs');
@@ -44,7 +41,8 @@ const license = '/*!\n'+
   ' * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n' +
   ' */\n';
 
-let UMDBanner = "var WaveFile = (function (global, factory) {" +
+
+let UMDBanner = "(function (global, factory) {" +
   "typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :" +
   "typeof define === 'function' && define.amd ? define(factory) :" +
   "(global.WaveFile = factory());" +
@@ -53,7 +51,7 @@ let UMDBanner = "var WaveFile = (function (global, factory) {" +
 let UMDFooter = 'return WaveFile; })));';
 
 export default [
-  // cjs
+  // cjs, es
   {
     input: 'index.js',
     output: [
@@ -67,10 +65,6 @@ export default [
         file: 'dist/wavefile.js',
         format: 'es'
       }
-    ],
-    plugins: [
-      nodeResolve(),
-      commonjs()
     ]
   },
   // umd
@@ -80,23 +74,19 @@ export default [
       {
         file: 'dist/wavefile.umd.js',
         name: 'WaveFile',
-        format: 'umd',
+        format: 'iife',
       }
     ],
     plugins: [
-      nodeResolve(),
-      commonjs(),
-      babel()
-      /*closure({
+      closure({
         languageIn: 'ECMASCRIPT6',
         languageOut: 'ECMASCRIPT5',
-        compilationLevel: 'SIMPLE',
+        compilationLevel: 'WHITESPACE_ONLY',
         warningLevel: 'VERBOSE',
         preserveTypeAnnotations: true,
         createSourceMap: false,
         outputWrapper: UMDBanner + '%output%' + UMDFooter
-
-      })*/
+      })
     ]
   },
   // browser
@@ -112,8 +102,6 @@ export default [
       }
     ],
     plugins: [
-      nodeResolve(),
-      commonjs(),
       closure({
         languageIn: 'ECMASCRIPT6',
         languageOut: 'ECMASCRIPT5',

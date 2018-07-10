@@ -18,7 +18,7 @@ let wavefile;
 // Browser
 if (process.argv[3] == '--min') {
     console.log('browser tests');
-    require('browser-env')();
+    global.window = global;
     require('../dist/wavefile.min.js');
     wavefile = window.WaveFile;
 

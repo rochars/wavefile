@@ -5,7 +5,7 @@ https://github.com/rochars/wavefile
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rawgit.com/rochars/wavefile/master/test/browser.html)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
-**wavefile** is a JavaScript library to create, read and write wave files.
+Create, read and write wav files according to the specs.
 
 - **Zero dependencies**
 - **MIT-licensed**
@@ -14,15 +14,19 @@ https://github.com/rochars/wavefile
 - **Use it out of the box with TypeScript**
 - **Handle files up to 2GB**
 - **Use it as a command line tool**
-- Create wave files from scratch
-- Read and write tags on .wav files
-- Set and delete cue points and their labels
-- Encode/decode files as ADPCM, A-Law and μ-Law
-- Turn RIFF files to RIFX and RIFX files to RIFF
-- **Create or edit BWF metadata** ("bext" chunk)
-- Change the bit depth of the audio
 - **Less than 10kb minified + compressed, less than 34kb minified**
 - Made with [Closure Compiler](https://github.com/google/closure-compiler) in mind (works great with others, too)
+
+With **wavefile** you can:
+
+- Create wav files
+- Read wav files
+- Change the bit depth of the audio
+- Read and write RIFF tags
+- Set and delete cue points and their labels
+- Encode/decode files as ADPCM, A-Law and μ-Law
+- Turn RIFF files to RIFX and RIFX to RIFF
+- Create or edit BWF metadata ("bext" chunk)
 
 And more.
 
@@ -61,7 +65,7 @@ And then import/require what you want from the *wavefile* folder:
 const WaveFile = require('./wavefile/dist/wavefile.umd.js');
 ```
 
-You can also download one of the dist files in  
+You can also download one of the files in the *./dist* folder:  
 https://github.com/rochars/wavefile/tree/master/dist
 
 ## Use
