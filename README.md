@@ -52,7 +52,9 @@ git clone https://github.com/rochars/wavefile
 ```
 
 And then import/require from the *wavefile* folder:
-```const WaveFile = require('./wavefile/dist/wavefile.umd.js');```
+```
+const WaveFile = require('./wavefile/dist/wavefile.umd.js');
+```
 
 ## Use
 
