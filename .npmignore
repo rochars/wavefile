@@ -8,6 +8,7 @@ docs/
 test/
 
 # Development files
+.babelrc
 .gitignore
 .jshintrc
 .npmignore
