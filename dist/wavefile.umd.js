@@ -2433,6 +2433,132 @@
    *
    */
 
+  var WavBuffer = function () {
+    function WavBuffer() {
+      classCallCheck(this, WavBuffer);
+
+      /**
+        * @type {number}
+        * @private
+        */
+      this.head_ = 0;
+    }
+
+    /**
+     * Write a variable size string as bytes. If the string is smaller
+     * than the max size the output array is filled with 0s.
+     * @param {string} str The string to be written as bytes.
+     * @param {number} maxSize the max size of the string.
+     * @return {!Array<number>} The bytes.
+     * @private
+     */
+
+
+    createClass(WavBuffer, [{
+      key: 'writeString_',
+      value: function writeString_(str, maxSize) {
+        var push = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+        /** @type {!Array<number>} */
+        var bytes = packString(str);
+        if (push) {
+          for (var i = bytes.length; i < maxSize; i++) {
+            bytes.push(0);
+          }
+        }
+        return bytes;
+      }
+
+      /**
+       * Read bytes as a ZSTR string.
+       * @param {!Uint8Array} bytes The bytes.
+       * @return {string} The string.
+       * @private
+       */
+
+    }, {
+      key: 'readZSTR_',
+      value: function readZSTR_(bytes) {
+        var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+        /** @type {string} */
+        var str = '';
+        for (var i = index; i < bytes.length; i++) {
+          this.head_++;
+          if (bytes[i] === 0) {
+            break;
+          }
+          str += unpackString(bytes, i, 1);
+        }
+        return str;
+      }
+
+      /**
+       * Read bytes as a string from a RIFF chunk.
+       * @param {!Uint8Array} bytes The bytes.
+       * @param {number} maxSize the max size of the string.
+       * @return {string} The string.
+       * @private
+       */
+
+    }, {
+      key: 'readString_',
+      value: function readString_(bytes, maxSize) {
+        /** @type {string} */
+        var str = '';
+        for (var i = 0; i < maxSize; i++) {
+          str += unpackString(bytes, this.head_, 1);
+          this.head_++;
+        }
+        return str;
+      }
+
+      /**
+       * Read a number from a chunk.
+       * @param {!Uint8Array} bytes The chunk bytes.
+       * @param {!Object} bdType The type definition.
+       * @return {number} The number.
+       * @private
+       */
+
+    }, {
+      key: 'read_',
+      value: function read_(bytes, bdType) {
+        /** @type {number} */
+        var size = bdType.bits / 8;
+        /** @type {number} */
+        var value = unpackFrom(bytes, bdType, this.head_);
+        this.head_ += size;
+        return value;
+      }
+    }]);
+    return WavBuffer;
+  }();
+
+  /*
+   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
   /**
    * A class to read and write wav data.
    * @extends WavStruct
@@ -2462,50 +2588,22 @@
        */
       _this.bitDepth = '0';
       /**
-       * @type {number}
-       * @private
-       */
-      _this.head_ = 0;
-      /**
        * @type {!Object}
        * @private
        */
       _this.dataType = {};
+      _this.wavbuffer = new WavBuffer();
       return _this;
     }
 
     /**
-     * Write a variable size string as bytes. If the string is smaller
-     * than the max size the output array is filled with 0s.
-     * @param {string} str The string to be written as bytes.
-     * @param {number} maxSize the max size of the string.
-     * @return {!Array<number>} The bytes.
+     * Return the bytes of the 'bext' chunk.
+     * @return {!Array<number>} The 'bext' chunk bytes.
      * @private
      */
 
 
     createClass(WavIO, [{
-      key: 'writeString_',
-      value: function writeString_(str, maxSize) {
-        var push = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
-        /** @type {!Array<number>} */
-        var bytes = packString(str);
-        if (push) {
-          for (var i = bytes.length; i < maxSize; i++) {
-            bytes.push(0);
-          }
-        }
-        return bytes;
-      }
-
-      /**
-       * Return the bytes of the 'bext' chunk.
-       * @return {!Array<number>} The 'bext' chunk bytes.
-       * @private
-       */
-
-    }, {
       key: 'getBextBytes_',
       value: function getBextBytes_() {
         /** @type {!Array<number>} */
@@ -2513,7 +2611,7 @@
         this.enforceBext_();
         if (this.bext.chunkId) {
           this.bext.chunkSize = 602 + this.bext.codingHistory.length;
-          bytes = bytes.concat(packString(this.bext.chunkId), pack(602 + this.bext.codingHistory.length, this.uInt32_), this.writeString_(this.bext.description, 256), this.writeString_(this.bext.originator, 32), this.writeString_(this.bext.originatorReference, 32), this.writeString_(this.bext.originationDate, 10), this.writeString_(this.bext.originationTime, 8), pack(this.bext.timeReference[0], this.uInt32_), pack(this.bext.timeReference[1], this.uInt32_), pack(this.bext.version, this.uInt16_), this.writeString_(this.bext.UMID, 64), pack(this.bext.loudnessValue, this.uInt16_), pack(this.bext.loudnessRange, this.uInt16_), pack(this.bext.maxTruePeakLevel, this.uInt16_), pack(this.bext.maxMomentaryLoudness, this.uInt16_), pack(this.bext.maxShortTermLoudness, this.uInt16_), this.writeString_(this.bext.reserved, 180), this.writeString_(this.bext.codingHistory, this.bext.codingHistory.length));
+          bytes = bytes.concat(packString(this.bext.chunkId), pack(602 + this.bext.codingHistory.length, this.uInt32_), this.wavbuffer.writeString_(this.bext.description, 256), this.wavbuffer.writeString_(this.bext.originator, 32), this.wavbuffer.writeString_(this.bext.originatorReference, 32), this.wavbuffer.writeString_(this.bext.originationDate, 10), this.wavbuffer.writeString_(this.bext.originationTime, 8), pack(this.bext.timeReference[0], this.uInt32_), pack(this.bext.timeReference[1], this.uInt32_), pack(this.bext.version, this.uInt16_), this.wavbuffer.writeString_(this.bext.UMID, 64), pack(this.bext.loudnessValue, this.uInt16_), pack(this.bext.loudnessRange, this.uInt16_), pack(this.bext.maxTruePeakLevel, this.uInt16_), pack(this.bext.maxMomentaryLoudness, this.uInt16_), pack(this.bext.maxShortTermLoudness, this.uInt16_), this.wavbuffer.writeString_(this.bext.reserved, 180), this.wavbuffer.writeString_(this.bext.codingHistory, this.bext.codingHistory.length));
         }
         return bytes;
       }
@@ -2728,11 +2826,11 @@
         var bytes = [];
         for (var i = 0; i < subChunks.length; i++) {
           if (format == 'INFO') {
-            bytes = bytes.concat(packString(subChunks[i].chunkId), pack(subChunks[i].value.length + 1, this.uInt32_), this.writeString_(subChunks[i].value, subChunks[i].value.length));
+            bytes = bytes.concat(packString(subChunks[i].chunkId), pack(subChunks[i].value.length + 1, this.uInt32_), this.wavbuffer.writeString_(subChunks[i].value, subChunks[i].value.length));
             bytes.push(0);
           } else if (format == 'adtl') {
             if (['labl', 'note'].indexOf(subChunks[i].chunkId) > -1) {
-              bytes = bytes.concat(packString(subChunks[i].chunkId), pack(subChunks[i].value.length + 4 + 1, this.uInt32_), pack(subChunks[i].dwName, this.uInt32_), this.writeString_(subChunks[i].value, subChunks[i].value.length));
+              bytes = bytes.concat(packString(subChunks[i].chunkId), pack(subChunks[i].value.length + 4 + 1, this.uInt32_), pack(subChunks[i].dwName, this.uInt32_), this.wavbuffer.writeString_(subChunks[i].value, subChunks[i].value.length));
               bytes.push(0);
             } else if (subChunks[i].chunkId == 'ltxt') {
               bytes = bytes.concat(this.getLtxtChunkBytes_(subChunks[i]));
@@ -2755,7 +2853,7 @@
     }, {
       key: 'getLtxtChunkBytes_',
       value: function getLtxtChunkBytes_(ltxt) {
-        return [].concat(packString(ltxt.chunkId), pack(ltxt.value.length + 20, this.uInt32_), pack(ltxt.dwName, this.uInt32_), pack(ltxt.dwSampleLength, this.uInt32_), pack(ltxt.dwPurposeID, this.uInt32_), pack(ltxt.dwCountry, this.uInt16_), pack(ltxt.dwLanguage, this.uInt16_), pack(ltxt.dwDialect, this.uInt16_), pack(ltxt.dwCodePage, this.uInt16_), this.writeString_(ltxt.value, ltxt.value.length));
+        return [].concat(packString(ltxt.chunkId), pack(ltxt.value.length + 20, this.uInt32_), pack(ltxt.dwName, this.uInt32_), pack(ltxt.dwSampleLength, this.uInt32_), pack(ltxt.dwPurposeID, this.uInt32_), pack(ltxt.dwCountry, this.uInt16_), pack(ltxt.dwLanguage, this.uInt16_), pack(ltxt.dwDialect, this.uInt16_), pack(ltxt.dwCodePage, this.uInt16_), this.wavbuffer.writeString_(ltxt.value, ltxt.value.length));
       }
 
       /**
@@ -2873,7 +2971,7 @@
       value: function readWavBuffer(buffer) {
         var samples = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-        this.head_ = 0;
+        this.wavbuffer.head_ = 0;
         this.clearHeader_();
         this.readRIFFChunk_(buffer);
         /** @type {!Object} */
@@ -2983,14 +3081,14 @@
     }, {
       key: 'readRIFFChunk_',
       value: function readRIFFChunk_(bytes) {
-        this.head_ = 0;
-        this.container = this.readString_(bytes, 4);
+        this.wavbuffer.head_ = 0;
+        this.container = this.wavbuffer.readString_(bytes, 4);
         if (['RIFF', 'RIFX', 'RF64'].indexOf(this.container) === -1) {
           throw Error('Not a supported format.');
         }
         this.LEorBE_();
-        this.chunkSize = this.read_(bytes, this.uInt32_);
-        this.format = this.readString_(bytes, 4);
+        this.chunkSize = this.wavbuffer.read_(bytes, this.uInt32_);
+        this.format = this.wavbuffer.readString_(bytes, 4);
         if (this.format != 'WAVE') {
           throw Error('Could not find the "WAVE" format identifier');
         }
@@ -3010,15 +3108,15 @@
         /** @type {?Object} */
         var chunk = this.findChunk_(signature, 'fmt ');
         if (chunk) {
-          this.head_ = chunk.chunkData.start;
+          this.wavbuffer.head_ = chunk.chunkData.start;
           this.fmt.chunkId = chunk.chunkId;
           this.fmt.chunkSize = chunk.chunkSize;
-          this.fmt.audioFormat = this.read_(buffer, this.uInt16_);
-          this.fmt.numChannels = this.read_(buffer, this.uInt16_);
-          this.fmt.sampleRate = this.read_(buffer, this.uInt32_);
-          this.fmt.byteRate = this.read_(buffer, this.uInt32_);
-          this.fmt.blockAlign = this.read_(buffer, this.uInt16_);
-          this.fmt.bitsPerSample = this.read_(buffer, this.uInt16_);
+          this.fmt.audioFormat = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.fmt.numChannels = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.fmt.sampleRate = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.fmt.byteRate = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.fmt.blockAlign = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.fmt.bitsPerSample = this.wavbuffer.read_(buffer, this.uInt16_);
           this.readFmtExtension_(buffer);
         } else {
           throw Error('Could not find the "fmt " chunk');
@@ -3035,12 +3133,12 @@
       key: 'readFmtExtension_',
       value: function readFmtExtension_(buffer) {
         if (this.fmt.chunkSize > 16) {
-          this.fmt.cbSize = this.read_(buffer, this.uInt16_);
+          this.fmt.cbSize = this.wavbuffer.read_(buffer, this.uInt16_);
           if (this.fmt.chunkSize > 18) {
-            this.fmt.validBitsPerSample = this.read_(buffer, this.uInt16_);
+            this.fmt.validBitsPerSample = this.wavbuffer.read_(buffer, this.uInt16_);
             if (this.fmt.chunkSize > 20) {
-              this.fmt.dwChannelMask = this.read_(buffer, this.uInt32_);
-              this.fmt.subformat = [this.read_(buffer, this.uInt32_), this.read_(buffer, this.uInt32_), this.read_(buffer, this.uInt32_), this.read_(buffer, this.uInt32_)];
+              this.fmt.dwChannelMask = this.wavbuffer.read_(buffer, this.uInt32_);
+              this.fmt.subformat = [this.wavbuffer.read_(buffer, this.uInt32_), this.wavbuffer.read_(buffer, this.uInt32_), this.wavbuffer.read_(buffer, this.uInt32_), this.wavbuffer.read_(buffer, this.uInt32_)];
             }
           }
         }
@@ -3059,10 +3157,10 @@
         /** @type {?Object} */
         var chunk = this.findChunk_(signature, 'fact');
         if (chunk) {
-          this.head_ = chunk.chunkData.start;
+          this.wavbuffer.head_ = chunk.chunkData.start;
           this.fact.chunkId = chunk.chunkId;
           this.fact.chunkSize = chunk.chunkSize;
-          this.fact.dwSampleLength = this.read_(buffer, this.uInt32_);
+          this.fact.dwSampleLength = this.wavbuffer.read_(buffer, this.uInt32_);
         }
       }
 
@@ -3079,18 +3177,18 @@
         /** @type {?Object} */
         var chunk = this.findChunk_(signature, 'cue ');
         if (chunk) {
-          this.head_ = chunk.chunkData.start;
+          this.wavbuffer.head_ = chunk.chunkData.start;
           this.cue.chunkId = chunk.chunkId;
           this.cue.chunkSize = chunk.chunkSize;
-          this.cue.dwCuePoints = this.read_(buffer, this.uInt32_);
+          this.cue.dwCuePoints = this.wavbuffer.read_(buffer, this.uInt32_);
           for (var i = 0; i < this.cue.dwCuePoints; i++) {
             this.cue.points.push({
-              dwName: this.read_(buffer, this.uInt32_),
-              dwPosition: this.read_(buffer, this.uInt32_),
-              fccChunk: this.readString_(buffer, 4),
-              dwChunkStart: this.read_(buffer, this.uInt32_),
-              dwBlockStart: this.read_(buffer, this.uInt32_),
-              dwSampleOffset: this.read_(buffer, this.uInt32_)
+              dwName: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwPosition: this.wavbuffer.read_(buffer, this.uInt32_),
+              fccChunk: this.wavbuffer.readString_(buffer, 4),
+              dwChunkStart: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwBlockStart: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwSampleOffset: this.wavbuffer.read_(buffer, this.uInt32_)
             });
           }
         }
@@ -3109,26 +3207,26 @@
         /** @type {?Object} */
         var chunk = this.findChunk_(signature, 'smpl');
         if (chunk) {
-          this.head_ = chunk.chunkData.start;
+          this.wavbuffer.head_ = chunk.chunkData.start;
           this.smpl.chunkId = chunk.chunkId;
           this.smpl.chunkSize = chunk.chunkSize;
-          this.smpl.dwManufacturer = this.read_(buffer, this.uInt32_);
-          this.smpl.dwProduct = this.read_(buffer, this.uInt32_);
-          this.smpl.dwSamplePeriod = this.read_(buffer, this.uInt32_);
-          this.smpl.dwMIDIUnityNote = this.read_(buffer, this.uInt32_);
-          this.smpl.dwMIDIPitchFraction = this.read_(buffer, this.uInt32_);
-          this.smpl.dwSMPTEFormat = this.read_(buffer, this.uInt32_);
-          this.smpl.dwSMPTEOffset = this.read_(buffer, this.uInt32_);
-          this.smpl.dwNumSampleLoops = this.read_(buffer, this.uInt32_);
-          this.smpl.dwSamplerData = this.read_(buffer, this.uInt32_);
+          this.smpl.dwManufacturer = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwProduct = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwSamplePeriod = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwMIDIUnityNote = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwMIDIPitchFraction = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwSMPTEFormat = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwSMPTEOffset = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwNumSampleLoops = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.smpl.dwSamplerData = this.wavbuffer.read_(buffer, this.uInt32_);
           for (var i = 0; i < this.smpl.dwNumSampleLoops; i++) {
             this.smpl.loops.push({
-              dwName: this.read_(buffer, this.uInt32_),
-              dwType: this.read_(buffer, this.uInt32_),
-              dwStart: this.read_(buffer, this.uInt32_),
-              dwEnd: this.read_(buffer, this.uInt32_),
-              dwFraction: this.read_(buffer, this.uInt32_),
-              dwPlayCount: this.read_(buffer, this.uInt32_)
+              dwName: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwType: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwStart: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwEnd: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwFraction: this.wavbuffer.read_(buffer, this.uInt32_),
+              dwPlayCount: this.wavbuffer.read_(buffer, this.uInt32_)
             });
           }
         }
@@ -3172,24 +3270,24 @@
         /** @type {?Object} */
         var chunk = this.findChunk_(signature, 'bext');
         if (chunk) {
-          this.head_ = chunk.chunkData.start;
+          this.wavbuffer.head_ = chunk.chunkData.start;
           this.bext.chunkId = chunk.chunkId;
           this.bext.chunkSize = chunk.chunkSize;
-          this.bext.description = this.readString_(buffer, 256);
-          this.bext.originator = this.readString_(buffer, 32);
-          this.bext.originatorReference = this.readString_(buffer, 32);
-          this.bext.originationDate = this.readString_(buffer, 10);
-          this.bext.originationTime = this.readString_(buffer, 8);
-          this.bext.timeReference = [this.read_(buffer, this.uInt32_), this.read_(buffer, this.uInt32_)];
-          this.bext.version = this.read_(buffer, this.uInt16_);
-          this.bext.UMID = this.readString_(buffer, 64);
-          this.bext.loudnessValue = this.read_(buffer, this.uInt16_);
-          this.bext.loudnessRange = this.read_(buffer, this.uInt16_);
-          this.bext.maxTruePeakLevel = this.read_(buffer, this.uInt16_);
-          this.bext.maxMomentaryLoudness = this.read_(buffer, this.uInt16_);
-          this.bext.maxShortTermLoudness = this.read_(buffer, this.uInt16_);
-          this.bext.reserved = this.readString_(buffer, 180);
-          this.bext.codingHistory = this.readString_(buffer, this.bext.chunkSize - 602);
+          this.bext.description = this.wavbuffer.readString_(buffer, 256);
+          this.bext.originator = this.wavbuffer.readString_(buffer, 32);
+          this.bext.originatorReference = this.wavbuffer.readString_(buffer, 32);
+          this.bext.originationDate = this.wavbuffer.readString_(buffer, 10);
+          this.bext.originationTime = this.wavbuffer.readString_(buffer, 8);
+          this.bext.timeReference = [this.wavbuffer.read_(buffer, this.uInt32_), this.wavbuffer.read_(buffer, this.uInt32_)];
+          this.bext.version = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.bext.UMID = this.wavbuffer.readString_(buffer, 64);
+          this.bext.loudnessValue = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.bext.loudnessRange = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.bext.maxTruePeakLevel = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.bext.maxMomentaryLoudness = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.bext.maxShortTermLoudness = this.wavbuffer.read_(buffer, this.uInt16_);
+          this.bext.reserved = this.wavbuffer.readString_(buffer, 180);
+          this.bext.codingHistory = this.wavbuffer.readString_(buffer, this.bext.chunkSize - 602);
         }
       }
 
@@ -3207,16 +3305,16 @@
         /** @type {?Object} */
         var chunk = this.findChunk_(signature, 'ds64');
         if (chunk) {
-          this.head_ = chunk.chunkData.start;
+          this.wavbuffer.head_ = chunk.chunkData.start;
           this.ds64.chunkId = chunk.chunkId;
           this.ds64.chunkSize = chunk.chunkSize;
-          this.ds64.riffSizeHigh = this.read_(buffer, this.uInt32_);
-          this.ds64.riffSizeLow = this.read_(buffer, this.uInt32_);
-          this.ds64.dataSizeHigh = this.read_(buffer, this.uInt32_);
-          this.ds64.dataSizeLow = this.read_(buffer, this.uInt32_);
-          this.ds64.originationTime = this.read_(buffer, this.uInt32_);
-          this.ds64.sampleCountHigh = this.read_(buffer, this.uInt32_);
-          this.ds64.sampleCountLow = this.read_(buffer, this.uInt32_);
+          this.ds64.riffSizeHigh = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.ds64.riffSizeLow = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.ds64.dataSizeHigh = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.ds64.dataSizeLow = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.ds64.originationTime = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.ds64.sampleCountHigh = this.wavbuffer.read_(buffer, this.uInt32_);
+          this.ds64.sampleCountLow = this.wavbuffer.read_(buffer, this.uInt32_);
           //if (this.ds64.chunkSize > 28) {
           //  this.ds64.tableLength = unpack(
           //    chunkData.slice(28, 32), this.uInt32_);
@@ -3272,31 +3370,31 @@
       value: function readLISTSubChunks_(subChunk, format, buffer) {
         if (format == 'adtl') {
           if (['labl', 'note', 'ltxt'].indexOf(subChunk.chunkId) > -1) {
-            this.head_ = subChunk.chunkData.start;
+            this.wavbuffer.head_ = subChunk.chunkData.start;
             /** @type {!Object<string, string|number>} */
             var item = {
               chunkId: subChunk.chunkId,
               chunkSize: subChunk.chunkSize,
-              dwName: this.read_(buffer, this.uInt32_)
+              dwName: this.wavbuffer.read_(buffer, this.uInt32_)
             };
             if (subChunk.chunkId == 'ltxt') {
-              item.dwSampleLength = this.read_(buffer, this.uInt32_);
-              item.dwPurposeID = this.read_(buffer, this.uInt32_);
-              item.dwCountry = this.read_(buffer, this.uInt16_);
-              item.dwLanguage = this.read_(buffer, this.uInt16_);
-              item.dwDialect = this.read_(buffer, this.uInt16_);
-              item.dwCodePage = this.read_(buffer, this.uInt16_);
+              item.dwSampleLength = this.wavbuffer.read_(buffer, this.uInt32_);
+              item.dwPurposeID = this.wavbuffer.read_(buffer, this.uInt32_);
+              item.dwCountry = this.wavbuffer.read_(buffer, this.uInt16_);
+              item.dwLanguage = this.wavbuffer.read_(buffer, this.uInt16_);
+              item.dwDialect = this.wavbuffer.read_(buffer, this.uInt16_);
+              item.dwCodePage = this.wavbuffer.read_(buffer, this.uInt16_);
             }
-            item.value = this.readZSTR_(buffer, this.head_);
+            item.value = this.wavbuffer.readZSTR_(buffer, this.wavbuffer.head_);
             this.LIST[this.LIST.length - 1].subChunks.push(item);
           }
           // RIFF INFO tags like ICRD, ISFT, ICMT
         } else if (format == 'INFO') {
-          this.head_ = subChunk.chunkData.start;
+          this.wavbuffer.head_ = subChunk.chunkData.start;
           this.LIST[this.LIST.length - 1].subChunks.push({
             chunkId: subChunk.chunkId,
             chunkSize: subChunk.chunkSize,
-            value: this.readZSTR_(buffer, this.head_)
+            value: this.wavbuffer.readZSTR_(buffer, this.wavbuffer.head_)
           });
         }
       }
@@ -3320,69 +3418,6 @@
             chunkData: [].slice.call(buffer.slice(chunk.chunkData.start, chunk.chunkData.end))
           };
         }
-      }
-
-      /**
-       * Read bytes as a ZSTR string.
-       * @param {!Uint8Array} bytes The bytes.
-       * @return {string} The string.
-       * @private
-       */
-
-    }, {
-      key: 'readZSTR_',
-      value: function readZSTR_(bytes) {
-        var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-        /** @type {string} */
-        var str = '';
-        for (var i = index; i < bytes.length; i++) {
-          this.head_++;
-          if (bytes[i] === 0) {
-            break;
-          }
-          str += unpackString(bytes, i, 1);
-        }
-        return str;
-      }
-
-      /**
-       * Read bytes as a string from a RIFF chunk.
-       * @param {!Uint8Array} bytes The bytes.
-       * @param {number} maxSize the max size of the string.
-       * @return {string} The string.
-       * @private
-       */
-
-    }, {
-      key: 'readString_',
-      value: function readString_(bytes, maxSize) {
-        /** @type {string} */
-        var str = '';
-        for (var i = 0; i < maxSize; i++) {
-          str += unpackString(bytes, this.head_, 1);
-          this.head_++;
-        }
-        return str;
-      }
-
-      /**
-       * Read a number from a chunk.
-       * @param {!Uint8Array} bytes The chunk bytes.
-       * @param {!Object} bdType The type definition.
-       * @return {number} The number.
-       * @private
-       */
-
-    }, {
-      key: 'read_',
-      value: function read_(bytes, bdType) {
-        /** @type {number} */
-        var size = bdType.bits / 8;
-        /** @type {number} */
-        var value = unpackFrom(bytes, bdType, this.head_);
-        this.head_ += size;
-        return value;
       }
 
       /**
