@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "8.1.5-alpha.2",
+  "version": "8.1.5",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -79,6 +79,7 @@
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
+    "byte-data": "^13.2.5",
     "chai": "^4.1.2",
     "codecov": "^3.0.2",
     "docdash": "^0.4.0",
