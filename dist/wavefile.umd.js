@@ -369,7 +369,22 @@ function unpackArrayTo(buffer,theType,output,index,end){index=index===undefined?
  @param {!Object} options
  */
 function wavHeader(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options){var header={};if(bitDepthCode=="4")header=createADPCMHeader_(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options);else if(bitDepthCode=="8a"||bitDepthCode=="8m")header=createALawMulawHeader_(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options);else if(Object.keys(AUDIO_FORMATS).indexOf(bitDepthCode)==-1||numChannels>2)header=createExtensibleHeader_(bitDepthCode,numChannels,sampleRate,
-numBytes,samplesLength,options);else header=createPCMHeader_(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options);return header}/**
+numBytes,samplesLength,options);else header=createPCMHeader_(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options);return header}/** @private @throws {Error} */ function validateHeader_(header){validateBitDepth_$1(header);validateNumChannels_(header);validateSampleRate_(header)}/**
+ @private
+ @return {boolean}
+ @throws {Error}
+ */
+function validateBitDepth_$1(header){if(!AUDIO_FORMATS[header.bitDepth]){if(parseInt(header.bitDepth,10)>8&&parseInt(header.bitDepth,10)<54)return true;throw new Error("Invalid bit depth.");}return true}/**
+ @private
+ @return {boolean}
+ @throws {Error}
+ */
+function validateNumChannels_(header){/** @type {number} */ var blockAlign=header.fmt.numChannels*header.fmt.bitsPerSample/8;if(header.fmt.numChannels<1||blockAlign>65535)throw new Error("Invalid number of channels.");return true}/**
+ @private
+ @return {boolean}
+ @throws {Error}
+ */
+function validateSampleRate_(header){/** @type {number} */ var byteRate=header.fmt.numChannels*(header.fmt.bitsPerSample/8)*header.fmt.sampleRate;if(header.fmt.sampleRate<1||byteRate>4294967295)throw new Error("Invalid sample rate.");return true}/**
  @private
  @param {string} bitDepthCode
  @param {number} numChannels
@@ -378,7 +393,8 @@ numBytes,samplesLength,options);else header=createPCMHeader_(bitDepthCode,numCha
  @param {number} samplesLength
  @param {!Object} options
  */
-function createPCMHeader_(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options){return{container:options.container,chunkSize:36+samplesLength,format:"WAVE",fmt:{chunkId:"fmt ",chunkSize:16,audioFormat:AUDIO_FORMATS[bitDepthCode]?AUDIO_FORMATS[bitDepthCode]:65534,numChannels:numChannels,sampleRate:sampleRate,byteRate:numChannels*numBytes*sampleRate,blockAlign:numChannels*numBytes,bitsPerSample:parseInt(bitDepthCode,10),cbSize:0,validBitsPerSample:0,dwChannelMask:0,subformat:[]}}}/**
+function createPCMHeader_(bitDepthCode,numChannels,sampleRate,numBytes,samplesLength,options){return{container:options.container,chunkSize:36+samplesLength,format:"WAVE",bitDepth:bitDepthCode,fmt:{chunkId:"fmt ",chunkSize:16,audioFormat:AUDIO_FORMATS[bitDepthCode]?AUDIO_FORMATS[bitDepthCode]:65534,numChannels:numChannels,sampleRate:sampleRate,byteRate:numChannels*numBytes*sampleRate,blockAlign:numChannels*numBytes,bitsPerSample:parseInt(bitDepthCode,10),cbSize:0,validBitsPerSample:0,dwChannelMask:0,
+subformat:[]}}}/**
  @private
  @param {string} bitDepthCode
  @param {number} numChannels
@@ -416,6 +432,13 @@ function getDwChannelMask_(numChannels){/** @type {number} */ var dwChannelMask=
  */
 function riffChunks(buffer){head_=0;var chunkId=getChunkId_(buffer,0);uInt32_.be=chunkId=="RIFX";var format=unpackString(buffer,8,4);head_+=4;return{chunkId:chunkId,chunkSize:getChunkSize_(buffer,0),format:format,subChunks:getSubChunksIndex_(buffer)}}/**
  @private
+ @param {!Object} chunks
+ @param {string} chunkId
+ @param {boolean} multiple
+ @return {?Array<!Object>}
+ */
+function findChunk_(chunks,chunkId,multiple){multiple=multiple===undefined?false:multiple;/** @type {!Array<!Object>} */ var chunk=[];for(var i$11=0;i$11<chunks.length;i$11++)if(chunks[i$11].chunkId==chunkId)if(multiple)chunk.push(chunks[i$11]);else return chunks[i$11];if(chunkId=="LIST")return chunk.length?chunk:null;return null}/**
+ @private
  @param {!Uint8Array} buffer
  @return {!Array<Object>}
  */
@@ -443,18 +466,18 @@ function getChunkSize_(buffer,index){head_+=4;return unpackFrom(buffer,uInt32_,i
  @param {number} maxSize
  @return {!Array<number>}
  */
-BufferIO.prototype.writeString_=function(str,maxSize,push){push=push===undefined?true:push;/** @type {!Array<number>} */ var bytes=packString(str);if(push)for(var i$11=bytes.length;i$11<maxSize;i$11++)bytes.push(0);return bytes};/**
+BufferIO.prototype.writeString_=function(str,maxSize,push){push=push===undefined?true:push;/** @type {!Array<number>} */ var bytes=packString(str);if(push)for(var i$12=bytes.length;i$12<maxSize;i$12++)bytes.push(0);return bytes};/**
  @private
  @param {!Uint8Array} bytes
  @return {string}
  */
-BufferIO.prototype.readZSTR_=function(bytes,index){index=index===undefined?0:index;/** @type {string} */ var str="";for(var i$12=index;i$12<bytes.length;i$12++){this.head_++;if(bytes[i$12]===0)break;str+=unpackString(bytes,i$12,1)}return str};/**
+BufferIO.prototype.readZSTR_=function(bytes,index){index=index===undefined?0:index;/** @type {string} */ var str="";for(var i$13=index;i$13<bytes.length;i$13++){this.head_++;if(bytes[i$13]===0)break;str+=unpackString(bytes,i$13,1)}return str};/**
  @private
  @param {!Uint8Array} bytes
  @param {number} maxSize
  @return {string}
  */
-BufferIO.prototype.readString_=function(bytes,maxSize){/** @type {string} */ var str="";for(var i$13=0;i$13<maxSize;i$13++){str+=unpackString(bytes,this.head_,1);this.head_++}return str};/**
+BufferIO.prototype.readString_=function(bytes,maxSize){/** @type {string} */ var str="";for(var i$14=0;i$14<maxSize;i$14++){str+=unpackString(bytes,this.head_,1);this.head_++}return str};/**
  @private
  @param {!Uint8Array} bytes
  @param {!Object} bdType
@@ -480,8 +503,8 @@ var WaveFile=function(bytes){bytes=bytes===undefined?null:bytes;/** @type {strin
  @param {?Object} options
  @throws {Error}
  */
-WaveFile.prototype.fromScratch=function(numChannels,sampleRate,bitDepthCode,samples,options){options=options===undefined?{}:options;if(!options.container)options.container="RIFF";this.container=options.container;this.bitDepth=bitDepthCode;samples=this.interleave_(samples);/** @type {number} */ var numBytes=((parseInt(bitDepthCode,10)-1|7)+1)/8;this.updateDataType_();this.data.samples=new Uint8Array(samples.length*numBytes);packArrayTo(samples,this.dataType,this.data.samples);/** @type {!Object} */ var header=
-wavHeader(bitDepthCode,numChannels,sampleRate,numBytes,this.data.samples.length,options);this.clearHeader_();this.chunkSize=header.chunkSize;this.format=header.format;this.fmt=header.fmt;if(header.fact)this.fact=header.fact;this.data.chunkId="data";this.data.chunkSize=this.data.samples.length;this.validateHeader_();this.LEorBE_()};/**
+WaveFile.prototype.fromScratch=function(numChannels,sampleRate,bitDepthCode,samples,options){options=options===undefined?{}:options;if(!options.container)options.container="RIFF";this.container=options.container;this.bitDepth=bitDepthCode;samples=this.interleave_(samples);this.updateDataType_();/** @type {number} */ var numBytes=this.dataType.bits/8;this.data.samples=new Uint8Array(samples.length*numBytes);packArrayTo(samples,this.dataType,this.data.samples);/** @type {!Object} */ var header=wavHeader(bitDepthCode,
+numChannels,sampleRate,numBytes,this.data.samples.length,options);this.clearHeader_();this.chunkSize=header.chunkSize;this.format=header.format;this.fmt=header.fmt;if(header.fact)this.fact=header.fact;this.data.chunkId="data";this.data.chunkSize=this.data.samples.length;validateHeader_(this);this.LEorBE_()};/**
  @param {!Uint8Array} bytes
  @param {boolean=} samples
  @throws {Error}
@@ -490,7 +513,7 @@ WaveFile.prototype.fromBuffer=function(bytes,samples){samples=samples===undefine
  @return {!Uint8Array}
  @throws {Error}
  */
-WaveFile.prototype.toBuffer=function(){this.validateHeader_();return this.createWaveFile_()};/**
+WaveFile.prototype.toBuffer=function(){validateHeader_(this);return this.createWaveFile_()};/**
  @param {string} base64String
  @throws {Error}
  */
@@ -512,7 +535,7 @@ this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType),{
  @param {boolean} changeResolution
  @throws {Error}
  */
-WaveFile.prototype.toBitDepth=function(newBitDepth,changeResolution){changeResolution=changeResolution===undefined?true:changeResolution;var toBitDepth=newBitDepth;var thisBitDepth=this.bitDepth;if(!changeResolution){toBitDepth=this.realBitDepth_(newBitDepth);thisBitDepth=this.realBitDepth_(this.bitDepth)}this.assureUncompressed_();var sampleCount=this.data.samples.length/(this.dataType.bits/8);var typedSamplesInput=new Float64Array(sampleCount+1);var typedSamplesOutput=new Float64Array(sampleCount+
+WaveFile.prototype.toBitDepth=function(newBitDepth,changeResolution){changeResolution=changeResolution===undefined?true:changeResolution;var toBitDepth=newBitDepth;var thisBitDepth=this.bitDepth;if(!changeResolution){if(newBitDepth!="32f")toBitDepth=this.dataType.bits.toString();thisBitDepth=this.dataType.bits}this.assureUncompressed_();var sampleCount=this.data.samples.length/(this.dataType.bits/8);var typedSamplesInput=new Float64Array(sampleCount+1);var typedSamplesOutput=new Float64Array(sampleCount+
 1);unpackArrayTo(this.data.samples,this.dataType,typedSamplesInput);bitDepth(typedSamplesInput,thisBitDepth,toBitDepth,typedSamplesOutput);this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,newBitDepth,typedSamplesOutput,{container:this.correctContainer_()})};/** @throws {Error} */ WaveFile.prototype.toIMAADPCM=function(){if(this.fmt.sampleRate!==8E3)throw new Error("Only 8000 Hz files can be compressed as IMA-ADPCM.");else if(this.fmt.numChannels!==1)throw new Error("Only mono files can be compressed as IMA-ADPCM.");
 else{this.assure16Bit_();var output=new Int16Array(this.data.samples.length/2);unpackArrayTo(this.data.samples,this.dataType,output);this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,"4",encode(output),{container:this.correctContainer_()})}};/**
  @param {string} bitDepthCode
@@ -543,21 +566,21 @@ WaveFile.prototype.deleteTag=function(tag){/** @type {!Object} */ var index=this
  @param {number} position
  @param {string} labl
  */
-WaveFile.prototype.setCuePoint=function(position,labl){labl=labl===undefined?"":labl;this.cue.chunkId="cue ";position=position*this.fmt.sampleRate/1E3;/** @type {!Array<!Object>} */ var existingPoints=this.getCuePoints_();this.clearLISTadtl_();/** @type {number} */ var len=this.cue.points.length;this.cue.points=[];/** @type {boolean} */ var hasSet=false;if(len===0)this.setCuePoint_(position,1,labl);else{for(var i$14=0;i$14<len;i$14++)if(existingPoints[i$14].dwPosition>position&&!hasSet){this.setCuePoint_(position,
-i$14+1,labl);this.setCuePoint_(existingPoints[i$14].dwPosition,i$14+2,existingPoints[i$14].label);hasSet=true}else this.setCuePoint_(existingPoints[i$14].dwPosition,i$14+1,existingPoints[i$14].label);if(!hasSet)this.setCuePoint_(position,this.cue.points.length+1,labl)}this.cue.dwCuePoints=this.cue.points.length};/**
+WaveFile.prototype.setCuePoint=function(position,labl){labl=labl===undefined?"":labl;this.cue.chunkId="cue ";position=position*this.fmt.sampleRate/1E3;/** @type {!Array<!Object>} */ var existingPoints=this.getCuePoints_();this.clearLISTadtl_();/** @type {number} */ var len=this.cue.points.length;this.cue.points=[];/** @type {boolean} */ var hasSet=false;if(len===0)this.setCuePoint_(position,1,labl);else{for(var i$15=0;i$15<len;i$15++)if(existingPoints[i$15].dwPosition>position&&!hasSet){this.setCuePoint_(position,
+i$15+1,labl);this.setCuePoint_(existingPoints[i$15].dwPosition,i$15+2,existingPoints[i$15].label);hasSet=true}else this.setCuePoint_(existingPoints[i$15].dwPosition,i$15+1,existingPoints[i$15].label);if(!hasSet)this.setCuePoint_(position,this.cue.points.length+1,labl)}this.cue.dwCuePoints=this.cue.points.length};/**
  @param {number} index
  */
-WaveFile.prototype.deleteCuePoint=function(index){this.cue.chunkId="cue ";/** @type {!Array<!Object>} */ var existingPoints=this.getCuePoints_();this.clearLISTadtl_();/** @type {number} */ var len=this.cue.points.length;this.cue.points=[];for(var i$15=0;i$15<len;i$15++)if(i$15+1!==index)this.setCuePoint_(existingPoints[i$15].dwPosition,i$15+1,existingPoints[i$15].label);this.cue.dwCuePoints=this.cue.points.length;if(this.cue.dwCuePoints)this.cue.chunkId="cue ";else{this.cue.chunkId="";this.clearLISTadtl_()}};
+WaveFile.prototype.deleteCuePoint=function(index){this.cue.chunkId="cue ";/** @type {!Array<!Object>} */ var existingPoints=this.getCuePoints_();this.clearLISTadtl_();/** @type {number} */ var len=this.cue.points.length;this.cue.points=[];for(var i$16=0;i$16<len;i$16++)if(i$16+1!==index)this.setCuePoint_(existingPoints[i$16].dwPosition,i$16+1,existingPoints[i$16].label);this.cue.dwCuePoints=this.cue.points.length;if(this.cue.dwCuePoints)this.cue.chunkId="cue ";else{this.cue.chunkId="";this.clearLISTadtl_()}};
 /**
  @param {number} pointIndex
  @param {string} label
  */
-WaveFile.prototype.updateLabel=function(pointIndex,label){/** @type {?number} */ var adtlIndex=this.getAdtlChunk_();if(adtlIndex!==null)for(var i$16=0;i$16<this.LIST[adtlIndex].subChunks.length;i$16++)if(this.LIST[adtlIndex].subChunks[i$16].dwName==pointIndex)this.LIST[adtlIndex].subChunks[i$16].value=label};/** @private */ WaveFile.prototype.assure16Bit_=function(){this.assureUncompressed_();if(this.bitDepth!="16")this.toBitDepth("16")};/** @private */ WaveFile.prototype.assureUncompressed_=function(){if(this.bitDepth==
+WaveFile.prototype.updateLabel=function(pointIndex,label){/** @type {?number} */ var adtlIndex=this.getAdtlChunk_();if(adtlIndex!==null)for(var i$17=0;i$17<this.LIST[adtlIndex].subChunks.length;i$17++)if(this.LIST[adtlIndex].subChunks[i$17].dwName==pointIndex)this.LIST[adtlIndex].subChunks[i$17].value=label};/** @private */ WaveFile.prototype.assure16Bit_=function(){this.assureUncompressed_();if(this.bitDepth!="16")this.toBitDepth("16")};/** @private */ WaveFile.prototype.assureUncompressed_=function(){if(this.bitDepth==
 "8a")this.fromALaw();else if(this.bitDepth=="8m")this.fromMuLaw();else if(this.bitDepth=="4")this.fromIMAADPCM()};/**
  @private
  @param {(!Array<number>|!Array<!Array<number>>|!ArrayBufferView)} samples
  */
-WaveFile.prototype.interleave_=function(samples){if(samples.length>0)if(samples[0].constructor===Array){/** @type {!Array<number>} */ var finalSamples=[];for(var i$17=0;i$17<samples[0].length;i$17++)for(var j=0;j<samples.length;j++)finalSamples.push(samples[j][i$17]);samples=finalSamples}return samples};/**
+WaveFile.prototype.interleave_=function(samples){if(samples.length>0)if(samples[0].constructor===Array){/** @type {!Array<number>} */ var finalSamples=[];for(var i$18=0;i$18<samples[0].length;i$18++)for(var j=0;j<samples.length;j++)finalSamples.push(samples[j][i$18]);samples=finalSamples}return samples};/**
  @private
  @param {number} position
  @param {number} dwName
@@ -566,12 +589,12 @@ WaveFile.prototype.setCuePoint_=function(position,dwName,label){this.cue.points.
  @private
  @return {!Array<!Object>}
  */
-WaveFile.prototype.getCuePoints_=function(){/** @type {!Array<!Object>} */ var points=[];for(var i$18=0;i$18<this.cue.points.length;i$18++)points.push({dwPosition:this.cue.points[i$18].dwPosition,label:this.getLabelForCuePoint_(this.cue.points[i$18].dwName)});return points};/**
+WaveFile.prototype.getCuePoints_=function(){/** @type {!Array<!Object>} */ var points=[];for(var i$19=0;i$19<this.cue.points.length;i$19++)points.push({dwPosition:this.cue.points[i$19].dwPosition,label:this.getLabelForCuePoint_(this.cue.points[i$19].dwName)});return points};/**
  @private
  @param {number} pointDwName
  @return {string}
  */
-WaveFile.prototype.getLabelForCuePoint_=function(pointDwName){/** @type {?number} */ var adtlIndex=this.getAdtlChunk_();if(adtlIndex!==null)for(var i$19=0;i$19<this.LIST[adtlIndex].subChunks.length;i$19++)if(this.LIST[adtlIndex].subChunks[i$19].dwName==pointDwName)return this.LIST[adtlIndex].subChunks[i$19].value;return""};/** @private */ WaveFile.prototype.clearLISTadtl_=function(){for(var i$20=0;i$20<this.LIST.length;i$20++)if(this.LIST[i$20].format=="adtl")this.LIST.splice(i$20)};/**
+WaveFile.prototype.getLabelForCuePoint_=function(pointDwName){/** @type {?number} */ var adtlIndex=this.getAdtlChunk_();if(adtlIndex!==null)for(var i$20=0;i$20<this.LIST[adtlIndex].subChunks.length;i$20++)if(this.LIST[adtlIndex].subChunks[i$20].dwName==pointDwName)return this.LIST[adtlIndex].subChunks[i$20].value;return""};/** @private */ WaveFile.prototype.clearLISTadtl_=function(){for(var i$21=0;i$21<this.LIST.length;i$21++)if(this.LIST[i$21].format=="adtl")this.LIST.splice(i$21)};/**
  @private
  @param {number} dwName
  @param {string} label
@@ -586,17 +609,17 @@ WaveFile.prototype.setLabelText_=function(adtlIndex,dwName,label){this.LIST[adtl
  @private
  @return {?number}
  */
-WaveFile.prototype.getAdtlChunk_=function(){for(var i$21=0;i$21<this.LIST.length;i$21++)if(this.LIST[i$21].format=="adtl")return i$21;return null};/**
+WaveFile.prototype.getAdtlChunk_=function(){for(var i$22=0;i$22<this.LIST.length;i$22++)if(this.LIST[i$22].format=="adtl")return i$22;return null};/**
  @private
  @param {string} tag
  @return {!Object<string,?number>}
  */
-WaveFile.prototype.getTagIndex_=function(tag){/** @type {!Object<string,?number>} */ var index={LIST:null,TAG:null};for(var i$22=0;i$22<this.LIST.length;i$22++)if(this.LIST[i$22].format=="INFO"){index.LIST=i$22;for(var j=0;j<this.LIST[i$22].subChunks.length;j++)if(this.LIST[i$22].subChunks[j].chunkId==tag){index.TAG=j;break}break}return index};/**
+WaveFile.prototype.getTagIndex_=function(tag){/** @type {!Object<string,?number>} */ var index={LIST:null,TAG:null};for(var i$23=0;i$23<this.LIST.length;i$23++)if(this.LIST[i$23].format=="INFO"){index.LIST=i$23;for(var j=0;j<this.LIST[i$23].subChunks.length;j++)if(this.LIST[i$23].subChunks[j].chunkId==tag){index.TAG=j;break}break}return index};/**
  @private
  @param {string} tag
  @return {string}
  */
-WaveFile.prototype.fixTagName_=function(tag){if(tag.constructor!==String)throw new Error("Invalid tag name.");else if(tag.length<4)for(var i$23=0;i$23<4-tag.length;i$23++)tag+=" ";return tag};/**
+WaveFile.prototype.fixTagName_=function(tag){if(tag.constructor!==String)throw new Error("Invalid tag name.");else if(tag.length<4)for(var i$24=0;i$24<4-tag.length;i$24++)tag+=" ";return tag};/**
  @param {!Uint8Array} buffer
  @param {boolean=} samples
  @throws {Error}
@@ -613,8 +636,8 @@ WaveFile.prototype.readRIFFChunk_=function(bytes){this.io.head_=0;this.container
  @param {!Object} signature
  @throws {Error}
  */
-WaveFile.prototype.readFmtChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"fmt ");if(chunk){this.io.head_=chunk.chunkData.start;this.fmt.chunkId=chunk.chunkId;this.fmt.chunkSize=chunk.chunkSize;this.fmt.audioFormat=this.io.read_(buffer,this.uInt16_);this.fmt.numChannels=this.io.read_(buffer,this.uInt16_);this.fmt.sampleRate=this.io.read_(buffer,this.uInt32_);this.fmt.byteRate=this.io.read_(buffer,this.uInt32_);this.fmt.blockAlign=this.io.read_(buffer,
-this.uInt16_);this.fmt.bitsPerSample=this.io.read_(buffer,this.uInt16_);this.readFmtExtension_(buffer)}else throw Error('Could not find the "fmt " chunk');};/**
+WaveFile.prototype.readFmtChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"fmt ");if(chunk){this.io.head_=chunk.chunkData.start;this.fmt.chunkId=chunk.chunkId;this.fmt.chunkSize=chunk.chunkSize;this.fmt.audioFormat=this.io.read_(buffer,this.uInt16_);this.fmt.numChannels=this.io.read_(buffer,this.uInt16_);this.fmt.sampleRate=this.io.read_(buffer,this.uInt32_);this.fmt.byteRate=this.io.read_(buffer,this.uInt32_);this.fmt.blockAlign=this.io.read_(buffer,this.uInt16_);
+this.fmt.bitsPerSample=this.io.read_(buffer,this.uInt16_);this.readFmtExtension_(buffer)}else throw Error('Could not find the "fmt " chunk');};/**
  @private
  @param {!Uint8Array} buffer
  */
@@ -623,19 +646,19 @@ WaveFile.prototype.readFmtExtension_=function(buffer){if(this.fmt.chunkSize>16){
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-WaveFile.prototype.readFactChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"fact");if(chunk){this.io.head_=chunk.chunkData.start;this.fact.chunkId=chunk.chunkId;this.fact.chunkSize=chunk.chunkSize;this.fact.dwSampleLength=this.io.read_(buffer,this.uInt32_)}};/**
+WaveFile.prototype.readFactChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"fact");if(chunk){this.io.head_=chunk.chunkData.start;this.fact.chunkId=chunk.chunkId;this.fact.chunkSize=chunk.chunkSize;this.fact.dwSampleLength=this.io.read_(buffer,this.uInt32_)}};/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-WaveFile.prototype.readCueChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"cue ");if(chunk){this.io.head_=chunk.chunkData.start;this.cue.chunkId=chunk.chunkId;this.cue.chunkSize=chunk.chunkSize;this.cue.dwCuePoints=this.io.read_(buffer,this.uInt32_);for(var i$24=0;i$24<this.cue.dwCuePoints;i$24++)this.cue.points.push({dwName:this.io.read_(buffer,this.uInt32_),dwPosition:this.io.read_(buffer,this.uInt32_),fccChunk:this.io.readString_(buffer,4),dwChunkStart:this.io.read_(buffer,
+WaveFile.prototype.readCueChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"cue ");if(chunk){this.io.head_=chunk.chunkData.start;this.cue.chunkId=chunk.chunkId;this.cue.chunkSize=chunk.chunkSize;this.cue.dwCuePoints=this.io.read_(buffer,this.uInt32_);for(var i$25=0;i$25<this.cue.dwCuePoints;i$25++)this.cue.points.push({dwName:this.io.read_(buffer,this.uInt32_),dwPosition:this.io.read_(buffer,this.uInt32_),fccChunk:this.io.readString_(buffer,4),dwChunkStart:this.io.read_(buffer,
 this.uInt32_),dwBlockStart:this.io.read_(buffer,this.uInt32_),dwSampleOffset:this.io.read_(buffer,this.uInt32_)})}};/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-WaveFile.prototype.readSmplChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"smpl");if(chunk){this.io.head_=chunk.chunkData.start;this.smpl.chunkId=chunk.chunkId;this.smpl.chunkSize=chunk.chunkSize;this.smpl.dwManufacturer=this.io.read_(buffer,this.uInt32_);this.smpl.dwProduct=this.io.read_(buffer,this.uInt32_);this.smpl.dwSamplePeriod=this.io.read_(buffer,this.uInt32_);this.smpl.dwMIDIUnityNote=this.io.read_(buffer,this.uInt32_);this.smpl.dwMIDIPitchFraction=
-this.io.read_(buffer,this.uInt32_);this.smpl.dwSMPTEFormat=this.io.read_(buffer,this.uInt32_);this.smpl.dwSMPTEOffset=this.io.read_(buffer,this.uInt32_);this.smpl.dwNumSampleLoops=this.io.read_(buffer,this.uInt32_);this.smpl.dwSamplerData=this.io.read_(buffer,this.uInt32_);for(var i$25=0;i$25<this.smpl.dwNumSampleLoops;i$25++)this.smpl.loops.push({dwName:this.io.read_(buffer,this.uInt32_),dwType:this.io.read_(buffer,this.uInt32_),dwStart:this.io.read_(buffer,this.uInt32_),dwEnd:this.io.read_(buffer,
+WaveFile.prototype.readSmplChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"smpl");if(chunk){this.io.head_=chunk.chunkData.start;this.smpl.chunkId=chunk.chunkId;this.smpl.chunkSize=chunk.chunkSize;this.smpl.dwManufacturer=this.io.read_(buffer,this.uInt32_);this.smpl.dwProduct=this.io.read_(buffer,this.uInt32_);this.smpl.dwSamplePeriod=this.io.read_(buffer,this.uInt32_);this.smpl.dwMIDIUnityNote=this.io.read_(buffer,this.uInt32_);this.smpl.dwMIDIPitchFraction=
+this.io.read_(buffer,this.uInt32_);this.smpl.dwSMPTEFormat=this.io.read_(buffer,this.uInt32_);this.smpl.dwSMPTEOffset=this.io.read_(buffer,this.uInt32_);this.smpl.dwNumSampleLoops=this.io.read_(buffer,this.uInt32_);this.smpl.dwSamplerData=this.io.read_(buffer,this.uInt32_);for(var i$26=0;i$26<this.smpl.dwNumSampleLoops;i$26++)this.smpl.loops.push({dwName:this.io.read_(buffer,this.uInt32_),dwType:this.io.read_(buffer,this.uInt32_),dwStart:this.io.read_(buffer,this.uInt32_),dwEnd:this.io.read_(buffer,
 this.uInt32_),dwFraction:this.io.read_(buffer,this.uInt32_),dwPlayCount:this.io.read_(buffer,this.uInt32_)})}};/**
  @private
  @param {!Uint8Array} buffer
@@ -643,12 +666,12 @@ this.uInt32_),dwFraction:this.io.read_(buffer,this.uInt32_),dwPlayCount:this.io.
  @param {boolean} samples
  @throws {Error}
  */
-WaveFile.prototype.readDataChunk_=function(buffer,signature,samples){/** @type {?Object} */ var chunk=this.findChunk_(signature,"data");if(chunk){this.data.chunkId="data";this.data.chunkSize=chunk.chunkSize;if(samples)this.data.samples=buffer.slice(chunk.chunkData.start,chunk.chunkData.end)}else throw Error('Could not find the "data" chunk');};/**
+WaveFile.prototype.readDataChunk_=function(buffer,signature,samples){/** @type {?Object} */ var chunk=findChunk_(signature,"data");if(chunk){this.data.chunkId="data";this.data.chunkSize=chunk.chunkSize;if(samples)this.data.samples=buffer.slice(chunk.chunkData.start,chunk.chunkData.end)}else throw Error('Could not find the "data" chunk');};/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-WaveFile.prototype.readBextChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"bext");if(chunk){this.io.head_=chunk.chunkData.start;this.bext.chunkId=chunk.chunkId;this.bext.chunkSize=chunk.chunkSize;this.bext.description=this.io.readString_(buffer,256);this.bext.originator=this.io.readString_(buffer,32);this.bext.originatorReference=this.io.readString_(buffer,32);this.bext.originationDate=this.io.readString_(buffer,10);this.bext.originationTime=this.io.readString_(buffer,
+WaveFile.prototype.readBextChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"bext");if(chunk){this.io.head_=chunk.chunkData.start;this.bext.chunkId=chunk.chunkId;this.bext.chunkSize=chunk.chunkSize;this.bext.description=this.io.readString_(buffer,256);this.bext.originator=this.io.readString_(buffer,32);this.bext.originatorReference=this.io.readString_(buffer,32);this.bext.originationDate=this.io.readString_(buffer,10);this.bext.originationTime=this.io.readString_(buffer,
 8);this.bext.timeReference=[this.io.read_(buffer,this.uInt32_),this.io.read_(buffer,this.uInt32_)];this.bext.version=this.io.read_(buffer,this.uInt16_);this.bext.UMID=this.io.readString_(buffer,64);this.bext.loudnessValue=this.io.read_(buffer,this.uInt16_);this.bext.loudnessRange=this.io.read_(buffer,this.uInt16_);this.bext.maxTruePeakLevel=this.io.read_(buffer,this.uInt16_);this.bext.maxMomentaryLoudness=this.io.read_(buffer,this.uInt16_);this.bext.maxShortTermLoudness=this.io.read_(buffer,this.uInt16_);
 this.bext.reserved=this.io.readString_(buffer,180);this.bext.codingHistory=this.io.readString_(buffer,this.bext.chunkSize-602)}};/**
  @private
@@ -656,13 +679,13 @@ this.bext.reserved=this.io.readString_(buffer,180);this.bext.codingHistory=this.
  @param {!Object} signature
  @throws {Error}
  */
-WaveFile.prototype.readDs64Chunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"ds64");if(chunk){this.io.head_=chunk.chunkData.start;this.ds64.chunkId=chunk.chunkId;this.ds64.chunkSize=chunk.chunkSize;this.ds64.riffSizeHigh=this.io.read_(buffer,this.uInt32_);this.ds64.riffSizeLow=this.io.read_(buffer,this.uInt32_);this.ds64.dataSizeHigh=this.io.read_(buffer,this.uInt32_);this.ds64.dataSizeLow=this.io.read_(buffer,this.uInt32_);this.ds64.originationTime=this.io.read_(buffer,
+WaveFile.prototype.readDs64Chunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"ds64");if(chunk){this.io.head_=chunk.chunkData.start;this.ds64.chunkId=chunk.chunkId;this.ds64.chunkSize=chunk.chunkSize;this.ds64.riffSizeHigh=this.io.read_(buffer,this.uInt32_);this.ds64.riffSizeLow=this.io.read_(buffer,this.uInt32_);this.ds64.dataSizeHigh=this.io.read_(buffer,this.uInt32_);this.ds64.dataSizeLow=this.io.read_(buffer,this.uInt32_);this.ds64.originationTime=this.io.read_(buffer,
 this.uInt32_);this.ds64.sampleCountHigh=this.io.read_(buffer,this.uInt32_);this.ds64.sampleCountLow=this.io.read_(buffer,this.uInt32_)}else if(this.container=="RF64")throw Error('Could not find the "ds64" chunk');};/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-WaveFile.prototype.readLISTChunk_=function(buffer,signature){/** @type {?Object} */ var listChunks=this.findChunk_(signature,"LIST",true);if(listChunks===null)return;for(var j=0;j<listChunks.length;j++){/** @type {!Object} */ var subChunk=listChunks[j];this.LIST.push({chunkId:subChunk.chunkId,chunkSize:subChunk.chunkSize,format:subChunk.format,subChunks:[]});for(var x=0;x<subChunk.subChunks.length;x++)this.readLISTSubChunks_(subChunk.subChunks[x],subChunk.format,buffer)}};/**
+WaveFile.prototype.readLISTChunk_=function(buffer,signature){/** @type {?Object} */ var listChunks=findChunk_(signature,"LIST",true);if(listChunks===null)return;for(var j=0;j<listChunks.length;j++){/** @type {!Object} */ var subChunk=listChunks[j];this.LIST.push({chunkId:subChunk.chunkId,chunkSize:subChunk.chunkSize,format:subChunk.format,subChunks:[]});for(var x=0;x<subChunk.subChunks.length;x++)this.readLISTSubChunks_(subChunk.subChunks[x],subChunk.format,buffer)}};/**
  @private
  @param {!Object} subChunk
  @param {string} format
@@ -674,7 +697,7 @@ this.uInt16_);item.dwLanguage=this.io.read_(buffer,this.uInt16_);item.dwDialect=
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-WaveFile.prototype.readJunkChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=this.findChunk_(signature,"junk");if(chunk)this.junk={chunkId:chunk.chunkId,chunkSize:chunk.chunkSize,chunkData:[].slice.call(buffer.slice(chunk.chunkData.start,chunk.chunkData.end))}};/**
+WaveFile.prototype.readJunkChunk_=function(buffer,signature){/** @type {?Object} */ var chunk=findChunk_(signature,"junk");if(chunk)this.junk={chunkId:chunk.chunkId,chunkSize:chunk.chunkSize,chunkData:[].slice.call(buffer.slice(chunk.chunkData.start,chunk.chunkData.end))}};/**
  @private
  @return {!Array<number>}
  */
@@ -693,7 +716,7 @@ WaveFile.prototype.getCueBytes_=function(){/** @type {!Array<number>} */ var byt
  @private
  @return {!Array<number>}
  */
-WaveFile.prototype.getCuePointsBytes_=function(){/** @type {!Array<number>} */ var points=[];for(var i$26=0;i$26<this.cue.dwCuePoints;i$26++)points=points.concat(pack(this.cue.points[i$26].dwName,this.uInt32_),pack(this.cue.points[i$26].dwPosition,this.uInt32_),packString(this.cue.points[i$26].fccChunk),pack(this.cue.points[i$26].dwChunkStart,this.uInt32_),pack(this.cue.points[i$26].dwBlockStart,this.uInt32_),pack(this.cue.points[i$26].dwSampleOffset,this.uInt32_));return points};/**
+WaveFile.prototype.getCuePointsBytes_=function(){/** @type {!Array<number>} */ var points=[];for(var i$27=0;i$27<this.cue.dwCuePoints;i$27++)points=points.concat(pack(this.cue.points[i$27].dwName,this.uInt32_),pack(this.cue.points[i$27].dwPosition,this.uInt32_),packString(this.cue.points[i$27].fccChunk),pack(this.cue.points[i$27].dwChunkStart,this.uInt32_),pack(this.cue.points[i$27].dwBlockStart,this.uInt32_),pack(this.cue.points[i$27].dwSampleOffset,this.uInt32_));return points};/**
  @private
  @return {!Array<number>}
  */
@@ -702,7 +725,7 @@ this.uInt32_),pack(this.smpl.dwSMPTEOffset,this.uInt32_),pack(this.smpl.dwNumSam
  @private
  @return {!Array<number>}
  */
-WaveFile.prototype.getSmplLoopsBytes_=function(){/** @type {!Array<number>} */ var loops=[];for(var i$27=0;i$27<this.smpl.dwNumSampleLoops;i$27++)loops=loops.concat(pack(this.smpl.loops[i$27].dwName,this.uInt32_),pack(this.smpl.loops[i$27].dwType,this.uInt32_),pack(this.smpl.loops[i$27].dwStart,this.uInt32_),pack(this.smpl.loops[i$27].dwEnd,this.uInt32_),pack(this.smpl.loops[i$27].dwFraction,this.uInt32_),pack(this.smpl.loops[i$27].dwPlayCount,this.uInt32_));return loops};/**
+WaveFile.prototype.getSmplLoopsBytes_=function(){/** @type {!Array<number>} */ var loops=[];for(var i$28=0;i$28<this.smpl.dwNumSampleLoops;i$28++)loops=loops.concat(pack(this.smpl.loops[i$28].dwName,this.uInt32_),pack(this.smpl.loops[i$28].dwType,this.uInt32_),pack(this.smpl.loops[i$28].dwStart,this.uInt32_),pack(this.smpl.loops[i$28].dwEnd,this.uInt32_),pack(this.smpl.loops[i$28].dwFraction,this.uInt32_),pack(this.smpl.loops[i$28].dwPlayCount,this.uInt32_));return loops};/**
  @private
  @return {!Array<number>}
  */
@@ -720,14 +743,14 @@ WaveFile.prototype.getFmtExtensionBytes_=function(){/** @type {!Array<number>} *
 this.uInt32_),pack(this.fmt.subformat[2],this.uInt32_),pack(this.fmt.subformat[3],this.uInt32_));return extension};/**
  @return {!Array<number>}
  */
-WaveFile.prototype.getLISTBytes_=function(){/** @type {!Array<number>} */ var bytes=[];for(var i$28=0;i$28<this.LIST.length;i$28++){/** @type {!Array<number>} */ var subChunksBytes=this.getLISTSubChunksBytes_(this.LIST[i$28].subChunks,this.LIST[i$28].format);bytes=bytes.concat(packString(this.LIST[i$28].chunkId),pack(subChunksBytes.length+4,this.uInt32_),packString(this.LIST[i$28].format),subChunksBytes)}return bytes};/**
+WaveFile.prototype.getLISTBytes_=function(){/** @type {!Array<number>} */ var bytes=[];for(var i$29=0;i$29<this.LIST.length;i$29++){/** @type {!Array<number>} */ var subChunksBytes=this.getLISTSubChunksBytes_(this.LIST[i$29].subChunks,this.LIST[i$29].format);bytes=bytes.concat(packString(this.LIST[i$29].chunkId),pack(subChunksBytes.length+4,this.uInt32_),packString(this.LIST[i$29].format),subChunksBytes)}return bytes};/**
  @private
  @param {!Array<!Object>} subChunks
  @param {string} format
  @return {!Array<number>}
  */
-WaveFile.prototype.getLISTSubChunksBytes_=function(subChunks,format){/** @type {!Array<number>} */ var bytes=[];for(var i$29=0;i$29<subChunks.length;i$29++){if(format=="INFO"){bytes=bytes.concat(packString(subChunks[i$29].chunkId),pack(subChunks[i$29].value.length+1,this.uInt32_),this.io.writeString_(subChunks[i$29].value,subChunks[i$29].value.length));bytes.push(0)}else if(format=="adtl")if(["labl","note"].indexOf(subChunks[i$29].chunkId)>-1){bytes=bytes.concat(packString(subChunks[i$29].chunkId),
-pack(subChunks[i$29].value.length+4+1,this.uInt32_),pack(subChunks[i$29].dwName,this.uInt32_),this.io.writeString_(subChunks[i$29].value,subChunks[i$29].value.length));bytes.push(0)}else if(subChunks[i$29].chunkId=="ltxt")bytes=bytes.concat(this.getLtxtChunkBytes_(subChunks[i$29]));if(bytes.length%2)bytes.push(0)}return bytes};/**
+WaveFile.prototype.getLISTSubChunksBytes_=function(subChunks,format){/** @type {!Array<number>} */ var bytes=[];for(var i$30=0;i$30<subChunks.length;i$30++){if(format=="INFO"){bytes=bytes.concat(packString(subChunks[i$30].chunkId),pack(subChunks[i$30].value.length+1,this.uInt32_),this.io.writeString_(subChunks[i$30].value,subChunks[i$30].value.length));bytes.push(0)}else if(format=="adtl")if(["labl","note"].indexOf(subChunks[i$30].chunkId)>-1){bytes=bytes.concat(packString(subChunks[i$30].chunkId),
+pack(subChunks[i$30].value.length+4+1,this.uInt32_),pack(subChunks[i$30].dwName,this.uInt32_),this.io.writeString_(subChunks[i$30].value,subChunks[i$30].value.length));bytes.push(0)}else if(subChunks[i$30].chunkId=="ltxt")bytes=bytes.concat(this.getLtxtChunkBytes_(subChunks[i$30]));if(bytes.length%2)bytes.push(0)}return bytes};/**
  @private
  @param {!Object} ltxt
  @return {!Array<number>}
@@ -740,41 +763,13 @@ WaveFile.prototype.getJunkBytes_=function(){/** @type {!Array<number>} */ var by
  @private
  @return {!Uint8Array}
  */
-WaveFile.prototype.createWaveFile_=function(){/** @type {!Array<!Array<number>>} */ var fileBody=[this.getJunkBytes_(),this.getDs64Bytes_(),this.getBextBytes_(),this.getFmtBytes_(),this.getFactBytes_(),packString(this.data.chunkId),pack(this.data.samples.length,this.uInt32_),this.data.samples,this.getCueBytes_(),this.getSmplBytes_(),this.getLISTBytes_()];/** @type {number} */ var fileBodyLength=0;for(var i$30=0;i$30<fileBody.length;i$30++)fileBodyLength+=fileBody[i$30].length;/** @type {!Uint8Array} */ var file=
-new Uint8Array(fileBodyLength+12);/** @type {number} */ var index=0;index=packStringTo(this.container,file,index);index=packTo(fileBodyLength+4,this.uInt32_,file,index);index=packStringTo(this.format,file,index);for(var i$31=0;i$31<fileBody.length;i$31++){file.set(fileBody[i$31],index);index+=fileBody[i$31].length}return file};/** @private */ WaveFile.prototype.clearHeader_=function(){this.fmt.cbSize=0;this.fmt.validBitsPerSample=0;this.fact.chunkId="";this.ds64.chunkId=""};/**
+WaveFile.prototype.createWaveFile_=function(){/** @type {!Array<!Array<number>>} */ var fileBody=[this.getJunkBytes_(),this.getDs64Bytes_(),this.getBextBytes_(),this.getFmtBytes_(),this.getFactBytes_(),packString(this.data.chunkId),pack(this.data.samples.length,this.uInt32_),this.data.samples,this.getCueBytes_(),this.getSmplBytes_(),this.getLISTBytes_()];/** @type {number} */ var fileBodyLength=0;for(var i$31=0;i$31<fileBody.length;i$31++)fileBodyLength+=fileBody[i$31].length;/** @type {!Uint8Array} */ var file=
+new Uint8Array(fileBodyLength+12);/** @type {number} */ var index=0;index=packStringTo(this.container,file,index);index=packTo(fileBodyLength+4,this.uInt32_,file,index);index=packStringTo(this.format,file,index);for(var i$32=0;i$32<fileBody.length;i$32++){file.set(fileBody[i$32],index);index+=fileBody[i$32].length}return file};/** @private */ WaveFile.prototype.clearHeader_=function(){this.fmt.cbSize=0;this.fmt.validBitsPerSample=0;this.fact.chunkId="";this.ds64.chunkId=""};/**
  @private
  @return {boolean}
  */
-WaveFile.prototype.LEorBE_=function(){/** @type {boolean} */ var bigEndian=this.container==="RIFX";this.uInt16_.be=bigEndian;this.uInt32_.be=bigEndian;return bigEndian};/**
- @private
- @param {!Object} chunks
- @param {string} chunkId
- @param {boolean} multiple
- @return {?Array<!Object>}
- */
-WaveFile.prototype.findChunk_=function(chunks,chunkId,multiple){multiple=multiple===undefined?false:multiple;/** @type {!Array<!Object>} */ var chunk=[];for(var i$32=0;i$32<chunks.length;i$32++)if(chunks[i$32].chunkId==chunkId)if(multiple)chunk.push(chunks[i$32]);else return chunks[i$32];if(chunkId=="LIST")return chunk.length?chunk:null;return null};/** @private */ WaveFile.prototype.updateDataType_=function(){/** @type {!Object} */ this.dataType={bits:(parseInt(this.bitDepth,10)-1|7)+1,float:this.bitDepth==
-"32f"||this.bitDepth=="64",signed:this.bitDepth!="8",be:this.container=="RIFX"};if(["4","8a","8m"].indexOf(this.bitDepth)>-1){this.dataType.bits=8;this.dataType.signed=false}};/** @private */ WaveFile.prototype.bitDepthFromFmt_=function(){if(this.fmt.audioFormat===3&&this.fmt.bitsPerSample===32)this.bitDepth="32f";else if(this.fmt.audioFormat===6)this.bitDepth="8a";else if(this.fmt.audioFormat===7)this.bitDepth="8m";else this.bitDepth=this.fmt.bitsPerSample.toString()};/** @private @throws {Error} */ WaveFile.prototype.validateHeader_=
-function(){this.validateBitDepth_();this.validateNumChannels_();this.validateSampleRate_()};/**
- @private
- @return {boolean}
- @throws {Error}
- */
-WaveFile.prototype.validateBitDepth_=function(){if(!AUDIO_FORMATS[this.bitDepth]){if(parseInt(this.bitDepth,10)>8&&parseInt(this.bitDepth,10)<54)return true;throw new Error("Invalid bit depth.");}return true};/**
- @private
- @return {boolean}
- @throws {Error}
- */
-WaveFile.prototype.validateNumChannels_=function(){/** @type {number} */ var blockAlign=this.fmt.numChannels*this.fmt.bitsPerSample/8;if(this.fmt.numChannels<1||blockAlign>65535)throw new Error("Invalid number of channels.");return true};/**
- @private
- @return {boolean}
- @throws {Error}
- */
-WaveFile.prototype.validateSampleRate_=function(){/** @type {number} */ var byteRate=this.fmt.numChannels*(this.fmt.bitsPerSample/8)*this.fmt.sampleRate;if(this.fmt.sampleRate<1||byteRate>4294967295)throw new Error("Invalid sample rate.");return true};/**
- @private
- @param {string} bitDepthCode
- @return {string}
- */
-WaveFile.prototype.realBitDepth_=function(bitDepthCode){if(bitDepthCode!="32f")bitDepthCode=((parseInt(bitDepthCode,10)-1|7)+1).toString();return bitDepthCode};/**
+WaveFile.prototype.LEorBE_=function(){/** @type {boolean} */ var bigEndian=this.container==="RIFX";this.uInt16_.be=bigEndian;this.uInt32_.be=bigEndian;return bigEndian};/** @private */ WaveFile.prototype.updateDataType_=function(){/** @type {!Object} */ this.dataType={bits:(parseInt(this.bitDepth,10)-1|7)+1,float:this.bitDepth=="32f"||this.bitDepth=="64",signed:this.bitDepth!="8",be:this.container=="RIFX"};if(["4","8a","8m"].indexOf(this.bitDepth)>-1){this.dataType.bits=8;this.dataType.signed=false}};
+/** @private */ WaveFile.prototype.bitDepthFromFmt_=function(){if(this.fmt.audioFormat===3&&this.fmt.bitsPerSample===32)this.bitDepth="32f";else if(this.fmt.audioFormat===6)this.bitDepth="8a";else if(this.fmt.audioFormat===7)this.bitDepth="8m";else this.bitDepth=this.fmt.bitsPerSample.toString()};/**
  @private
  @return {string}
  */

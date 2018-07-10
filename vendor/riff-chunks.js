@@ -43,7 +43,7 @@ let head_ = 0;
  * @param {!Uint8Array} buffer The file bytes.
  * @return {!Object} The RIFF chunks.
  */
-export default function riffChunks(buffer) {
+export function riffChunks(buffer) {
     head_ = 0;
     let chunkId = getChunkId_(buffer, 0);
     uInt32_.be = chunkId == 'RIFX';
@@ -55,6 +55,33 @@ export default function riffChunks(buffer) {
         format: format,
         subChunks: getSubChunksIndex_(buffer)
     };
+}
+
+/**
+  * Find a chunk by its fourCC_ in a array of RIFF chunks.
+  * @param {!Object} chunks The wav file chunks.
+  * @param {string} chunkId The chunk fourCC_.
+  * @param {boolean} multiple True if there may be multiple chunks
+  *    with the same chunkId.
+  * @return {?Array<!Object>}
+  * @private
+  */
+export function findChunk_(chunks, chunkId, multiple=false) {
+  /** @type {!Array<!Object>} */
+  let chunk = [];
+  for (let i=0; i<chunks.length; i++) {
+    if (chunks[i].chunkId == chunkId) {
+      if (multiple) {
+        chunk.push(chunks[i]);
+      } else {
+        return chunks[i];
+      }
+    }
+  }
+  if (chunkId == 'LIST') {
+    return chunk.length ? chunk : null;
+  }
+  return null;
 }
 
 /**

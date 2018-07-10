@@ -35,8 +35,8 @@ import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
 import {unpackArray, packArrayTo, unpackArrayTo,
 pack, packStringTo, packTo, packString} from './vendor/byte-data.js';
-import {wavHeader, AUDIO_FORMATS} from './lib/wavheader.js';
-import riffChunks from './vendor/riff-chunks.js';
+import {wavHeader, validateHeader_, AUDIO_FORMATS} from './lib/wavheader.js';
+import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
 import BufferIO from './lib/bufferio.js';
 
 /**
@@ -315,9 +315,9 @@ export default class WaveFile {
     this.container = options.container;
     this.bitDepth = bitDepthCode;
     samples = this.interleave_(samples);
-    /** @type {number} */
-    let numBytes = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1) / 8;
     this.updateDataType_();
+    /** @type {number} */
+    let numBytes = this.dataType.bits / 8;
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
     /** @type {!Object} */
@@ -333,7 +333,7 @@ export default class WaveFile {
     }
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
-    this.validateHeader_();
+    validateHeader_(this);
     this.LEorBE_();
   }
 
@@ -356,7 +356,7 @@ export default class WaveFile {
    * @throws {Error} If any property of the object appears invalid.
    */
   toBuffer() {
-    this.validateHeader_();
+    validateHeader_(this);
     return this.createWaveFile_();
   }
 
@@ -454,8 +454,10 @@ export default class WaveFile {
     // @type {string}
     let thisBitDepth = this.bitDepth;
     if (!changeResolution) {
-      toBitDepth = this.realBitDepth_(newBitDepth);
-      thisBitDepth = this.realBitDepth_(this.bitDepth);
+      if (newBitDepth != '32f') {
+        toBitDepth = this.dataType.bits.toString();
+      }
+      thisBitDepth = this.dataType.bits;
     }
     this.assureUncompressed_();
     // @type {number}
@@ -998,7 +1000,7 @@ export default class WaveFile {
    */
   readFmtChunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'fmt ');
+    let chunk = findChunk_(signature, 'fmt ');
     if (chunk) {
       this.io.head_ = chunk.chunkData.start;
       this.fmt.chunkId = chunk.chunkId;
@@ -1045,7 +1047,7 @@ export default class WaveFile {
    */
   readFactChunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'fact');
+    let chunk = findChunk_(signature, 'fact');
     if (chunk) {
       this.io.head_ = chunk.chunkData.start;
       this.fact.chunkId = chunk.chunkId;
@@ -1062,7 +1064,7 @@ export default class WaveFile {
    */
   readCueChunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'cue ');
+    let chunk = findChunk_(signature, 'cue ');
     if (chunk) {
       this.io.head_ = chunk.chunkData.start;
       this.cue.chunkId = chunk.chunkId;
@@ -1089,7 +1091,7 @@ export default class WaveFile {
    */
   readSmplChunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'smpl');
+    let chunk = findChunk_(signature, 'smpl');
     if (chunk) {
       this.io.head_ = chunk.chunkData.start;
       this.smpl.chunkId = chunk.chunkId;
@@ -1126,7 +1128,7 @@ export default class WaveFile {
    */
   readDataChunk_(buffer, signature, samples) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'data');
+    let chunk = findChunk_(signature, 'data');
     if (chunk) {
       this.data.chunkId = 'data';
       this.data.chunkSize = chunk.chunkSize;
@@ -1148,7 +1150,7 @@ export default class WaveFile {
    */
   readBextChunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'bext');
+    let chunk = findChunk_(signature, 'bext');
     if (chunk) {
       this.io.head_ = chunk.chunkData.start;
       this.bext.chunkId = chunk.chunkId;
@@ -1183,7 +1185,7 @@ export default class WaveFile {
    */
   readDs64Chunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'ds64');
+    let chunk = findChunk_(signature, 'ds64');
     if (chunk) {
       this.io.head_ = chunk.chunkData.start;
       this.ds64.chunkId = chunk.chunkId;
@@ -1216,7 +1218,7 @@ export default class WaveFile {
    */
   readLISTChunk_(buffer, signature) {
     /** @type {?Object} */
-    let listChunks = this.findChunk_(signature, 'LIST', true);
+    let listChunks = findChunk_(signature, 'LIST', true);
     if (listChunks === null) {
       return;
     }
@@ -1282,7 +1284,7 @@ export default class WaveFile {
    */
   readJunkChunk_(buffer, signature) {
     /** @type {?Object} */
-    let chunk = this.findChunk_(signature, 'junk');
+    let chunk = findChunk_(signature, 'junk');
     if (chunk) {
       this.junk = {
         chunkId: chunk.chunkId,
@@ -1701,33 +1703,6 @@ export default class WaveFile {
   }
 
   /**
-   * Find a chunk by its fourCC_ in a array of RIFF chunks.
-   * @param {!Object} chunks The wav file chunks.
-   * @param {string} chunkId The chunk fourCC_.
-   * @param {boolean} multiple True if there may be multiple chunks
-   *    with the same chunkId.
-   * @return {?Array<!Object>}
-   * @private
-   */
-  findChunk_(chunks, chunkId, multiple=false) {
-    /** @type {!Array<!Object>} */
-    let chunk = [];
-    for (let i=0; i<chunks.length; i++) {
-      if (chunks[i].chunkId == chunkId) {
-        if (multiple) {
-          chunk.push(chunks[i]);
-        } else {
-          return chunks[i];
-        }
-      }
-    }
-    if (chunkId == 'LIST') {
-      return chunk.length ? chunk : null;
-    }
-    return null;
-  }
-
-  /**
    * Update the type definition used to read and write the samples.
    * @private
    */
@@ -1759,79 +1734,6 @@ export default class WaveFile {
     } else {
       this.bitDepth = this.fmt.bitsPerSample.toString();
     }
-  }
-
-  /**
-   * Validate the header of the file.
-   * @throws {Error} If any property of the object appears invalid.
-   * @private
-   */
-  validateHeader_() {
-    this.validateBitDepth_();
-    this.validateNumChannels_();
-    this.validateSampleRate_();
-  }
-
-  /**
-   * Validate the bit depth.
-   * @return {boolean} True is the bit depth is valid.
-   * @throws {Error} If bit depth is invalid.
-   * @private
-   */
-  validateBitDepth_() {
-    if (!AUDIO_FORMATS[this.bitDepth]) {
-      if (parseInt(this.bitDepth, 10) > 8 &&
-          parseInt(this.bitDepth, 10) < 54) {
-        return true;
-      }
-      throw new Error('Invalid bit depth.');
-    }
-    return true;
-  }
-
-  /**
-   * Validate the number of channels.
-   * @return {boolean} True is the number of channels is valid.
-   * @throws {Error} If the number of channels is invalid.
-   * @private
-   */
-  validateNumChannels_() {
-    /** @type {number} */
-    let blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
-    if (this.fmt.numChannels < 1 || blockAlign > 65535) {
-      throw new Error('Invalid number of channels.');
-    }
-    return true;
-  }
-
-  /**
-   * Validate the sample rate value.
-   * @return {boolean} True is the sample rate is valid.
-   * @throws {Error} If the sample rate is invalid.
-   * @private
-   */
-  validateSampleRate_() {
-    /** @type {number} */
-    let byteRate = this.fmt.numChannels *
-      (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
-    if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
-      throw new Error('Invalid sample rate.');
-    }
-    return true;
-  }
-
-  /**
-   * Return the closest greater number of bits for a number of bits that
-   * do not fill a full sequence of bytes.
-   * @param {string} bitDepthCode The bit depth.
-   * @return {string}
-   * @private
-   */
-  realBitDepth_(bitDepthCode) {
-    if (bitDepthCode != '32f') {
-      bitDepthCode = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1).toString();
-    }
-    return bitDepthCode;
   }
 
   /**
