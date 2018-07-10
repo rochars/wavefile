@@ -47,7 +47,9 @@
     "url": "https://github.com/rochars/wavefile/issues"
   },
   "directories": {
-    "dist": "./dist"
+    "dist": "./dist",
+    "lib": "./lib",
+    "vendor": "./vendor"
   },
   "scripts": {
     "lint": "jshint index.js externs.js cli.js",
@@ -68,6 +70,7 @@
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "browser-env": "^3.2.5",
+    "byte-data": "^13.2.5",
     "chai": "^4.1.2",
     "codecov": "^3.0.2",
     "docdash": "^0.4.0",
@@ -84,8 +87,5 @@
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0"
   },
-  "dependencies": {
-    "base64-arraybuffer-es6": "^0.3.1",
-    "byte-data": "^13.2.4"
-  }
+  "dependencies": {}
 }

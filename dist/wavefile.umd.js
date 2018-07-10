@@ -815,77 +815,6 @@
       return arraybuffer;
   };
 
-  /*
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
-   *
-   * Permission is hereby granted, free of charge, to any person obtaining
-   * a copy of this software and associated documentation files (the
-   * "Software"), to deal in the Software without restriction, including
-   * without limitation the rights to use, copy, modify, merge, publish,
-   * distribute, sublicense, and/or sell copies of the Software, and to
-   * permit persons to whom the Software is furnished to do so, subject to
-   * the following conditions:
-   *
-   * The above copyright notice and this permission notice shall be
-   * included in all copies or substantial portions of the Software.
-   *
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-   *
-   */
-
-  /**
-   * @fileoverview A function to swap endianness in byte buffers.
-   * @see https://github.com/rochars/endianness
-   */
-
-  /**
-   * Swap the byte ordering in a buffer. The buffer is modified in place.
-   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
-   * @param {number} offset The byte offset.
-   * @param {number=} index The start index. Assumes 0.
-   * @param {?number=} end The end index. Assumes the buffer length.
-   * @throws {Error} If the buffer length is not valid.
-   */
-  function endianness(bytes, offset) {
-    var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var end = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
-    var len = end || bytes.length;
-    var limit = parseInt(offset / 2, 10);
-    if (len % offset) {
-      throw new Error("Bad buffer length.");
-    }
-    while (index < len) {
-      swap(bytes, offset, index, limit);
-      index += offset;
-    }
-  }
-
-  /**
-   * Swap the byte order of a value in a buffer. The buffer is modified in place.
-   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
-   * @param {number} offset The byte offset.
-   * @param {number} index The start index.
-   * @private
-   */
-  function swap(bytes, offset, index, limit) {
-    var x = 0;
-    var y = offset - 1;
-    while (x < limit) {
-      var theByte = bytes[index + x];
-      bytes[index + x] = bytes[index + y];
-      bytes[index + y] = theByte;
-      x++;
-      y--;
-    }
-  }
-
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -959,6 +888,73 @@
    */
 
   /**
+   * @fileoverview A function to swap endianness in byte buffers.
+   * @see https://github.com/rochars/endianness
+   */
+
+  /**
+   * Swap the byte ordering in a buffer. The buffer is modified in place.
+   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
+   * @param {number} offset The byte offset.
+   * @param {number=} index The start index. Assumes 0.
+   * @param {number=} end The end index. Assumes the buffer length.
+   * @throws {Error} If the buffer length is not valid.
+   */
+  function endianness(bytes, offset) {
+    var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var end = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : bytes.length;
+
+    if (end % offset) {
+      throw new Error("Bad buffer length.");
+    }
+    for (; index < end; index += offset) {
+      swap(bytes, offset, index);
+    }
+  }
+
+  /**
+   * Swap the byte order of a value in a buffer. The buffer is modified in place.
+   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
+   * @param {number} offset The byte offset.
+   * @param {number} index The start index.
+   * @private
+   */
+  function swap(bytes, offset, index) {
+    offset--;
+    for (var x = 0; x < offset; x++) {
+      /** @type {number|string} */
+      var theByte = bytes[index + x];
+      bytes[index + x] = bytes[index + offset];
+      bytes[index + offset] = theByte;
+      offset--;
+    }
+  }
+
+  /*
+   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
+  /**
    * @fileoverview Pack and unpack two's complement ints and unsigned ints.
    * @see https://github.com/rochars/byte-data
    */
@@ -966,6 +962,7 @@
   /**
    * A class to pack and unpack two's complement ints and unsigned ints.
    */
+
   var Integer = function () {
 
     /**
@@ -1269,6 +1266,8 @@
    * @param {number} code The code.
    * @throws {Error} If the code is not a valid ASCII code.
    */
+
+
   function validateASCIICode(code) {
     if (code > 127) {
       throw new Error('Bad ASCII code.');
@@ -1356,7 +1355,9 @@
    * @type {boolean}
    * @private
    */
-  var HOST_BE_ = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+  var BE_ENV = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+  var HIGH = BE_ENV ? 1 : 0;
+  var LOW = BE_ENV ? 0 : 1;
 
   /**
    * @type {!Int8Array}
@@ -1452,9 +1453,13 @@
    * @private
    */
   function read16F_(bytes, i) {
+    /** @type {number} */
     var int = gInt_.read(bytes, i);
+    /** @type {number} */
     var exponent = (int & 0x7C00) >> 10;
+    /** @type {number} */
     var fraction = int & 0x03FF;
+    /** @type {number} */
     var floatValue = void 0;
     if (exponent) {
       floatValue = Math.pow(2, exponent - 15) * (1 + fraction / 0x400);
@@ -1485,13 +1490,8 @@
    * @private
    */
   function read64F_(bytes, i) {
-    if (HOST_BE_) {
-      ui32_[1] = gInt_.read(bytes, i);
-      ui32_[0] = gInt_.read(bytes, i + 4);
-    } else {
-      ui32_[0] = gInt_.read(bytes, i);
-      ui32_[1] = gInt_.read(bytes, i + 4);
-    }
+    ui32_[HIGH] = gInt_.read(bytes, i);
+    ui32_[LOW] = gInt_.read(bytes, i + 4);
     return f64_[0];
   }
 
@@ -1517,9 +1517,13 @@
    */
   function write16F_(bytes, number, j) {
     f32_[0] = number;
+    /** @type {number} */
     var x = ui32_[0];
+    /** @type {number} */
     var bits = x >> 16 & 0x8000;
+    /** @type {number} */
     var m = x >> 12 & 0x07ff;
+    /** @type {number} */
     var e = x >> 23 & 0xff;
     if (e >= 103) {
       bits |= e - 112 << 10 | m >> 1;
@@ -1553,14 +1557,8 @@
    */
   function write64F_(bytes, number, j) {
     f64_[0] = number;
-    if (HOST_BE_) {
-      j = gInt_.write(bytes, ui32_[1], j);
-      j = gInt_.write(bytes, ui32_[0], j);
-    } else {
-      j = gInt_.write(bytes, ui32_[0], j);
-      j = gInt_.write(bytes, ui32_[1], j);
-    }
-    return j;
+    j = gInt_.write(bytes, ui32_[HIGH], j);
+    return gInt_.write(bytes, ui32_[LOW], j);
   }
 
   /**

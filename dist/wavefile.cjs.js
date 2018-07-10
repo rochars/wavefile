@@ -880,18 +880,15 @@ const decode$2 = function (base64) {
  * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
  * @param {number} offset The byte offset.
  * @param {number=} index The start index. Assumes 0.
- * @param {?number=} end The end index. Assumes the buffer length.
+ * @param {number=} end The end index. Assumes the buffer length.
  * @throws {Error} If the buffer length is not valid.
  */
-function endianness(bytes, offset, index=0, end=null) {
-  let len = end || bytes.length;
-  let limit = parseInt(offset / 2, 10);
-  if (len % offset) {
+function endianness(bytes, offset, index=0, end=bytes.length) {
+  if (end % offset) {
     throw new Error("Bad buffer length.");
   }
-  while (index < len) {
-    swap(bytes, offset, index, limit);
-    index += offset;
+  for (; index < end; index += offset) {
+    swap(bytes, offset, index);
   }
 }
 
@@ -902,15 +899,14 @@ function endianness(bytes, offset, index=0, end=null) {
  * @param {number} index The start index.
  * @private
  */
-function swap(bytes, offset, index, limit) {
-  let x = 0;
-  let y = offset - 1;
-  while(x < limit) {
+function swap(bytes, offset, index) {
+  offset--;
+  for(let x = 0; x < offset; x++) {
+    /** @type {number|string} */
     let theByte = bytes[index + x];
-    bytes[index + x] = bytes[index + y];
-    bytes[index + y] = theByte;
-    x++;
-    y--;
+    bytes[index + x] = bytes[index + offset];
+    bytes[index + offset] = theByte;
+    offset--;
   }
 }
 
@@ -1292,28 +1288,30 @@ function validateIntType_(theType) {
  * @type {boolean}
  * @private
  */
-let HOST_BE_ = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+const BE_ENV = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+const HIGH = BE_ENV ? 1 : 0;
+const LOW = BE_ENV ? 0 : 1;
 
 /**
  * @type {!Int8Array}
  * @private
  */
-const int8_ = new Int8Array(8);
+let int8_ = new Int8Array(8);
 /**
  * @type {!Uint32Array}
  * @private
  */
-const ui32_ = new Uint32Array(int8_.buffer);
+let ui32_ = new Uint32Array(int8_.buffer);
 /**
  * @type {!Float32Array}
  * @private
  */
-const f32_ = new Float32Array(int8_.buffer);
+let f32_ = new Float32Array(int8_.buffer);
 /**
  * @type {!Float64Array}
  * @private
  */
-const f64_ = new Float64Array(int8_.buffer);
+let f64_ = new Float64Array(int8_.buffer);
 /**
  * @type {Function}
  * @private
@@ -1391,9 +1389,13 @@ function readInt_(bytes, i) {
  * @private
  */
 function read16F_(bytes, i) {
+  /** @type {number} */
   let int = gInt_.read(bytes, i);
+  /** @type {number} */
   let exponent = (int & 0x7C00) >> 10;
+  /** @type {number} */
   let fraction = int & 0x03FF;
+  /** @type {number} */
   let floatValue;
   if (exponent) {
     floatValue =  Math.pow(2, exponent - 15) * (1 + fraction / 0x400);
@@ -1424,13 +1426,8 @@ function read32F_(bytes, i) {
  * @private
  */
 function read64F_(bytes, i) {
-  if (HOST_BE_) {
-    ui32_[1] = gInt_.read(bytes, i);
-    ui32_[0] = gInt_.read(bytes, i + 4);
-  } else {
-    ui32_[0] = gInt_.read(bytes, i);
-    ui32_[1] = gInt_.read(bytes, i + 4);
-  }
+  ui32_[HIGH] = gInt_.read(bytes, i);
+  ui32_[LOW] = gInt_.read(bytes, i + 4);
   return f64_[0];
 }
 
@@ -1456,9 +1453,13 @@ function writeInt_(bytes, number, j) {
  */
 function write16F_(bytes, number, j) {
   f32_[0] = number;
+  /** @type {number} */
   let x = ui32_[0];
+  /** @type {number} */
   let bits = (x >> 16) & 0x8000;
+  /** @type {number} */
   let m = (x >> 12) & 0x07ff;
+  /** @type {number} */
   let e = (x >> 23) & 0xff;
   if (e >= 103) {
     bits |= ((e - 112) << 10) | (m >> 1);
@@ -1492,14 +1493,8 @@ function write32F_(bytes, number, j) {
  */
 function write64F_(bytes, number, j) {
   f64_[0] = number;
-  if (HOST_BE_) {
-    j = gInt_.write(bytes, ui32_[1], j);
-    j = gInt_.write(bytes, ui32_[0], j);
-  } else {
-    j = gInt_.write(bytes, ui32_[0], j);
-    j = gInt_.write(bytes, ui32_[1], j);
-  }
-  return j;
+  j = gInt_.write(bytes, ui32_[HIGH], j);
+  return gInt_.write(bytes, ui32_[LOW], j);
 }
 
 /**
@@ -1733,7 +1728,7 @@ function unpackArrayFrom(buffer, theType, index=0, end=null) {
   }
   let values = [];
   let step = theType.offset;
-  for (let i=index; i < len; i+=step) {
+  for (let i = index; i < len; i += step) {
     values.push(reader_(buffer, i));
   }
   if (theType.be) {
@@ -1762,7 +1757,7 @@ function unpackArrayTo(buffer, theType, output, index=0, end=null) {
   }
   let outputIndex = 0;
   let step = theType.offset;
-  for (let i=index; i < len; i+=step) {
+  for (let i = index; i < len; i += step) {
     output.set([reader_(buffer, i)], outputIndex);
     outputIndex++;
   }

@@ -29,11 +29,11 @@
 
 /** @module wavefile */
 
-import bitDepthLib from './lib/bitdepth.js';
-import * as imaadpcm from './lib/imaadpcm.js';
-import * as alawmulaw from './lib/alawmulaw.js';
-import {encode, decode} from 'base64-arraybuffer-es6';
-import {unpackArray, packArrayTo, unpackArrayTo} from 'byte-data';
+import bitDepthLib from './vendor/bitdepth.js';
+import * as imaadpcm from './vendor/imaadpcm.js';
+import * as alawmulaw from './vendor/alawmulaw.js';
+import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
+import {unpackArray, packArrayTo, unpackArrayTo} from './vendor/byte-data.js';
 
 // @type {WavIO}
 import WavIO from './lib/wavio.js';

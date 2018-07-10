@@ -31,7 +31,7 @@
 
 /** @module riffChunks */
 
-import {unpackFrom, unpackString} from 'byte-data';
+import {unpackFrom, unpackString} from './byte-data.js';
 
 /** @private */
 const uInt32_ = {bits: 32};
