@@ -42,11 +42,15 @@ if (process.argv[3] == '--min') {
 // ESM
 } else if (process.argv[3] == '--esm') {
 	console.log('esm tests');
+	require = require("esm")(module);
+	global.module = module;
 	wavefile = require('../dist/wavefile.js').default;
 
 // Source
 } else {
 	console.log('Source tests');
+	require = require("esm")(module);
+	global.module = module;
 	wavefile = require('../index.js').default;
 }
 

@@ -66,8 +66,8 @@
   ],
   "scripts": {
     "lint": "jshint index.js externs.js cli.js lib",
-    "test": "nyc --require=esm ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=240000",
-    "test-esm": "nyc ./node_modules/mocha/bin/_mocha test/dist --esm --require=esm --recursive -R dot --timeout=240000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=240000",
+    "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist --esm --recursive -R dot --timeout=240000",
     "test-min": "node ./node_modules/mocha/bin/_mocha test/dist --min --recursive -R dot --timeout=240000",
     "test-cjs": "node ./node_modules/mocha/bin/_mocha test/dist --cjs --recursive -R dot --timeout=240000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist --umd --recursive -R dot --timeout=240000",
