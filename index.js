@@ -34,7 +34,7 @@ import * as imaadpcm from './vendor/imaadpcm.js';
 import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
 import {unpackArray, packArrayTo, unpackArrayTo} from './vendor/byte-data.js';
-
+import {wavHeader, AUDIO_FORMATS} from './lib/wavheader.js';
 // @type {WavIO}
 import WavIO from './lib/wavio.js';
 
@@ -86,21 +86,17 @@ export default class WaveFile extends WavIO {
     this.updateDataType_();
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
-    // create headers
-    this.createPCMHeader_(
-      bitDepthCode, numChannels, sampleRate, numBytes, options);
-    if (bitDepthCode == '4') {
-      this.createADPCMHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, options);
-    } else if (bitDepthCode == '8a' || bitDepthCode == '8m') {
-      this.createALawMulawHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, options);
-    } else if(Object.keys(this.audioFormats_).indexOf(bitDepthCode) == -1 ||
-        this.fmt.numChannels > 2) {
-      this.createExtensibleHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, options);
+    /** @type {!Object} */
+    let header = wavHeader(
+      bitDepthCode, numChannels, sampleRate,
+      numBytes, this.data.samples.length, options);
+    this.clearHeader_();
+    this.chunkSize = header.chunkSize;
+    this.format = header.format;
+    this.fmt = header.fmt;
+    if (header.fact) {
+      this.fact = header.fact;
     }
-    // the data chunk
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
     this.validateHeader_();
@@ -711,5 +707,64 @@ export default class WaveFile extends WavIO {
       }
     }
     return tag;
+  }
+
+  /**
+   * Validate the header of the file.
+   * @throws {Error} If any property of the object appears invalid.
+   * @private
+   */
+  validateHeader_() {
+    this.validateBitDepth_();
+    this.validateNumChannels_();
+    this.validateSampleRate_();
+  }
+
+  /**
+   * Validate the bit depth.
+   * @return {boolean} True is the bit depth is valid.
+   * @throws {Error} If bit depth is invalid.
+   * @private
+   */
+  validateBitDepth_() {
+    if (!AUDIO_FORMATS[this.bitDepth]) {
+      if (parseInt(this.bitDepth, 10) > 8 &&
+          parseInt(this.bitDepth, 10) < 54) {
+        return true;
+      }
+      throw new Error('Invalid bit depth.');
+    }
+    return true;
+  }
+
+  /**
+   * Validate the number of channels.
+   * @return {boolean} True is the number of channels is valid.
+   * @throws {Error} If the number of channels is invalid.
+   * @private
+   */
+  validateNumChannels_() {
+    /** @type {number} */
+    let blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
+    if (this.fmt.numChannels < 1 || blockAlign > 65535) {
+      throw new Error('Invalid number of channels.');
+    }
+    return true;
+  }
+
+  /**
+   * Validate the sample rate value.
+   * @return {boolean} True is the sample rate is valid.
+   * @throws {Error} If the sample rate is invalid.
+   * @private
+   */
+  validateSampleRate_() {
+    /** @type {number} */
+    let byteRate = this.fmt.numChannels *
+      (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
+    if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
+      throw new Error('Invalid sample rate.');
+    }
+    return true;
   }
 }

@@ -1835,6 +1835,212 @@
   }
 
   /*
+   * Copyright (c) 2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
+  /**
+   * @fileoverview A tool to create wav file headers.
+   * @see https://github.com/rochars/wavefile
+   */
+
+  /**
+   * Audio formats.
+   * Formats not listed here will be set to 65534,
+   * the code for WAVE_FORMAT_EXTENSIBLE
+   * @enum {number}
+   * @private
+   */
+  var AUDIO_FORMATS = {
+    '4': 17,
+    '8': 1,
+    '8a': 6,
+    '8m': 7,
+    '16': 1,
+    '24': 1,
+    '32': 1,
+    '32f': 3,
+    '64': 3
+  };
+
+  /**
+   * Return the header for a wav file.
+   * @param {string} bitDepthCode The audio bit depth
+   * @param {number} numChannels The number of channels
+   * @param {number} sampleRate The sample rate.
+   * @param {number} numBytes The number of bytes each sample use.
+   * @param {number} samplesLength The length of the samples in bytes.
+   * @param {!Object} options The extra options, like container defintion.
+   * @private
+   */
+  function wavHeader(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+    var header = {};
+    if (bitDepthCode == '4') {
+      header = createADPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    } else if (bitDepthCode == '8a' || bitDepthCode == '8m') {
+      header = createALawMulawHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    } else if (Object.keys(AUDIO_FORMATS).indexOf(bitDepthCode) == -1 || numChannels > 2) {
+      header = createExtensibleHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    } else {
+      header = createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    }
+    return header;
+  }
+
+  /**
+   * Create the header of a linear PCM wave file.
+   * @param {string} bitDepthCode The audio bit depth
+   * @param {number} numChannels The number of channels
+   * @param {number} sampleRate The sample rate.
+   * @param {number} numBytes The number of bytes each sample use.
+   * @param {number} samplesLength The length of the samples in bytes.
+   * @param {!Object} options The extra options, like container defintion.
+   * @private
+   */
+  function createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+    return {
+      container: options.container,
+      chunkSize: 36 + samplesLength,
+      format: 'WAVE',
+      fmt: {
+        chunkId: 'fmt ',
+        chunkSize: 16,
+        audioFormat: AUDIO_FORMATS[bitDepthCode] ? AUDIO_FORMATS[bitDepthCode] : 65534,
+        numChannels: numChannels,
+        sampleRate: sampleRate,
+        byteRate: numChannels * numBytes * sampleRate,
+        blockAlign: numChannels * numBytes,
+        bitsPerSample: parseInt(bitDepthCode, 10),
+        cbSize: 0,
+        validBitsPerSample: 0,
+        dwChannelMask: 0,
+        subformat: []
+      }
+    };
+  }
+
+  /**
+   * Create the header of a ADPCM wave file.
+   * @param {string} bitDepthCode The audio bit depth
+   * @param {number} numChannels The number of channels
+   * @param {number} sampleRate The sample rate.
+   * @param {number} numBytes The number of bytes each sample use.
+   * @param {number} samplesLength The length of the samples in bytes.
+   * @param {!Object} options The extra options, like container defintion.
+   * @private
+   */
+  function createADPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+    var header = createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    header.chunkSize = 40 + samplesLength;
+    header.fmt.chunkSize = 20;
+    header.fmt.byteRate = 4055;
+    header.fmt.blockAlign = 256;
+    header.fmt.bitsPerSample = 4;
+    header.fmt.cbSize = 2;
+    header.fmt.validBitsPerSample = 505;
+    header.fact = {
+      chunkId: 'fact',
+      chunkSize: 4,
+      dwSampleLength: samplesLength * 2
+    };
+    return header;
+  }
+
+  /**
+   * Create the header of WAVE_FORMAT_EXTENSIBLE file.
+   * @param {string} bitDepthCode The audio bit depth
+   * @param {number} numChannels The number of channels
+   * @param {number} sampleRate The sample rate.
+   * @param {number} numBytes The number of bytes each sample use.
+   * @param {number} samplesLength The length of the samples in bytes.
+   * @param {!Object} options The extra options, like container defintion.
+   * @private
+   */
+  function createExtensibleHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+    var header = createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    header.chunkSize = 36 + 24 + samplesLength;
+    header.fmt.chunkSize = 40;
+    header.fmt.bitsPerSample = (parseInt(bitDepthCode, 10) - 1 | 7) + 1;
+    header.fmt.cbSize = 22;
+    header.fmt.validBitsPerSample = parseInt(bitDepthCode, 10);
+    header.fmt.dwChannelMask = getDwChannelMask_(numChannels);
+    // subformat 128-bit GUID as 4 32-bit values
+    // only supports uncompressed integer PCM samples
+    header.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
+    return header;
+  }
+
+  /**
+   * Create the header of mu-Law and A-Law wave files.
+   * @param {string} bitDepthCode The audio bit depth
+   * @param {number} numChannels The number of channels
+   * @param {number} sampleRate The sample rate.
+   * @param {number} numBytes The number of bytes each sample use.
+   * @param {number} samplesLength The length of the samples in bytes.
+   * @param {!Object} options The extra options, like container defintion.
+   * @private
+   */
+  function createALawMulawHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+    var header = createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
+    header.chunkSize = 40 + samplesLength;
+    header.fmt.chunkSize = 20;
+    header.fmt.cbSize = 2;
+    header.fmt.validBitsPerSample = 8;
+    header.fact = {
+      chunkId: 'fact',
+      chunkSize: 4,
+      dwSampleLength: samplesLength
+    };
+    return header;
+  }
+
+  /**
+   * Get the value for dwChannelMask according to the number of channels.
+   * @return {number} the dwChannelMask value.
+   * @private
+   */
+  function getDwChannelMask_(numChannels) {
+    /** @type {number} */
+    var dwChannelMask = 0;
+    // mono = FC
+    if (numChannels === 1) {
+      dwChannelMask = 0x4;
+      // stereo = FL, FR
+    } else if (numChannels === 2) {
+      dwChannelMask = 0x3;
+      // quad = FL, FR, BL, BR
+    } else if (numChannels === 4) {
+      dwChannelMask = 0x33;
+      // 5.1 = FL, FR, FC, LF, BL, BR
+    } else if (numChannels === 6) {
+      dwChannelMask = 0x3F;
+      // 7.1 = FL, FR, FC, LF, BL, BR, SL, SR
+    } else if (numChannels === 8) {
+      dwChannelMask = 0x63F;
+    }
+    return dwChannelMask;
+  }
+
+  /*
    * riff-chunks: Read and write the chunks of RIFF and RIFX files.
    * https://github.com/rochars/riff-chunks
    *
@@ -2255,24 +2461,6 @@
        * @type {string}
        */
       _this.bitDepth = '0';
-      /**
-       * Audio formats.
-       * Formats not listed here will be set to 65534
-       * and treated as WAVE_FORMAT_EXTENSIBLE
-       * @enum {number}
-       * @private
-       */
-      _this.audioFormats_ = {
-        '4': 17,
-        '8': 1,
-        '8a': 6,
-        '8m': 7,
-        '16': 1,
-        '24': 1,
-        '32': 1,
-        '32f': 3,
-        '64': 3
-      };
       /**
        * @type {number}
        * @private
@@ -2704,140 +2892,6 @@
       }
 
       /**
-       * Create the header of a ADPCM wave file.
-       * @param {string} bitDepthCode The audio bit depth
-       * @param {number} numChannels The number of channels
-       * @param {number} sampleRate The sample rate.
-       * @param {number} numBytes The number of bytes each sample use.
-       * @param {!Object} options The extra options, like container defintion.
-       * @private
-       */
-
-    }, {
-      key: 'createADPCMHeader_',
-      value: function createADPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options) {
-        this.createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
-        this.chunkSize = 40 + this.data.samples.length;
-        this.fmt.chunkSize = 20;
-        this.fmt.byteRate = 4055;
-        this.fmt.blockAlign = 256;
-        this.fmt.bitsPerSample = 4;
-        this.fmt.cbSize = 2;
-        this.fmt.validBitsPerSample = 505;
-        this.fact.chunkId = 'fact';
-        this.fact.chunkSize = 4;
-        this.fact.dwSampleLength = this.data.samples.length * 2;
-        this.data.chunkSize = this.data.samples.length;
-      }
-
-      /**
-       * Create the header of WAVE_FORMAT_EXTENSIBLE file.
-       * @param {string} bitDepthCode The audio bit depth
-       * @param {number} numChannels The number of channels
-       * @param {number} sampleRate The sample rate.
-       * @param {number} numBytes The number of bytes each sample use.
-       * @param {!Object} options The extra options, like container defintion.
-       * @private
-       */
-
-    }, {
-      key: 'createExtensibleHeader_',
-      value: function createExtensibleHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options) {
-        this.createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
-        this.chunkSize = 36 + 24 + this.data.samples.length;
-        this.fmt.chunkSize = 40;
-        this.fmt.bitsPerSample = (parseInt(bitDepthCode, 10) - 1 | 7) + 1;
-        this.fmt.cbSize = 22;
-        this.fmt.validBitsPerSample = parseInt(bitDepthCode, 10);
-        this.fmt.dwChannelMask = this.getDwChannelMask_();
-        // subformat 128-bit GUID as 4 32-bit values
-        // only supports uncompressed integer PCM samples
-        this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
-      }
-
-      /**
-       * Get the value for dwChannelMask according to the number of channels.
-       * @return {number} the dwChannelMask value.
-       * @private
-       */
-
-    }, {
-      key: 'getDwChannelMask_',
-      value: function getDwChannelMask_() {
-        /** @type {number} */
-        var dwChannelMask = 0;
-        // mono = FC
-        if (this.fmt.numChannels === 1) {
-          dwChannelMask = 0x4;
-          // stereo = FL, FR
-        } else if (this.fmt.numChannels === 2) {
-          dwChannelMask = 0x3;
-          // quad = FL, FR, BL, BR
-        } else if (this.fmt.numChannels === 4) {
-          dwChannelMask = 0x33;
-          // 5.1 = FL, FR, FC, LF, BL, BR
-        } else if (this.fmt.numChannels === 6) {
-          dwChannelMask = 0x3F;
-          // 7.1 = FL, FR, FC, LF, BL, BR, SL, SR
-        } else if (this.fmt.numChannels === 8) {
-          dwChannelMask = 0x63F;
-        }
-        return dwChannelMask;
-      }
-
-      /**
-       * Create the header of mu-Law and A-Law wave files.
-       * @param {string} bitDepthCode The audio bit depth
-       * @param {number} numChannels The number of channels
-       * @param {number} sampleRate The sample rate.
-       * @param {number} numBytes The number of bytes each sample use.
-       * @param {!Object} options The extra options, like container defintion.
-       * @private
-       */
-
-    }, {
-      key: 'createALawMulawHeader_',
-      value: function createALawMulawHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options) {
-        this.createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
-        this.chunkSize = 40 + this.data.samples.length;
-        this.fmt.chunkSize = 20;
-        this.fmt.cbSize = 2;
-        this.fmt.validBitsPerSample = 8;
-        this.fact.chunkId = 'fact';
-        this.fact.chunkSize = 4;
-        this.fact.dwSampleLength = this.data.samples.length;
-      }
-
-      /**
-       * Create the header of a linear PCM wave file.
-       * @param {string} bitDepthCode The audio bit depth
-       * @param {number} numChannels The number of channels
-       * @param {number} sampleRate The sample rate.
-       * @param {number} numBytes The number of bytes each sample use.
-       * @param {!Object} options The extra options, like container defintion.
-       * @private
-       */
-
-    }, {
-      key: 'createPCMHeader_',
-      value: function createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options) {
-        this.clearHeader_();
-        this.container = options.container;
-        this.chunkSize = 36 + this.data.samples.length;
-        this.format = 'WAVE';
-        this.fmt.chunkId = 'fmt ';
-        this.fmt.chunkSize = 16;
-        this.fmt.byteRate = numChannels * numBytes * sampleRate;
-        this.fmt.blockAlign = numChannels * numBytes;
-        this.fmt.audioFormat = this.audioFormats_[bitDepthCode] ? this.audioFormats_[bitDepthCode] : 65534;
-        this.fmt.numChannels = numChannels;
-        this.fmt.sampleRate = sampleRate;
-        this.fmt.bitsPerSample = parseInt(bitDepthCode, 10);
-        this.fmt.cbSize = 0;
-        this.fmt.validBitsPerSample = 0;
-      }
-
-      /**
        * Return the closest greater number of bits for a number of bits that
        * do not fill a full sequence of bytes.
        * @param {string} bitDepthCode The bit depth.
@@ -2852,75 +2906,6 @@
           bitDepthCode = ((parseInt(bitDepthCode, 10) - 1 | 7) + 1).toString();
         }
         return bitDepthCode;
-      }
-
-      /**
-       * Validate the header of the file.
-       * @throws {Error} If any property of the object appears invalid.
-       * @private
-       */
-
-    }, {
-      key: 'validateHeader_',
-      value: function validateHeader_() {
-        this.validateBitDepth_();
-        this.validateNumChannels_();
-        this.validateSampleRate_();
-      }
-
-      /**
-       * Validate the bit depth.
-       * @return {boolean} True is the bit depth is valid.
-       * @throws {Error} If bit depth is invalid.
-       * @private
-       */
-
-    }, {
-      key: 'validateBitDepth_',
-      value: function validateBitDepth_() {
-        if (!this.audioFormats_[this.bitDepth]) {
-          if (parseInt(this.bitDepth, 10) > 8 && parseInt(this.bitDepth, 10) < 54) {
-            return true;
-          }
-          throw new Error('Invalid bit depth.');
-        }
-        return true;
-      }
-
-      /**
-       * Validate the number of channels.
-       * @return {boolean} True is the number of channels is valid.
-       * @throws {Error} If the number of channels is invalid.
-       * @private
-       */
-
-    }, {
-      key: 'validateNumChannels_',
-      value: function validateNumChannels_() {
-        /** @type {number} */
-        var blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
-        if (this.fmt.numChannels < 1 || blockAlign > 65535) {
-          throw new Error('Invalid number of channels.');
-        }
-        return true;
-      }
-
-      /**
-       * Validate the sample rate value.
-       * @return {boolean} True is the sample rate is valid.
-       * @throws {Error} If the sample rate is invalid.
-       * @private
-       */
-
-    }, {
-      key: 'validateSampleRate_',
-      value: function validateSampleRate_() {
-        /** @type {number} */
-        var byteRate = this.fmt.numChannels * (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
-        if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
-          throw new Error('Invalid sample rate.');
-        }
-        return true;
       }
 
       /**
@@ -3509,16 +3494,15 @@
         this.updateDataType_();
         this.data.samples = new Uint8Array(samples.length * numBytes);
         packArrayTo(samples, this.dataType, this.data.samples);
-        // create headers
-        this.createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
-        if (bitDepthCode == '4') {
-          this.createADPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
-        } else if (bitDepthCode == '8a' || bitDepthCode == '8m') {
-          this.createALawMulawHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
-        } else if (Object.keys(this.audioFormats_).indexOf(bitDepthCode) == -1 || this.fmt.numChannels > 2) {
-          this.createExtensibleHeader_(bitDepthCode, numChannels, sampleRate, numBytes, options);
+        /** @type {!Object} */
+        var header = wavHeader(bitDepthCode, numChannels, sampleRate, numBytes, this.data.samples.length, options);
+        this.clearHeader_();
+        this.chunkSize = header.chunkSize;
+        this.format = header.format;
+        this.fmt = header.fmt;
+        if (header.fact) {
+          this.fact = header.fact;
         }
-        // the data chunk
         this.data.chunkId = 'data';
         this.data.chunkSize = this.data.samples.length;
         this.validateHeader_();
@@ -4171,6 +4155,75 @@
           }
         }
         return tag;
+      }
+
+      /**
+       * Validate the header of the file.
+       * @throws {Error} If any property of the object appears invalid.
+       * @private
+       */
+
+    }, {
+      key: 'validateHeader_',
+      value: function validateHeader_() {
+        this.validateBitDepth_();
+        this.validateNumChannels_();
+        this.validateSampleRate_();
+      }
+
+      /**
+       * Validate the bit depth.
+       * @return {boolean} True is the bit depth is valid.
+       * @throws {Error} If bit depth is invalid.
+       * @private
+       */
+
+    }, {
+      key: 'validateBitDepth_',
+      value: function validateBitDepth_() {
+        if (!AUDIO_FORMATS[this.bitDepth]) {
+          if (parseInt(this.bitDepth, 10) > 8 && parseInt(this.bitDepth, 10) < 54) {
+            return true;
+          }
+          throw new Error('Invalid bit depth.');
+        }
+        return true;
+      }
+
+      /**
+       * Validate the number of channels.
+       * @return {boolean} True is the number of channels is valid.
+       * @throws {Error} If the number of channels is invalid.
+       * @private
+       */
+
+    }, {
+      key: 'validateNumChannels_',
+      value: function validateNumChannels_() {
+        /** @type {number} */
+        var blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
+        if (this.fmt.numChannels < 1 || blockAlign > 65535) {
+          throw new Error('Invalid number of channels.');
+        }
+        return true;
+      }
+
+      /**
+       * Validate the sample rate value.
+       * @return {boolean} True is the sample rate is valid.
+       * @throws {Error} If the sample rate is invalid.
+       * @private
+       */
+
+    }, {
+      key: 'validateSampleRate_',
+      value: function validateSampleRate_() {
+        /** @type {number} */
+        var byteRate = this.fmt.numChannels * (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
+        if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
+          throw new Error('Invalid sample rate.');
+        }
+        return true;
       }
     }]);
     return WaveFile;
