@@ -5,8 +5,10 @@ https://github.com/rochars/wavefile
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rawgit.com/rochars/wavefile/master/test/browser.html)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
-**wavefile** is a JavaScript module to create, read and write wave files.
+**wavefile** is a JavaScript library to create, read and write wave files.
 
+- **Zero dependencies**
+- **MIT-licensed**
 - **Use it out of the box in the browser**
 - **Use it out of the box in Node**
 - **Use it out of the box with TypeScript**
@@ -19,13 +21,14 @@ https://github.com/rochars/wavefile
 - Turn RIFF files to RIFX and RIFX files to RIFF
 - **Create or edit BWF metadata** ("bext" chunk)
 - Change the bit depth of the audio
-- **All MIT-licensed**
 - **Less than 10kb minified + compressed, less than 34kb minified**
 - Made with [Closure Compiler](https://github.com/google/closure-compiler) in mind (works great with others, too)
 
 And more.
 
 ## Install
+
+### NPM
 To use it in your programs:
 ```
 npm install wavefile
@@ -42,10 +45,19 @@ wavefile --help
 ```
 Read more about the [command line interface](#cli-usage) below.
 
+### GitHub
+This is not recommended as it will also include test and build assets in your installation. If this is what you want, you can:
+```
+git clone https://github.com/rochars/wavefile
+```
+
+And then import/require from the *wavefile* folder:
+```const WaveFile = require('./wavefile/dist/wavefile.umd.js');```
+
 ## Use
 
 ### Node
-Require WaveFile from **wavefile**:
+If you installed via [NPM](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com), require WaveFile from **wavefile**:
 ```javascript
 const WaveFile = require('wavefile');
 let wav = new WaveFile();
@@ -58,14 +70,14 @@ let wav = new WaveFile();
 ```
 
 ### ES module
-import WaveFile from **wavefile.js**:
+Import WaveFile from **wavefile.js** in the *./dist* folder of this package:
 ```javascript
 import WaveFile from './dist/wavefile.js';
 let wav = new WaveFile();
 ```
 
 ### Browser
-Use the compiled file in the */dist* folder:
+Use the compiled file in the */dist* folder of this package:
 ```html
 <script src="./dist/wavefile.min.js"></script>
 <script>
@@ -92,7 +104,7 @@ Or as a module from [jspm](https://jspm.io):
 ```
 
 #### Browser Compatibility
-**wavefile** supports all browsers that are ES5-compliant (IE8 and below are not supported).
+**wavefile** need IE10+ to run. All moderns browsers should work fine. Cross-browser tests are on the [ROADMAP](ROADMAP.md).
 
 ## Table of Contents
 - [Install](#install)

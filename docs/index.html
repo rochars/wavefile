@@ -48,8 +48,10 @@
     <section class="readme">
         <article><h1>wavefile</h1><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>https://github.com/rochars/wavefile</p>
 <p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rawgit.com/rochars/wavefile/master/test/browser.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
-<p><strong>wavefile</strong> is a JavaScript module to create, read and write wave files.</p>
+<p><strong>wavefile</strong> is a JavaScript library to create, read and write wave files.</p>
 <ul>
+<li><strong>Zero dependencies</strong></li>
+<li><strong>MIT-licensed</strong></li>
 <li><strong>Use it out of the box in the browser</strong></li>
 <li><strong>Use it out of the box in Node</strong></li>
 <li><strong>Use it out of the box with TypeScript</strong></li>
@@ -62,22 +64,24 @@
 <li>Turn RIFF files to RIFX and RIFX files to RIFF</li>
 <li><strong>Create or edit BWF metadata</strong> (&quot;bext&quot; chunk)</li>
 <li>Change the bit depth of the audio</li>
-<li><strong>All MIT-licensed</strong></li>
 <li><strong>Less than 10kb minified + compressed, less than 34kb minified</strong></li>
 <li>Made with <a href="https://github.com/google/closure-compiler">Closure Compiler</a> in mind (works great with others, too)</li>
 </ul>
 <p>And more.</p>
-<h2>Install</h2><p>To use it in your programs:</p>
+<h2>Install</h2><h3>NPM</h3><p>To use it in your programs:</p>
 <pre class="prettyprint source"><code>npm install wavefile</code></pre><p>To use it from the command line, install it globally:</p>
 <pre class="prettyprint source"><code>npm install wavefile -g</code></pre><p>And then to see the available options:</p>
 <pre class="prettyprint source"><code>wavefile --help</code></pre><p>Read more about the <a href="#cli-usage">command line interface</a> below.</p>
-<h2>Use</h2><h3>Node</h3><p>Require WaveFile from <strong>wavefile</strong>:</p>
+<h3>GitHub</h3><p>This is not recommended as it will also include test and build assets in your installation. If this is what you want, you can:</p>
+<pre class="prettyprint source"><code>git clone https://github.com/rochars/wavefile</code></pre><p>And then import/require from the <em>wavefile</em> folder:
+<code>const WaveFile = require('./wavefile/dist/wavefile.umd.js');</code></p>
+<h2>Use</h2><h3>Node</h3><p>If you installed via <a href="https://www.npmjs.com/">NPM</a> or <a href="https://yarnpkg.com">Yarn</a>, require WaveFile from <strong>wavefile</strong>:</p>
 <pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
 let wav = new WaveFile();</code></pre><p>This also works:</p>
 <pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile').default;
-let wav = new WaveFile();</code></pre><h3>ES module</h3><p>import WaveFile from <strong>wavefile.js</strong>:</p>
+let wav = new WaveFile();</code></pre><h3>ES module</h3><p>Import WaveFile from <strong>wavefile.js</strong> in the <em>./dist</em> folder of this package:</p>
 <pre class="prettyprint source lang-javascript"><code>import WaveFile from './dist/wavefile.js';
-let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Use the compiled file in the <em>/dist</em> folder:</p>
+let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Use the compiled file in the <em>/dist</em> folder of this package:</p>
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;./dist/wavefile.min.js&quot;>&lt;/script>
 &lt;script>
   var WaveFile = new WaveFile();
@@ -87,7 +91,7 @@ let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Use the compiled file i
 <pre class="prettyprint source lang-html"><code>&lt;script type=&quot;module&quot;>
   import WaveFile from 'https://dev.jspm.io/wavefile';
   console.log(new WaveFile());
-&lt;/script></code></pre><h4>Browser Compatibility</h4><p><strong>wavefile</strong> supports all browsers that are ES5-compliant (IE8 and below are not supported).</p>
+&lt;/script></code></pre><h4>Browser Compatibility</h4><p><strong>wavefile</strong> need IE10+ to run. All moderns browsers should work fine. Cross-browser tests are on the <a href="ROADMAP.md">ROADMAP</a>.</p>
 <h2>Table of Contents</h2><ul>
 <li><a href="#install">Install</a></li>
 <li><a href="#use">Use</a></li>
@@ -832,7 +836,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jul 09 2018 23:43:32 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jul 10 2018 00:52:45 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
