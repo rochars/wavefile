@@ -34,16 +34,21 @@ To use it in your programs:
 npm install wavefile
 ```
 
-To use it from the command line, install it globally:
+To use it from the [command line](#cli-usage), install it globally:
 ```
 npm install wavefile -g
 ```
 
-And then to see the available options:
+### Yarn
+To use it in your programs:
 ```
-wavefile --help
+yarn add wavefile
 ```
-Read more about the [command line interface](#cli-usage) below.
+
+To use it from the [command line](#cli-usage), install it globally:
+```
+yarn global add wavefile
+```
 
 ### GitHub
 This is not recommended as it will also include test and build assets in your installation. If this is what you want, you can:
@@ -51,10 +56,13 @@ This is not recommended as it will also include test and build assets in your in
 git clone https://github.com/rochars/wavefile
 ```
 
-And then import/require from the *wavefile* folder:
+And then import/require what you want from the *wavefile* folder:
 ```
 const WaveFile = require('./wavefile/dist/wavefile.umd.js');
 ```
+
+You can also download one of the dist files in  
+https://github.com/rochars/wavefile/tree/master/dist
 
 ## Use
 
