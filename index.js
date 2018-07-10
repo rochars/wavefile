@@ -766,4 +766,28 @@ export default class WaveFile extends WavIO {
     }
     return true;
   }
+
+  /**
+   * Return the closest greater number of bits for a number of bits that
+   * do not fill a full sequence of bytes.
+   * @param {string} bitDepthCode The bit depth.
+   * @return {string}
+   * @private
+   */
+  realBitDepth_(bitDepthCode) {
+    if (bitDepthCode != '32f') {
+      bitDepthCode = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1).toString();
+    }
+    return bitDepthCode;
+  }
+
+  /**
+   * Return 'RIFF' if the container is 'RF64', the current container name
+   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
+   * @return {string}
+   * @private
+   */
+  correctContainer_() {
+    return this.container == 'RF64' ? 'RIFF' : this.container;
+  }
 }

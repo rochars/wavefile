@@ -2879,32 +2879,6 @@ class WavIO extends WavStruct {
   }
 
   /**
-   * Return 'RIFF' if the container is 'RF64', the current container name
-   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
-   * @return {string}
-   * @private
-   */
-  correctContainer_() {
-    return this.container == 'RF64' ? 'RIFF' : this.container;
-  }
-
-  /**
-   * Set the string code of the bit depth based on the 'fmt ' chunk.
-   * @private
-   */
-  bitDepthFromFmt_() {
-    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
-      this.bitDepth = '32f';
-    } else if (this.fmt.audioFormat === 6) {
-      this.bitDepth = '8a';
-    } else if (this.fmt.audioFormat === 7) {
-      this.bitDepth = '8m';
-    } else {
-      this.bitDepth = this.fmt.bitsPerSample.toString();
-    }
-  }
-
-  /**
    * Return a .wav file byte buffer with the data from the WaveFile object.
    * The return value of this method can be written straight to disk.
    * @return {!Uint8Array} The wav file bytes.
@@ -2945,24 +2919,6 @@ class WavIO extends WavStruct {
   }
 
   /**
-   * Update the type definition used to read and write the samples.
-   * @private
-   */
-  updateDataType_() {
-    /** @type {!Object} */
-    this.dataType = {
-      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      float: this.bitDepth == '32f' || this.bitDepth == '64',
-      signed: this.bitDepth != '8',
-      be: this.container == 'RIFX'
-    };
-    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
-      this.dataType.bits = 8;
-      this.dataType.signed = false;
-    }
-  }
-
-  /**
    * Set up the WaveFile object from a byte buffer.
    * @param {!Uint8Array} buffer The buffer.
    * @param {boolean=} samples True if the samples should be loaded.
@@ -2987,74 +2943,6 @@ class WavIO extends WavStruct {
     this.readLISTChunk_(buffer, chunk.subChunks);
     this.bitDepthFromFmt_();
     this.updateDataType_();
-  }
-
-  /**
-   * Return the closest greater number of bits for a number of bits that
-   * do not fill a full sequence of bytes.
-   * @param {string} bitDepthCode The bit depth.
-   * @return {string}
-   * @private
-   */
-  realBitDepth_(bitDepthCode) {
-    if (bitDepthCode != '32f') {
-      bitDepthCode = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1).toString();
-    }
-    return bitDepthCode;
-  }
-
-  /**
-   * Reset attributes that should emptied when a file is
-   * created with the fromScratch() or fromBuffer() methods.
-   * @private
-   */
-  clearHeader_() {
-    this.fmt.cbSize = 0;
-    this.fmt.validBitsPerSample = 0;
-    this.fact.chunkId = '';
-    this.ds64.chunkId = '';
-  }
-
-  /**
-   * Set up to work wih big-endian or little-endian files.
-   * The types used are changed to LE or BE. If the
-   * the file is big-endian (RIFX), true is returned.
-   * @return {boolean} True if the file is RIFX.
-   * @private
-   */
-  LEorBE_() {
-    /** @type {boolean} */
-    let bigEndian = this.container === 'RIFX';
-    this.uInt16_.be = bigEndian;
-    this.uInt32_.be = bigEndian;
-    return bigEndian;
-  }
-
-  /**
-   * Find a chunk by its fourCC_ in a array of RIFF chunks.
-   * @param {!Object} chunks The wav file chunks.
-   * @param {string} chunkId The chunk fourCC_.
-   * @param {boolean} multiple True if there may be multiple chunks
-   *    with the same chunkId.
-   * @return {?Array<!Object>}
-   * @private
-   */
-  findChunk_(chunks, chunkId, multiple=false) {
-    /** @type {!Array<!Object>} */
-    let chunk = [];
-    for (let i=0; i<chunks.length; i++) {
-      if (chunks[i].chunkId == chunkId) {
-        if (multiple) {
-          chunk.push(chunks[i]);
-        } else {
-          return chunks[i];
-        }
-      }
-    }
-    if (chunkId == 'LIST') {
-      return chunk.length ? chunk : null;
-    }
-    return null;
   }
 
   /**
@@ -3379,6 +3267,94 @@ class WavIO extends WavStruct {
           chunk.chunkData.start,
           chunk.chunkData.end))
       };
+    }
+  }
+
+  /**
+   * Reset attributes that should emptied when a file is
+   * created with the fromScratch() or fromBuffer() methods.
+   * @private
+   */
+  clearHeader_() {
+    this.fmt.cbSize = 0;
+    this.fmt.validBitsPerSample = 0;
+    this.fact.chunkId = '';
+    this.ds64.chunkId = '';
+  }
+
+  /**
+   * Set up to work wih big-endian or little-endian files.
+   * The types used are changed to LE or BE. If the
+   * the file is big-endian (RIFX), true is returned.
+   * @return {boolean} True if the file is RIFX.
+   * @private
+   */
+  LEorBE_() {
+    /** @type {boolean} */
+    let bigEndian = this.container === 'RIFX';
+    this.uInt16_.be = bigEndian;
+    this.uInt32_.be = bigEndian;
+    return bigEndian;
+  }
+
+  /**
+   * Find a chunk by its fourCC_ in a array of RIFF chunks.
+   * @param {!Object} chunks The wav file chunks.
+   * @param {string} chunkId The chunk fourCC_.
+   * @param {boolean} multiple True if there may be multiple chunks
+   *    with the same chunkId.
+   * @return {?Array<!Object>}
+   * @private
+   */
+  findChunk_(chunks, chunkId, multiple=false) {
+    /** @type {!Array<!Object>} */
+    let chunk = [];
+    for (let i=0; i<chunks.length; i++) {
+      if (chunks[i].chunkId == chunkId) {
+        if (multiple) {
+          chunk.push(chunks[i]);
+        } else {
+          return chunks[i];
+        }
+      }
+    }
+    if (chunkId == 'LIST') {
+      return chunk.length ? chunk : null;
+    }
+    return null;
+  }
+
+  /**
+   * Update the type definition used to read and write the samples.
+   * @private
+   */
+  updateDataType_() {
+    /** @type {!Object} */
+    this.dataType = {
+      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+      float: this.bitDepth == '32f' || this.bitDepth == '64',
+      signed: this.bitDepth != '8',
+      be: this.container == 'RIFX'
+    };
+    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
+      this.dataType.bits = 8;
+      this.dataType.signed = false;
+    }
+  }
+
+  /**
+   * Set the string code of the bit depth based on the 'fmt ' chunk.
+   * @private
+   */
+  bitDepthFromFmt_() {
+    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
+      this.bitDepth = '32f';
+    } else if (this.fmt.audioFormat === 6) {
+      this.bitDepth = '8a';
+    } else if (this.fmt.audioFormat === 7) {
+      this.bitDepth = '8m';
+    } else {
+      this.bitDepth = this.fmt.bitsPerSample.toString();
     }
   }
 }
@@ -4134,6 +4110,30 @@ class WaveFile extends WavIO {
       throw new Error('Invalid sample rate.');
     }
     return true;
+  }
+
+  /**
+   * Return the closest greater number of bits for a number of bits that
+   * do not fill a full sequence of bytes.
+   * @param {string} bitDepthCode The bit depth.
+   * @return {string}
+   * @private
+   */
+  realBitDepth_(bitDepthCode) {
+    if (bitDepthCode != '32f') {
+      bitDepthCode = (((parseInt(bitDepthCode, 10) - 1) | 7) + 1).toString();
+    }
+    return bitDepthCode;
+  }
+
+  /**
+   * Return 'RIFF' if the container is 'RF64', the current container name
+   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
+   * @return {string}
+   * @private
+   */
+  correctContainer_() {
+    return this.container == 'RF64' ? 'RIFF' : this.container;
   }
 }
 
