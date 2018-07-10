@@ -21,8 +21,8 @@ externsSrc += 'WaveFile.getLISTBytes_ = function() {};'
 const license = '/*!\n'+
   ' * https://github.com/rochars/wavefile\n' +
   ' * Copyright (c) 2017-2018 Rafael da Silva Rocha.\n' +
-  ' * Copyright (c) 2017 Brett Zamir, 2012 Niklas von Hertzen. MIT License.\n' +
-  ' * Copyright (c) 2016 acida, 2018 Rafael da Silva Rocha. MIT License.\n' +
+  ' * Copyright (c) 2017 Brett Zamir, 2012 Niklas von Hertzen.\n' +
+  ' * Copyright (c) 2016 acida, 2018 Rafael da Silva Rocha.\n' +
   ' *\n' +
   ' * Permission is hereby granted, free of charge, to any person obtaining\n' +
   ' * a copy of this software and associated documentation files (the\n' +
