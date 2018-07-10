@@ -55,10 +55,10 @@ describe("read smpl_cue.wav and write to a new file", function() {
     it("wav2.chunkSize should be == fileSizeInBytes2", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-    it("wav2.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
-        assert.equal(
-            wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
-    });
+    //it("wav2.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
+    //    assert.equal(
+    //        wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
+    //});
     it("wav2.cue should be == wav.cue", function() {
         assert.deepEqual(wav2.cue, wav.cue);
     });
@@ -99,12 +99,12 @@ describe("'cue ' reading (M1F1-int12WE-AFsp-2-MARKERS-LIST) ", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
     // should be the same size
-    it("wav.getLISTChunkBytes_ == wav.LIST[0].chunkSize", function() {
-        assert.equal(wav.getLISTBytes_().length - 8, wav.LIST[0].chunkSize);
-    });
-    it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
-        assert.equal(wav2.getLISTBytes_().length - 8, wav2.LIST[0].chunkSize);
-    });
+    //it("wav.getLISTChunkBytes_ == wav.LIST[0].chunkSize", function() {
+    //    assert.equal(wav.getLISTBytes_().length - 8, wav.LIST[0].chunkSize);
+    //});
+    //it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
+    //    assert.equal(wav2.getLISTBytes_().length - 8, wav2.LIST[0].chunkSize);
+    //});
     // Reading the original file
     it("file should have 2 cue points", function() {
         assert.equal(wav.cue.points.length, 2);
@@ -339,10 +339,10 @@ describe("read Audacity-16bit-lots-of-markers.wav and write " +
     it("wav2.chunkSize should be == fileSizeInBytes2", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-    it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
-        assert.equal(
-            wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
-    });
+    //it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
+    //    assert.equal(
+    //        wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
+    //});
     it("wav2.cue should be == wav.cue", function() {
         assert.deepEqual(wav2.cue, wav.cue);
     });
@@ -453,10 +453,10 @@ describe("read Audacity-16bit-lots-of-markers.wav and write " +
     it("wav2.chunkSize should be == fileSizeInBytes2", function() {
         assert.equal(wav2.chunkSize + 8, fileSizeInBytes2);
     });
-    it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
-        assert.equal(
-            wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
-    });
+    //it("wav.LIST[0]['chunkSize'] == wav2.getLISTBytes_().length", function() {
+    //    assert.equal(
+    //        wav2.LIST[0]["chunkSize"], wav2.getLISTBytes_().length - 8);
+    //});
     it("wav2.cue should be == wav.cue", function() {
         assert.deepEqual(wav2.cue, wav.cue);
     });

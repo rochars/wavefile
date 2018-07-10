@@ -12,7 +12,6 @@ import closure from 'rollup-plugin-closure-compiler-js';
 // Read externs definitions
 const fs = require('fs');
 let externsSrc = fs.readFileSync('./externs.js', 'utf8');
-externsSrc += 'WaveFile.getLISTBytes_ = function() {};'
 
 // License notes
 const license = '/*!\n'+
@@ -41,13 +40,12 @@ const license = '/*!\n'+
   ' * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n' +
   ' */\n';
 
-
+// UMD header to use GCC to transpile the code
 let UMDBanner = "(function (global, factory) {" +
   "typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :" +
   "typeof define === 'function' && define.amd ? define(factory) :" +
   "(global.WaveFile = factory());" +
   "}(this, (function () { 'use strict';"
-
 let UMDFooter = 'return WaveFile; })));';
 
 export default [

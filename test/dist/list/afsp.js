@@ -86,24 +86,24 @@ describe("M1F1-int12WE-AFsp.wav test suite", function() {
         assert.equal(wav.LIST[0].subChunks[2].value, "kabal@CAPELLA");
     });
     // WAV2
-    it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
-        assert.equal(wav.getLISTBytes_().length - 8, wav.LIST[0].chunkSize);
-    });
-    it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
-        assert.equal(wav2.getLISTBytes_().length - 8, wav2.LIST[0].chunkSize);
-    });
-    it("wav3.getLISTChunkBytes_ == wav3.LIST[0].chunkSize", function() {
-        let wav3 = new WaveFile(wav2.toBuffer());
-        assert.equal(wav3.getLISTBytes_().length - 8, wav3.LIST[0].chunkSize);
-    });
-    it("wav3 create tag", function() {
-        assert.equal(
-            wav3.getLISTBytes_().length, wav2.getLISTBytes_().length + 10);
-    });
-    it("wav3 create tag, save file, read file", function() {
-        assert.equal(
-            wav3.getLISTBytes_().length, wav2.getLISTBytes_().length + 10);
-    });
+    //it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
+    //    assert.equal(wav.getLISTBytes_().length - 8, wav.LIST[0].chunkSize);
+    //});
+    //it("wav2.getLISTChunkBytes_ == wav2.LIST[0].chunkSize", function() {
+    //    assert.equal(wav2.getLISTBytes_().length - 8, wav2.LIST[0].chunkSize);
+    //});
+    //it("wav3.getLISTChunkBytes_ == wav3.LIST[0].chunkSize", function() {
+    //    let wav3 = new WaveFile(wav2.toBuffer());
+    //    assert.equal(wav3.getLISTBytes_().length - 8, wav3.LIST[0].chunkSize);
+    //});
+    //it("wav3 create tag", function() {
+    //    assert.equal(
+    //        wav3.getLISTBytes_().length, wav2.getLISTBytes_().length + 10);
+    //});
+    //it("wav3 create tag, save file, read file", function() {
+    //    assert.equal(
+    //        wav3.getLISTBytes_().length, wav2.getLISTBytes_().length + 10);
+    //});
     // 'INFO'
     it("LISTChunks[0].chunkId should be 'LIST'", function() {
         assert.equal(wav2.LIST[0]["chunkId"], "LIST");
