@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.1.4 (2018-07-09)
+- No dependencies.
+
 ## version 8.1.3 (2018-07-08)
 - Fix: UMD dist transpiled to ES5.
 - Use updated alawmulaw module to avoid license issues
