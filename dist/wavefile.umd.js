@@ -487,7 +487,7 @@ BufferIO.prototype.read_=function(bytes,bdType){/** @type {number} */ var size=b
  @private
  @return {!Uint8Array}
  */
-function writeWavBuffer(wav,uInt32_,uInt16_){/** @type {!Array<!Array<number>>} */ var fileBody=[getJunkBytes_(wav,uInt32_),getDs64Bytes_(wav,uInt32_),getBextBytes_(wav,uInt32_,uInt16_),getFmtBytes_(wav,uInt32_,uInt16_),getFactBytes_(wav,uInt32_),packString(wav.data.chunkId),pack(wav.data.samples.length,uInt32_),wav.data.samples,getCueBytes_(wav,uInt32_,uInt16_),getSmplBytes_(wav,uInt32_,uInt16_),getLISTBytes_(wav,uInt32_,uInt16_)];/** @type {number} */ var fileBodyLength=0;for(var i$15=0;i$15<fileBody.length;i$15++)fileBodyLength+=
+function writeWavBuffer(wav,uInt32_,uInt16_){/** @type {!Array<!Array<number>>} */ var fileBody=[getJunkBytes_(wav,uInt32_),getDs64Bytes_(wav,uInt32_),getBextBytes_(wav,uInt32_,uInt16_),getFmtBytes_(wav,uInt32_,uInt16_),getFactBytes_(wav,uInt32_),packString(wav.data.chunkId),pack(wav.data.samples.length,uInt32_),wav.data.samples,getCueBytes_(wav,uInt32_),getSmplBytes_(wav,uInt32_),getLISTBytes_(wav,uInt32_,uInt16_)];/** @type {number} */ var fileBodyLength=0;for(var i$15=0;i$15<fileBody.length;i$15++)fileBodyLength+=
 fileBody[i$15].length;/** @type {!Uint8Array} */ var file=new Uint8Array(fileBodyLength+12);/** @type {number} */ var index=0;index=packStringTo(wav.container,file,index);index=packTo(fileBodyLength+4,uInt32_,file,index);index=packStringTo(wav.format,file,index);for(var i$16=0;i$16<fileBody.length;i$16++){file.set(fileBody[i$16],index);index+=fileBody[i$16].length}return file}/**
  @private
  @return {!Array<number>}
@@ -502,7 +502,7 @@ function getDs64Bytes_(wav,uInt32_){/** @type {!Array<number>} */ var bytes=[];i
  @private
  @return {!Array<number>}
  */
-function getCueBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.cue.chunkId){/** @type {!Array<number>} */ var cuePointsBytes=getCuePointsBytes_(wav,uInt32_);bytes=bytes.concat(packString(wav.cue.chunkId),pack(cuePointsBytes.length+4,uInt32_),pack(wav.cue.dwCuePoints,uInt32_),cuePointsBytes)}return bytes}/**
+function getCueBytes_(wav,uInt32_){/** @type {!Array<number>} */ var bytes=[];if(wav.cue.chunkId){/** @type {!Array<number>} */ var cuePointsBytes=getCuePointsBytes_(wav,uInt32_);bytes=bytes.concat(packString(wav.cue.chunkId),pack(cuePointsBytes.length+4,uInt32_),pack(wav.cue.dwCuePoints,uInt32_),cuePointsBytes)}return bytes}/**
  @private
  @return {!Array<number>}
  */
@@ -510,8 +510,8 @@ function getCuePointsBytes_(wav,uInt32_){/** @type {!Array<number>} */ var point
  @private
  @return {!Array<number>}
  */
-function getSmplBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.smpl.chunkId){/** @type {!Array<number>} */ var smplLoopsBytes=getSmplLoopsBytes_(wav,uInt32_);bytes=bytes.concat(packString(wav.smpl.chunkId),pack(smplLoopsBytes.length+36,uInt32_),pack(wav.smpl.dwManufacturer,uInt32_),pack(wav.smpl.dwProduct,uInt32_),pack(wav.smpl.dwSamplePeriod,uInt32_),pack(wav.smpl.dwMIDIUnityNote,uInt32_),pack(wav.smpl.dwMIDIPitchFraction,uInt32_),pack(wav.smpl.dwSMPTEFormat,uInt32_),
-pack(wav.smpl.dwSMPTEOffset,uInt32_),pack(wav.smpl.dwNumSampleLoops,uInt32_),pack(wav.smpl.dwSamplerData,uInt32_),smplLoopsBytes)}return bytes}/**
+function getSmplBytes_(wav,uInt32_){/** @type {!Array<number>} */ var bytes=[];if(wav.smpl.chunkId){/** @type {!Array<number>} */ var smplLoopsBytes=getSmplLoopsBytes_(wav,uInt32_);bytes=bytes.concat(packString(wav.smpl.chunkId),pack(smplLoopsBytes.length+36,uInt32_),pack(wav.smpl.dwManufacturer,uInt32_),pack(wav.smpl.dwProduct,uInt32_),pack(wav.smpl.dwSamplePeriod,uInt32_),pack(wav.smpl.dwMIDIUnityNote,uInt32_),pack(wav.smpl.dwMIDIPitchFraction,uInt32_),pack(wav.smpl.dwSMPTEFormat,uInt32_),pack(wav.smpl.dwSMPTEOffset,
+uInt32_),pack(wav.smpl.dwNumSampleLoops,uInt32_),pack(wav.smpl.dwSamplerData,uInt32_),smplLoopsBytes)}return bytes}/**
  @private
  @return {!Array<number>}
  */

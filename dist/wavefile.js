@@ -2361,8 +2361,8 @@ function writeWavBuffer(wav, uInt32_, uInt16_) {
     packString(wav.data.chunkId),
     pack(wav.data.samples.length, uInt32_),
     wav.data.samples,
-    getCueBytes_(wav, uInt32_, uInt16_),
-    getSmplBytes_(wav, uInt32_, uInt16_),
+    getCueBytes_(wav, uInt32_),
+    getSmplBytes_(wav, uInt32_),
     getLISTBytes_(wav, uInt32_, uInt16_)
   ];
   /** @type {number} */
@@ -2470,7 +2470,7 @@ function getDs64Bytes_(wav, uInt32_) {
  * @return {!Array<number>} The 'cue ' chunk bytes.
  * @private
  */
-function getCueBytes_(wav, uInt32_, uInt16_) {
+function getCueBytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let bytes = [];
   if (wav.cue.chunkId) {
@@ -2510,7 +2510,7 @@ function getCuePointsBytes_(wav, uInt32_) {
  * @return {!Array<number>} The 'smpl' chunk bytes.
  * @private
  */
-function getSmplBytes_(wav, uInt32_, uInt16_) {
+function getSmplBytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let bytes = [];
   if (wav.smpl.chunkId) {
