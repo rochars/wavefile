@@ -3386,7 +3386,7 @@ class WaveFile {
     this.io = new BufferIO();
     // Load a file from the buffer if one was passed
     // when creating the object
-    if(bytes) {
+    if (bytes) {
       this.fromBuffer(bytes);
     }
   }
@@ -3567,7 +3567,7 @@ class WaveFile {
     if (this.fmt.sampleRate !== 8000) {
       throw new Error(
         'Only 8000 Hz files can be compressed as IMA-ADPCM.');
-    } else if(this.fmt.numChannels !== 1) {
+    } else if (this.fmt.numChannels !== 1) {
       throw new Error(
         'Only mono files can be compressed as IMA-ADPCM.');
     } else {
@@ -3929,7 +3929,7 @@ class WaveFile {
    */
   getAdtlChunk_() {
     for (let i=0; i<this.LIST.length; i++) {
-      if(this.LIST[i].format == 'adtl') {
+      if (this.LIST[i].format == 'adtl') {
         return i;
       }
     }
@@ -3971,7 +3971,7 @@ class WaveFile {
   fixTagName_(tag) {
     if (tag.constructor !== String) {
       throw new Error('Invalid tag name.');
-    } else if(tag.length < 4) {
+    } else if (tag.length < 4) {
       for (let i=0; i<4-tag.length; i++) {
         tag += ' ';
       }
@@ -4009,7 +4009,7 @@ class WaveFile {
   assureUncompressed_() {
     if (this.bitDepth == '8a') {
       this.fromALaw();
-    } else if(this.bitDepth == '8m') {
+    } else if (this.bitDepth == '8m') {
       this.fromMuLaw();
     } else if (this.bitDepth == '4') {
       this.fromIMAADPCM();
