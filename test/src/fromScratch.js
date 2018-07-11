@@ -6,9 +6,8 @@
  * 
  */
 
-var chai = chai || require('chai');
+var assert = assert || require('assert');
 var WaveFile = WaveFile || require('../loader.js');
-var assert = chai.assert;
 
 describe('create a 8-bit wave file from scratch', function() {
     

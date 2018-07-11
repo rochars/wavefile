@@ -6,9 +6,8 @@
  * 
  */
 
-var chai = chai || require('chai');
+var assert = assert || require('assert');
 var WaveFile = WaveFile || require('../loader.js');
-var assert = chai.assert;
 
 describe('16-bit wave file to and from DataURI string', function() {
     
