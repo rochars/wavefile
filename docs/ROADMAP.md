@@ -4,7 +4,7 @@ This document outlines the development plan from a high level and will be update
 
 Please feel free to file issues on this repository if you have questions, concerns or suggestions.
 
-See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md) for information about how to contribute to this project.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information about how to contribute to this project.
 
 ## Planned features
 Items in this list should not require a major version update.
@@ -37,7 +37,7 @@ This is why the bitDepth param is a string. It should be a number describing onl
 To add a list of compatible browsers to the docs.
 
 ### Fix the name of test wav files
-Update the name of the files in *test/files/* so they all follow the naming convention described in [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md).
+Update the name of the files in *test/files/* so they all follow the naming convention described in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Unit testing
 The current test suite is actually a high level test suite aimed to run against the minified dist file - as a consequence, it only tests public methods and properties. There should be a test suite aimed at the source files to test all aspects of the WaveFile class.

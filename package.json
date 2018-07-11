@@ -12,7 +12,7 @@
   "jsdelivr": "./dist/wavefile.min.js",
   "unpkg": "./dist/wavefile.min.js",
   "types": "./index.d.ts",
-  "bin": "./cli.js",
+  "bin": "./bin/wavefile.js",
   "engines": {
     "node": ">=8"
   },
@@ -47,17 +47,22 @@
     "url": "https://github.com/rochars/wavefile/issues"
   },
   "directories": {
-    "dist": "dist/",
-    "lib": "lib/",
-    "vendor": "vendor/"
+    "bin": "bin",
+    "dist": "dist",
+    "externs": "externs",
+    "lib": "lib",
+    "vendor": "vendor"
   },
   "files": [
-    "dist/",
-    "lib/",
-    "vendor/",
+    "bin",
+    "dist/wavefile.cjs.js",
+    "dist/wavefile.js",
+    "dist/wavefile.min.js",
+    "dist/wavefile.umd.js",
+    "externs",
+    "lib",
+    "vendor",
     "index.js",
-    "cli.js",
-    "externs.js",
     "index.d.ts",
     "LICENSE",
     "README.md",
@@ -65,7 +70,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "lint": "jshint index.js externs.js cli.js lib",
+    "lint": "jshint index.js bin externs lib",
     "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=240000",
     "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist --esm --recursive -R dot --timeout=240000",
     "test-min": "node ./node_modules/mocha/bin/_mocha test/dist --min --recursive -R dot --timeout=240000",
@@ -73,14 +78,13 @@
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist --umd --recursive -R dot --timeout=240000",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-min && npm run test-cjs && npm run test-umd && npm run test-esm && npm run test-cli",
-    "bundle": "rollup --config && npm run test-dist",
-    "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
-    "build": "npm run lint && npm test && npm run bundle && npm run doc",
+    "rollup-bundle": "rollup --config && npm run test-dist",
+    "doc": "./node_modules/.bin/jsdoc index.js -d docs/api",
+    "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
     "codecov": "^3.0.2",
-    "docdash": "^0.4.0",
     "esm": "^3.0.51",
     "google-closure-compiler-js": "^20180610.0.0",
     "jsdoc": "^3.5.5",
@@ -90,5 +94,6 @@
     "nyc": "^12.0.2",
     "rollup": "^0.61.2",
     "rollup-plugin-closure-compiler-js": "^1.0.6"
-  }
+  },
+  "dependencies": {}
 }

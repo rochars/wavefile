@@ -11,7 +11,7 @@ import closure from 'rollup-plugin-closure-compiler-js';
 
 // Read externs definitions
 const fs = require('fs');
-let externsSrc = fs.readFileSync('./externs.js', 'utf8');
+let externsSrc = fs.readFileSync('./externs/wavefile.js', 'utf8');
 
 // License notes
 const license = '/*!\n'+

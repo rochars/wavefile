@@ -7,7 +7,7 @@ Real world files are needed to test **wavefile** features. As some aspects of th
 
 If you plan to add sample files to be used in tests, they should go on the *test/files/* folder.
 
-Look at the [ROADMAP.md](https://github.com/rochars/wavefile/blob/master/ROADMAP.md) to see if you have any .wav file that could be used to test the incoming features.
+Look at the [ROADMAP.md](ROADMAP.md) to see if you have any .wav file that could be used to test the incoming features.
 
 ### Files created by yourself
 If you created the file yourself you should use this naming convention:  
@@ -40,14 +40,14 @@ npm test
 ```
 npm run build
 ```
-Look at [BUILDING.md](https://github.com/rochars/wavefile/blob/master/BUILDING.md) for details on building **wavefile**.
+Look at [BUILDING.md](BUILDING.md) for details on building **wavefile**.
 
 ## Style guide
 **wavefile** code should follow the Google JavaScript Style Guide:  
 https://google.github.io/styleguide/jsguide.html
 
 ## Code of conduct
-This project adopt the [Contributor Covenant, version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html), available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
+This project adopt the [Contributor Covenant, version 1.4](CODE_OF_CONDUCT.md), also available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html as its code of conduct.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting rocha.rafaelsilva@gmail.com.
 
