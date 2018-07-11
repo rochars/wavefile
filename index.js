@@ -33,8 +33,7 @@ import bitDepthLib from './vendor/bitdepth.js';
 import * as imaadpcm from './vendor/imaadpcm.js';
 import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
-import {unpackArray, packArrayTo, unpackArrayTo,
-pack, packStringTo, packTo, packString} from './vendor/byte-data.js';
+import {unpackArray, packArrayTo, unpackArrayTo} from './vendor/byte-data.js';
 import {wavHeader, validateHeader_} from './lib/wavheader.js';
 import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
 import BufferIO from './lib/bufferio.js';

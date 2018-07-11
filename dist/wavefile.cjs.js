@@ -2355,11 +2355,11 @@ let io = new BufferIO();
 function writeWavBuffer(wav, uInt32_, uInt16_) {
   /** @type {!Array<!Array<number>>} */
   let fileBody = [
-    getJunkBytes_(wav, uInt32_, uInt16_),
-    getDs64Bytes_(wav, uInt32_, uInt16_),
+    getJunkBytes_(wav, uInt32_),
+    getDs64Bytes_(wav, uInt32_),
     getBextBytes_(wav, uInt32_, uInt16_),
     getFmtBytes_(wav, uInt32_, uInt16_),
-    getFactBytes_(wav, uInt32_, uInt16_),
+    getFactBytes_(wav, uInt32_),
     packString(wav.data.chunkId),
     pack(wav.data.samples.length, uInt32_),
     wav.data.samples,
@@ -2394,7 +2394,7 @@ function writeWavBuffer(wav, uInt32_, uInt16_) {
 function getBextBytes_(wav, uInt32_, uInt16_) {
   /** @type {!Array<number>} */
   let bytes = [];
-  enforceBext_(wav, uInt32_, uInt16_);
+  enforceBext_(wav);
   if (wav.bext.chunkId) {
     wav.bext.chunkSize = 602 + wav.bext.codingHistory.length;
     bytes = bytes.concat(
@@ -2425,7 +2425,7 @@ function getBextBytes_(wav, uInt32_, uInt16_) {
  * Make sure a 'bext' chunk is created if BWF data was created in a file.
  * @private
  */
-function enforceBext_(wav, uInt32_, uInt16_) {
+function enforceBext_(wav) {
   for (var prop in wav.bext) {
     if (wav.bext.hasOwnProperty(prop)) {
       if (wav.bext[prop] && prop != 'timeReference') {
@@ -2444,7 +2444,7 @@ function enforceBext_(wav, uInt32_, uInt16_) {
  * @return {!Array<number>} The 'ds64' chunk bytes.
  * @private
  */
-function getDs64Bytes_(wav, uInt32_, uInt16_) {
+function getDs64Bytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let bytes = [];
   if (wav.ds64.chunkId) {
@@ -2477,7 +2477,7 @@ function getCueBytes_(wav, uInt32_, uInt16_) {
   let bytes = [];
   if (wav.cue.chunkId) {
     /** @type {!Array<number>} */
-    let cuePointsBytes = getCuePointsBytes_(wav, uInt32_, uInt16_);
+    let cuePointsBytes = getCuePointsBytes_(wav, uInt32_);
     bytes = bytes.concat(
       packString(wav.cue.chunkId),
       pack(cuePointsBytes.length + 4, uInt32_),
@@ -2492,7 +2492,7 @@ function getCueBytes_(wav, uInt32_, uInt16_) {
  * @return {!Array<number>} The 'cue ' points as an array of bytes.
  * @private
  */
-function getCuePointsBytes_(wav, uInt32_, uInt16_) {
+function getCuePointsBytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let points = [];
   for (let i=0; i<wav.cue.dwCuePoints; i++) {
@@ -2517,7 +2517,7 @@ function getSmplBytes_(wav, uInt32_, uInt16_) {
   let bytes = [];
   if (wav.smpl.chunkId) {
     /** @type {!Array<number>} */
-    let smplLoopsBytes = getSmplLoopsBytes_(wav, uInt32_, uInt16_);
+    let smplLoopsBytes = getSmplLoopsBytes_(wav, uInt32_);
     bytes = bytes.concat(
       packString(wav.smpl.chunkId),
       pack(smplLoopsBytes.length + 36, uInt32_),
@@ -2540,7 +2540,7 @@ function getSmplBytes_(wav, uInt32_, uInt16_) {
  * @return {!Array<number>} The 'smpl' loops as an array of bytes.
  * @private
  */
-function getSmplLoopsBytes_(wav, uInt32_, uInt16_) {
+function getSmplLoopsBytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let loops = [];
   for (let i=0; i<wav.smpl.dwNumSampleLoops; i++) {
@@ -2560,7 +2560,7 @@ function getSmplLoopsBytes_(wav, uInt32_, uInt16_) {
  * @return {!Array<number>} The 'fact' chunk bytes.
  * @private
  */
-function getFactBytes_(wav, uInt32_, uInt16_) {
+function getFactBytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let bytes = [];
   if (wav.fact.chunkId) {
@@ -2713,7 +2713,7 @@ function getLtxtChunkBytes_(ltxt, wav, uInt32_, uInt16_) {
  * @return {!Array<number>} The 'junk' chunk bytes.
  * @private
  */
-function getJunkBytes_(wav, uInt32_, uInt16_) {
+function getJunkBytes_(wav, uInt32_) {
   /** @type {!Array<number>} */
   let bytes = [];
   if (wav.junk.chunkId) {
@@ -2767,23 +2767,23 @@ function readWavBuffer(buffer, samples, wav, uInt32_, uInt16_) {
   readRIFFChunk_(buffer, wav, uInt32_, uInt16_);
   /** @type {!Object} */
   let chunk = riffChunks(buffer);
-  readDs64Chunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
+  readDs64Chunk_(buffer, chunk.subChunks, wav, uInt32_);
   readFmtChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
-  readFactChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
+  readFactChunk_(buffer, chunk.subChunks, wav, uInt32_);
   readBextChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
-  readCueChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
-  readSmplChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
-  readDataChunk_(buffer, chunk.subChunks, samples, wav, uInt32_, uInt16_);
-  readJunkChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
+  readCueChunk_(buffer, chunk.subChunks, wav, uInt32_);
+  readSmplChunk_(buffer, chunk.subChunks, wav, uInt32_);
+  readDataChunk_(buffer, chunk.subChunks, samples, wav);
+  readJunkChunk_(buffer, chunk.subChunks, wav);
   readLISTChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
-  bitDepthFromFmt_(wav, uInt32_, uInt16_);
+  bitDepthFromFmt_(wav);
 }
 
 /**
  * Set the string code of the bit depth based on the 'fmt ' chunk.
  * @private
  */
-function bitDepthFromFmt_(wav, uInt32_, uInt16_) {
+function bitDepthFromFmt_(wav) {
   if (wav.fmt.audioFormat === 3 && wav.fmt.bitsPerSample === 32) {
     wav.bitDepth = '32f';
   } else if (wav.fmt.audioFormat === 6) {
@@ -2870,7 +2870,7 @@ function readFmtExtension_(buffer, wav, uInt32_, uInt16_) {
  * @param {!Object} signature The file signature.
  * @private
  */
-function readFactChunk_(buffer, signature, wav, uInt32_, uInt16_) {
+function readFactChunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
   let chunk = findChunk_(signature, 'fact');
   if (chunk) {
@@ -2887,7 +2887,7 @@ function readFactChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  * @param {!Object} signature The file signature.
  * @private
  */
-function readCueChunk_(buffer, signature, wav, uInt32_, uInt16_) {
+function readCueChunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
   let chunk = findChunk_(signature, 'cue ');
   if (chunk) {
@@ -2914,7 +2914,7 @@ function readCueChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  * @param {!Object} signature The file signature.
  * @private
  */
-function readSmplChunk_(buffer, signature, wav, uInt32_, uInt16_) {
+function readSmplChunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
   let chunk = findChunk_(signature, 'smpl');
   if (chunk) {
@@ -2951,7 +2951,7 @@ function readSmplChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  * @throws {Error} If no 'data' chunk is found.
  * @private
  */
-function readDataChunk_(buffer, signature, samples, wav, uInt32_, uInt16_) {
+function readDataChunk_(buffer, signature, samples, wav) {
   /** @type {?Object} */
   let chunk = findChunk_(signature, 'data');
   if (chunk) {
@@ -3008,7 +3008,7 @@ function readBextChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  * @throws {Error} If no 'ds64' chunk is found and the file is RF64.
  * @private
  */
-function readDs64Chunk_(buffer, signature, wav, uInt32_, uInt16_) {
+function readDs64Chunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
   let chunk = findChunk_(signature, 'ds64');
   if (chunk) {
@@ -3107,7 +3107,7 @@ function readLISTSubChunks_(subChunk, format, buffer, wav, uInt32_, uInt16_) {
  * @param {!Object} signature The file signature.
  * @private
  */
-function readJunkChunk_(buffer, signature, wav, uInt32_, uInt16_) {
+function readJunkChunk_(buffer, signature, wav) {
   /** @type {?Object} */
   let chunk = findChunk_(signature, 'junk');
   if (chunk) {

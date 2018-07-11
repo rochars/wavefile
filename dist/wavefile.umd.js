@@ -487,39 +487,39 @@ BufferIO.prototype.read_=function(bytes,bdType){/** @type {number} */ var size=b
  @private
  @return {!Uint8Array}
  */
-function writeWavBuffer(wav,uInt32_,uInt16_){/** @type {!Array<!Array<number>>} */ var fileBody=[getJunkBytes_(wav,uInt32_,uInt16_),getDs64Bytes_(wav,uInt32_,uInt16_),getBextBytes_(wav,uInt32_,uInt16_),getFmtBytes_(wav,uInt32_,uInt16_),getFactBytes_(wav,uInt32_,uInt16_),packString(wav.data.chunkId),pack(wav.data.samples.length,uInt32_),wav.data.samples,getCueBytes_(wav,uInt32_,uInt16_),getSmplBytes_(wav,uInt32_,uInt16_),getLISTBytes_(wav,uInt32_,uInt16_)];/** @type {number} */ var fileBodyLength=
-0;for(var i$15=0;i$15<fileBody.length;i$15++)fileBodyLength+=fileBody[i$15].length;/** @type {!Uint8Array} */ var file=new Uint8Array(fileBodyLength+12);/** @type {number} */ var index=0;index=packStringTo(wav.container,file,index);index=packTo(fileBodyLength+4,uInt32_,file,index);index=packStringTo(wav.format,file,index);for(var i$16=0;i$16<fileBody.length;i$16++){file.set(fileBody[i$16],index);index+=fileBody[i$16].length}return file}/**
+function writeWavBuffer(wav,uInt32_,uInt16_){/** @type {!Array<!Array<number>>} */ var fileBody=[getJunkBytes_(wav,uInt32_),getDs64Bytes_(wav,uInt32_),getBextBytes_(wav,uInt32_,uInt16_),getFmtBytes_(wav,uInt32_,uInt16_),getFactBytes_(wav,uInt32_),packString(wav.data.chunkId),pack(wav.data.samples.length,uInt32_),wav.data.samples,getCueBytes_(wav,uInt32_,uInt16_),getSmplBytes_(wav,uInt32_,uInt16_),getLISTBytes_(wav,uInt32_,uInt16_)];/** @type {number} */ var fileBodyLength=0;for(var i$15=0;i$15<fileBody.length;i$15++)fileBodyLength+=
+fileBody[i$15].length;/** @type {!Uint8Array} */ var file=new Uint8Array(fileBodyLength+12);/** @type {number} */ var index=0;index=packStringTo(wav.container,file,index);index=packTo(fileBodyLength+4,uInt32_,file,index);index=packStringTo(wav.format,file,index);for(var i$16=0;i$16<fileBody.length;i$16++){file.set(fileBody[i$16],index);index+=fileBody[i$16].length}return file}/**
  @private
  @return {!Array<number>}
  */
-function getBextBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];enforceBext_(wav,uInt32_,uInt16_);if(wav.bext.chunkId){wav.bext.chunkSize=602+wav.bext.codingHistory.length;bytes=bytes.concat(packString(wav.bext.chunkId),pack(602+wav.bext.codingHistory.length,uInt32_),io.writeString_(wav.bext.description,256),io.writeString_(wav.bext.originator,32),io.writeString_(wav.bext.originatorReference,32),io.writeString_(wav.bext.originationDate,10),io.writeString_(wav.bext.originationTime,
-8),pack(wav.bext.timeReference[0],uInt32_),pack(wav.bext.timeReference[1],uInt32_),pack(wav.bext.version,uInt16_),io.writeString_(wav.bext.UMID,64),pack(wav.bext.loudnessValue,uInt16_),pack(wav.bext.loudnessRange,uInt16_),pack(wav.bext.maxTruePeakLevel,uInt16_),pack(wav.bext.maxMomentaryLoudness,uInt16_),pack(wav.bext.maxShortTermLoudness,uInt16_),io.writeString_(wav.bext.reserved,180),io.writeString_(wav.bext.codingHistory,wav.bext.codingHistory.length))}return bytes}/** @private */ function enforceBext_(wav,
-uInt32_,uInt16_){for(var prop in wav.bext)if(wav.bext.hasOwnProperty(prop))if(wav.bext[prop]&&prop!="timeReference"){wav.bext.chunkId="bext";break}if(wav.bext.timeReference[0]||wav.bext.timeReference[1])wav.bext.chunkId="bext"}/**
+function getBextBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];enforceBext_(wav);if(wav.bext.chunkId){wav.bext.chunkSize=602+wav.bext.codingHistory.length;bytes=bytes.concat(packString(wav.bext.chunkId),pack(602+wav.bext.codingHistory.length,uInt32_),io.writeString_(wav.bext.description,256),io.writeString_(wav.bext.originator,32),io.writeString_(wav.bext.originatorReference,32),io.writeString_(wav.bext.originationDate,10),io.writeString_(wav.bext.originationTime,8),pack(wav.bext.timeReference[0],
+uInt32_),pack(wav.bext.timeReference[1],uInt32_),pack(wav.bext.version,uInt16_),io.writeString_(wav.bext.UMID,64),pack(wav.bext.loudnessValue,uInt16_),pack(wav.bext.loudnessRange,uInt16_),pack(wav.bext.maxTruePeakLevel,uInt16_),pack(wav.bext.maxMomentaryLoudness,uInt16_),pack(wav.bext.maxShortTermLoudness,uInt16_),io.writeString_(wav.bext.reserved,180),io.writeString_(wav.bext.codingHistory,wav.bext.codingHistory.length))}return bytes}/** @private */ function enforceBext_(wav){for(var prop in wav.bext)if(wav.bext.hasOwnProperty(prop))if(wav.bext[prop]&&
+prop!="timeReference"){wav.bext.chunkId="bext";break}if(wav.bext.timeReference[0]||wav.bext.timeReference[1])wav.bext.chunkId="bext"}/**
  @private
  @return {!Array<number>}
  */
-function getDs64Bytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.ds64.chunkId)bytes=bytes.concat(packString(wav.ds64.chunkId),pack(wav.ds64.chunkSize,uInt32_),pack(wav.ds64.riffSizeHigh,uInt32_),pack(wav.ds64.riffSizeLow,uInt32_),pack(wav.ds64.dataSizeHigh,uInt32_),pack(wav.ds64.dataSizeLow,uInt32_),pack(wav.ds64.originationTime,uInt32_),pack(wav.ds64.sampleCountHigh,uInt32_),pack(wav.ds64.sampleCountLow,uInt32_));return bytes}/**
+function getDs64Bytes_(wav,uInt32_){/** @type {!Array<number>} */ var bytes=[];if(wav.ds64.chunkId)bytes=bytes.concat(packString(wav.ds64.chunkId),pack(wav.ds64.chunkSize,uInt32_),pack(wav.ds64.riffSizeHigh,uInt32_),pack(wav.ds64.riffSizeLow,uInt32_),pack(wav.ds64.dataSizeHigh,uInt32_),pack(wav.ds64.dataSizeLow,uInt32_),pack(wav.ds64.originationTime,uInt32_),pack(wav.ds64.sampleCountHigh,uInt32_),pack(wav.ds64.sampleCountLow,uInt32_));return bytes}/**
  @private
  @return {!Array<number>}
  */
-function getCueBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.cue.chunkId){/** @type {!Array<number>} */ var cuePointsBytes=getCuePointsBytes_(wav,uInt32_,uInt16_);bytes=bytes.concat(packString(wav.cue.chunkId),pack(cuePointsBytes.length+4,uInt32_),pack(wav.cue.dwCuePoints,uInt32_),cuePointsBytes)}return bytes}/**
+function getCueBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.cue.chunkId){/** @type {!Array<number>} */ var cuePointsBytes=getCuePointsBytes_(wav,uInt32_);bytes=bytes.concat(packString(wav.cue.chunkId),pack(cuePointsBytes.length+4,uInt32_),pack(wav.cue.dwCuePoints,uInt32_),cuePointsBytes)}return bytes}/**
  @private
  @return {!Array<number>}
  */
-function getCuePointsBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var points=[];for(var i$17=0;i$17<wav.cue.dwCuePoints;i$17++)points=points.concat(pack(wav.cue.points[i$17].dwName,uInt32_),pack(wav.cue.points[i$17].dwPosition,uInt32_),packString(wav.cue.points[i$17].fccChunk),pack(wav.cue.points[i$17].dwChunkStart,uInt32_),pack(wav.cue.points[i$17].dwBlockStart,uInt32_),pack(wav.cue.points[i$17].dwSampleOffset,uInt32_));return points}/**
+function getCuePointsBytes_(wav,uInt32_){/** @type {!Array<number>} */ var points=[];for(var i$17=0;i$17<wav.cue.dwCuePoints;i$17++)points=points.concat(pack(wav.cue.points[i$17].dwName,uInt32_),pack(wav.cue.points[i$17].dwPosition,uInt32_),packString(wav.cue.points[i$17].fccChunk),pack(wav.cue.points[i$17].dwChunkStart,uInt32_),pack(wav.cue.points[i$17].dwBlockStart,uInt32_),pack(wav.cue.points[i$17].dwSampleOffset,uInt32_));return points}/**
  @private
  @return {!Array<number>}
  */
-function getSmplBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.smpl.chunkId){/** @type {!Array<number>} */ var smplLoopsBytes=getSmplLoopsBytes_(wav,uInt32_,uInt16_);bytes=bytes.concat(packString(wav.smpl.chunkId),pack(smplLoopsBytes.length+36,uInt32_),pack(wav.smpl.dwManufacturer,uInt32_),pack(wav.smpl.dwProduct,uInt32_),pack(wav.smpl.dwSamplePeriod,uInt32_),pack(wav.smpl.dwMIDIUnityNote,uInt32_),pack(wav.smpl.dwMIDIPitchFraction,uInt32_),pack(wav.smpl.dwSMPTEFormat,
-uInt32_),pack(wav.smpl.dwSMPTEOffset,uInt32_),pack(wav.smpl.dwNumSampleLoops,uInt32_),pack(wav.smpl.dwSamplerData,uInt32_),smplLoopsBytes)}return bytes}/**
+function getSmplBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.smpl.chunkId){/** @type {!Array<number>} */ var smplLoopsBytes=getSmplLoopsBytes_(wav,uInt32_);bytes=bytes.concat(packString(wav.smpl.chunkId),pack(smplLoopsBytes.length+36,uInt32_),pack(wav.smpl.dwManufacturer,uInt32_),pack(wav.smpl.dwProduct,uInt32_),pack(wav.smpl.dwSamplePeriod,uInt32_),pack(wav.smpl.dwMIDIUnityNote,uInt32_),pack(wav.smpl.dwMIDIPitchFraction,uInt32_),pack(wav.smpl.dwSMPTEFormat,uInt32_),
+pack(wav.smpl.dwSMPTEOffset,uInt32_),pack(wav.smpl.dwNumSampleLoops,uInt32_),pack(wav.smpl.dwSamplerData,uInt32_),smplLoopsBytes)}return bytes}/**
  @private
  @return {!Array<number>}
  */
-function getSmplLoopsBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var loops=[];for(var i$18=0;i$18<wav.smpl.dwNumSampleLoops;i$18++)loops=loops.concat(pack(wav.smpl.loops[i$18].dwName,uInt32_),pack(wav.smpl.loops[i$18].dwType,uInt32_),pack(wav.smpl.loops[i$18].dwStart,uInt32_),pack(wav.smpl.loops[i$18].dwEnd,uInt32_),pack(wav.smpl.loops[i$18].dwFraction,uInt32_),pack(wav.smpl.loops[i$18].dwPlayCount,uInt32_));return loops}/**
+function getSmplLoopsBytes_(wav,uInt32_){/** @type {!Array<number>} */ var loops=[];for(var i$18=0;i$18<wav.smpl.dwNumSampleLoops;i$18++)loops=loops.concat(pack(wav.smpl.loops[i$18].dwName,uInt32_),pack(wav.smpl.loops[i$18].dwType,uInt32_),pack(wav.smpl.loops[i$18].dwStart,uInt32_),pack(wav.smpl.loops[i$18].dwEnd,uInt32_),pack(wav.smpl.loops[i$18].dwFraction,uInt32_),pack(wav.smpl.loops[i$18].dwPlayCount,uInt32_));return loops}/**
  @private
  @return {!Array<number>}
  */
-function getFactBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.fact.chunkId)bytes=bytes.concat(packString(wav.fact.chunkId),pack(wav.fact.chunkSize,uInt32_),pack(wav.fact.dwSampleLength,uInt32_));return bytes}/**
+function getFactBytes_(wav,uInt32_){/** @type {!Array<number>} */ var bytes=[];if(wav.fact.chunkId)bytes=bytes.concat(packString(wav.fact.chunkId),pack(wav.fact.chunkSize,uInt32_),pack(wav.fact.dwSampleLength,uInt32_));return bytes}/**
  @private
  @return {!Array<number>}
  @throws {Error}
@@ -548,7 +548,7 @@ function getLtxtChunkBytes_(ltxt,wav,uInt32_,uInt16_){return[].concat(packString
  @private
  @return {!Array<number>}
  */
-function getJunkBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var bytes=[];if(wav.junk.chunkId)return bytes.concat(packString(wav.junk.chunkId),pack(wav.junk.chunkData.length,uInt32_),wav.junk.chunkData);return bytes}var io$1=new BufferIO;/**
+function getJunkBytes_(wav,uInt32_){/** @type {!Array<number>} */ var bytes=[];if(wav.junk.chunkId)return bytes.concat(packString(wav.junk.chunkId),pack(wav.junk.chunkData.length,uInt32_),wav.junk.chunkData);return bytes}var io$1=new BufferIO;/**
  @param {!Uint8Array} buffer
  @param {boolean} samples
  @param {!Object} wav
@@ -556,9 +556,8 @@ function getJunkBytes_(wav,uInt32_,uInt16_){/** @type {!Array<number>} */ var by
  @param {!Object} uInt16_
  @throws {Error}
  */
-function readWavBuffer(buffer,samples,wav,uInt32_,uInt16_){io$1.head_=0;readRIFFChunk_(buffer,wav,uInt32_,uInt16_);/** @type {!Object} */ var chunk=riffChunks(buffer);readDs64Chunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readFmtChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readFactChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readBextChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readCueChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readSmplChunk_(buffer,chunk.subChunks,wav,
-uInt32_,uInt16_);readDataChunk_(buffer,chunk.subChunks,samples,wav,uInt32_,uInt16_);readJunkChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readLISTChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);bitDepthFromFmt_(wav,uInt32_,uInt16_)}/** @private */ function bitDepthFromFmt_(wav,uInt32_,uInt16_){if(wav.fmt.audioFormat===3&&wav.fmt.bitsPerSample===32)wav.bitDepth="32f";else if(wav.fmt.audioFormat===6)wav.bitDepth="8a";else if(wav.fmt.audioFormat===7)wav.bitDepth="8m";else wav.bitDepth=wav.fmt.bitsPerSample.toString()}
-/**
+function readWavBuffer(buffer,samples,wav,uInt32_,uInt16_){io$1.head_=0;readRIFFChunk_(buffer,wav,uInt32_,uInt16_);/** @type {!Object} */ var chunk=riffChunks(buffer);readDs64Chunk_(buffer,chunk.subChunks,wav,uInt32_);readFmtChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readFactChunk_(buffer,chunk.subChunks,wav,uInt32_);readBextChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);readCueChunk_(buffer,chunk.subChunks,wav,uInt32_);readSmplChunk_(buffer,chunk.subChunks,wav,uInt32_);readDataChunk_(buffer,
+chunk.subChunks,samples,wav);readJunkChunk_(buffer,chunk.subChunks,wav);readLISTChunk_(buffer,chunk.subChunks,wav,uInt32_,uInt16_);bitDepthFromFmt_(wav)}/** @private */ function bitDepthFromFmt_(wav){if(wav.fmt.audioFormat===3&&wav.fmt.bitsPerSample===32)wav.bitDepth="32f";else if(wav.fmt.audioFormat===6)wav.bitDepth="8a";else if(wav.fmt.audioFormat===7)wav.bitDepth="8m";else wav.bitDepth=wav.fmt.bitsPerSample.toString()}/**
  @private
  @param {!Uint8Array} bytes
  @throws {Error}
@@ -579,18 +578,18 @@ function readFmtExtension_(buffer,wav,uInt32_,uInt16_){if(wav.fmt.chunkSize>16){
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-function readFactChunk_(buffer,signature,wav,uInt32_,uInt16_){/** @type {?Object} */ var chunk=findChunk_(signature,"fact");if(chunk){io$1.head_=chunk.chunkData.start;wav.fact.chunkId=chunk.chunkId;wav.fact.chunkSize=chunk.chunkSize;wav.fact.dwSampleLength=io$1.read_(buffer,uInt32_)}}/**
+function readFactChunk_(buffer,signature,wav,uInt32_){/** @type {?Object} */ var chunk=findChunk_(signature,"fact");if(chunk){io$1.head_=chunk.chunkData.start;wav.fact.chunkId=chunk.chunkId;wav.fact.chunkSize=chunk.chunkSize;wav.fact.dwSampleLength=io$1.read_(buffer,uInt32_)}}/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-function readCueChunk_(buffer,signature,wav,uInt32_,uInt16_){/** @type {?Object} */ var chunk=findChunk_(signature,"cue ");if(chunk){io$1.head_=chunk.chunkData.start;wav.cue.chunkId=chunk.chunkId;wav.cue.chunkSize=chunk.chunkSize;wav.cue.dwCuePoints=io$1.read_(buffer,uInt32_);for(var i$21=0;i$21<wav.cue.dwCuePoints;i$21++)wav.cue.points.push({dwName:io$1.read_(buffer,uInt32_),dwPosition:io$1.read_(buffer,uInt32_),fccChunk:io$1.readString_(buffer,4),dwChunkStart:io$1.read_(buffer,uInt32_),dwBlockStart:io$1.read_(buffer,
+function readCueChunk_(buffer,signature,wav,uInt32_){/** @type {?Object} */ var chunk=findChunk_(signature,"cue ");if(chunk){io$1.head_=chunk.chunkData.start;wav.cue.chunkId=chunk.chunkId;wav.cue.chunkSize=chunk.chunkSize;wav.cue.dwCuePoints=io$1.read_(buffer,uInt32_);for(var i$21=0;i$21<wav.cue.dwCuePoints;i$21++)wav.cue.points.push({dwName:io$1.read_(buffer,uInt32_),dwPosition:io$1.read_(buffer,uInt32_),fccChunk:io$1.readString_(buffer,4),dwChunkStart:io$1.read_(buffer,uInt32_),dwBlockStart:io$1.read_(buffer,
 uInt32_),dwSampleOffset:io$1.read_(buffer,uInt32_)})}}/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-function readSmplChunk_(buffer,signature,wav,uInt32_,uInt16_){/** @type {?Object} */ var chunk=findChunk_(signature,"smpl");if(chunk){io$1.head_=chunk.chunkData.start;wav.smpl.chunkId=chunk.chunkId;wav.smpl.chunkSize=chunk.chunkSize;wav.smpl.dwManufacturer=io$1.read_(buffer,uInt32_);wav.smpl.dwProduct=io$1.read_(buffer,uInt32_);wav.smpl.dwSamplePeriod=io$1.read_(buffer,uInt32_);wav.smpl.dwMIDIUnityNote=io$1.read_(buffer,uInt32_);wav.smpl.dwMIDIPitchFraction=io$1.read_(buffer,uInt32_);wav.smpl.dwSMPTEFormat=
+function readSmplChunk_(buffer,signature,wav,uInt32_){/** @type {?Object} */ var chunk=findChunk_(signature,"smpl");if(chunk){io$1.head_=chunk.chunkData.start;wav.smpl.chunkId=chunk.chunkId;wav.smpl.chunkSize=chunk.chunkSize;wav.smpl.dwManufacturer=io$1.read_(buffer,uInt32_);wav.smpl.dwProduct=io$1.read_(buffer,uInt32_);wav.smpl.dwSamplePeriod=io$1.read_(buffer,uInt32_);wav.smpl.dwMIDIUnityNote=io$1.read_(buffer,uInt32_);wav.smpl.dwMIDIPitchFraction=io$1.read_(buffer,uInt32_);wav.smpl.dwSMPTEFormat=
 io$1.read_(buffer,uInt32_);wav.smpl.dwSMPTEOffset=io$1.read_(buffer,uInt32_);wav.smpl.dwNumSampleLoops=io$1.read_(buffer,uInt32_);wav.smpl.dwSamplerData=io$1.read_(buffer,uInt32_);for(var i$22=0;i$22<wav.smpl.dwNumSampleLoops;i$22++)wav.smpl.loops.push({dwName:io$1.read_(buffer,uInt32_),dwType:io$1.read_(buffer,uInt32_),dwStart:io$1.read_(buffer,uInt32_),dwEnd:io$1.read_(buffer,uInt32_),dwFraction:io$1.read_(buffer,uInt32_),dwPlayCount:io$1.read_(buffer,uInt32_)})}}/**
  @private
  @param {!Uint8Array} buffer
@@ -598,7 +597,7 @@ io$1.read_(buffer,uInt32_);wav.smpl.dwSMPTEOffset=io$1.read_(buffer,uInt32_);wav
  @param {boolean} samples
  @throws {Error}
  */
-function readDataChunk_(buffer,signature,samples,wav,uInt32_,uInt16_){/** @type {?Object} */ var chunk=findChunk_(signature,"data");if(chunk){wav.data.chunkId="data";wav.data.chunkSize=chunk.chunkSize;if(samples)wav.data.samples=buffer.slice(chunk.chunkData.start,chunk.chunkData.end)}else throw Error('Could not find the "data" chunk');}/**
+function readDataChunk_(buffer,signature,samples,wav){/** @type {?Object} */ var chunk=findChunk_(signature,"data");if(chunk){wav.data.chunkId="data";wav.data.chunkSize=chunk.chunkSize;if(samples)wav.data.samples=buffer.slice(chunk.chunkData.start,chunk.chunkData.end)}else throw Error('Could not find the "data" chunk');}/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
@@ -611,8 +610,8 @@ wav.bext.chunkSize-602)}}/**
  @param {!Object} signature
  @throws {Error}
  */
-function readDs64Chunk_(buffer,signature,wav,uInt32_,uInt16_){/** @type {?Object} */ var chunk=findChunk_(signature,"ds64");if(chunk){io$1.head_=chunk.chunkData.start;wav.ds64.chunkId=chunk.chunkId;wav.ds64.chunkSize=chunk.chunkSize;wav.ds64.riffSizeHigh=io$1.read_(buffer,uInt32_);wav.ds64.riffSizeLow=io$1.read_(buffer,uInt32_);wav.ds64.dataSizeHigh=io$1.read_(buffer,uInt32_);wav.ds64.dataSizeLow=io$1.read_(buffer,uInt32_);wav.ds64.originationTime=io$1.read_(buffer,uInt32_);wav.ds64.sampleCountHigh=
-io$1.read_(buffer,uInt32_);wav.ds64.sampleCountLow=io$1.read_(buffer,uInt32_)}else if(wav.container=="RF64")throw Error('Could not find the "ds64" chunk');}/**
+function readDs64Chunk_(buffer,signature,wav,uInt32_){/** @type {?Object} */ var chunk=findChunk_(signature,"ds64");if(chunk){io$1.head_=chunk.chunkData.start;wav.ds64.chunkId=chunk.chunkId;wav.ds64.chunkSize=chunk.chunkSize;wav.ds64.riffSizeHigh=io$1.read_(buffer,uInt32_);wav.ds64.riffSizeLow=io$1.read_(buffer,uInt32_);wav.ds64.dataSizeHigh=io$1.read_(buffer,uInt32_);wav.ds64.dataSizeLow=io$1.read_(buffer,uInt32_);wav.ds64.originationTime=io$1.read_(buffer,uInt32_);wav.ds64.sampleCountHigh=io$1.read_(buffer,
+uInt32_);wav.ds64.sampleCountLow=io$1.read_(buffer,uInt32_)}else if(wav.container=="RF64")throw Error('Could not find the "ds64" chunk');}/**
  @private
  @param {!Uint8Array} buffer
  @param {!Object} signature
@@ -629,7 +628,7 @@ io$1.read_(buffer,uInt16_);item.dwDialect=io$1.read_(buffer,uInt16_);item.dwCode
  @param {!Uint8Array} buffer
  @param {!Object} signature
  */
-function readJunkChunk_(buffer,signature,wav,uInt32_,uInt16_){/** @type {?Object} */ var chunk=findChunk_(signature,"junk");if(chunk)wav.junk={chunkId:chunk.chunkId,chunkSize:chunk.chunkSize,chunkData:[].slice.call(buffer.slice(chunk.chunkData.start,chunk.chunkData.end))}}/**
+function readJunkChunk_(buffer,signature,wav){/** @type {?Object} */ var chunk=findChunk_(signature,"junk");if(chunk)wav.junk={chunkId:chunk.chunkId,chunkSize:chunk.chunkSize,chunkData:[].slice.call(buffer.slice(chunk.chunkData.start,chunk.chunkData.end))}}/**
  @struct
  @constructor
  @param {?Uint8Array} bytes
