@@ -14,7 +14,7 @@ Create, read and write wav files according to the specs.
 - **Use it out of the box with TypeScript**
 - **Handle files up to 2GB**
 - **Use it as a command line tool**
-- **Less than 10kb minified + compressed, less than 34kb minified**
+- **Less than 10kb minified + compressed, less than 30kb minified**
 - Made with [Closure Compiler](https://github.com/google/closure-compiler) in mind (works great with others, too)
 
 With **wavefile** you can:

@@ -671,8 +671,7 @@ WaveFile.prototype.toDataURI=function(){return"data:audio/wav;base64,"+this.toBa
  @param {string} dataURI
  @throws {Error}
  */
-WaveFile.prototype.fromDataURI=function(dataURI){this.fromBase64(dataURI.replace("data:audio/wav;base64,",""))};WaveFile.prototype.toRIFF=function(){if(this.container=="RF64")this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType));else{this.dataType.be=true;this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType))}};WaveFile.prototype.toRIFX=function(){if(this.container=="RF64")this.fromScratch(this.fmt.numChannels,
-this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType),{container:"RIFX"});else this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType),{container:"RIFX"})};/**
+WaveFile.prototype.fromDataURI=function(dataURI){this.fromBase64(dataURI.replace("data:audio/wav;base64,",""))};WaveFile.prototype.toRIFF=function(){this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType))};WaveFile.prototype.toRIFX=function(){this.fromScratch(this.fmt.numChannels,this.fmt.sampleRate,this.bitDepth,unpackArray(this.data.samples,this.dataType),{container:"RIFX"})};/**
  @param {string} newBitDepth
  @param {boolean} changeResolution
  @throws {Error}

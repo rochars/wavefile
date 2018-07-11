@@ -3504,41 +3504,23 @@ class WaveFile {
    * Force a file as RIFF.
    */
   toRIFF() {
-    if (this.container == 'RF64') {
-      this.fromScratch(
-        this.fmt.numChannels,
-        this.fmt.sampleRate,
-        this.bitDepth,
-        unpackArray(this.data.samples, this.dataType));
-    } else {
-      this.dataType.be = true;
-      this.fromScratch(
-        this.fmt.numChannels,
-        this.fmt.sampleRate,
-        this.bitDepth,
-        unpackArray(this.data.samples, this.dataType));
-    }
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      this.bitDepth,
+      unpackArray(this.data.samples, this.dataType));
   }
 
   /**
    * Force a file as RIFX.
    */
   toRIFX() {
-    if (this.container == 'RF64') {
-      this.fromScratch(
-        this.fmt.numChannels,
-        this.fmt.sampleRate,
-        this.bitDepth,
-        unpackArray(this.data.samples, this.dataType),
-        {container: 'RIFX'});
-    } else {
-      this.fromScratch(
-        this.fmt.numChannels,
-        this.fmt.sampleRate,
-        this.bitDepth,
-        unpackArray(this.data.samples, this.dataType),
-        {container: 'RIFX'});
-    }
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      this.bitDepth,
+      unpackArray(this.data.samples, this.dataType),
+      {container: 'RIFX'});
   }
 
   /**
