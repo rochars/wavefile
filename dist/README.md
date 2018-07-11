@@ -25,7 +25,7 @@ You may load both **./dist/wavefile.umd.js** and **./dist/wavefile.min.js** in t
 
 - The **browser-only** dist is **./dist/wavefile.min.js**. It is transpiled to ES5 and compiled. It is used in the "unpkg" and "jsdelivr" fields of package.json.
 
-- The **ES6 dist** is **./dist/wavefile.js**, served as "es2015" in package.json. It is not compiled/minified.
+- The **ES6 bundle** is **./dist/wavefile.js**, served as "es2015" in package.json. It is not compiled/minified.
 
 - **./index.js** is served as "module" in package.json. This should be the entry point for bundlers.
 

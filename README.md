@@ -38,7 +38,7 @@ To use it in your programs:
 npm install wavefile
 ```
 
-To use it from the [command line](#cli-usage), install it globally:
+To use it from the [command line](https://github.com/rochars/wavefile/blob/master/docs/README.md#cli-usage), install it globally:
 ```
 npm install wavefile -g
 ```
@@ -49,7 +49,7 @@ To use it in your programs:
 yarn add wavefile
 ```
 
-To use it from the [command line](#cli-usage), install it globally:
+To use it from the [command line](https://github.com/rochars/wavefile/blob/master/docs/README.md#cli-usage), install it globally:
 ```
 yarn global add wavefile
 ```
@@ -109,7 +109,7 @@ Or get it from [unpkg](https://unpkg.com/wavefile):
 <script src="https://unpkg.com/wavefile"></script>
 ```
 
-Or as a module from [jspm](https://jspm.io):
+Or load it as a module using [jspm](https://jspm.io):
 ```html
 <script type="module">
   import WaveFile from 'https://dev.jspm.io/wavefile';
@@ -124,7 +124,7 @@ Or as a module from [jspm](https://jspm.io):
 Learn how to use **[wavefile](https://github.com/rochars/wavefile/blob/master/docs/README.md)**
 
 ## API
-Read the **[wavefile API docs](https://github.com/rochars/wavefile/blob/master/docs/api/index.html)**
+Read the **[wavefile API docs](https://rochars.github.io/wavefile/api/)**
 
 ## Legal
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large)

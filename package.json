@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "8.1.5",
+  "version": "8.1.6",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -55,10 +55,7 @@
   },
   "files": [
     "bin",
-    "dist/wavefile.cjs.js",
-    "dist/wavefile.js",
-    "dist/wavefile.min.js",
-    "dist/wavefile.umd.js",
+    "dist",
     "externs",
     "lib",
     "vendor",
