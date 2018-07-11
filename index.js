@@ -267,16 +267,6 @@ export default class WaveFile {
       chunkData: []
     };
     /**
-     * @type {!Object}
-     * @private
-     */
-    this.uInt16_ = {bits: 16, be: false};
-    /**
-     * @type {!Object}
-     * @private
-     */
-    this.uInt32_ = {bits: 32, be: false};
-    /**
      * The bit depth code according to the samples.
      * @type {string}
      */
@@ -335,19 +325,6 @@ export default class WaveFile {
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
     validateHeader_(this);
-    this.LEorBE_();
-  }
-
-  /**
-   * Reset attributes that should emptied when a file is
-   * created with the fromScratch() or fromBuffer() methods.
-   * @private
-   */
-  clearHeader_() {
-    this.fmt.cbSize = 0;
-    this.fmt.validBitsPerSample = 0;
-    this.fact.chunkId = '';
-    this.ds64.chunkId = '';
   }
 
   /**
@@ -360,7 +337,7 @@ export default class WaveFile {
    */
   fromBuffer(bytes, samples=true) {
     this.clearHeader_();
-    readWavBuffer(bytes, samples, this, this.uInt32_, this.uInt16_);
+    readWavBuffer(bytes, samples, this);
     this.updateDataType_();
   }
 
@@ -372,7 +349,7 @@ export default class WaveFile {
    */
   toBuffer() {
     validateHeader_(this);
-    return writeWavBuffer(this, this.uInt32_, this.uInt16_);
+    return writeWavBuffer(this);
   }
 
   /**
@@ -753,52 +730,6 @@ export default class WaveFile {
   }
 
   /**
-   * Make the file 16-bit if it is not.
-   * @private
-   */
-  assure16Bit_() {
-    this.assureUncompressed_();
-    if (this.bitDepth != '16') {
-      this.toBitDepth('16');
-    }
-  }
-
-  /**
-   * Uncompress the samples in case of a compressed file.
-   * @private
-   */
-  assureUncompressed_() {
-    if (this.bitDepth == '8a') {
-      this.fromALaw();
-    } else if(this.bitDepth == '8m') {
-      this.fromMuLaw();
-    } else if (this.bitDepth == '4') {
-      this.fromIMAADPCM();
-    }
-  }
-
-  /**
-   * Set up the WaveFile object from a byte buffer.
-   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples The samples.
-   * @private
-   */
-  interleave_(samples) {
-    if (samples.length > 0) {
-      if (samples[0].constructor === Array) {
-        /** @type {!Array<number>} */
-        let finalSamples = [];
-        for (let i=0; i < samples[0].length; i++) {
-          for (let j=0; j < samples.length; j++) {
-            finalSamples.push(samples[j][i]);
-          }
-        }
-        samples = finalSamples;
-      }
-    }
-    return samples;
-  }
-
-  /**
    * Push a new cue point in this.cue.points.
    * @param {number} position The position in milliseconds.
    * @param {number} dwName the dwName of the cue point
@@ -960,18 +891,61 @@ export default class WaveFile {
   }
 
   /**
-   * Set up to work wih big-endian or little-endian files.
-   * The types used are changed to LE or BE. If the
-   * the file is big-endian (RIFX), true is returned.
-   * @return {boolean} True if the file is RIFX.
+   * Reset attributes that should emptied when a file is
+   * created with the fromScratch() or fromBuffer() methods.
    * @private
    */
-  LEorBE_() {
-    /** @type {boolean} */
-    let bigEndian = this.container === 'RIFX';
-    this.uInt16_.be = bigEndian;
-    this.uInt32_.be = bigEndian;
-    return bigEndian;
+  clearHeader_() {
+    this.fmt.cbSize = 0;
+    this.fmt.validBitsPerSample = 0;
+    this.fact.chunkId = '';
+    this.ds64.chunkId = '';
+  }
+
+  /**
+   * Make the file 16-bit if it is not.
+   * @private
+   */
+  assure16Bit_() {
+    this.assureUncompressed_();
+    if (this.bitDepth != '16') {
+      this.toBitDepth('16');
+    }
+  }
+
+  /**
+   * Uncompress the samples in case of a compressed file.
+   * @private
+   */
+  assureUncompressed_() {
+    if (this.bitDepth == '8a') {
+      this.fromALaw();
+    } else if(this.bitDepth == '8m') {
+      this.fromMuLaw();
+    } else if (this.bitDepth == '4') {
+      this.fromIMAADPCM();
+    }
+  }
+
+  /**
+   * Set up the WaveFile object from a byte buffer.
+   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples The samples.
+   * @private
+   */
+  interleave_(samples) {
+    if (samples.length > 0) {
+      if (samples[0].constructor === Array) {
+        /** @type {!Array<number>} */
+        let finalSamples = [];
+        for (let i=0; i < samples[0].length; i++) {
+          for (let j=0; j < samples.length; j++) {
+            finalSamples.push(samples[j][i]);
+          }
+        }
+        samples = finalSamples;
+      }
+    }
+    return samples;
   }
 
   /**
