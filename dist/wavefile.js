@@ -2347,6 +2347,7 @@ let io = new BufferIO();
 /**
  * Return a .wav file byte buffer with the data from the WaveFile object.
  * The return value of this method can be written straight to disk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Uint8Array} The wav file bytes.
  * @private
  */
@@ -2390,6 +2391,7 @@ function writeWavBuffer(wav) {
 
 /**
  * Return the bytes of the 'bext' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'bext' chunk bytes.
  * @private
  */
@@ -2425,6 +2427,7 @@ function getBextBytes_(wav, uInt32_, uInt16_) {
 
 /**
  * Make sure a 'bext' chunk is created if BWF data was created in a file.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function enforceBext_(wav) {
@@ -2443,6 +2446,7 @@ function enforceBext_(wav) {
 
 /**
  * Return the bytes of the 'ds64' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'ds64' chunk bytes.
  * @private
  */
@@ -2471,6 +2475,7 @@ function getDs64Bytes_(wav, uInt32_) {
 
 /**
  * Return the bytes of the 'cue ' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'cue ' chunk bytes.
  * @private
  */
@@ -2491,6 +2496,7 @@ function getCueBytes_(wav, uInt32_) {
 
 /**
  * Return the bytes of the 'cue ' points.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'cue ' points as an array of bytes.
  * @private
  */
@@ -2511,6 +2517,7 @@ function getCuePointsBytes_(wav, uInt32_) {
 
 /**
  * Return the bytes of the 'smpl' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'smpl' chunk bytes.
  * @private
  */
@@ -2539,6 +2546,7 @@ function getSmplBytes_(wav, uInt32_) {
 
 /**
  * Return the bytes of the 'smpl' loops.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'smpl' loops as an array of bytes.
  * @private
  */
@@ -2559,6 +2567,7 @@ function getSmplLoopsBytes_(wav, uInt32_) {
 
 /**
  * Return the bytes of the 'fact' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'fact' chunk bytes.
  * @private
  */
@@ -2576,6 +2585,7 @@ function getFactBytes_(wav, uInt32_) {
 
 /**
  * Return the bytes of the 'fmt ' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'fmt' chunk bytes.
  * @throws {Error} if no 'fmt ' chunk is present.
  * @private
@@ -2600,6 +2610,7 @@ function getFmtBytes_(wav, uInt32_, uInt16_) {
 
 /**
  * Return the bytes of the fmt extension fields.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The fmt extension bytes.
  * @private
  */
@@ -2630,6 +2641,7 @@ function getFmtExtensionBytes_(wav, uInt32_, uInt16_) {
 
 /**
  * Return the bytes of the 'LIST' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'LIST' chunk bytes.
  */
 function getLISTBytes_(wav, uInt32_, uInt16_) {
@@ -2653,6 +2665,7 @@ function getLISTBytes_(wav, uInt32_, uInt16_) {
  * @param {!Array<!Object>} subChunks The 'LIST' sub chunks.
  * @param {string} format The format of the 'LIST' chunk.
  *    Currently supported values are 'adtl' or 'INFO'.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The sub chunk bytes.
  * @private
  */
@@ -2693,6 +2706,7 @@ function getLISTSubChunksBytes_(subChunks, format, wav, uInt32_, uInt16_) {
 /**
  * Return the bytes of a 'ltxt' chunk.
  * @param {!Object} ltxt the 'ltxt' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'ltxt' chunk bytes.
  * @private
  */
@@ -2712,6 +2726,7 @@ function getLtxtChunkBytes_(ltxt, wav, uInt32_, uInt16_) {
 
 /**
  * Return the bytes of the 'junk' chunk.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @return {!Array<number>} The 'junk' chunk bytes.
  * @private
  */
@@ -2757,7 +2772,7 @@ let io$1 = new BufferIO();
  * Set up the WaveFile object from a byte buffer.
  * @param {!Uint8Array} buffer The buffer.
  * @param {boolean} samples True if the samples should be loaded.
- * @param {!Object} wav True if the samples should be loaded.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @throws {Error} If container is not RIFF, RIFX or RF64.
  * @throws {Error} If no 'fmt ' chunk is found.
  * @throws {Error} If no 'data' chunk is found.
@@ -2778,28 +2793,12 @@ function readWavBuffer(buffer, samples, wav) {
   readDataChunk_(buffer, chunk.subChunks, samples, wav);
   readJunkChunk_(buffer, chunk.subChunks, wav);
   readLISTChunk_(buffer, chunk.subChunks, wav, uInt32_, uInt16_);
-  bitDepthFromFmt_(wav);
-}
-
-/**
- * Set the string code of the bit depth based on the 'fmt ' chunk.
- * @private
- */
-function bitDepthFromFmt_(wav) {
-  if (wav.fmt.audioFormat === 3 && wav.fmt.bitsPerSample === 32) {
-    wav.bitDepth = '32f';
-  } else if (wav.fmt.audioFormat === 6) {
-    wav.bitDepth = '8a';
-  } else if (wav.fmt.audioFormat === 7) {
-    wav.bitDepth = '8m';
-  } else {
-    wav.bitDepth = wav.fmt.bitsPerSample.toString();
-  }
 }
 
 /**
  * Read the RIFF chunk a wave file.
  * @param {!Uint8Array} bytes A wav buffer.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @throws {Error} If no 'RIFF' chunk is found.
  * @private
  */
@@ -2822,6 +2821,7 @@ function readRIFFChunk_(bytes, wav, uInt32_, uInt16_) {
  * Read the 'fmt ' chunk of a wave file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @throws {Error} If no 'fmt ' chunk is found.
  * @private
  */
@@ -2847,6 +2847,7 @@ function readFmtChunk_(buffer, signature, wav, uInt32_, uInt16_) {
 /**
  * Read the 'fmt ' chunk extension.
  * @param {!Uint8Array} buffer The wav file buffer.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readFmtExtension_(buffer, wav, uInt32_, uInt16_) {
@@ -2870,6 +2871,7 @@ function readFmtExtension_(buffer, wav, uInt32_, uInt16_) {
  * Read the 'fact' chunk of a wav file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readFactChunk_(buffer, signature, wav, uInt32_) {
@@ -2887,6 +2889,7 @@ function readFactChunk_(buffer, signature, wav, uInt32_) {
  * Read the 'cue ' chunk of a wave file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readCueChunk_(buffer, signature, wav, uInt32_) {
@@ -2914,6 +2917,7 @@ function readCueChunk_(buffer, signature, wav, uInt32_) {
  * Read the 'smpl' chunk of a wave file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readSmplChunk_(buffer, signature, wav, uInt32_) {
@@ -2950,6 +2954,7 @@ function readSmplChunk_(buffer, signature, wav, uInt32_) {
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
  * @param {boolean} samples True if the samples should be loaded.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @throws {Error} If no 'data' chunk is found.
  * @private
  */
@@ -2973,6 +2978,7 @@ function readDataChunk_(buffer, signature, samples, wav) {
  * Read the 'bext' chunk of a wav file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readBextChunk_(buffer, signature, wav, uInt32_, uInt16_) {
@@ -3007,6 +3013,7 @@ function readBextChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  * Read the 'ds64' chunk of a wave file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @throws {Error} If no 'ds64' chunk is found and the file is RF64.
  * @private
  */
@@ -3041,6 +3048,7 @@ function readDs64Chunk_(buffer, signature, wav, uInt32_) {
  * Read the 'LIST' chunks of a wave file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readLISTChunk_(buffer, signature, wav, uInt32_, uInt16_) {
@@ -3069,6 +3077,7 @@ function readLISTChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  * @param {!Object} subChunk The 'LIST' subchunks.
  * @param {string} format The 'LIST' format, 'adtl' or 'INFO'.
  * @param {!Uint8Array} buffer The wav file buffer.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readLISTSubChunks_(subChunk, format, buffer, wav, uInt32_, uInt16_) {
@@ -3107,6 +3116,7 @@ function readLISTSubChunks_(subChunk, format, buffer, wav, uInt32_, uInt16_) {
  * Read the 'junk' chunk of a wave file.
  * @param {!Uint8Array} buffer The wav file buffer.
  * @param {!Object} signature The file signature.
+ * @param {!WavBuffer} wav A WavBuffer instance.
  * @private
  */
 function readJunkChunk_(buffer, signature, wav) {
@@ -3148,18 +3158,21 @@ function readJunkChunk_(buffer, signature, wav) {
  */
 
 /**
- * Class representing a wav file.
- * @ignore
+ * @fileoverview The WavBuffer class.
+ * @see https://github.com/rochars/wavefile
  */
-class WaveFile {
+
+/**
+ * A class representing the data in a wav buffer.
+ */
+class WavBuffer {
 
   /**
-   * @param {?Uint8Array} bytes A wave file buffer.
    * @throws {Error} If no 'RIFF' chunk is found.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
-  constructor(bytes=null) {
+  constructor() {
     /**
      * The container identifier.
      * 'RIFF', 'RIFX' and 'RF64' are supported.
@@ -3373,6 +3386,48 @@ class WaveFile {
       /** @type {!Array<number>} */
       chunkData: []
     };
+  }
+}
+
+/*
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * Class representing a wav file.
+ * @extends WavBuffer
+ * @ignore
+ */
+class WaveFile extends WavBuffer {
+
+  /**
+   * @param {?Uint8Array} bytes A wave file buffer.
+   * @throws {Error} If no 'RIFF' chunk is found.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(bytes=null) {
+    super();
     /**
      * The bit depth code according to the samples.
      * @type {string}
@@ -3445,6 +3500,7 @@ class WaveFile {
   fromBuffer(bytes, samples=true) {
     this.clearHeader_();
     readWavBuffer(bytes, samples, this);
+    this.bitDepthFromFmt_();
     this.updateDataType_();
   }
 
@@ -3818,6 +3874,22 @@ class WaveFile {
     }
   }
 
+  /**
+   * Set the string code of the bit depth based on the 'fmt ' chunk.
+   * @private
+   */
+  bitDepthFromFmt_() {
+    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
+      this.bitDepth = '32f';
+    } else if (this.fmt.audioFormat === 6) {
+      this.bitDepth = '8a';
+    } else if (this.fmt.audioFormat === 7) {
+      this.bitDepth = '8m';
+    } else {
+      this.bitDepth = this.fmt.bitsPerSample.toString();
+    }
+  }
+  
   /**
    * Push a new cue point in this.cue.points.
    * @param {number} position The position in milliseconds.

@@ -76,12 +76,16 @@
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-min && npm run test-cjs && npm run test-umd && npm run test-esm && npm run test-cli",
     "rollup-bundle": "rollup --config && npm run test-dist",
-    "doc": "./node_modules/.bin/jsdoc index.js -d docs/api",
+    "doc": "./node_modules/.bin/jsdoc index.js -d docs/api -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
     "codecov": "^3.0.2",
+    "docdash": "^0.4.0",
     "esm": "^3.0.51",
     "google-closure-compiler-js": "^20180610.0.0",
     "jsdoc": "^3.5.5",
@@ -90,6 +94,7 @@
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^12.0.2",
     "rollup": "^0.61.2",
+    "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-closure-compiler-js": "^1.0.6"
   },
   "dependencies": {}

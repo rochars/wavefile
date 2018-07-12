@@ -11,11 +11,11 @@ Create, read and write wav files according to the specs.
 - **MIT-licensed**
 - **Use it out of the box in the browser**
 - **Use it out of the box in Node**
-- **Use it out of the box with TypeScript**
+- **Use it out of the box with [TypeScript](https://www.typescriptlang.org/)**
 - **Handle files up to 2GB**
 - **Use it as a command line tool**
-- **Less than 10kb minified + compressed, less than 30kb minified**
-- Made with [Closure Compiler](https://github.com/google/closure-compiler) in mind (works great with others, too)
+- **Less than 10kb minified + compressed, less than 35kb minified**
+- Made with **[Closure Compiler](https://github.com/google/closure-compiler)** in mind (works great with others, too)
 
 With **wavefile** you can:
 
@@ -74,12 +74,6 @@ https://github.com/rochars/wavefile/tree/master/dist
 If you installed via [NPM](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com), require WaveFile from **wavefile**:
 ```javascript
 const WaveFile = require('wavefile');
-let wav = new WaveFile();
-```
-
-This also works:
-```javascript
-const WaveFile = require('wavefile').default;
 let wav = new WaveFile();
 ```
 
