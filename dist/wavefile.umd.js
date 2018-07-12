@@ -3906,7 +3906,6 @@
        * is that the return value of this method includes the position in
        * milliseconds of each cue point (WaveFile.cue only have the sample offset)
        * @return {!Array<!Object>}
-       * @private
        */
 
     }, {
