@@ -3900,6 +3900,27 @@
       }
 
       /**
+       * Return an array with all cue points in the file, in the order they appear
+       * in the file.
+       * The difference between this method and using the list in WaveFile.cue
+       * is that the return value of this method includes the position in
+       * milliseconds of each cue point (WaveFile.cue only have the sample offset)
+       * @return {!Array<!Object>}
+       * @private
+       */
+
+    }, {
+      key: 'listCuePoints',
+      value: function listCuePoints() {
+        /** @type {!Array<!Object>} */
+        var points = this.getCuePoints_();
+        for (var i = 0; i < points.length; i++) {
+          points[i].milliseconds = points[i].dwPosition / this.fmt.sampleRate * 1000;
+        }
+        return points;
+      }
+
+      /**
        * Update the label of a cue point.
        * @param {number} pointIndex The ID of the cue point.
        * @param {string} label The new text for the label.
@@ -3960,7 +3981,8 @@
       }
 
       /**
-       * Return an array with the position of all cue points in the file.
+       * Return an array with all cue points in the file, in the order they appear
+       * in the file.
        * @return {!Array<!Object>}
        * @private
        */

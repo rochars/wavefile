@@ -87,7 +87,8 @@ WaveFile.cue = {
     fccChunk: 0,
     dwChunkStart: 0,
     dwBlockStart: 0,
-    dwSampleOffset: 0
+    dwSampleOffset: 0,
+    milliseconds: 0
   }],
 };
 /**
@@ -441,3 +442,14 @@ WaveFile.updateLabel = function(pointIndex, label) {};
  * @return {!Object<string, string>} The file tags.
  */
 WaveFile.listTags = function() {};
+
+/**
+ * Return an array with all cue points in the file, in the order they appear
+ * in the file.
+ * The difference between this method and using the list in WaveFile.cue
+ * is that the return value of this method includes the position in
+ * milliseconds of each cue point (WaveFile.cue only have the sample offset)
+ * @return {!Array<!Object>}
+ * @private
+ */
+WaveFile.listCuePoints = function() {};

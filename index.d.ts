@@ -54,4 +54,6 @@ declare class WaveFile {
     updateLabel(pointIndex: number, label: string): void;
 
     listTags(): object;
+
+    listCuePoints(): Array<object>;
 }

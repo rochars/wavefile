@@ -566,12 +566,36 @@ WaveFile.setCuePoint(position, labl='') {}
 WaveFile.deleteCuePoint(index) {}
 
 /**
+ * Return an array with all cue points in the file, in the order they appear
+ * in the file.
+ * The difference between this method and using the list in WaveFile.cue
+ * is that the return value of this method includes the position in
+ * milliseconds of each cue point (WaveFile.cue only have the sample offset)
+ * @return {!Array<!Object>}
+ * @private
+ */
+listCuePoints() {}
+
+/**
  * Update the label of a cue point.
  * @param {number} pointIndex The ID of the cue point.
  * @param {string} label The new text for the label.
  */
 WaveFile.updateLabel(pointIndex, label) {}
 ```
+
+#### WaveFile.listCuePoints()
+This method returns a list like this:
+```javascript
+[
+  {
+    milliseconds: 1000, // the position in milliseconds
+    dwPosition: 8000, // the sample offset of the point
+    label: "cue marker 2" // the label of the point
+  },
+]
+```
+The list order reflects the order of the points in the file.
 
 ### The WaveFile properties
 ```javascript

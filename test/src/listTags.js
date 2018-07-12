@@ -28,11 +28,7 @@ describe('listTags() of a 16-bit wave files from scratch', function() {
     });
     it('should return a empty object if the file have no tags', function() {
         let wav = new WaveFile();
-        let samples = [];
-        for (let i=0; i<8000; i++) {
-            samples.push(0);
-        }
-        wav.fromScratch(1, 8000, '16', samples);
+        wav.fromScratch(1, 8000, '16', []);
         assert.deepEqual(wav.listTags(), {});
     });
 });
