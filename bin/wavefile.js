@@ -18,23 +18,26 @@ const help = " Usage:\n" +
 	"\n" +
 	" Available options:\n" +
 	"\n" +
-	"  --bitdepth   Ex: --bitdepth=32f\n" +
+	"  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav\n" +
 	"               Change the bit depth.\n" +
 	"               The input file is not affected.\n" +
 	"               Possible values: 8, 16, 24, 32, 32f, 64\n" +
 	"\n" +
-	"  --compress   Ex: --compress=adpcm\n" +
+	"  --compress   Ex: wavefile input.wav --compress=adpcm output.wav\n" +
 	"               Apply compression to the file.\n" +
 	"               The input file is not affected.\n" +
 	"               Possible values: adpcm, alaw, mulaw\n" +
 	"\n" +
-	"  --tag        Ex: --tag=ICRD\n" +
+	"  --tag        Ex: wavefile input.wav --tag=ICRD\n" +
 	"               Print the value of tag if the tag exists.\n" +
 	"\n" +
-	"  --bits       Ex: --bits\n" +
+	"  --list-tags  Ex: wavefile input.wav --list-tags\n" +
+	"               Print all tags of a file.\n" +
+	"\n" +
+	"  --bits       Ex: wavefile input.wav --bits\n" +
 	"               Print the bit depth of the file.\n" +
 	"\n" +
-	"  --rate       Ex: --rate\n" +
+	"  --rate       Ex: wavefile input.wav --rate\n" +
 	"               Print the sample rate of the file.\n" +
 	"\n" +
 	"  --help       Ex: --help\n" +
@@ -97,6 +100,13 @@ for (let command in commands) {
 	// --tag
 	}else if (splitCommand[0] == '--tag') {
 		console.log(wav.getTag(splitCommand[1]));
+	}else if (splitCommand[0] == '--list-tags') {
+		tags = wav.listTags();
+		for (var tag in tags) {
+	        if (tags.hasOwnProperty(tag)) {
+	           console.log(tag + ': ' + tags[tag]);
+	        }
+	    }
 	// --bits
 	}else if (splitCommand[0] == '--bits') {
 		if (wav.fmt.validBitsPerSample) {
