@@ -2,6 +2,7 @@
 
 ## version 8.2.0 (unreleased)
 - Add listTags() method to the API. Returns a Object<tag, value> with the RIFF tags in the file.
+- Add listCuePoints() method to the API. Return a object similar to in WaveFile.cue, but with the position of each point in milliseconds.
 
 ## version 8.1.5 (2018-07-10)
 - Fix: Remove unecessary files from the dist.

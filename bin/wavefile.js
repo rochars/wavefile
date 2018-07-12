@@ -32,7 +32,10 @@ const help = " Usage:\n" +
 	"               Print the value of tag if the tag exists.\n" +
 	"\n" +
 	"  --list-tags  Ex: wavefile input.wav --list-tags\n" +
-	"               Print all tags of a file.\n" +
+	"               Print all tags of the file.\n" +
+	"\n" +
+	"  --list-cue   Ex: wavefile input.wav --list-cue\n" +
+	"               Print all the cue points of the file.\n" +
 	"\n" +
 	"  --bits       Ex: wavefile input.wav --bits\n" +
 	"               Print the bit depth of the file.\n" +
@@ -100,6 +103,7 @@ for (let command in commands) {
 	// --tag
 	}else if (splitCommand[0] == '--tag') {
 		console.log(wav.getTag(splitCommand[1]));
+	// --list-tag
 	}else if (splitCommand[0] == '--list-tags') {
 		tags = wav.listTags();
 		for (var tag in tags) {
@@ -107,6 +111,9 @@ for (let command in commands) {
 	           console.log(tag + ': ' + tags[tag]);
 	        }
 	    }
+	// --list-cue
+	}else if (splitCommand[0] == '--list-cue') {
+		console.log(wav.listCuePoints());
 	// --bits
 	}else if (splitCommand[0] == '--bits') {
 		if (wav.fmt.validBitsPerSample) {

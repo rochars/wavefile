@@ -12,7 +12,8 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('listCuePoints() of a 16-bit wave files from scratch', function() {
     
-    it('should list the cue points of a file created from scratch', function() {
+    it('should list the cue points of a file created from scratch',
+        function() {
         let wav = new WaveFile();
         let samples = [];
         for (let i=0; i<128000; i++)  {
@@ -25,29 +26,30 @@ describe('listCuePoints() of a 16-bit wave files from scratch', function() {
         wav.setCuePoint(1250, "cue marker 3"); //
         wav.setCuePoint(2000, "cue marker 4"); //
         assert.deepEqual(wav.listCuePoints(), [
-                {
-                    milliseconds: 1000,
-                    dwPosition: 8000,
-                    label: "cue marker 2"
-                },
-                {
-                    milliseconds: 1250,
-                    dwPosition: 10000,
-                    label: "cue marker 3"
-                },
-                {
-                    milliseconds: 1500,
-                    dwPosition: 12000,
-                    label: "cue marker 1"
-                },
-                {
-                    milliseconds: 2000,
-                    dwPosition: 16000,
-                    label: "cue marker 4"
-                },
-            ]);
+            {
+                milliseconds: 1000,
+                dwPosition: 8000,
+                label: "cue marker 2"
+            },
+            {
+                milliseconds: 1250,
+                dwPosition: 10000,
+                label: "cue marker 3"
+            },
+            {
+                milliseconds: 1500,
+                dwPosition: 12000,
+                label: "cue marker 1"
+            },
+            {
+                milliseconds: 2000,
+                dwPosition: 16000,
+                label: "cue marker 4"
+            },
+        ]);
     });
-    it('should return a empty array if the file have no cue points', function() {
+    it('should return a empty array if the file have no cue points',
+        function() {
         let wav = new WaveFile();
         wav.fromScratch(1, 8000, '16', []);
         assert.deepEqual(wav.listCuePoints(), []);

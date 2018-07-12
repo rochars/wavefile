@@ -383,6 +383,37 @@ To see the available options:
 wavefile --help
 ```
 
+The available options:
+```
+  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
+               Change the bit depth.
+               The input file is not affected.
+               Possible values: 8, 16, 24, 32, 32f, 64
+
+  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
+               Apply compression to the file.
+               The input file is not affected.
+               Possible values: adpcm, alaw, mulaw
+
+  --tag        Ex: wavefile input.wav --tag=ICRD
+               Print the value of tag if the tag exists.
+
+  --list-tags  Ex: wavefile input.wav --list-tags
+               Print all tags of the file.
+
+  --list-cue   Ex: wavefile input.wav --list-cue
+               Print all the cue points of the file.
+
+  --bits       Ex: wavefile input.wav --bits
+               Print the bit depth of the file.
+
+  --rate       Ex: wavefile input.wav --rate
+               Print the sample rate of the file.
+
+  --help       Ex: --help
+               Show this help page.
+```
+
 ## API
 To create a WaveFile object:
 ```javascript
