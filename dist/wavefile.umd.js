@@ -1878,18 +1878,18 @@
    */
 
   /**
-   * @fileoverview A tool to create wav file headers.
+   * @fileoverview The code for different formats of WAVE audio.
    * @see https://github.com/rochars/wavefile
    */
 
   /**
    * Audio formats.
-   * Formats not listed here will be set to 65534,
+   * Formats not listed here should be set to 65534,
    * the code for WAVE_FORMAT_EXTENSIBLE
    * @enum {number}
    * @private
    */
-  var AUDIO_FORMATS = {
+  var WAV_AUDIO_FORMATS = {
     '4': 17,
     '8': 1,
     '8a': 6,
@@ -1901,6 +1901,30 @@
     '64': 3
   };
 
+  /*
+   * Copyright (c) 2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
   /**
    * Return the header for a wav file.
    * @param {string} bitDepthCode The audio bit depth
@@ -1911,75 +1935,18 @@
    * @param {!Object} options The extra options, like container defintion.
    * @private
    */
-  function wavHeader(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+  function makeWavHeader(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
     var header = {};
     if (bitDepthCode == '4') {
       header = createADPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
     } else if (bitDepthCode == '8a' || bitDepthCode == '8m') {
       header = createALawMulawHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-    } else if (Object.keys(AUDIO_FORMATS).indexOf(bitDepthCode) == -1 || numChannels > 2) {
+    } else if (Object.keys(WAV_AUDIO_FORMATS).indexOf(bitDepthCode) == -1 || numChannels > 2) {
       header = createExtensibleHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
     } else {
       header = createPCMHeader_(bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
     }
     return header;
-  }
-
-  /**
-   * Validate the header of the file.
-   * @throws {Error} If any property of the object appears invalid.
-   * @private
-   */
-  function validateHeader_(header) {
-    validateBitDepth_$1(header);
-    validateNumChannels_(header);
-    validateSampleRate_(header);
-  }
-
-  /**
-   * Validate the bit depth.
-   * @return {boolean} True is the bit depth is valid.
-   * @throws {Error} If bit depth is invalid.
-   * @private
-   */
-  function validateBitDepth_$1(header) {
-    if (!AUDIO_FORMATS[header.bitDepth]) {
-      if (parseInt(header.bitDepth, 10) > 8 && parseInt(header.bitDepth, 10) < 54) {
-        return true;
-      }
-      throw new Error('Invalid bit depth.');
-    }
-    return true;
-  }
-
-  /**
-   * Validate the number of channels.
-   * @return {boolean} True is the number of channels is valid.
-   * @throws {Error} If the number of channels is invalid.
-   * @private
-   */
-  function validateNumChannels_(header) {
-    /** @type {number} */
-    var blockAlign = header.fmt.numChannels * header.fmt.bitsPerSample / 8;
-    if (header.fmt.numChannels < 1 || blockAlign > 65535) {
-      throw new Error('Invalid number of channels.');
-    }
-    return true;
-  }
-
-  /**
-   * Validate the sample rate value.
-   * @return {boolean} True is the sample rate is valid.
-   * @throws {Error} If the sample rate is invalid.
-   * @private
-   */
-  function validateSampleRate_(header) {
-    /** @type {number} */
-    var byteRate = header.fmt.numChannels * (header.fmt.bitsPerSample / 8) * header.fmt.sampleRate;
-    if (header.fmt.sampleRate < 1 || byteRate > 4294967295) {
-      throw new Error('Invalid sample rate.');
-    }
-    return true;
   }
 
   /**
@@ -2001,7 +1968,7 @@
       fmt: {
         chunkId: 'fmt ',
         chunkSize: 16,
-        audioFormat: AUDIO_FORMATS[bitDepthCode] ? AUDIO_FORMATS[bitDepthCode] : 65534,
+        audioFormat: WAV_AUDIO_FORMATS[bitDepthCode] || 65534,
         numChannels: numChannels,
         sampleRate: sampleRate,
         byteRate: numChannels * numBytes * sampleRate,
@@ -2115,6 +2082,87 @@
       dwChannelMask = 0x63F;
     }
     return dwChannelMask;
+  }
+
+  /*
+   * Copyright (c) 2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
+  /**
+   * Validate the header of the file.
+   * @throws {Error} If any property of the object appears invalid.
+   * @private
+   */
+  function validateWavHeader_(header) {
+    validateBitDepth_$1(header);
+    validateNumChannels_(header);
+    validateSampleRate_(header);
+  }
+
+  /**
+   * Validate the bit depth.
+   * @return {boolean} True is the bit depth is valid.
+   * @throws {Error} If bit depth is invalid.
+   * @private
+   */
+  function validateBitDepth_$1(header) {
+    if (!WAV_AUDIO_FORMATS[header.bitDepth]) {
+      if (parseInt(header.bitDepth, 10) > 8 && parseInt(header.bitDepth, 10) < 54) {
+        return true;
+      }
+      throw new Error('Invalid bit depth.');
+    }
+    return true;
+  }
+
+  /**
+   * Validate the number of channels.
+   * @return {boolean} True is the number of channels is valid.
+   * @throws {Error} If the number of channels is invalid.
+   * @private
+   */
+  function validateNumChannels_(header) {
+    /** @type {number} */
+    var blockAlign = header.fmt.numChannels * header.fmt.bitsPerSample / 8;
+    if (header.fmt.numChannels < 1 || blockAlign > 65535) {
+      throw new Error('Invalid number of channels.');
+    }
+    return true;
+  }
+
+  /**
+   * Validate the sample rate value.
+   * @return {boolean} True is the sample rate is valid.
+   * @throws {Error} If the sample rate is invalid.
+   * @private
+   */
+  function validateSampleRate_(header) {
+    /** @type {number} */
+    var byteRate = header.fmt.numChannels * (header.fmt.bitsPerSample / 8) * header.fmt.sampleRate;
+    if (header.fmt.sampleRate < 1 || byteRate > 4294967295) {
+      throw new Error('Invalid sample rate.');
+    }
+    return true;
   }
 
   /*
@@ -3436,7 +3484,7 @@
         this.data.samples = new Uint8Array(samples.length * numBytes);
         packArrayTo(samples, this.dataType, this.data.samples);
         /** @type {!Object} */
-        var header = wavHeader(bitDepthCode, numChannels, sampleRate, numBytes, this.data.samples.length, options);
+        var header = makeWavHeader(bitDepthCode, numChannels, sampleRate, numBytes, this.data.samples.length, options);
         this.clearHeader_();
         this.chunkSize = header.chunkSize;
         this.format = header.format;
@@ -3446,7 +3494,7 @@
         }
         this.data.chunkId = 'data';
         this.data.chunkSize = this.data.samples.length;
-        validateHeader_(this);
+        validateWavHeader_(this);
       }
 
       /**
@@ -3479,7 +3527,7 @@
     }, {
       key: 'toBuffer',
       value: function toBuffer() {
-        validateHeader_(this);
+        validateWavHeader_(this);
         return writeWavBuffer(this);
       }
 

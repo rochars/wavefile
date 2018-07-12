@@ -34,7 +34,8 @@ import * as imaadpcm from './vendor/imaadpcm.js';
 import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
 import {unpackArray, packArrayTo, unpackArrayTo} from './vendor/byte-data.js';
-import {wavHeader, validateHeader_} from './lib/wavheader.js';
+import makeWavHeader from './lib/make-wav-header.js';
+import validateWavHeader from './lib/validate-wav-header';
 import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
 import BufferIO from './lib/bufferio.js';
 import writeWavBuffer from './lib/wav-buffer-writer.js';
@@ -102,7 +103,7 @@ export default class WaveFile extends WavBuffer {
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
     /** @type {!Object} */
-    let header = wavHeader(
+    let header = makeWavHeader(
       bitDepthCode, numChannels, sampleRate,
       numBytes, this.data.samples.length, options);
     this.clearHeader_();
@@ -114,7 +115,7 @@ export default class WaveFile extends WavBuffer {
     }
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
-    validateHeader_(this);
+    validateWavHeader(this);
   }
 
   /**
@@ -139,7 +140,7 @@ export default class WaveFile extends WavBuffer {
    * @throws {Error} If any property of the object appears invalid.
    */
   toBuffer() {
-    validateHeader_(this);
+    validateWavHeader(this);
     return writeWavBuffer(this);
   }
 
