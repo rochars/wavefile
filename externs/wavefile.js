@@ -1,5 +1,5 @@
 /**
- * @fileoverview Externs for wavefile 8.1
+ * @fileoverview Externs for wavefile 8.2
  *
  * @see https://github.com/rochars/wavefile
  * @externs
@@ -435,3 +435,9 @@ WaveFile.deleteCuePoint = function(index) {};
  * @param {string} label The new text for the label.
  */
 WaveFile.updateLabel = function(pointIndex, label) {};
+
+/**
+ * Return a Object<tag, value> with the RIFF tags in the file.
+ * @return {!Object<string, string>} The file tags.
+ */
+WaveFile.listTags = function() {};

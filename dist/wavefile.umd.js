@@ -3792,6 +3792,26 @@
       }
 
       /**
+       * Return a Object<tag, value> with the RIFF tags in the file.
+       * @return {!Object<string, string>} The file tags.
+       */
+
+    }, {
+      key: 'listTags',
+      value: function listTags() {
+        /** @type {?number} */
+        var index = this.getLISTINFOIndex_();
+        /** @type {!Object} */
+        var tags = {};
+        if (index !== null) {
+          for (var i = 0; i < this.LIST[index].subChunks.length; i++) {
+            tags[this.LIST[index].subChunks[i].chunkId] = this.LIST[index].subChunks[i].value;
+          }
+        }
+        return tags;
+      }
+
+      /**
        * Remove a RIFF tag in the INFO chunk.
        * @param {string} tag The tag name.
        * @return {boolean} True if a tag was deleted.
@@ -4053,6 +4073,26 @@
           }
         }
         return null;
+      }
+
+      /**
+       * Return the index of the INFO chunk in the LIST chunk.
+       * @return {?number} the index of the INFO chunk.
+       * @private
+       */
+
+    }, {
+      key: 'getLISTINFOIndex_',
+      value: function getLISTINFOIndex_() {
+        /** @type {?number} */
+        var index = null;
+        for (var i = 0; i < this.LIST.length; i++) {
+          if (this.LIST[i].format === 'INFO') {
+            index = i;
+            break;
+          }
+        }
+        return index;
       }
 
       /**

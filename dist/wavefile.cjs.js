@@ -3824,6 +3824,24 @@ class WaveFile extends WavBuffer {
   }
 
   /**
+   * Return a Object<tag, value> with the RIFF tags in the file.
+   * @return {!Object<string, string>} The file tags.
+   */
+  listTags() {
+    /** @type {?number} */
+    let index = this.getLISTINFOIndex_();
+    /** @type {!Object} */
+    let tags = {};
+    if (index !== null) {
+      for (let i=0; i<this.LIST[index].subChunks.length; i++) {
+        tags[this.LIST[index].subChunks[i].chunkId] =
+          this.LIST[index].subChunks[i].value;
+      }
+    }
+    return tags;
+  }
+
+  /**
    * Remove a RIFF tag in the INFO chunk.
    * @param {string} tag The tag name.
    * @return {boolean} True if a tag was deleted.
@@ -4059,6 +4077,23 @@ class WaveFile extends WavBuffer {
       }
     }
     return null;
+  }
+
+  /**
+   * Return the index of the INFO chunk in the LIST chunk.
+   * @return {?number} the index of the INFO chunk.
+   * @private
+   */
+  getLISTINFOIndex_() {
+    /** @type {?number} */
+    let index = null;
+    for (let i=0; i<this.LIST.length; i++) {
+      if (this.LIST[i].format === 'INFO') {
+        index = i;
+        break;
+      }
+    }
+    return index;
   }
 
   /**

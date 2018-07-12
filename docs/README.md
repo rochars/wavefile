@@ -546,6 +546,12 @@ WaveFile.getTag(tag) {}
 WaveFile.deleteTag(tag) {}
 
 /**
+ * Return a Object<tag, value> with the RIFF tags in the file.
+ * @return {!Object<string, string>} The file tags.
+ */
+WaveFile.listTags() {}
+
+/**
  * Create a cue point in the wave file.
  * @param {number} position The cue point position in milliseconds.
  * @param {string} labl The LIST adtl labl text of the marker. Optional.

@@ -1,4 +1,4 @@
-// Type definitions for wavefile 8.1
+// Type definitions for wavefile 8.2
 // Project: https://github.com/rochars/wavefile
 // Definitions by: Rafael S. Rocha <https://github.com/rochars>
 // Definitions: https://github.com/rochars/wavefile
@@ -52,4 +52,6 @@ declare class WaveFile {
     deleteCuePoint(index: number): void;
 
     updateLabel(pointIndex: number, label: string): void;
+
+    listTags(): object;
 }
