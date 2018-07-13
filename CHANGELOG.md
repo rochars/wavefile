@@ -1,6 +1,7 @@
 # CHANGELOG
 
-## version 8.3.2 (unreleased)
+## version 8.3.2 (2018-07-13)
+- Fix misssing properties in TypeScript declaration file.
 - Fix documentation issues.
 
 ## version 8.3.1 (2018-07-13)

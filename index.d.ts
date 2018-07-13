@@ -9,6 +9,20 @@ declare class WaveFile {
     
     constructor(bytes?: Uint8Array);
 
+    bitDepth: string;
+    container: string;
+    chunkSize: number;
+    format: string;
+    fmt: object;
+    fact: object;
+    cue: object;
+    smpl: object;
+    bext: object;
+    ds64: object;
+    data: object;
+    LIST: object;
+    junk: object;
+
     getSample(index: number): number;
 
     setSample(index: number, sample: number): void;
