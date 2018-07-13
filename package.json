@@ -50,15 +50,13 @@
     "bin": "bin",
     "dist": "dist",
     "externs": "externs",
-    "lib": "lib",
-    "vendor": "vendor"
+    "lib": "lib"
   },
   "files": [
     "bin",
     "dist",
     "externs",
     "lib",
-    "vendor",
     "index.js",
     "index.d.ts",
     "LICENSE",
