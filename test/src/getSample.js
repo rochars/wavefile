@@ -9,7 +9,7 @@
 var assert = assert || require('assert');
 var WaveFile = WaveFile || require('../loader.js');
 
-describe('create a 8-bit wave file from scratch', function() {
+describe('getSample(): 8-bit wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '8', [0, 255, 2, 3]);
@@ -25,7 +25,7 @@ describe('create a 8-bit wave file from scratch', function() {
     });
 });
 
-describe('create a 16-bit wave file from scratch', function() {
+describe('getSample(): 16-bit wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
@@ -47,7 +47,7 @@ describe('create a 16-bit wave file from scratch', function() {
     });
 });
 
-describe('create a 24-bit wave file from scratch', function() {
+describe('getSample(): 24-bit wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(1, 48000, '24', [0, 1, -8388608, 8388607]);
@@ -69,7 +69,7 @@ describe('create a 24-bit wave file from scratch', function() {
     });
 });
 
-describe('create a 32-bit wave file from scratch', function() {
+describe('getSample(): 32-bit wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(1, 44100, '32', [0, 1, -2147483648, 2147483647]);
@@ -91,7 +91,7 @@ describe('create a 32-bit wave file from scratch', function() {
     });
 });
 
-describe('create a 32-bit FP wave file from scratch', function() {
+describe('getSample(): 32-bit fp wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(1, 44100, '32f', [0, 1, 0.04029441, -0.04029440]);
@@ -113,7 +113,7 @@ describe('create a 32-bit FP wave file from scratch', function() {
     });
 });
 
-describe('create a 64-bit wave file from scratch', function() {
+describe('getSample(): 64-bit wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(
@@ -137,7 +137,7 @@ describe('create a 64-bit wave file from scratch', function() {
     });
 });
 
-describe('create 16-bit RIFX file from scratch', function() {
+describe('getSample(): 8-bit RIFX wave file from scratch', function() {
     
     let wav = new WaveFile();
     wav.fromScratch(

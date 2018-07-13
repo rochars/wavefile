@@ -33,7 +33,8 @@ import bitDepthLib from './vendor/bitdepth.js';
 import * as imaadpcm from './vendor/imaadpcm.js';
 import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
-import {unpackArray, packArrayTo, unpackArrayTo, unpack} from './vendor/byte-data.js';
+import {unpackArray, packArrayTo, unpackArrayTo,
+  unpack, packTo} from './vendor/byte-data.js';
 import makeWavHeader from './lib/make-wav-header.js';
 import validateWavHeader from './lib/validate-wav-header';
 import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
@@ -89,6 +90,20 @@ export default class WaveFile extends WavBuffer {
     return unpack(
       this.data.samples.slice(index, index + this.dataType.bits / 8),
       this.dataType);
+  }
+
+  /**
+   * Set the sample at a given index.
+   * @param {number} index The sample index.
+   * @param {number} sample The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  setSample(index, sample) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    packTo(sample, this.dataType, this.data.samples, index);
   }
 
   /**

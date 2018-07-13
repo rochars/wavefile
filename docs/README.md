@@ -437,9 +437,8 @@ WaveFile(bytes=null);
  * @param {string} bitDepth The audio bit depth code.
  *      One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
  *      or any value between "8" and "32" (like "12").
- * @param {!Array<number>} samples Array of samples to be written.
- *      The samples must be in the correct range according to the
- *      bit depth.
+ * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
+ *      The samples. Must be in the correct range according to the bit depth.
  * @param {?Object} options Optional. Used to force the container
  *      as RIFX with {"container": "RIFX"}
  * @throws {Error} If any argument does not meet the criteria.
@@ -621,6 +620,14 @@ WaveFile.updateLabel(pointIndex, label) {}
  * @throws {Error} If the sample index is off range.
  */
 WaveFile.getSample(index) {};
+
+/**
+ * Set the sample at a given index.
+ * @param {number} index The sample index.
+ * @param {number} sample The sample.
+ * @throws {Error} If the sample index is off range.
+ */
+WaveFile.setSample(index, sample) {};
 ```
 
 #### WaveFile.listCuePoints()
@@ -936,7 +943,26 @@ Where "chunkId" may be any RIFF tag:
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
 ## The samples
-Samples are stored in WaveFile.data.samples as a Uint8Array.
+Samples are stored in WaveFile.data.samples as a Uint8Array representing a byte buffer. Once you inform the samples with fromScratch() they are packed as bytes and stay that way.
+
+To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.
+
+Example:
+```javascript
+wav = new WaveFile();
+
+// some samples
+let samples = [561, 1200, 423];
+
+// Create a WaveFile using the samples
+wav.fromScratch(1, 8000, "16", samples);
+
+// Getting and setting a sample in the WaveFile instance:
+wav.getSample(1); // return 1200, the value of the second sample
+wav.setSample(1, 10); // change the second sample to 10
+wav.getSample(1); // return 10, the new value of the second sample
+```
+
 Range:
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit

@@ -275,6 +275,14 @@ WaveFile.bitDepth = '';
 WaveFile.getSample = function(index) {};
 
 /**
+ * Set the sample at a given index.
+ * @param {number} index The sample index.
+ * @param {number} sample The sample.
+ * @throws {Error} If the sample index is off range.
+ */
+WaveFile.setSample = function(index, sample) {};
+
+/**
  * Set up the WaveFile object based on the arguments passed.
  * @param {number} numChannels The number of channels
  *      (Integer numbers: 1 for mono, 2 stereo and so on).

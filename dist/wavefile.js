@@ -3526,6 +3526,20 @@ class WaveFile extends WavBuffer {
   }
 
   /**
+   * Set the sample at a given index.
+   * @param {number} index The sample index.
+   * @param {number} sample The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  setSample(index, sample) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    packTo(sample, this.dataType, this.data.samples, index);
+  }
+
+  /**
    * Set up the WaveFile object based on the arguments passed.
    * @param {number} numChannels The number of channels
    *    (Integer numbers: 1 for mono, 2 stereo and so on).

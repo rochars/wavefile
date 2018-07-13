@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## version 8.3.0 (2018-07-13)
-- Add getSample() to the API; return the sample at a given index.
+## version 8.3.0 (unreleased)
+- Add getSample(index) to the API; return the sample at a given index.
+- Add setSample(index, sample) to the API; set the sample at a given index.
 
 ## version 8.2.0 (2018-07-12)
 - Add listTags() method to the API. It return a Object<tag, value> with the RIFF tags in the file.

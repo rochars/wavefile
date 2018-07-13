@@ -11,6 +11,8 @@ declare class WaveFile {
 
     getSample(index: number): number;
 
+    setSample(index: number, sample: number): void;
+
     fromScratch(numChannels: number, sampleRate: number, bitDepthCode: string, samples: Array<number>, options?: object): void;
 
     fromBuffer(bytes: Uint8Array, samples?:boolean): void;
