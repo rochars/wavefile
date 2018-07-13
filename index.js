@@ -81,8 +81,6 @@ export default class WaveFile extends WavBuffer {
    * @throws {Error} If the sample index is off range.
    */
   getSample(index) {
-    /** @type {number} */
-    let sample;
     index = index * (this.dataType.bits / 8);
     if (index + this.dataType.bits / 8 > this.data.samples.length) {
       throw new Error('Range error');
