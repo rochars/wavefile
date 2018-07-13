@@ -1,5 +1,5 @@
 /**
- * @fileoverview Externs for wavefile 8.2
+ * @fileoverview Externs for wavefile 8.3
  *
  * @see https://github.com/rochars/wavefile
  * @externs
@@ -265,6 +265,14 @@ WaveFile.junk = {
  * @type {string}
  */
 WaveFile.bitDepth = '';
+
+/**
+ * Return the sample at a given index.
+ * @param {number} index The sample index.
+ * @return {number} The sample.
+ * @throws {Error} If the sample index is off range.
+ */
+WaveFile.getSample = function(index) {};
 
 /**
  * Set up the WaveFile object based on the arguments passed.

@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -72,11 +72,10 @@ import bitDepthLib from './vendor/bitdepth.js';
 import * as imaadpcm from './vendor/imaadpcm.js';
 import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
-import {unpackArray, packArrayTo, unpackArrayTo} from './vendor/byte-data.js';
+import {unpackArray, packArrayTo, unpackArrayTo, unpack} from './vendor/byte-data.js';
 import makeWavHeader from './lib/make-wav-header.js';
 import validateWavHeader from './lib/validate-wav-header';
 import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
-import BufferIO from './lib/bufferio.js';
 import writeWavBuffer from './lib/wav-buffer-writer.js';
 import readWavBuffer from './lib/wav-buffer-reader.js';
 import WavBuffer from './lib/wav-buffer.js';
@@ -106,12 +105,29 @@ export default class WaveFile extends WavBuffer {
      * @private
      */
     this.dataType = {};
-    this.io = new BufferIO();
     // Load a file from the buffer if one was passed
     // when creating the object
     if (bytes) {
       this.fromBuffer(bytes);
     }
+  }
+
+  /**
+   * Return the sample at a given index.
+   * @param {number} index The sample index.
+   * @return {number} The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  getSample(index) {
+    /** @type {number} */
+    let sample;
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    return unpack(
+      this.data.samples.slice(index, index + this.dataType.bits / 8),
+      this.dataType);
   }
 
   /**
@@ -871,7 +887,7 @@ export default class WaveFile extends WavBuffer {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jul 12 2018 04:00:50 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 13 2018 01:20:04 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

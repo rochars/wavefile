@@ -613,6 +613,14 @@ listCuePoints() {}
  * @param {string} label The new text for the label.
  */
 WaveFile.updateLabel(pointIndex, label) {}
+
+/**
+ * Return the sample at a given index.
+ * @param {number} index The sample index.
+ * @return {number} The sample.
+ * @throws {Error} If the sample index is off range.
+ */
+WaveFile.getSample(index) {};
 ```
 
 #### WaveFile.listCuePoints()

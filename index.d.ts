@@ -1,4 +1,4 @@
-// Type definitions for wavefile 8.2
+// Type definitions for wavefile 8.3
 // Project: https://github.com/rochars/wavefile
 // Definitions by: Rafael S. Rocha <https://github.com/rochars>
 // Definitions: https://github.com/rochars/wavefile
@@ -8,6 +8,8 @@ export default WaveFile;
 declare class WaveFile {
     
     constructor(bytes?: Uint8Array);
+
+    getSample(index: number): number;
 
     fromScratch(numChannels: number, sampleRate: number, bitDepthCode: string, samples: Array<number>, options?: object): void;
 

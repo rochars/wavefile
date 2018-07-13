@@ -1757,6 +1757,19 @@
   }
 
   /**
+   * Unpack a number from a byte buffer.
+   * @param {!Uint8Array} buffer The byte buffer.
+   * @param {!Object} theType The type definition.
+   * @return {number}
+   * @throws {Error} If the type definition is not valid
+   */
+  function unpack(buffer, theType) {
+    setUp_(theType);
+    var values = unpackArrayFrom(buffer.slice(0, theType.offset), theType);
+    return values[0];
+  }
+
+  /**
    * Unpack an array of numbers from a byte buffer.
    * @param {!Uint8Array} buffer The byte buffer.
    * @param {!Object} theType The type definition.
@@ -3441,7 +3454,6 @@
        * @private
        */
       _this.dataType = {};
-      _this.io = new BufferIO();
       // Load a file from the buffer if one was passed
       // when creating the object
       if (bytes) {
@@ -3451,23 +3463,40 @@
     }
 
     /**
-     * Set up the WaveFile object based on the arguments passed.
-     * @param {number} numChannels The number of channels
-     *    (Integer numbers: 1 for mono, 2 stereo and so on).
-     * @param {number} sampleRate The sample rate.
-     *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
-     * @param {string} bitDepthCode The audio bit depth code.
-     *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
-     *    or any value between '8' and '32' (like '12').
-     * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
-     *    The samples. Must be in the correct range according to the bit depth.
-     * @param {?Object} options Optional. Used to force the container
-     *    as RIFX with {'container': 'RIFX'}
-     * @throws {Error} If any argument does not meet the criteria.
+     * Return the sample at a given index.
+     * @param {number} index The sample index.
+     * @return {number} The sample.
+     * @throws {Error} If the sample index is off range.
      */
 
 
     createClass(WaveFile, [{
+      key: 'getSample',
+      value: function getSample(index) {
+        index = index * (this.dataType.bits / 8);
+        if (index + this.dataType.bits / 8 > this.data.samples.length) {
+          throw new Error('Range error');
+        }
+        return unpack(this.data.samples.slice(index, index + this.dataType.bits / 8), this.dataType);
+      }
+
+      /**
+       * Set up the WaveFile object based on the arguments passed.
+       * @param {number} numChannels The number of channels
+       *    (Integer numbers: 1 for mono, 2 stereo and so on).
+       * @param {number} sampleRate The sample rate.
+       *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
+       * @param {string} bitDepthCode The audio bit depth code.
+       *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+       *    or any value between '8' and '32' (like '12').
+       * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
+       *    The samples. Must be in the correct range according to the bit depth.
+       * @param {?Object} options Optional. Used to force the container
+       *    as RIFX with {'container': 'RIFX'}
+       * @throws {Error} If any argument does not meet the criteria.
+       */
+
+    }, {
       key: 'fromScratch',
       value: function fromScratch(numChannels, sampleRate, bitDepthCode, samples) {
         var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};

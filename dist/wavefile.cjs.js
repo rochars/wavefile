@@ -1697,6 +1697,19 @@ function packArrayTo(values, theType, buffer, index=0) {
 }
 
 /**
+ * Unpack a number from a byte buffer.
+ * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Object} theType The type definition.
+ * @return {number}
+ * @throws {Error} If the type definition is not valid
+ */
+function unpack(buffer, theType) {
+  setUp_(theType);
+  let values = unpackArrayFrom(buffer.slice(0, theType.offset), theType);
+  return values[0];
+}
+
+/**
  * Unpack an array of numbers from a byte buffer.
  * @param {!Uint8Array} buffer The byte buffer.
  * @param {!Object} theType The type definition.
@@ -3491,12 +3504,27 @@ class WaveFile extends WavBuffer {
      * @private
      */
     this.dataType = {};
-    this.io = new BufferIO();
     // Load a file from the buffer if one was passed
     // when creating the object
     if (bytes) {
       this.fromBuffer(bytes);
     }
+  }
+
+  /**
+   * Return the sample at a given index.
+   * @param {number} index The sample index.
+   * @return {number} The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  getSample(index) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    return unpack(
+      this.data.samples.slice(index, index + this.dataType.bits / 8),
+      this.dataType);
   }
 
   /**

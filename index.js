@@ -33,11 +33,10 @@ import bitDepthLib from './vendor/bitdepth.js';
 import * as imaadpcm from './vendor/imaadpcm.js';
 import * as alawmulaw from './vendor/alawmulaw.js';
 import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
-import {unpackArray, packArrayTo, unpackArrayTo} from './vendor/byte-data.js';
+import {unpackArray, packArrayTo, unpackArrayTo, unpack} from './vendor/byte-data.js';
 import makeWavHeader from './lib/make-wav-header.js';
 import validateWavHeader from './lib/validate-wav-header';
 import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
-import BufferIO from './lib/bufferio.js';
 import writeWavBuffer from './lib/wav-buffer-writer.js';
 import readWavBuffer from './lib/wav-buffer-reader.js';
 import WavBuffer from './lib/wav-buffer.js';
@@ -67,12 +66,29 @@ export default class WaveFile extends WavBuffer {
      * @private
      */
     this.dataType = {};
-    this.io = new BufferIO();
     // Load a file from the buffer if one was passed
     // when creating the object
     if (bytes) {
       this.fromBuffer(bytes);
     }
+  }
+
+  /**
+   * Return the sample at a given index.
+   * @param {number} index The sample index.
+   * @return {number} The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  getSample(index) {
+    /** @type {number} */
+    let sample;
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    return unpack(
+      this.data.samples.slice(index, index + this.dataType.bits / 8),
+      this.dataType);
   }
 
   /**
