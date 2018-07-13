@@ -9,6 +9,8 @@
 
 import closure from 'rollup-plugin-closure-compiler-js';
 import babel from 'rollup-plugin-babel';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 
 // Read externs definitions
 const fs = require('fs');
@@ -38,6 +40,10 @@ export default [
         file: 'dist/wavefile.js',
         format: 'es'
       }
+    ],
+    plugins: [
+      resolve(),
+      commonjs()
     ]
   },
   // umd
@@ -51,6 +57,8 @@ export default [
       }
     ],
     plugins: [
+      resolve(),
+      commonjs(),
       babel()
     ]
   },
@@ -67,6 +75,8 @@ export default [
       }
     ],
     plugins: [
+      resolve(),
+      commonjs(),
       closure({
         languageIn: 'ECMASCRIPT6',
         languageOut: 'ECMASCRIPT5',

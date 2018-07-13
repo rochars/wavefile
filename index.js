@@ -29,15 +29,15 @@
 
 /** @module wavefile */
 
-import bitDepthLib from './vendor/bitdepth.js';
-import * as imaadpcm from './vendor/imaadpcm.js';
-import * as alawmulaw from './vendor/alawmulaw.js';
-import {encode, decode} from './vendor/base64-arraybuffer-es6.js';
+import bitDepthLib from 'bitdepth';
+import * as imaadpcm from 'imaadpcm';
+import * as alawmulaw from 'alawmulaw';
+import {encode, decode} from 'base64-arraybuffer-es6';
 import {unpackArray, packArrayTo, unpackArrayTo,
-  unpack, packTo} from './vendor/byte-data.js';
+  unpack, packTo} from 'byte-data';
+
 import makeWavHeader from './lib/make-wav-header.js';
 import validateWavHeader from './lib/validate-wav-header';
-import {riffChunks, findChunk_} from './vendor/riff-chunks.js';
 import writeWavBuffer from './lib/wav-buffer-writer.js';
 import readWavBuffer from './lib/wav-buffer-reader.js';
 import WavBuffer from './lib/wav-buffer.js';
@@ -262,6 +262,9 @@ export default class WaveFile extends WavBuffer {
     /** @type {!Float64Array} */
     let typedSamplesOutput = new Float64Array(sampleCount + 1);
     unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
+    if (thisBitDepth == "32f" || thisBitDepth == "64") {
+      this.truncateSamples_(typedSamplesInput);
+    }
     bitDepthLib(
       typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
     this.fromScratch(
@@ -847,5 +850,21 @@ export default class WaveFile extends WavBuffer {
    */
   correctContainer_() {
     return this.container == 'RF64' ? 'RIFF' : this.container;
+  }
+
+  /**
+   * Truncate float samples on over and underflow.
+   * @private
+   */
+  truncateSamples_(samples) {
+    /** @type {number} */   
+    let len = samples.length;
+    for (let i=0; i<len; i++) {
+      if (samples[i] > 1) {
+        samples[i] = 1;
+      } else if (samples[i] < -1) {
+        samples[i] = -1;
+      }
+    }
   }
 }

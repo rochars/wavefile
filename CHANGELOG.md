@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.3.1 (2018-07-13)
+- Add external dependencies.
+
 ## version 8.3.0 (2018-07-13)
 - Add getSample(index) to the API; return the sample at a given index.
 - Add setSample(index, sample) to the API; set the sample at a given index.

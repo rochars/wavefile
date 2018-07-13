@@ -63,9 +63,6 @@ function bitDepth(input, original, target, output) {
       output[i] = input[i] -= 128;
     }
   }
-  if (original == "32f" || original == "64") {
-    truncateSamples(input);
-  }
   // change the resolution of the samples
   for (let i=0; i<len; i++) {        
     output[i] = toFunction(input[i], options);
@@ -169,22 +166,6 @@ function validateBitDepth_(bitDepth) {
   if ((bitDepth != "32f" && bitDepth != "64") &&
       (parseInt(bitDepth, 10) < "8" || parseInt(bitDepth, 10) > "53")) {
     throw new Error("Invalid bit depth.");
-  }
-}
-
-/**
- * Truncate float samples on over and underflow.
- * @private
- */
-function truncateSamples(samples) {
-  /** @type {number} */   
-  let len = samples.length;
-  for (let i=0; i<len; i++) {
-    if (samples[i] > 1) {
-      samples[i] = 1;
-    } else if (samples[i] < -1) {
-      samples[i] = -1;
-    }
   }
 }
 
@@ -633,13 +614,6 @@ function decode$1(samples) {
   return pcmSamples;
 }
 
-var alaw = /*#__PURE__*/Object.freeze({
-  encodeSample: encodeSample,
-  decodeSample: decodeSample,
-  encode: encode$1,
-  decode: decode$1
-});
-
 /*
  * alawmulaw: A-Law and mu-Law codecs in JavaScript.
  * https://github.com/rochars/alawmulaw
@@ -765,7 +739,7 @@ function decodeSample$1(muLawSample) {
  * @param {!Int16Array} samples A array of 16-bit PCM samples.
  * @return {!Uint8Array}
  */
-function encode$1$1(samples) {
+function encode$2(samples) {
   /** @type {!Uint8Array} */
   let muLawSamples = new Uint8Array(samples.length);
   for (let i=0; i<samples.length; i++) {
@@ -779,7 +753,7 @@ function encode$1$1(samples) {
  * @param {!Uint8Array} samples A array of 8-bit mu-Law samples.
  * @return {!Int16Array}
  */
-function decode$1$1(samples) {
+function decode$2(samples) {
   /** @type {!Int16Array} */
   let pcmSamples = new Int16Array(samples.length);
   for (let i=0; i<samples.length; i++) {
@@ -788,12 +762,32 @@ function decode$1$1(samples) {
   return pcmSamples;
 }
 
-var mulaw = /*#__PURE__*/Object.freeze({
-  encodeSample: encodeSample$1,
-  decodeSample: decodeSample$1,
-  encode: encode$1$1,
-  decode: decode$1$1
-});
+/*
+ * alawmulaw: A-Law and mu-Law codecs in JavaScript.
+ * https://github.com/rochars/alawmulaw
+ *
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 /*
  * base64-arraybuffer
@@ -811,7 +805,7 @@ for (let i = 0; i < chars.length; i++) {
     lookup[chars.charCodeAt(i)] = i;
 }
 
-const encode$2 = function (arraybuffer, byteOffset, length) {
+const encode$3 = function (arraybuffer, byteOffset, length) {
     const bytes = new Uint8Array(arraybuffer, byteOffset, length),
         len = bytes.length;
     let base64 = '';
@@ -832,7 +826,7 @@ const encode$2 = function (arraybuffer, byteOffset, length) {
     return base64;
 };
 
-const decode$2 = function (base64) {
+const decode$3 = function (base64) {
     const len = base64.length;
 
     let bufferLength = base64.length * 0.75;
@@ -2127,153 +2121,6 @@ function validateSampleRate_(header) {
 }
 
 /*
- * riff-chunks: Read and write the chunks of RIFF and RIFX files.
- * https://github.com/rochars/riff-chunks
- *
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/** @private */
-const uInt32_ = {bits: 32};
-/** @type {number} */
-let head_ = 0;
-
-/**
- * Return the chunks in a RIFF/RIFX file.
- * @param {!Uint8Array} buffer The file bytes.
- * @return {!Object} The RIFF chunks.
- */
-function riffChunks(buffer) {
-    head_ = 0;
-    let chunkId = getChunkId_(buffer, 0);
-    uInt32_.be = chunkId == 'RIFX';
-    let format = unpackString(buffer, 8, 4);
-    head_ += 4;
-    return {
-        chunkId: chunkId,
-        chunkSize: getChunkSize_(buffer, 0),
-        format: format,
-        subChunks: getSubChunksIndex_(buffer)
-    };
-}
-
-/**
-  * Find a chunk by its fourCC_ in a array of RIFF chunks.
-  * @param {!Object} chunks The wav file chunks.
-  * @param {string} chunkId The chunk fourCC_.
-  * @param {boolean} multiple True if there may be multiple chunks
-  *    with the same chunkId.
-  * @return {?Array<!Object>}
-  * @private
-  */
-function findChunk_(chunks, chunkId, multiple=false) {
-  /** @type {!Array<!Object>} */
-  let chunk = [];
-  for (let i=0; i<chunks.length; i++) {
-    if (chunks[i].chunkId == chunkId) {
-      if (multiple) {
-        chunk.push(chunks[i]);
-      } else {
-        return chunks[i];
-      }
-    }
-  }
-  if (chunkId == 'LIST') {
-    return chunk.length ? chunk : null;
-  }
-  return null;
-}
-
-/**
- * Return the sub chunks of a RIFF file.
- * @param {!Uint8Array} buffer the RIFF file bytes.
- * @return {!Array<Object>} The subchunks of a RIFF/RIFX or LIST chunk.
- * @private
- */
-function getSubChunksIndex_(buffer) {
-    let chunks = [];
-    let i = head_;
-    while(i <= buffer.length - 8) {
-        chunks.push(getSubChunkIndex_(buffer, i));
-        i += 8 + chunks[chunks.length - 1].chunkSize;
-        i = i % 2 ? i + 1 : i;
-    }
-    return chunks;
-}
-
-/**
- * Return a sub chunk from a RIFF file.
- * @param {!Uint8Array} buffer the RIFF file bytes.
- * @param {number} index The start index of the chunk.
- * @return {!Object} A subchunk of a RIFF/RIFX or LIST chunk.
- * @private
- */
-function getSubChunkIndex_(buffer, index) {
-    let chunk = {
-        chunkId: getChunkId_(buffer, index),
-        chunkSize: getChunkSize_(buffer, index),
-    };
-    if (chunk.chunkId == 'LIST') {
-        chunk.format = unpackString(buffer, index + 8, 4);
-        head_ += 4;
-        chunk.subChunks = getSubChunksIndex_(buffer);
-    } else {
-        let realChunkSize = chunk.chunkSize % 2 ?
-            chunk.chunkSize + 1 : chunk.chunkSize;
-        head_ = index + 8 + realChunkSize;
-        chunk.chunkData = {
-            start: index + 8,
-            end: head_
-        };
-    }
-    return chunk;
-}
-
-/**
- * Return the fourCC_ of a chunk.
- * @param {!Uint8Array} buffer the RIFF file bytes.
- * @param {number} index The start index of the chunk.
- * @return {string} The id of the chunk.
- * @private
- */
-function getChunkId_(buffer, index) {
-    head_ += 4;
-    return unpackString(buffer, index, 4);
-}
-
-/**
- * Return the size of a chunk.
- * @param {!Uint8Array} buffer the RIFF file bytes.
- * @param {number} index The start index of the chunk.
- * @return {number} The size of the chunk without the id and size fields.
- * @private
- */
-function getChunkSize_(buffer, index) {
-    head_ += 4;
-    return unpackFrom(buffer, uInt32_, index + 4);
-}
-
-/*
  * Copyright (c) 2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -2807,6 +2654,149 @@ function getJunkBytes_(wav, uInt32_) {
 }
 
 /*
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/** @private */
+const uInt32_ = {bits: 32};
+/** @type {number} */
+let head_ = 0;
+
+/**
+ * Return the chunks in a RIFF/RIFX file.
+ * @param {!Uint8Array} buffer The file bytes.
+ * @return {!Object} The RIFF chunks.
+ */
+function riffChunks(buffer) {
+    head_ = 0;
+    let chunkId = getChunkId_(buffer, 0);
+    uInt32_.be = chunkId == 'RIFX';
+    let format = unpackString(buffer, 8, 4);
+    head_ += 4;
+    return {
+        chunkId: chunkId,
+        chunkSize: getChunkSize_(buffer, 0),
+        format: format,
+        subChunks: getSubChunksIndex_(buffer)
+    };
+}
+
+/**
+  * Find a chunk by its fourCC_ in a array of RIFF chunks.
+  * @param {!Object} chunks The wav file chunks.
+  * @param {string} chunkId The chunk fourCC_.
+  * @param {boolean} multiple True if there may be multiple chunks
+  *    with the same chunkId.
+  * @return {?Array<!Object>}
+  */
+function findChunk(chunks, chunkId, multiple=false) {
+  /** @type {!Array<!Object>} */
+  let chunk = [];
+  for (let i=0; i<chunks.length; i++) {
+    if (chunks[i].chunkId == chunkId) {
+      if (multiple) {
+        chunk.push(chunks[i]);
+      } else {
+        return chunks[i];
+      }
+    }
+  }
+  if (chunkId == 'LIST') {
+    return chunk.length ? chunk : null;
+  }
+  return null;
+}
+
+/**
+ * Return the sub chunks of a RIFF file.
+ * @param {!Uint8Array} buffer the RIFF file bytes.
+ * @return {!Array<Object>} The subchunks of a RIFF/RIFX or LIST chunk.
+ * @private
+ */
+function getSubChunksIndex_(buffer) {
+    let chunks = [];
+    let i = head_;
+    while(i <= buffer.length - 8) {
+        chunks.push(getSubChunkIndex_(buffer, i));
+        i += 8 + chunks[chunks.length - 1].chunkSize;
+        i = i % 2 ? i + 1 : i;
+    }
+    return chunks;
+}
+
+/**
+ * Return a sub chunk from a RIFF file.
+ * @param {!Uint8Array} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {!Object} A subchunk of a RIFF/RIFX or LIST chunk.
+ * @private
+ */
+function getSubChunkIndex_(buffer, index) {
+    let chunk = {
+        chunkId: getChunkId_(buffer, index),
+        chunkSize: getChunkSize_(buffer, index),
+    };
+    if (chunk.chunkId == 'LIST') {
+        chunk.format = unpackString(buffer, index + 8, 4);
+        head_ += 4;
+        chunk.subChunks = getSubChunksIndex_(buffer);
+    } else {
+        let realChunkSize = chunk.chunkSize % 2 ?
+            chunk.chunkSize + 1 : chunk.chunkSize;
+        head_ = index + 8 + realChunkSize;
+        chunk.chunkData = {
+            start: index + 8,
+            end: head_
+        };
+    }
+    return chunk;
+}
+
+/**
+ * Return the fourCC_ of a chunk.
+ * @param {!Uint8Array} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {string} The id of the chunk.
+ * @private
+ */
+function getChunkId_(buffer, index) {
+    head_ += 4;
+    return unpackString(buffer, index, 4);
+}
+
+/**
+ * Return the size of a chunk.
+ * @param {!Uint8Array} buffer the RIFF file bytes.
+ * @param {number} index The start index of the chunk.
+ * @return {number} The size of the chunk without the id and size fields.
+ * @private
+ */
+function getChunkSize_(buffer, index) {
+    head_ += 4;
+    return unpackFrom(buffer, uInt32_, index + 4);
+}
+
+/*
  * Copyright (c) 2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -2891,7 +2881,7 @@ function readRIFFChunk_(bytes, wav, uInt32_, uInt16_) {
  */
 function readFmtChunk_(buffer, signature, wav, uInt32_, uInt16_) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'fmt ');
+  let chunk = findChunk(signature, 'fmt ');
   if (chunk) {
     io$1.head_ = chunk.chunkData.start;
     wav.fmt.chunkId = chunk.chunkId;
@@ -2940,7 +2930,7 @@ function readFmtExtension_(buffer, wav, uInt32_, uInt16_) {
  */
 function readFactChunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'fact');
+  let chunk = findChunk(signature, 'fact');
   if (chunk) {
     io$1.head_ = chunk.chunkData.start;
     wav.fact.chunkId = chunk.chunkId;
@@ -2958,7 +2948,7 @@ function readFactChunk_(buffer, signature, wav, uInt32_) {
  */
 function readCueChunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'cue ');
+  let chunk = findChunk(signature, 'cue ');
   if (chunk) {
     io$1.head_ = chunk.chunkData.start;
     wav.cue.chunkId = chunk.chunkId;
@@ -2986,7 +2976,7 @@ function readCueChunk_(buffer, signature, wav, uInt32_) {
  */
 function readSmplChunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'smpl');
+  let chunk = findChunk(signature, 'smpl');
   if (chunk) {
     io$1.head_ = chunk.chunkData.start;
     wav.smpl.chunkId = chunk.chunkId;
@@ -3024,7 +3014,7 @@ function readSmplChunk_(buffer, signature, wav, uInt32_) {
  */
 function readDataChunk_(buffer, signature, samples, wav) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'data');
+  let chunk = findChunk(signature, 'data');
   if (chunk) {
     wav.data.chunkId = 'data';
     wav.data.chunkSize = chunk.chunkSize;
@@ -3047,7 +3037,7 @@ function readDataChunk_(buffer, signature, samples, wav) {
  */
 function readBextChunk_(buffer, signature, wav, uInt32_, uInt16_) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'bext');
+  let chunk = findChunk(signature, 'bext');
   if (chunk) {
     io$1.head_ = chunk.chunkData.start;
     wav.bext.chunkId = chunk.chunkId;
@@ -3083,7 +3073,7 @@ function readBextChunk_(buffer, signature, wav, uInt32_, uInt16_) {
  */
 function readDs64Chunk_(buffer, signature, wav, uInt32_) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'ds64');
+  let chunk = findChunk(signature, 'ds64');
   if (chunk) {
     io$1.head_ = chunk.chunkData.start;
     wav.ds64.chunkId = chunk.chunkId;
@@ -3117,7 +3107,7 @@ function readDs64Chunk_(buffer, signature, wav, uInt32_) {
  */
 function readLISTChunk_(buffer, signature, wav, uInt32_, uInt16_) {
   /** @type {?Object} */
-  let listChunks = findChunk_(signature, 'LIST', true);
+  let listChunks = findChunk(signature, 'LIST', true);
   if (listChunks === null) {
     return;
   }
@@ -3185,7 +3175,7 @@ function readLISTSubChunks_(subChunk, format, buffer, wav, uInt32_, uInt16_) {
  */
 function readJunkChunk_(buffer, signature, wav) {
   /** @type {?Object} */
-  let chunk = findChunk_(signature, 'junk');
+  let chunk = findChunk(signature, 'junk');
   if (chunk) {
     wav.junk = {
       chunkId: chunk.chunkId,
@@ -3614,7 +3604,7 @@ class WaveFile extends WavBuffer {
    * @throws {Error} If any property of the object appears invalid.
    */
   fromBase64(base64String) {
-    this.fromBuffer(new Uint8Array(decode$2(base64String)));
+    this.fromBuffer(new Uint8Array(decode$3(base64String)));
   }
 
   /**
@@ -3625,7 +3615,7 @@ class WaveFile extends WavBuffer {
   toBase64() {
     /** @type {!Uint8Array} */
     let buffer = this.toBuffer();
-    return encode$2(buffer, 0, buffer.length);
+    return encode$3(buffer, 0, buffer.length);
   }
 
   /**
@@ -3697,6 +3687,9 @@ class WaveFile extends WavBuffer {
     /** @type {!Float64Array} */
     let typedSamplesOutput = new Float64Array(sampleCount + 1);
     unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
+    if (thisBitDepth == "32f" || thisBitDepth == "64") {
+      this.truncateSamples_(typedSamplesInput);
+    }
     bitDepth(
       typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
     this.fromScratch(
@@ -3761,7 +3754,7 @@ class WaveFile extends WavBuffer {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      alaw.encode(output),
+      encode$1(output),
       {container: this.correctContainer_()});
   }
 
@@ -3776,7 +3769,7 @@ class WaveFile extends WavBuffer {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      alaw.decode(this.data.samples),
+      decode$1(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -3794,7 +3787,7 @@ class WaveFile extends WavBuffer {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      mulaw.encode(output),
+      encode$2(output),
       {container: this.correctContainer_()});
   }
 
@@ -3809,7 +3802,7 @@ class WaveFile extends WavBuffer {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      mulaw.decode(this.data.samples),
+      decode$2(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -4282,6 +4275,22 @@ class WaveFile extends WavBuffer {
    */
   correctContainer_() {
     return this.container == 'RF64' ? 'RIFF' : this.container;
+  }
+
+  /**
+   * Truncate float samples on over and underflow.
+   * @private
+   */
+  truncateSamples_(samples) {
+    /** @type {number} */   
+    let len = samples.length;
+    for (let i=0; i<len; i++) {
+      if (samples[i] > 1) {
+        samples[i] = 1;
+      } else if (samples[i] < -1) {
+        samples[i] = -1;
+      }
+    }
   }
 }
 

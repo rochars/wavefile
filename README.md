@@ -7,14 +7,13 @@ https://github.com/rochars/wavefile
 
 Create, read and write wav files according to the specs.
 
-- **Zero dependencies**
 - **MIT-licensed**
 - **Use it out of the box in the browser**
 - **Use it out of the box in Node**
 - **Use it out of the box with [TypeScript](https://www.typescriptlang.org/)**
 - **Handle files up to 2GB**
 - **Use it as a command line tool**
-- **Less than 10kb minified + compressed, less than 35kb minified**
+- **Less than 10kb minified + compressed, less than 32kb minified**
 - Made with **[Closure Compiler](https://github.com/google/closure-compiler)** in mind (works great with others, too)
 
 With **wavefile** you can:

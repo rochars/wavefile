@@ -69,9 +69,6 @@
         output[i] = input[i] -= 128;
       }
     }
-    if (original == "32f" || original == "64") {
-      truncateSamples(input);
-    }
     // change the resolution of the samples
     for (var _i = 0; _i < len; _i++) {
       output[_i] = toFunction(input[_i], options);
@@ -175,22 +172,6 @@
   function validateBitDepth_(bitDepth) {
     if (bitDepth != "32f" && bitDepth != "64" && (parseInt(bitDepth, 10) < "8" || parseInt(bitDepth, 10) > "53")) {
       throw new Error("Invalid bit depth.");
-    }
-  }
-
-  /**
-   * Truncate float samples on over and underflow.
-   * @private
-   */
-  function truncateSamples(samples) {
-    /** @type {number} */
-    var len = samples.length;
-    for (var i = 0; i < len; i++) {
-      if (samples[i] > 1) {
-        samples[i] = 1;
-      } else if (samples[i] < -1) {
-        samples[i] = -1;
-      }
     }
   }
 
@@ -617,13 +598,6 @@
     return pcmSamples;
   }
 
-  var alaw = /*#__PURE__*/Object.freeze({
-    encodeSample: encodeSample,
-    decodeSample: decodeSample,
-    encode: encode$1,
-    decode: decode$1
-  });
-
   /*
    * alawmulaw: A-Law and mu-Law codecs in JavaScript.
    * https://github.com/rochars/alawmulaw
@@ -733,7 +707,7 @@
    * @param {!Int16Array} samples A array of 16-bit PCM samples.
    * @return {!Uint8Array}
    */
-  function encode$1$1(samples) {
+  function encode$2(samples) {
     /** @type {!Uint8Array} */
     var muLawSamples = new Uint8Array(samples.length);
     for (var i = 0; i < samples.length; i++) {
@@ -747,7 +721,7 @@
    * @param {!Uint8Array} samples A array of 8-bit mu-Law samples.
    * @return {!Int16Array}
    */
-  function decode$1$1(samples) {
+  function decode$2(samples) {
     /** @type {!Int16Array} */
     var pcmSamples = new Int16Array(samples.length);
     for (var i = 0; i < samples.length; i++) {
@@ -756,12 +730,32 @@
     return pcmSamples;
   }
 
-  var mulaw = /*#__PURE__*/Object.freeze({
-    encodeSample: encodeSample$1,
-    decodeSample: decodeSample$1,
-    encode: encode$1$1,
-    decode: decode$1$1
-  });
+  /*
+   * alawmulaw: A-Law and mu-Law codecs in JavaScript.
+   * https://github.com/rochars/alawmulaw
+   *
+   * Copyright (c) 2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
 
   /*
    * base64-arraybuffer
@@ -779,7 +773,7 @@
       lookup[chars.charCodeAt(i)] = i;
   }
 
-  var encode$2 = function encode(arraybuffer, byteOffset, length) {
+  var encode$3 = function encode(arraybuffer, byteOffset, length) {
       var bytes = new Uint8Array(arraybuffer, byteOffset, length),
           len = bytes.length;
       var base64 = '';
@@ -800,7 +794,7 @@
       return base64;
   };
 
-  var decode$2 = function decode(base64) {
+  var decode$3 = function decode(base64) {
       var len = base64.length;
 
       var bufferLength = base64.length * 0.75;
@@ -833,6 +827,73 @@
 
       return arraybuffer;
   };
+
+  /*
+   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
+  /**
+   * @fileoverview A function to swap endianness in byte buffers.
+   * @see https://github.com/rochars/endianness
+   */
+
+  /**
+   * Swap the byte ordering in a buffer. The buffer is modified in place.
+   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
+   * @param {number} offset The byte offset.
+   * @param {number=} index The start index. Assumes 0.
+   * @param {number=} end The end index. Assumes the buffer length.
+   * @throws {Error} If the buffer length is not valid.
+   */
+  function endianness(bytes, offset) {
+    var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var end = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : bytes.length;
+
+    if (end % offset) {
+      throw new Error("Bad buffer length.");
+    }
+    for (; index < end; index += offset) {
+      swap(bytes, offset, index);
+    }
+  }
+
+  /**
+   * Swap the byte order of a value in a buffer. The buffer is modified in place.
+   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
+   * @param {number} offset The byte offset.
+   * @param {number} index The start index.
+   * @private
+   */
+  function swap(bytes, offset, index) {
+    offset--;
+    for (var x = 0; x < offset; x++) {
+      /** @type {number|string} */
+      var theByte = bytes[index + x];
+      bytes[index + x] = bytes[index + offset];
+      bytes[index + offset] = theByte;
+      offset--;
+    }
+  }
 
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -907,73 +968,6 @@
    */
 
   /**
-   * @fileoverview A function to swap endianness in byte buffers.
-   * @see https://github.com/rochars/endianness
-   */
-
-  /**
-   * Swap the byte ordering in a buffer. The buffer is modified in place.
-   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
-   * @param {number} offset The byte offset.
-   * @param {number=} index The start index. Assumes 0.
-   * @param {number=} end The end index. Assumes the buffer length.
-   * @throws {Error} If the buffer length is not valid.
-   */
-  function endianness(bytes, offset) {
-    var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    var end = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : bytes.length;
-
-    if (end % offset) {
-      throw new Error("Bad buffer length.");
-    }
-    for (; index < end; index += offset) {
-      swap(bytes, offset, index);
-    }
-  }
-
-  /**
-   * Swap the byte order of a value in a buffer. The buffer is modified in place.
-   * @param {!Array<number|string>|!Uint8Array} bytes The bytes.
-   * @param {number} offset The byte offset.
-   * @param {number} index The start index.
-   * @private
-   */
-  function swap(bytes, offset, index) {
-    offset--;
-    for (var x = 0; x < offset; x++) {
-      /** @type {number|string} */
-      var theByte = bytes[index + x];
-      bytes[index + x] = bytes[index + offset];
-      bytes[index + offset] = theByte;
-      offset--;
-    }
-  }
-
-  /*
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
-   *
-   * Permission is hereby granted, free of charge, to any person obtaining
-   * a copy of this software and associated documentation files (the
-   * "Software"), to deal in the Software without restriction, including
-   * without limitation the rights to use, copy, modify, merge, publish,
-   * distribute, sublicense, and/or sell copies of the Software, and to
-   * permit persons to whom the Software is furnished to do so, subject to
-   * the following conditions:
-   *
-   * The above copyright notice and this permission notice shall be
-   * included in all copies or substantial portions of the Software.
-   *
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-   *
-   */
-
-  /**
    * @fileoverview Pack and unpack two's complement ints and unsigned ints.
    * @see https://github.com/rochars/byte-data
    */
@@ -981,7 +975,6 @@
   /**
    * A class to pack and unpack two's complement ints and unsigned ints.
    */
-
   var Integer = function () {
 
     /**
@@ -1285,8 +1278,6 @@
    * @param {number} code The code.
    * @throws {Error} If the code is not a valid ASCII code.
    */
-
-
   function validateASCIICode(code) {
     if (code > 127) {
       throw new Error('Bad ASCII code.');
@@ -2179,154 +2170,6 @@
   }
 
   /*
-   * riff-chunks: Read and write the chunks of RIFF and RIFX files.
-   * https://github.com/rochars/riff-chunks
-   *
-   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
-   *
-   * Permission is hereby granted, free of charge, to any person obtaining
-   * a copy of this software and associated documentation files (the
-   * "Software"), to deal in the Software without restriction, including
-   * without limitation the rights to use, copy, modify, merge, publish,
-   * distribute, sublicense, and/or sell copies of the Software, and to
-   * permit persons to whom the Software is furnished to do so, subject to
-   * the following conditions:
-   *
-   * The above copyright notice and this permission notice shall be
-   * included in all copies or substantial portions of the Software.
-   *
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-   *
-   */
-
-  /** @private */
-  var uInt32_ = { bits: 32 };
-  /** @type {number} */
-  var head_ = 0;
-
-  /**
-   * Return the chunks in a RIFF/RIFX file.
-   * @param {!Uint8Array} buffer The file bytes.
-   * @return {!Object} The RIFF chunks.
-   */
-  function riffChunks(buffer) {
-      head_ = 0;
-      var chunkId = getChunkId_(buffer, 0);
-      uInt32_.be = chunkId == 'RIFX';
-      var format = unpackString(buffer, 8, 4);
-      head_ += 4;
-      return {
-          chunkId: chunkId,
-          chunkSize: getChunkSize_(buffer, 0),
-          format: format,
-          subChunks: getSubChunksIndex_(buffer)
-      };
-  }
-
-  /**
-    * Find a chunk by its fourCC_ in a array of RIFF chunks.
-    * @param {!Object} chunks The wav file chunks.
-    * @param {string} chunkId The chunk fourCC_.
-    * @param {boolean} multiple True if there may be multiple chunks
-    *    with the same chunkId.
-    * @return {?Array<!Object>}
-    * @private
-    */
-  function findChunk_(chunks, chunkId) {
-      var multiple = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-      /** @type {!Array<!Object>} */
-      var chunk = [];
-      for (var i = 0; i < chunks.length; i++) {
-          if (chunks[i].chunkId == chunkId) {
-              if (multiple) {
-                  chunk.push(chunks[i]);
-              } else {
-                  return chunks[i];
-              }
-          }
-      }
-      if (chunkId == 'LIST') {
-          return chunk.length ? chunk : null;
-      }
-      return null;
-  }
-
-  /**
-   * Return the sub chunks of a RIFF file.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @return {!Array<Object>} The subchunks of a RIFF/RIFX or LIST chunk.
-   * @private
-   */
-  function getSubChunksIndex_(buffer) {
-      var chunks = [];
-      var i = head_;
-      while (i <= buffer.length - 8) {
-          chunks.push(getSubChunkIndex_(buffer, i));
-          i += 8 + chunks[chunks.length - 1].chunkSize;
-          i = i % 2 ? i + 1 : i;
-      }
-      return chunks;
-  }
-
-  /**
-   * Return a sub chunk from a RIFF file.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @param {number} index The start index of the chunk.
-   * @return {!Object} A subchunk of a RIFF/RIFX or LIST chunk.
-   * @private
-   */
-  function getSubChunkIndex_(buffer, index) {
-      var chunk = {
-          chunkId: getChunkId_(buffer, index),
-          chunkSize: getChunkSize_(buffer, index)
-      };
-      if (chunk.chunkId == 'LIST') {
-          chunk.format = unpackString(buffer, index + 8, 4);
-          head_ += 4;
-          chunk.subChunks = getSubChunksIndex_(buffer);
-      } else {
-          var realChunkSize = chunk.chunkSize % 2 ? chunk.chunkSize + 1 : chunk.chunkSize;
-          head_ = index + 8 + realChunkSize;
-          chunk.chunkData = {
-              start: index + 8,
-              end: head_
-          };
-      }
-      return chunk;
-  }
-
-  /**
-   * Return the fourCC_ of a chunk.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @param {number} index The start index of the chunk.
-   * @return {string} The id of the chunk.
-   * @private
-   */
-  function getChunkId_(buffer, index) {
-      head_ += 4;
-      return unpackString(buffer, index, 4);
-  }
-
-  /**
-   * Return the size of a chunk.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @param {number} index The start index of the chunk.
-   * @return {number} The size of the chunk without the id and size fields.
-   * @private
-   */
-  function getChunkSize_(buffer, index) {
-      head_ += 4;
-      return unpackFrom(buffer, uInt32_, index + 4);
-  }
-
-  /*
    * Copyright (c) 2018 Rafael da Silva Rocha.
    *
    * Permission is hereby granted, free of charge, to any person obtaining
@@ -2764,6 +2607,150 @@
   }
 
   /*
+   * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining
+   * a copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sublicense, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+   * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+   * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   */
+
+  /** @private */
+  var uInt32_ = { bits: 32 };
+  /** @type {number} */
+  var head_ = 0;
+
+  /**
+   * Return the chunks in a RIFF/RIFX file.
+   * @param {!Uint8Array} buffer The file bytes.
+   * @return {!Object} The RIFF chunks.
+   */
+  function riffChunks(buffer) {
+      head_ = 0;
+      var chunkId = getChunkId_(buffer, 0);
+      uInt32_.be = chunkId == 'RIFX';
+      var format = unpackString(buffer, 8, 4);
+      head_ += 4;
+      return {
+          chunkId: chunkId,
+          chunkSize: getChunkSize_(buffer, 0),
+          format: format,
+          subChunks: getSubChunksIndex_(buffer)
+      };
+  }
+
+  /**
+    * Find a chunk by its fourCC_ in a array of RIFF chunks.
+    * @param {!Object} chunks The wav file chunks.
+    * @param {string} chunkId The chunk fourCC_.
+    * @param {boolean} multiple True if there may be multiple chunks
+    *    with the same chunkId.
+    * @return {?Array<!Object>}
+    */
+  function findChunk(chunks, chunkId) {
+      var multiple = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      /** @type {!Array<!Object>} */
+      var chunk = [];
+      for (var i = 0; i < chunks.length; i++) {
+          if (chunks[i].chunkId == chunkId) {
+              if (multiple) {
+                  chunk.push(chunks[i]);
+              } else {
+                  return chunks[i];
+              }
+          }
+      }
+      if (chunkId == 'LIST') {
+          return chunk.length ? chunk : null;
+      }
+      return null;
+  }
+
+  /**
+   * Return the sub chunks of a RIFF file.
+   * @param {!Uint8Array} buffer the RIFF file bytes.
+   * @return {!Array<Object>} The subchunks of a RIFF/RIFX or LIST chunk.
+   * @private
+   */
+  function getSubChunksIndex_(buffer) {
+      var chunks = [];
+      var i = head_;
+      while (i <= buffer.length - 8) {
+          chunks.push(getSubChunkIndex_(buffer, i));
+          i += 8 + chunks[chunks.length - 1].chunkSize;
+          i = i % 2 ? i + 1 : i;
+      }
+      return chunks;
+  }
+
+  /**
+   * Return a sub chunk from a RIFF file.
+   * @param {!Uint8Array} buffer the RIFF file bytes.
+   * @param {number} index The start index of the chunk.
+   * @return {!Object} A subchunk of a RIFF/RIFX or LIST chunk.
+   * @private
+   */
+  function getSubChunkIndex_(buffer, index) {
+      var chunk = {
+          chunkId: getChunkId_(buffer, index),
+          chunkSize: getChunkSize_(buffer, index)
+      };
+      if (chunk.chunkId == 'LIST') {
+          chunk.format = unpackString(buffer, index + 8, 4);
+          head_ += 4;
+          chunk.subChunks = getSubChunksIndex_(buffer);
+      } else {
+          var realChunkSize = chunk.chunkSize % 2 ? chunk.chunkSize + 1 : chunk.chunkSize;
+          head_ = index + 8 + realChunkSize;
+          chunk.chunkData = {
+              start: index + 8,
+              end: head_
+          };
+      }
+      return chunk;
+  }
+
+  /**
+   * Return the fourCC_ of a chunk.
+   * @param {!Uint8Array} buffer the RIFF file bytes.
+   * @param {number} index The start index of the chunk.
+   * @return {string} The id of the chunk.
+   * @private
+   */
+  function getChunkId_(buffer, index) {
+      head_ += 4;
+      return unpackString(buffer, index, 4);
+  }
+
+  /**
+   * Return the size of a chunk.
+   * @param {!Uint8Array} buffer the RIFF file bytes.
+   * @param {number} index The start index of the chunk.
+   * @return {number} The size of the chunk without the id and size fields.
+   * @private
+   */
+  function getChunkSize_(buffer, index) {
+      head_ += 4;
+      return unpackFrom(buffer, uInt32_, index + 4);
+  }
+
+  /*
    * Copyright (c) 2018 Rafael da Silva Rocha.
    *
    * Permission is hereby granted, free of charge, to any person obtaining
@@ -2848,7 +2835,7 @@
    */
   function readFmtChunk_(buffer, signature, wav, uInt32_, uInt16_) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'fmt ');
+    var chunk = findChunk(signature, 'fmt ');
     if (chunk) {
       io$1.head_ = chunk.chunkData.start;
       wav.fmt.chunkId = chunk.chunkId;
@@ -2893,7 +2880,7 @@
    */
   function readFactChunk_(buffer, signature, wav, uInt32_) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'fact');
+    var chunk = findChunk(signature, 'fact');
     if (chunk) {
       io$1.head_ = chunk.chunkData.start;
       wav.fact.chunkId = chunk.chunkId;
@@ -2911,7 +2898,7 @@
    */
   function readCueChunk_(buffer, signature, wav, uInt32_) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'cue ');
+    var chunk = findChunk(signature, 'cue ');
     if (chunk) {
       io$1.head_ = chunk.chunkData.start;
       wav.cue.chunkId = chunk.chunkId;
@@ -2939,7 +2926,7 @@
    */
   function readSmplChunk_(buffer, signature, wav, uInt32_) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'smpl');
+    var chunk = findChunk(signature, 'smpl');
     if (chunk) {
       io$1.head_ = chunk.chunkData.start;
       wav.smpl.chunkId = chunk.chunkId;
@@ -2977,7 +2964,7 @@
    */
   function readDataChunk_(buffer, signature, samples, wav) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'data');
+    var chunk = findChunk(signature, 'data');
     if (chunk) {
       wav.data.chunkId = 'data';
       wav.data.chunkSize = chunk.chunkSize;
@@ -2998,7 +2985,7 @@
    */
   function readBextChunk_(buffer, signature, wav, uInt32_, uInt16_) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'bext');
+    var chunk = findChunk(signature, 'bext');
     if (chunk) {
       io$1.head_ = chunk.chunkData.start;
       wav.bext.chunkId = chunk.chunkId;
@@ -3031,7 +3018,7 @@
    */
   function readDs64Chunk_(buffer, signature, wav, uInt32_) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'ds64');
+    var chunk = findChunk(signature, 'ds64');
     if (chunk) {
       io$1.head_ = chunk.chunkData.start;
       wav.ds64.chunkId = chunk.chunkId;
@@ -3065,7 +3052,7 @@
    */
   function readLISTChunk_(buffer, signature, wav, uInt32_, uInt16_) {
     /** @type {?Object} */
-    var listChunks = findChunk_(signature, 'LIST', true);
+    var listChunks = findChunk(signature, 'LIST', true);
     if (listChunks === null) {
       return;
     }
@@ -3132,7 +3119,7 @@
    */
   function readJunkChunk_(buffer, signature, wav) {
     /** @type {?Object} */
-    var chunk = findChunk_(signature, 'junk');
+    var chunk = findChunk(signature, 'junk');
     if (chunk) {
       wav.junk = {
         chunkId: chunk.chunkId,
@@ -3586,7 +3573,7 @@
     }, {
       key: 'fromBase64',
       value: function fromBase64(base64String) {
-        this.fromBuffer(new Uint8Array(decode$2(base64String)));
+        this.fromBuffer(new Uint8Array(decode$3(base64String)));
       }
 
       /**
@@ -3600,7 +3587,7 @@
       value: function toBase64() {
         /** @type {!Uint8Array} */
         var buffer = this.toBuffer();
-        return encode$2(buffer, 0, buffer.length);
+        return encode$3(buffer, 0, buffer.length);
       }
 
       /**
@@ -3680,6 +3667,9 @@
         /** @type {!Float64Array} */
         var typedSamplesOutput = new Float64Array(sampleCount + 1);
         unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
+        if (thisBitDepth == "32f" || thisBitDepth == "64") {
+          this.truncateSamples_(typedSamplesInput);
+        }
         bitDepth(typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
         this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, newBitDepth, typedSamplesOutput, { container: this.correctContainer_() });
       }
@@ -3733,7 +3723,7 @@
         this.assure16Bit_();
         var output = new Int16Array(this.data.samples.length / 2);
         unpackArrayTo(this.data.samples, this.dataType, output);
-        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '8a', alaw.encode(output), { container: this.correctContainer_() });
+        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '8a', encode$1(output), { container: this.correctContainer_() });
       }
 
       /**
@@ -3748,7 +3738,7 @@
       value: function fromALaw() {
         var bitDepthCode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '16';
 
-        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '16', alaw.decode(this.data.samples), { container: this.correctContainer_() });
+        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '16', decode$1(this.data.samples), { container: this.correctContainer_() });
         if (bitDepthCode != '16') {
           this.toBitDepth(bitDepthCode);
         }
@@ -3764,7 +3754,7 @@
         this.assure16Bit_();
         var output = new Int16Array(this.data.samples.length / 2);
         unpackArrayTo(this.data.samples, this.dataType, output);
-        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '8m', mulaw.encode(output), { container: this.correctContainer_() });
+        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '8m', encode$2(output), { container: this.correctContainer_() });
       }
 
       /**
@@ -3779,7 +3769,7 @@
       value: function fromMuLaw() {
         var bitDepthCode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '16';
 
-        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '16', mulaw.decode(this.data.samples), { container: this.correctContainer_() });
+        this.fromScratch(this.fmt.numChannels, this.fmt.sampleRate, '16', decode$2(this.data.samples), { container: this.correctContainer_() });
         if (bitDepthCode != '16') {
           this.toBitDepth(bitDepthCode);
         }
@@ -4313,6 +4303,25 @@
       key: 'correctContainer_',
       value: function correctContainer_() {
         return this.container == 'RF64' ? 'RIFF' : this.container;
+      }
+
+      /**
+       * Truncate float samples on over and underflow.
+       * @private
+       */
+
+    }, {
+      key: 'truncateSamples_',
+      value: function truncateSamples_(samples) {
+        /** @type {number} */
+        var len = samples.length;
+        for (var i = 0; i < len; i++) {
+          if (samples[i] > 1) {
+            samples[i] = 1;
+          } else if (samples[i] < -1) {
+            samples[i] = -1;
+          }
+        }
       }
     }]);
     return WaveFile;

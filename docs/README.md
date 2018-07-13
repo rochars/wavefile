@@ -7,14 +7,13 @@ https://github.com/rochars/wavefile
 
 Create, read and write wav files according to the specs.
 
-- **Zero dependencies**
 - **MIT-licensed**
 - **Use it out of the box in the browser**
 - **Use it out of the box in Node**
 - **Use it out of the box with [TypeScript](https://www.typescriptlang.org/)**
 - **Handle files up to 2GB**
 - **Use it as a command line tool**
-- **Less than 10kb minified + compressed, less than 35kb minified**
+- **Less than 10kb minified + compressed, less than 32kb minified**
 - Made with **[Closure Compiler](https://github.com/google/closure-compiler)** in mind (works great with others, too)
 
 With **wavefile** you can:
@@ -38,7 +37,7 @@ To use it in your programs:
 npm install wavefile
 ```
 
-To use it from the [command line](#cli-usage), install it globally:
+To use it from the [command line](https://github.com/rochars/wavefile/blob/master/docs/README.md#cli-usage), install it globally:
 ```
 npm install wavefile -g
 ```
@@ -49,7 +48,7 @@ To use it in your programs:
 yarn add wavefile
 ```
 
-To use it from the [command line](#cli-usage), install it globally:
+To use it from the [command line](https://github.com/rochars/wavefile/blob/master/docs/README.md#cli-usage), install it globally:
 ```
 yarn global add wavefile
 ```
@@ -74,12 +73,6 @@ https://github.com/rochars/wavefile/tree/master/dist
 If you installed via [NPM](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com), require WaveFile from **wavefile**:
 ```javascript
 const WaveFile = require('wavefile');
-let wav = new WaveFile();
-```
-
-This also works:
-```javascript
-const WaveFile = require('wavefile').default;
 let wav = new WaveFile();
 ```
 
@@ -109,7 +102,7 @@ Or get it from [unpkg](https://unpkg.com/wavefile):
 <script src="https://unpkg.com/wavefile"></script>
 ```
 
-Or as a module from [jspm](https://jspm.io):
+Or load it as a module using [jspm](https://jspm.io):
 ```html
 <script type="module">
   import WaveFile from 'https://dev.jspm.io/wavefile';
