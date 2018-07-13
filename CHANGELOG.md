@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.3.2 (unreleased)
+- Fix documentation issues.
+
 ## version 8.3.1 (2018-07-13)
 - Add external dependencies.
 

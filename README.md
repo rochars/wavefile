@@ -7,7 +7,7 @@ https://github.com/rochars/wavefile
 
 Create, read and write wav files according to the specs.
 
-- **MIT-licensed**
+- **All MIT licensed**
 - **Use it out of the box in the browser**
 - **Use it out of the box in Node**
 - **Use it out of the box with [TypeScript](https://www.typescriptlang.org/)**
@@ -70,16 +70,15 @@ https://github.com/rochars/wavefile/tree/master/dist
 ## Use
 
 ### Node
-If you installed via [NPM](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com), require WaveFile from **wavefile**:
+If you installed via [NPM](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com), **import WaveFile from wavefile**:
 ```javascript
-const WaveFile = require('wavefile');
+import WaveFile from 'wavefile';
 let wav = new WaveFile();
 ```
 
-### ES module
-Import WaveFile from **wavefile.js** in the *./dist* folder of this package:
+Or:
 ```javascript
-import WaveFile from './dist/wavefile.js';
+const WaveFile = require('wavefile');
 let wav = new WaveFile();
 ```
 
@@ -113,11 +112,30 @@ Or load it as a module using [jspm](https://jspm.io):
 #### Browser Compatibility
 **wavefile** need IE10+ to run. All moderns browsers should work fine. Cross-browser tests are on the [ROADMAP](https://github.com/rochars/wavefile/blob/master/docs/ROADMAP.md).
 
+### ES bundle
+Import WaveFile from **wavefile.js** in the *./dist* folder of this package:
+```javascript
+import WaveFile from './dist/wavefile.js';
+let wav = new WaveFile();
+```
+
 ## Manual
 Learn how to use **[wavefile](https://github.com/rochars/wavefile/blob/master/docs/README.md)**
 
 ## API
 Read the **[wavefile API docs](https://rochars.github.io/wavefile/api/)**
+
+## Contributing to wavefile
+**wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.
+
+See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/docs/CONTRIBUTING.md) for details.
+
+### Style guide
+**wavefile** code should follow the Google JavaScript Style Guide:  
+https://google.github.io/styleguide/jsguide.html
+
+### Code of conduct
+This project is bound by a Code of Conduct: The [Contributor Covenant, version 1.4](https://github.com/rochars/wavefile/blob/master/docs/CODE_OF_CONDUCT.md), also available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 
 ## Legal
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large)
