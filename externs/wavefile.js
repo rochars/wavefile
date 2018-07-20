@@ -1,12 +1,12 @@
 /**
- * @fileoverview Externs for wavefile 8.3
+ * @fileoverview Externs for wavefile 9.0
  *
  * @see https://github.com/rochars/wavefile
  * @externs
  */
 
 // WaveFile class
-const WaveFile = {};
+var WaveFile = {};
 
 /**
  * The container identifier.
