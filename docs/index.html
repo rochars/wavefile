@@ -47,17 +47,17 @@
 
     <section class="readme">
         <article><h1>wavefile</h1><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>https://github.com/rochars/wavefile</p>
-<p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/api/"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rochars.github.io/wavefile/"><img src="https://img.shields.io/badge/manual-online-blue.svg?style=for-the-badge" alt="Manual"></a> <a href="https://rawgit.com/rochars/wavefile/master/test/browser.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
+<p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rawgit.com/rochars/wavefile/master/test/browser.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
 <p>Create, read and write wav files according to the specs.</p>
 <ul>
-<li><strong>All MIT licensed</strong></li>
-<li><strong>Use it out of the box in the browser</strong></li>
-<li><strong>Use it out of the box in Node</strong></li>
-<li><strong>Use it out of the box with <a href="https://www.typescriptlang.org/">TypeScript</a></strong></li>
-<li><strong>Handle files up to 2GB</strong></li>
+<li><strong>MIT licensed</strong></li>
+<li><strong>Use it in the browser</strong></li>
+<li><strong>Use it in Node.js</strong></li>
 <li><strong>Use it as a command line tool</strong></li>
+<li><strong>Use it with <a href="https://www.typescriptlang.org/">TypeScript</a></strong></li>
+<li><strong>Handle files up to 2GB</strong></li>
 <li><strong>Less than 10kb minified + compressed, less than 32kb minified</strong></li>
-<li>Made with <strong><a href="https://github.com/google/closure-compiler">Closure Compiler</a></strong> in mind (works great with others, too)</li>
+<li><strong>Made with <a href="https://github.com/google/closure-compiler">Closure Compiler</a> in mind</strong> (works great with others, too)</li>
 </ul>
 <p>With <strong>wavefile</strong> you can:</p>
 <ul>
@@ -71,14 +71,14 @@
 <li>Create or edit BWF metadata (&quot;bext&quot; chunk)</li>
 </ul>
 <p>And more.</p>
-<h2>Install</h2><h3>NPM</h3><p>To use it in your programs:</p>
-<pre class="prettyprint source"><code>npm install wavefile</code></pre><p>To use it from the <a href="https://github.com/rochars/wavefile/blob/master/README.md#cli-usage">command line</a>, install it globally:</p>
+<h2>Install</h2><p>To use it in your programs:</p>
+<pre class="prettyprint source"><code>npm install wavefile</code></pre><p>To use it from the <a href="#command-line">command line</a>, install it globally:</p>
 <pre class="prettyprint source"><code>npm install wavefile -g</code></pre><p>You can also download one of the files in the <em>./dist</em> folder:<br>https://github.com/rochars/wavefile/tree/master/dist</p>
 <h2>Use</h2><h3>Node</h3><p>If you installed via <a href="https://www.npmjs.com/">NPM</a> or <a href="https://yarnpkg.com">Yarn</a>, <strong>import WaveFile from wavefile</strong>:</p>
 <pre class="prettyprint source lang-javascript"><code>import WaveFile from 'wavefile';
 let wav = new WaveFile();</code></pre><p>Or:</p>
 <pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
-let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Use the compiled file in the <em>/dist</em> folder of this package:</p>
+let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Load <strong>wavefile.umd.js</strong> with <code>&lt;script&gt;</code> tags:</p>
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;./dist/wavefile.umd.js&quot;>&lt;/script>
 &lt;script>
   var WaveFile = new WaveFile();
@@ -88,13 +88,55 @@ let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Use the compiled file i
 <pre class="prettyprint source lang-html"><code>&lt;script type=&quot;module&quot;>
   import WaveFile from 'https://dev.jspm.io/wavefile';
   console.log(new WaveFile());
-&lt;/script></code></pre><h4>Browser Compatibility</h4><p>All moderns browsers should work fine. Cross-browser tests are on the <a href="https://github.com/rochars/wavefile/blob/master/ROADMAP.md">ROADMAP</a>.</p>
+&lt;/script></code></pre><h4>Browser Compatibility</h4><p>All modern browsers should work fine. Cross-browser tests are on the <a href="https://github.com/rochars/wavefile/blob/master/ROADMAP.md">ROADMAP</a>.</p>
 <h3>ES bundle</h3><p>Import WaveFile from <strong>wavefile.js</strong> in the <em>./dist</em> folder of this package:</p>
 <pre class="prettyprint source lang-javascript"><code>import WaveFile from './dist/wavefile.js';
-let wav = new WaveFile();</code></pre><h2>Table of Contents</h2><ul>
+let wav = new WaveFile();</code></pre><h3>Command line</h3><p>To see the available options:</p>
+<pre class="prettyprint source"><code>wavefile --help</code></pre><p>The available options:</p>
+<pre class="prettyprint source"><code>  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
+               Change the bit depth.
+               The input file is not affected.
+               Possible values: 8, 16, 24, 32, 32f, 64
+
+  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
+               Apply compression to the file.
+               The input file is not affected.
+               Possible values: adpcm, alaw, mulaw
+
+  --tag        Ex: wavefile input.wav --tag=ICRD
+               Print the value of tag if the tag exists.
+
+  --list-tags  Ex: wavefile input.wav --list-tags
+               Print all tags of the file.
+
+  --list-cue   Ex: wavefile input.wav --list-cue
+               Print all the cue points of the file.
+
+  --bits       Ex: wavefile input.wav --bits
+               Print the bit depth of the file.
+
+  --rate       Ex: wavefile input.wav --rate
+               Print the sample rate of the file.
+
+  --help       Ex: --help
+               Show this help page.</code></pre><h2>Node.js Example</h2><pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
+
+// Load a wav file from disk into a WaveFile object
+let wav = new WaveFile(buffer);
+
+// Check some of the file properties
+console.log(wav.container);
+console.log(wav.chunkSize);
+console.log(wav.fmt.chunkId);
+
+// Call toBuffer() to get the bytes of the file.
+// You can write the output straight to disk:
+let wavBuffer = wav.toBuffer();
+
+// Call toDataURI() to get the file as a DataURI:
+let wavDataURI = wav.toDataURI();</code></pre><h2>Table of Contents</h2><ul>
 <li><a href="#install">Install</a></li>
 <li><a href="#use">Use</a></li>
-<li><a href="#see-it-in-action">See it in action</a></li>
 <li><a href="#example">Example</a></li>
 <li><a href="#operation-manual">Operation Manual</a><ul>
 <li><a href="#create-wave-files-from-scratch">Create wave files from scratch</a></li>
@@ -107,7 +149,6 @@ let wav = new WaveFile();</code></pre><h2>Table of Contents</h2><ul>
 <li><a href="#change-the-bit-depth">Change the bit depth</a></li>
 <li><a href="#add-bwf-metadata">Add BWF metadata</a></li>
 <li><a href="#rf64">RF64</a></li>
-<li><a href="#cli-usage">Command line interface</a></li>
 </ul>
 </li>
 <li><a href="#api">API</a><ul>
@@ -126,35 +167,7 @@ let wav = new WaveFile();</code></pre><h2>Table of Contents</h2><ul>
 <li><a href="#references">References</a></li>
 <li><a href="#legal">Legal</a></li>
 </ul>
-<h2>See it in action</h2><p>With <strong>wavefile</strong> you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses <strong>wavefile</strong> and <strong>wavesurfer</strong> to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by <strong>wavefile</strong>:</p>
-<p>https://rochars.github.io/wavefile/example</p>
-<pre class="prettyprint source lang-javascript"><code>// Load a wav file that is encoded as 4-bit IMA ADPCM:
-var wav = new WaveFile(ADPCMFileBuffer);
-
-// Decode the file as 16-bit PCM, supported by most browsers:
-wav.fromIMAADPCM();
-
-// Get the DataURI of your new, browser-friendly wav file:
-var wavDataURI = wav.toDataURI();
-
-// Load your new wav file into your player
-// ...</code></pre><p>Check out wavesurfer:<br>https://github.com/katspaugh/wavesurfer.js</p>
-<h2>Example</h2><pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
-
-// Load a wav file from disk into a WaveFile object
-let wav = new WaveFile(buffer);
-
-// Check some of the file properties
-console.log(wav.container);
-console.log(wav.chunkSize);
-console.log(wav.fmt.chunkId);
-
-// Call toBuffer() to get the bytes of the file.
-// You can write the output straight to disk:
-let wavBuffer = wav.toBuffer();
-
-// Call toDataURI() to get the file as a DataURI:
-let wavDataURI = wav.toDataURI();</code></pre><h2>Operation Manual</h2><h3>Create wave files from scratch</h3><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order).</p>
+<h2>Operation Manual</h2><h3>Create wave files from scratch</h3><p>You must inform the number of channels, the sample rate, the bit depth and the samples (in this order).</p>
 <h4>Mono:</h4><pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
@@ -223,36 +236,7 @@ wav.bext.originator = &quot;wavefile&quot;;
 // Write the new BWF file
 fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());</code></pre><p>By default <strong>wavefile</strong> will not insert a &quot;bext&quot; chunk in new files or in files that do not already have a &quot;bext&quot; chunk unless a property of <strong>WaveFile.bext</strong> is changed from it's default value. See below the full list of properties in <strong>WaveFile.bext</strong>.</p>
 <h3>RF64</h3><p><strong>wavefile</strong> have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
-<h3>CLI Usage</h3><p><strong>wavefile</strong> can run as a command line tool. To use <strong>wavefile</strong> from the command line, install it globally:</p>
-<pre class="prettyprint source"><code>npm install wavefile -g</code></pre><p>To see the available options:</p>
-<pre class="prettyprint source"><code>wavefile --help</code></pre><p>The available options:</p>
-<pre class="prettyprint source"><code>  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
-               Change the bit depth.
-               The input file is not affected.
-               Possible values: 8, 16, 24, 32, 32f, 64
-
-  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
-               Apply compression to the file.
-               The input file is not affected.
-               Possible values: adpcm, alaw, mulaw
-
-  --tag        Ex: wavefile input.wav --tag=ICRD
-               Print the value of tag if the tag exists.
-
-  --list-tags  Ex: wavefile input.wav --list-tags
-               Print all tags of the file.
-
-  --list-cue   Ex: wavefile input.wav --list-cue
-               Print all the cue points of the file.
-
-  --bits       Ex: wavefile input.wav --bits
-               Print the bit depth of the file.
-
-  --rate       Ex: wavefile input.wav --rate
-               Print the sample rate of the file.
-
-  --help       Ex: --help
-               Show this help page.</code></pre><h2>API</h2><p>To create a WaveFile object:</p>
+<h2>API</h2><p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>/**
  * @param {?Uint8Array} bytes A wave file buffer.
  * @throws {Error} If no &quot;RIFF&quot; chunk is found.
@@ -897,7 +881,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 20 2018 12:36:37 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 20 2018 13:03:06 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

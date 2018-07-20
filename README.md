@@ -2,19 +2,19 @@
 Copyright (c) 2017-2018 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
-[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/api/) [![Manual](https://img.shields.io/badge/manual-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rawgit.com/rochars/wavefile/master/test/browser.html)  
+[![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rawgit.com/rochars/wavefile/master/test/browser.html)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
 Create, read and write wav files according to the specs.
 
-- **All MIT licensed**
-- **Use it out of the box in the browser**
-- **Use it out of the box in Node**
-- **Use it out of the box with [TypeScript](https://www.typescriptlang.org/)**
-- **Handle files up to 2GB**
+- **MIT licensed**
+- **Use it in the browser**
+- **Use it in Node.js**
 - **Use it as a command line tool**
+- **Use it with [TypeScript](https://www.typescriptlang.org/)**
+- **Handle files up to 2GB**
 - **Less than 10kb minified + compressed, less than 32kb minified**
-- Made with **[Closure Compiler](https://github.com/google/closure-compiler)** in mind (works great with others, too)
+- **Made with [Closure Compiler](https://github.com/google/closure-compiler) in mind** (works great with others, too)
 
 With **wavefile** you can:
 
@@ -30,14 +30,12 @@ With **wavefile** you can:
 And more.
 
 ## Install
-
-### NPM
 To use it in your programs:
 ```
 npm install wavefile
 ```
 
-To use it from the [command line](https://github.com/rochars/wavefile/blob/master/README.md#cli-usage), install it globally:
+To use it from the [command line](#command-line), install it globally:
 ```
 npm install wavefile -g
 ```
@@ -61,7 +59,7 @@ let wav = new WaveFile();
 ```
 
 ### Browser
-Use the compiled file in the */dist* folder of this package:
+Load **wavefile.umd.js** with ```<script>``` tags:
 ```html
 <script src="./dist/wavefile.umd.js"></script>
 <script>
@@ -88,7 +86,7 @@ Or load WaveFile a module using [jspm](https://jspm.io):
 ```
 
 #### Browser Compatibility
-All moderns browsers should work fine. Cross-browser tests are on the [ROADMAP](https://github.com/rochars/wavefile/blob/master/ROADMAP.md).
+All modern browsers should work fine. Cross-browser tests are on the [ROADMAP](https://github.com/rochars/wavefile/blob/master/ROADMAP.md).
 
 ### ES bundle
 Import WaveFile from **wavefile.js** in the *./dist* folder of this package:
@@ -97,59 +95,44 @@ import WaveFile from './dist/wavefile.js';
 let wav = new WaveFile();
 ```
 
-## Table of Contents
-- [Install](#install)
-- [Use](#use)
-- [See it in action](#see-it-in-action)
-- [Example](#example)
-- [Operation Manual](#operation-manual)
-  * [Create wave files from scratch](#create-wave-files-from-scratch)
-  * [Add RIFF tags to files](#add-riff-tags-to-files)
-  * [Add cue points to files](#add-cue-points-to-files)
-  * [RIFX](#rifx)
-  * [IMA-ADPCM](#ima-adpcm)
-  * [A-Law](#a-law)
-  * [mu-Law](#mu-law)
-  * [Change the bit depth](#change-the-bit-depth)
-  * [Add BWF metadata](#add-bwf-metadata)
-  * [RF64](#rf64)
-  * [Command line interface](#cli-usage)
-- [API](#api)
-  * [The WaveFile methods:](#the-wavefile-methods-)
-  * [The WaveFile properties](#the-wavefile-properties)
-    + [Cue points](#cue-points)
-    + [Sample loops](#sample-loops)
-    + [LIST chunk](#list-chunk)
-- [The samples](#the-samples)
-- [Distribution](#distribution)
-- [Contributing to wavefile](#contributing-to-wavefile)
-- [References](#references)
-- [Legal](#legal)
-
-## See it in action
-
-With **wavefile** you can change the bit depth and compression type of wav files on the fly before loading them in a browser player. This example uses **wavefile** and **wavesurfer** to create a browser player that supports mu-Law, A-Law, IMA ADPCM and all other formats supported by **wavefile**:
-
-https://rochars.github.io/wavefile/example
-
-```javascript
-// Load a wav file that is encoded as 4-bit IMA ADPCM:
-var wav = new WaveFile(ADPCMFileBuffer);
-
-// Decode the file as 16-bit PCM, supported by most browsers:
-wav.fromIMAADPCM();
-
-// Get the DataURI of your new, browser-friendly wav file:
-var wavDataURI = wav.toDataURI();
-
-// Load your new wav file into your player
-// ...
+### Command line
+To see the available options:
+```
+wavefile --help
 ```
 
-Check out wavesurfer:  
-https://github.com/katspaugh/wavesurfer.js
+The available options:
+```
+  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
+               Change the bit depth.
+               The input file is not affected.
+               Possible values: 8, 16, 24, 32, 32f, 64
 
-## Example
+  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
+               Apply compression to the file.
+               The input file is not affected.
+               Possible values: adpcm, alaw, mulaw
+
+  --tag        Ex: wavefile input.wav --tag=ICRD
+               Print the value of tag if the tag exists.
+
+  --list-tags  Ex: wavefile input.wav --list-tags
+               Print all tags of the file.
+
+  --list-cue   Ex: wavefile input.wav --list-cue
+               Print all the cue points of the file.
+
+  --bits       Ex: wavefile input.wav --bits
+               Print the bit depth of the file.
+
+  --rate       Ex: wavefile input.wav --rate
+               Print the sample rate of the file.
+
+  --help       Ex: --help
+               Show this help page.
+```
+
+## Node.js Example
 ```javascript
 const WaveFile = require('wavefile');
 
@@ -168,6 +151,33 @@ let wavBuffer = wav.toBuffer();
 // Call toDataURI() to get the file as a DataURI:
 let wavDataURI = wav.toDataURI();
 ```
+
+## Table of Contents
+- [Install](#install)
+- [Use](#use)
+- [Example](#example)
+- [Operation Manual](#operation-manual)
+  * [Create wave files from scratch](#create-wave-files-from-scratch)
+  * [Add RIFF tags to files](#add-riff-tags-to-files)
+  * [Add cue points to files](#add-cue-points-to-files)
+  * [RIFX](#rifx)
+  * [IMA-ADPCM](#ima-adpcm)
+  * [A-Law](#a-law)
+  * [mu-Law](#mu-law)
+  * [Change the bit depth](#change-the-bit-depth)
+  * [Add BWF metadata](#add-bwf-metadata)
+  * [RF64](#rf64)
+- [API](#api)
+  * [The WaveFile methods:](#the-wavefile-methods-)
+  * [The WaveFile properties](#the-wavefile-properties)
+    + [Cue points](#cue-points)
+    + [Sample loops](#sample-loops)
+    + [LIST chunk](#list-chunk)
+- [The samples](#the-samples)
+- [Distribution](#distribution)
+- [Contributing to wavefile](#contributing-to-wavefile)
+- [References](#references)
+- [Legal](#legal)
 
 ## Operation Manual
 
@@ -348,48 +358,6 @@ By default **wavefile** will not insert a "bext" chunk in new files or in files 
 
 ### RF64
 **wavefile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
-
-### CLI Usage
-**wavefile** can run as a command line tool. To use **wavefile** from the command line, install it globally:
-```
-npm install wavefile -g
-```
-
-To see the available options:
-```
-wavefile --help
-```
-
-The available options:
-```
-  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
-               Change the bit depth.
-               The input file is not affected.
-               Possible values: 8, 16, 24, 32, 32f, 64
-
-  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
-               Apply compression to the file.
-               The input file is not affected.
-               Possible values: adpcm, alaw, mulaw
-
-  --tag        Ex: wavefile input.wav --tag=ICRD
-               Print the value of tag if the tag exists.
-
-  --list-tags  Ex: wavefile input.wav --list-tags
-               Print all tags of the file.
-
-  --list-cue   Ex: wavefile input.wav --list-cue
-               Print all the cue points of the file.
-
-  --bits       Ex: wavefile input.wav --bits
-               Print the bit depth of the file.
-
-  --rate       Ex: wavefile input.wav --rate
-               Print the sample rate of the file.
-
-  --help       Ex: --help
-               Show this help page.
-```
 
 ## API
 To create a WaveFile object:
