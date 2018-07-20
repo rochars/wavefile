@@ -441,7 +441,7 @@ export default class WaveFile extends WavBuffer {
     /** @type {!Object} */
     let tags = {};
     if (index !== null) {
-      for (let i=0; i<this.LIST[index].subChunks.length; i++) {
+      for (let i = 0, len = this.LIST[index].subChunks.length; i < len; i++) {
         tags[this.LIST[index].subChunks[i].chunkId] =
           this.LIST[index].subChunks[i].value;
       }
@@ -483,7 +483,7 @@ export default class WaveFile extends WavBuffer {
     if (len === 0) {
       this.setCuePoint_(position, 1, labl);
     } else {
-      for (let i=0; i<len; i++) {
+      for (let i = 0; i < len; i++) {
         if (existingPoints[i].dwPosition > position && !hasSet) {
           this.setCuePoint_(position, i + 1, labl);
           this.setCuePoint_(
@@ -518,7 +518,7 @@ export default class WaveFile extends WavBuffer {
     /** @type {number} */
     let len = this.cue.points.length;
     this.cue.points = [];
-    for (let i=0; i<len; i++) {
+    for (let i = 0; i < len; i++) {
       if (i + 1 !== index) {
         this.setCuePoint_(
           existingPoints[i].dwPosition,
@@ -546,7 +546,7 @@ export default class WaveFile extends WavBuffer {
   listCuePoints() {
     /** @type {!Array<!Object>} */
     let points = this.getCuePoints_();
-    for (let i=0; i<points.length; i++) {
+    for (let i = 0, len = points.length; i < len; i++) {
       points[i].milliseconds =
         (points[i].dwPosition / this.fmt.sampleRate) * 1000;
     }
@@ -560,12 +560,12 @@ export default class WaveFile extends WavBuffer {
    */
   updateLabel(pointIndex, label) {
     /** @type {?number} */
-    let adtlIndex = this.getAdtlChunk_();
-    if (adtlIndex !== null) {
-      for (let i=0; i<this.LIST[adtlIndex].subChunks.length; i++) {
-        if (this.LIST[adtlIndex].subChunks[i].dwName ==
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
             pointIndex) {
-          this.LIST[adtlIndex].subChunks[i].value = label;
+          this.LIST[cIndex].subChunks[i].value = label;
         }
       }
     }
@@ -614,7 +614,7 @@ export default class WaveFile extends WavBuffer {
   getCuePoints_() {
     /** @type {!Array<!Object>} */
     let points = [];
-    for (let i=0; i<this.cue.points.length; i++) {
+    for (let i = 0, len = this.cue.points.length; i < len; i++) {
       points.push({
         dwPosition: this.cue.points[i].dwPosition,
         label: this.getLabelForCuePoint_(
@@ -631,12 +631,12 @@ export default class WaveFile extends WavBuffer {
    */
   getLabelForCuePoint_(pointDwName) {
     /** @type {?number} */
-    let adtlIndex = this.getAdtlChunk_();
-    if (adtlIndex !== null) {
-      for (let i=0; i<this.LIST[adtlIndex].subChunks.length; i++) {
-        if (this.LIST[adtlIndex].subChunks[i].dwName ==
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
             pointDwName) {
-          return this.LIST[adtlIndex].subChunks[i].value;
+          return this.LIST[cIndex].subChunks[i].value;
         }
       }
     }
@@ -648,7 +648,7 @@ export default class WaveFile extends WavBuffer {
    * @private
    */
   clearLISTadtl_() {
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format == 'adtl') {
         this.LIST.splice(i);
       }
@@ -698,7 +698,7 @@ export default class WaveFile extends WavBuffer {
    * @private
    */
   getAdtlChunk_() {
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format == 'adtl') {
         return i;
       }
@@ -714,7 +714,7 @@ export default class WaveFile extends WavBuffer {
   getLISTINFOIndex_() {
     /** @type {?number} */
     let index = null;
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format === 'INFO') {
         index = i;
         break;
@@ -734,10 +734,10 @@ export default class WaveFile extends WavBuffer {
   getTagIndex_(tag) {
     /** @type {!Object<string, ?number>} */
     let index = {LIST: null, TAG: null};
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format == 'INFO') {
         index.LIST = i;
-        for (let j=0; j<this.LIST[i].subChunks.length; j++) {
+        for (let j=0, subLen = this.LIST[i].subChunks.length; j < subLen; j++) {
           if (this.LIST[i].subChunks[j].chunkId == tag) {
             index.TAG = j;
             break;
@@ -759,7 +759,7 @@ export default class WaveFile extends WavBuffer {
     if (tag.constructor !== String) {
       throw new Error('Invalid tag name.');
     } else if (tag.length < 4) {
-      for (let i=0; i<4-tag.length; i++) {
+      for (let i = 0, len = 4 - tag.length; i < len; i++) {
         tag += ' ';
       }
     }
@@ -805,7 +805,8 @@ export default class WaveFile extends WavBuffer {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples The samples.
+   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView}
+   *   samples The samples.
    * @private
    */
   interleave_(samples) {
@@ -813,8 +814,8 @@ export default class WaveFile extends WavBuffer {
       if (samples[0].constructor === Array) {
         /** @type {!Array<number>} */
         let finalSamples = [];
-        for (let i=0; i < samples[0].length; i++) {
-          for (let j=0; j < samples.length; j++) {
+        for (let i = 0, len = samples[0].length; i < len; i++) {
+          for (let j = 0, subLen = samples.length; j < subLen; j++) {
             finalSamples.push(samples[j][i]);
           }
         }
@@ -858,8 +859,7 @@ export default class WaveFile extends WavBuffer {
    */
   truncateSamples_(samples) {
     /** @type {number} */   
-    let len = samples.length;
-    for (let i=0; i<len; i++) {
+    for (let i = 0, len = samples.length; i < len; i++) {
       if (samples[i] > 1) {
         samples[i] = 1;
       } else if (samples[i] < -1) {
