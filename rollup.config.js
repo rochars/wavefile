@@ -27,7 +27,7 @@ const license = '/*!\n'+
 // GCC wrapper
 const outputWrapper = license + 'var window=window||{};'+
   '%output%' +
-  'var module=module||{};module.exports=exports;' +
+  'var module=module||{};module.exports=exports;module.exports.default=exports;' +
   'var define=define||function(){};' +
 'define(["exports"],function(exports){return module.exports;});'
 
