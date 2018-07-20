@@ -70,7 +70,7 @@
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli",
     "rollup-bundle": "rollup --config && npm run test-dist",
-    "doc": "./node_modules/.bin/jsdoc index.js -d docs/api -t node_modules/docdash",
+    "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },

@@ -47,7 +47,7 @@ Look at [BUILDING.md](BUILDING.md) for details on building **wavefile**.
 https://google.github.io/styleguide/jsguide.html
 
 ## Code of conduct
-This project is bound by a Code of Conduct: The [Contributor Covenant, version 1.4](https://github.com/rochars/wavefile/blob/master/docs/CODE_OF_CONDUCT.md), also available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+This project is bound by a Code of Conduct: The [Contributor Covenant, version 1.4](CODE_OF_CONDUCT.md), also available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 
 ## Developer's Certificate of Origin 1.1
 By making a contribution to this project, I certify that:
