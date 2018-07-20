@@ -1,16 +1,13 @@
 {
   "name": "wavefile",
-  "version": "8.3.2",
+  "version": "9.0.0",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
-  "main": "./dist/wavefile.cjs.js",
+  "main": "./dist/wavefile.umd.js",
   "module": "./index.js",
   "es2015": "./dist/wavefile.js",
-  "browser": "./dist/wavefile.umd.js",
-  "jsdelivr": "./dist/wavefile.min.js",
-  "unpkg": "./dist/wavefile.min.js",
   "types": "./index.d.ts",
   "bin": "./bin/wavefile.js",
   "engines": {
@@ -68,20 +65,15 @@
     "lint": "jshint index.js bin externs lib",
     "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=240000",
     "test-esm": "node ./node_modules/mocha/bin/_mocha test --esm --recursive -R dot --timeout=240000",
-    "test-min": "node ./node_modules/mocha/bin/_mocha test --min --recursive -R dot --timeout=240000",
-    "test-cjs": "node ./node_modules/mocha/bin/_mocha test --cjs --recursive -R dot --timeout=240000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot --timeout=240000",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
-    "test-dist": "npm run test-min && npm run test-cjs && npm run test-umd && npm run test-esm && npm run test-cli",
+    "test-dist": "npm run test-umd && npm run test-esm && npm run test-cli",
     "rollup-bundle": "rollup --config && npm run test-dist",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs/api -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
     "codecov": "^3.0.2",
     "docdash": "^0.4.0",
     "esm": "^3.0.51",
@@ -92,7 +84,6 @@
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^12.0.2",
     "rollup": "^0.61.2",
-    "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-closure-compiler-js": "^1.0.6",
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0"
@@ -101,8 +92,7 @@
     "alawmulaw": "^5.0.2",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.2",
-    "byte-data": "^13.2.5",
-    "imaadpcm": "^4.0.1",
-    "riff-chunks": "^9.0.0"
+    "byte-data": "^15.0.0-alpha.0",
+    "imaadpcm": "^4.0.1"
   }
 }

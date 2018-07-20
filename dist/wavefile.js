@@ -922,6 +922,66 @@ function swap(bytes, offset, index) {
 }
 
 /*
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The utf8-buffer-size API.
+ * @see https://github.com/rochars/utf8-buffer-size
+ */
+
+/** @module utf8BufferSize */
+
+/**
+ * Returns how many bytes are needed to serialize a UTF-8 string.
+ * @see https://encoding.spec.whatwg.org/#utf-8-encoder
+ * @param {string} str The string to pack.
+ * @return {number} The number of bytes needed to serialize the string.
+ */
+function utf8BufferSize(str) {
+  /** @type {number} */
+  let bytes = 0;
+  for (let i = 0, len = str.length; i < len; i++) {
+    /** @type {number} */
+    let codePoint = str.codePointAt(i);
+    if (codePoint < 128) {
+      bytes++;
+    } else {
+      if (codePoint <= 2047) {
+        bytes++;
+      } else if(codePoint <= 65535) {
+        bytes+=2;
+      } else if(codePoint <= 1114111) {
+        i++;
+        bytes+=3;
+      }
+      bytes++;
+    }
+  }
+  return bytes;
+}
+
+/*
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -966,43 +1026,35 @@ class Integer {
      * @type {number}
      * @private
      */
-    this.bits = bits;
-    /**
-     * If this type it is signed or not.
-     * @type {boolean}
-     * @private
-     */
-    this.signed = signed;
+    this.bits_ = bits;
     /**
      * The number of bytes used by the data.
      * @type {number}
      * @private
      */
-    this.offset = 0;
-    /**
-     * Min value for numbers of this type.
-     * @type {number}
-     * @private
-     */
-    this.min = -Infinity;
-    /**
-     * Max value for numbers of this type.
-     * @type {number}
-     * @private
-     */
-    this.max = Infinity;
+    this.offset_ = 0;
     /**
      * The practical number of bits used by the data.
      * @type {number}
      * @private
      */
-    this.realBits_ = this.bits;
+    this.realBits_ = this.bits_;
     /**
      * The mask to be used in the last byte.
      * @type {number}
      * @private
      */
     this.lastByteMask_ = 255;
+    // Set the min and max values according to the number of bits
+    /** @type {number} */
+    let max = Math.pow(2, this.bits_);
+    if (signed) {
+      this.max_ = max / 2 -1;
+      this.min_ = -max / 2;
+    } else {
+      this.max_ = max - 1;
+      this.min_ = 0;
+    }
     this.build_();
   }
 
@@ -1014,70 +1066,31 @@ class Integer {
    */
   read(bytes, i=0) {
     let num = 0;
-    let x = this.offset - 1;
-    while (x > 0) {
-      num = (bytes[x + i] << x * 8) | num;
-      x--;
+    for(let x=0; x<this.offset_; x++) {
+      num += bytes[i + x] * Math.pow(256, x);
     }
-    num = (bytes[i] | num) >>> 0;
-    return this.overflow_(this.sign_(num));
+    return this.overflow_(this.sign_(num)); 
   }
 
   /**
    * Write one integer number to a byte buffer.
    * @param {!Array<number>} bytes An array of bytes.
-   * @param {number} number The number.
-   * @param {number=} j The index being written in the byte buffer.
-   * @return {number} The next index to write on the byte buffer.
-   */
-  write(bytes, number, j=0) {
-    number = this.overflow_(number);
-    bytes[j++] = number & 255;
-    for (let i = 2; i <= this.offset; i++) {
-      bytes[j++] = Math.floor(number / Math.pow(2, ((i - 1) * 8))) & 255;
-    }
-    return j;
-  }
-
-  /**
-   * Write one integer number to a byte buffer.
-   * @param {!Array<number>} bytes An array of bytes.
-   * @param {number} number The number.
+   * @param {number} num The number.
    * @param {number=} j The index being written in the byte buffer.
    * @return {number} The next index to write on the byte buffer.
    * @private
    */
-  writeEsoteric_(bytes, number, j=0) {
-    number = this.overflow_(number);
-    j = this.writeFirstByte_(bytes, number, j);
-    for (let i = 2; i < this.offset; i++) {
-      bytes[j++] = Math.floor(number / Math.pow(2, ((i - 1) * 8))) & 255;
+  write(bytes, num, j=0) {
+    j = this.writeFirstByte_(bytes, this.overflow_(num), j);
+    for (let i = 2, len = this.offset_; i < len; i++, j++) {
+      bytes[j] = Math.floor(num / Math.pow(2, ((i - 1) * 8))) & 255;
     }
-    if (this.bits > 8) {
-      bytes[j++] = Math.floor(
-          number / Math.pow(2, ((this.offset - 1) * 8))) &
-        this.lastByteMask_;
-    }
-    return j;
-  }
-
-  /**
-   * Read a integer number from a byte buffer by turning int bytes
-   * to a string of bits. Used for data with more than 32 bits.
-   * @param {!Uint8Array} bytes An array of bytes.
-   * @param {number=} i The index to read.
-   * @return {number}
-   * @private
-   */
-  readBits_(bytes, i=0) {
-    let binary = '';
-    let j = 0;
-    while(j < this.offset) {
-      let bits = bytes[i + j].toString(2);
-      binary = new Array(9 - bits.length).join('0') + bits + binary;
+    if (this.bits_ > 8) {
+      bytes[j] = Math.floor(
+          num / Math.pow(2, ((this.offset_ - 1) * 8))) & this.lastByteMask_;
       j++;
     }
-    return this.overflow_(this.sign_(parseInt(binary, 2)));
+    return j;
   }
 
   /**
@@ -1088,12 +1101,7 @@ class Integer {
   build_() {
     this.setRealBits_();
     this.setLastByteMask_();
-    this.setMinMax_();
-    this.offset = this.bits < 8 ? 1 : Math.ceil(this.realBits_ / 8);
-    if ((this.realBits_ != this.bits) || this.bits < 8 || this.bits > 32) {
-      this.write = this.writeEsoteric_;
-      this.read = this.readBits_;
-    }
+    this.offset_ = this.bits_ < 8 ? 1 : Math.ceil(this.realBits_ / 8);
   }
 
   /**
@@ -1103,52 +1111,35 @@ class Integer {
    * @private
    */
   sign_(num) {
-    if (num > this.max) {
-      num -= (this.max * 2) + 2;
+    if (num > this.max_) {
+      num -= (this.max_ * 2) + 2;
     }
     return num;
   }
 
   /**
-   * Limit the value according to the bit depth in case of
-   * overflow or underflow.
-   * @param {number} value The data.
+   * Trows error in case of underflow or overflow.
+   * @param {number} num The number.
    * @return {number}
+   * @throws {Error} on overflow or underflow.
    * @private
    */
-  overflow_(value) {
-    if (value > this.max) {
+  overflow_(num) {
+    if (num > this.max_) {
       throw new Error('Overflow.');
-    } else if (value < this.min) {
+    } else if (num < this.min_) {
       throw new Error('Underflow.');
     }
-    return value;
-  }
-
-  /**
-   * Set the minimum and maximum values for the type.
-   * @private
-   */
-  setMinMax_() {
-    let max = Math.pow(2, this.bits);
-    if (this.signed) {
-      this.max = max / 2 -1;
-      this.min = -max / 2;
-    } else {
-      this.max = max - 1;
-      this.min = 0;
-    }
+    return num;
   }
 
   /**
    * Set the practical bit number for data with bit count different
-   * from the standard types (8, 16, 32, 40, 48, 64) and more than 8 bits.
+   * from the standard types (8, 16, 32, 40, 48, 64).
    * @private
    */
   setRealBits_() {
-    if (this.bits > 8) {
-      this.realBits_ = ((this.bits - 1) | 7) + 1;
-    }
+    this.realBits_ = ((this.bits_ - 1) | 7) + 1;
   }
 
   /**
@@ -1156,8 +1147,9 @@ class Integer {
    * @private
    */
   setLastByteMask_() {
-    let r = 8 - (this.realBits_ - this.bits);
-    this.lastByteMask_ = Math.pow(2, r > 0 ? r : 8) -1;
+    /** @type {number} */
+    let r = 8 - (this.realBits_ - this.bits_);
+    this.lastByteMask_ = Math.pow(2, r > 0 ? r : 8) - 1;
   }
 
   /**
@@ -1169,12 +1161,12 @@ class Integer {
    * @private
    */
   writeFirstByte_(bytes, number, j) {
-    if (this.bits < 8) {
-      bytes[j++] = number < 0 ? number + Math.pow(2, this.bits) : number;
+    if (this.bits_ < 8) {
+      bytes[j] = number < 0 ? number + Math.pow(2, this.bits_) : number;
     } else {
-      bytes[j++] = number & 255;
+      bytes[j] = number & 255;
     }
-    return j;
+    return j + 1;
   }
 }
 
@@ -1207,14 +1199,11 @@ class Integer {
  * @see https://github.com/rochars/byte-data
  */
 
-/**
- * Validate that the code is a valid ASCII code.
- * @param {number} code The code.
- * @throws {Error} If the code is not a valid ASCII code.
- */
-function validateASCIICode(code) {
-  if (code > 127) {
-    throw new Error ('Bad ASCII code.');
+function validateValueType(value) {
+  if (value !== null) {
+    if ([Number, Boolean].indexOf(value.constructor) == -1) {
+      throw new Error('Expected Number, Boolean or Null; found ' + value.constructor);
+    }
   }
 }
 
@@ -1299,10 +1288,17 @@ function validateIntType_(theType) {
  * @type {boolean}
  * @private
  */
-const BE_ENV = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+const BE_ENV = new Uint8Array(new Uint32Array([1]).buffer)[0] === 0;
+/**
+ * @type {number}
+ * @private
+ */
 const HIGH = BE_ENV ? 1 : 0;
+/**
+ * @type {number}
+ * @private
+ */
 const LOW = BE_ENV ? 0 : 1;
-
 /**
  * @type {!Int8Array}
  * @private
@@ -1348,36 +1344,11 @@ let gInt_ = {};
 function setUp_(theType) {
   validateType(theType);
   theType.offset = theType.bits < 8 ? 1 : Math.ceil(theType.bits / 8);
-  theType.be = theType.be || false;
   setReader(theType);
   setWriter(theType);
   gInt_ = new Integer(
     theType.bits == 64 ? 32 : theType.bits,
     theType.float ? false : theType.signed);
-}
-
-/**
- * Turn numbers to bytes.
- * @param {number} value The value to be packed.
- * @param {!Object} theType The type definition.
- * @param {!Uint8Array|!Array<number>} buffer The buffer to write the bytes to.
- * @param {number} index The index to start writing.
- * @param {number} len The end index.
- * @param {!Function} validate The function used to validate input.
- * @param {boolean} be True if big-endian.
- * @return {number} the new index to be written.
- * @private
- */
-function writeBytes_(value, theType, buffer, index, len, validate, be) {
-  while (index < len) {
-    validate(value, theType);
-    index = writer_(buffer, value, index);
-  }
-  if (be) {
-    endianness(
-      buffer, theType.offset, index - theType.offset, index);
-  }
-  return index;
 }
 
 /**
@@ -1393,7 +1364,7 @@ function readInt_(bytes, i) {
 
 /**
  * Read 1 16-bit float from bytes.
- * Thanks https://stackoverflow.com/a/8796597
+ * @see https://stackoverflow.com/a/8796597
  * @param {!Uint8Array} bytes An array of bytes.
  * @param {number} i The index to read.
  * @return {number}
@@ -1519,7 +1490,7 @@ function setReader(theType) {
       reader_ = read16F_;
     } else if(theType.bits == 32) {
       reader_ = read32F_;
-    } else if(theType.bits == 64) {
+    } else {
       reader_ = read64F_;
     }
   } else {
@@ -1538,7 +1509,7 @@ function setWriter(theType) {
       writer_ = write16F_;
     } else if(theType.bits == 32) {
       writer_ = write32F_;
-    } else if(theType.bits == 64) {
+    } else {
       writer_ = write64F_;
     }
   } else {
@@ -1570,56 +1541,136 @@ function setWriter(theType) {
  *
  */
 
-// ASCII characters
 /**
- * Read a string of ASCII characters from a byte buffer.
- * @param {!Uint8Array} bytes A byte buffer.
+ * Read a string of UTF-8 characters from a byte buffer.
+ * @see https://encoding.spec.whatwg.org/#the-encoding
+ * @see https://stackoverflow.com/a/34926911
+ * @param {!Uint8Array|!Array<!number>} buffer A byte buffer.
  * @param {number=} index The index to read.
  * @param {?number=} len The number of bytes to read.
+ *    If len is undefined will read until the end of the buffer.
  * @return {string}
- * @throws {Error} If a character in the string is not valid ASCII.
  */
-function unpackString(bytes, index=0, len=null) {
-  let chrs = '';
-  len = len ? index + len : bytes.length;
-  while (index < len) {
-    validateASCIICode(bytes[index]);
-    chrs += String.fromCharCode(bytes[index]);
-    index++;
+function unpackString(buffer, index=0, len=undefined) {
+  len = len !== undefined ? index + len : buffer.length;
+  /** @type {string} */
+  let str = "";
+  while(index < len) {
+    /** @type {number} */
+    let lowerBoundary = 0x80;
+    /** @type {number} */
+    let upperBoundary = 0xBF;
+    /** @type {boolean} */
+    let replace = false;
+    /** @type {number} */
+    let charCode = buffer[index++];
+    if (charCode >= 0x00 && charCode <= 0x7F) {
+      str += String.fromCharCode(charCode);
+    } else {
+      /** @type {number} */
+      let count = 0;
+      if (charCode >= 0xC2 && charCode <= 0xDF) {
+        count = 1;
+      } else if (charCode >= 0xE0 && charCode <= 0xEF ) {
+        count = 2;
+        if (buffer[index] === 0xE0) {
+          lowerBoundary = 0xA0;
+        }
+        if (buffer[index] === 0xED) {
+          upperBoundary = 0x9F;
+        }
+      } else if (charCode >= 0xF0 && charCode <= 0xF4 ) {
+        count = 3;
+        if (buffer[index] === 0xF0) {
+          lowerBoundary = 0x90;
+        }
+        if (buffer[index] === 0xF4) {
+          upperBoundary = 0x8F;
+        }
+      } else {
+        replace = true;
+      }
+      charCode = charCode & (1 << (8 - count - 1)) - 1;
+      for (let i = 0; i < count; i++) {
+        if (buffer[index] < lowerBoundary || buffer[index] > upperBoundary) {
+          replace = true;
+        }
+        charCode = (charCode << 6) | (buffer[index] & 0x3f);
+        index++;
+      }
+      if (replace) {
+        str += String.fromCharCode(0xFFFD);
+      } 
+      else if (charCode <= 0xffff) {
+        str += String.fromCharCode(charCode);
+      } else {
+        charCode -= 0x10000;
+        str += String.fromCharCode(
+          ((charCode >> 10) & 0x3ff) + 0xd800,
+          (charCode & 0x3ff) + 0xdc00);
+      }
+    }
   }
-  return chrs;
+  return str;
 }
 
 /**
- * Write a string of ASCII characters as a byte buffer.
+ * Write a string of UTF-8 characters as a byte buffer.
+ * @see https://encoding.spec.whatwg.org/#utf-8-encoder
  * @param {string} str The string to pack.
- * @return {!Array<number>} The next index to write on the buffer.
- * @throws {Error} If a character in the string is not valid ASCII.
+ * @return {!Uint8Array} The packed string.
  */
 function packString(str) {
-  let bytes = [];
-  for (let i = 0; i < str.length; i++) {
-    let code = str.charCodeAt(i);
-    validateASCIICode(code);
-    bytes[i] = code;
+  /** @type {!Uint8Array} */
+  let bytes = new Uint8Array(utf8BufferSize(str));
+  let bufferIndex = 0;
+  for (let i = 0, len = str.length; i < len; i++) {
+    /** @type {number} */
+    let codePoint = str.codePointAt(i);
+    if (codePoint < 128) {
+      bytes[bufferIndex] = codePoint;
+      bufferIndex++;
+    } else {
+      /** @type {number} */
+      let count = 0;
+      /** @type {number} */
+      let offset = 0;
+      if (codePoint <= 0x07FF) {
+        count = 1;
+        offset = 0xC0;
+      } else if(codePoint <= 0xFFFF) {
+        count = 2;
+        offset = 0xE0;
+      } else if(codePoint <= 0x10FFFF) {
+        count = 3;
+        offset = 0xF0;
+        i++;
+      }
+      bytes[bufferIndex] = (codePoint >> (6 * count)) + offset;
+      bufferIndex++;
+      while (count > 0) {
+        bytes[bufferIndex] = 0x80 | (codePoint >> (6 * (count - 1)) & 0x3F);
+        bufferIndex++;
+        count--;
+      }
+    }
   }
   return bytes;
 }
 
 /**
- * Write a string of ASCII characters to a byte buffer.
+ * Write a string of UTF-8 characters to a byte buffer.
  * @param {string} str The string to pack.
  * @param {!Uint8Array|!Array<number>} buffer The output buffer.
- * @param {number=} index The index to write in the buffer.
+ * @param {number=} index The buffer index to start writing.
+ *   Assumes zero if undefined.
  * @return {number} The next index to write in the buffer.
- * @throws {Error} If a character in the string is not valid ASCII.
  */
 function packStringTo(str, buffer, index=0) {
-  for (let i = 0; i < str.length; i++) {
-    let code = str.charCodeAt(i);
-    validateASCIICode(code);
-    buffer[index] = code;
-    index++;
+  /** @type {!Uint8Array} */
+  let bytes = packString(str);
+  for (let i = 0, len = bytes.length; i < len; i++) {
+    buffer[index++] = bytes[i];
   }
   return index;
 }
@@ -1634,6 +1685,7 @@ function packStringTo(str, buffer, index=0) {
  * @throws {Error} If the value is not valid.
  */
 function pack(value, theType) {
+  /** @type {!Array<!number>} */
   let output = [];
   packTo(value, theType, output);
   return output;
@@ -1644,20 +1696,13 @@ function pack(value, theType) {
  * @param {number} value The value.
  * @param {!Object} theType The type definition.
  * @param {!Uint8Array|!Array<number>} buffer The output buffer.
- * @param {number=} index The index to write.
+ * @param {number=} index The buffer index to write. Assumes 0 if undefined.
  * @return {number} The next index to write.
  * @throws {Error} If the type definition is not valid.
  * @throws {Error} If the value is not valid.
  */
 function packTo(value, theType, buffer, index=0) {
-  setUp_(theType);
-  return writeBytes_(value,
-    theType,
-    buffer,
-    index,
-    index + theType.offset,
-    validateNotUndefined,
-    theType.be);
+  return packArrayTo([value], theType, buffer, index);
 }
 
 /**
@@ -1665,66 +1710,48 @@ function packTo(value, theType, buffer, index=0) {
  * @param {!Array<number>|!TypedArray} values The value.
  * @param {!Object} theType The type definition.
  * @param {!Uint8Array|!Array<number>} buffer The output buffer.
- * @param {number=} index The buffer index to write.
+ * @param {number=} index The buffer index to start writing.
+ *   Assumes zero if undefined.
  * @return {number} The next index to write.
  * @throws {Error} If the type definition is not valid.
  * @throws {Error} If the value is not valid.
  */
 function packArrayTo(values, theType, buffer, index=0) {
   setUp_(theType);
-  let be = theType.be;
-  let offset = theType.offset;
-  let len = values.length;
-  for (let i=0; i<len; i++) {
-    index = writeBytes_(
-      values[i],
-      theType,
-      buffer,
-      index,
-      index + offset,
-      validateNotUndefined,
-      be);
+  for (let i = 0, valuesLen = values.length; i < valuesLen; i++) {
+    validateNotUndefined(values[i]);
+    validateValueType(values[i]);
+    /** @type {number} */
+    let len = index + theType.offset;
+    while (index < len) {
+      index = writer_(buffer, values[i], index);
+    }
+    if (theType.be) {
+      endianness(
+        buffer, theType.offset, index - theType.offset, index);
+    }
   }
   return index;
 }
 
 /**
  * Unpack a number from a byte buffer.
- * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Uint8Array|!Array<!number>} buffer The byte buffer.
  * @param {!Object} theType The type definition.
+ * @param {number=} index The buffer index to read. Assumes zero if undefined.
  * @return {number}
  * @throws {Error} If the type definition is not valid
+ * @throws {Error} On bad buffer length.
  */
-function unpack(buffer, theType) {
+function unpack(buffer, theType, index=0) {
   setUp_(theType);
-  let values = unpackArrayFrom(buffer.slice(0, theType.offset), theType);
-  return values[0];
-}
-
-/**
- * Unpack an array of numbers from a byte buffer.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @return {!Array<number>}
- * @throws {Error} If the type definition is not valid.
- */
-function unpackArray(buffer, theType) {
-  return unpackArrayFrom(buffer, theType);
-}
-
-/**
- * Unpack a number from a byte buffer by index.
- * @param {!Uint8Array} buffer The byte buffer.
- * @param {!Object} theType The type definition.
- * @param {number=} index The buffer index to read.
- * @return {number}
- * @throws {Error} If the type definition is not valid
- */
-function unpackFrom(buffer, theType, index=0) {
-  setUp_(theType);
+  if ((theType.offset + index) > buffer.length) {
+    throw Error('Bad buffer length.');
+  }
   if (theType.be) {
     endianness(buffer, theType.offset, index, index + theType.offset);
   }
+  /** @type {number} */
   let value = reader_(buffer, index);
   if (theType.be) {
     endianness(buffer, theType.offset, index, index + theType.offset);
@@ -1733,60 +1760,42 @@ function unpackFrom(buffer, theType, index=0) {
 }
 
 /**
- * Unpack a array of numbers from a byte buffer by index.
- * @param {!Uint8Array} buffer The byte buffer.
+ * Unpack an array of numbers from a byte buffer.
+ * @param {!Uint8Array|!Array<!number>} buffer The byte buffer.
  * @param {!Object} theType The type definition.
- * @param {number=} index The start index. Assumes 0.
- * @param {?number=} end The end index. Assumes the buffer length.
+ * @param {number=} index The buffer index to start reading.
+ *   Assumes zero if undefined.
+ * @param {number=} end The buffer index to stop reading.
+ *   Assumes the buffer length if undefined.
  * @return {!Array<number>}
  * @throws {Error} If the type definition is not valid
  */
-function unpackArrayFrom(buffer, theType, index=0, end=null) {
-  setUp_(theType);
-  let len = end || buffer.length;
-  while ((len - index) % theType.offset) {
-    len--;
-  }
-  if (theType.be) {
-    endianness(buffer, theType.offset, index, len);
-  }
-  let values = [];
-  let step = theType.offset;
-  for (let i = index; i < len; i += step) {
-    values.push(reader_(buffer, i));
-  }
-  if (theType.be) {
-    endianness(buffer, theType.offset, index, len);
-  }
-  return values;
+function unpackArray(buffer, theType, index=0, end=buffer.length) {
+  /** @type {!Array<!number>} */
+  let output = [];
+  unpackArrayTo(buffer, theType, output, index, end);
+  return output;
 }
 
 /**
  * Unpack a array of numbers to a typed array.
- * @param {!Uint8Array} buffer The byte buffer.
+ * @param {!Uint8Array|!Array<!number>} buffer The byte buffer.
  * @param {!Object} theType The type definition.
- * @param {!TypedArray} output The output array.
- * @param {number=} index The start index. Assumes 0.
- * @param {?number=} end The end index. Assumes the buffer length.
+ * @param {!TypedArray|!Array<!number>} output The output array.
+ * @param {number=} index The buffer index to start reading.
+ *   Assumes zero if undefined.
+ * @param {number=} end The buffer index to stop reading.
+ *   Assumes the buffer length if undefined.
  * @throws {Error} If the type definition is not valid
  */
-function unpackArrayTo(buffer, theType, output, index=0, end=null) {
+function unpackArrayTo(
+    buffer, theType, output, index=0, end=buffer.length) {
   setUp_(theType);
-  let len = end || buffer.length;
-  while ((len - index) % theType.offset) {
-    len--;
+  while ((end - index) % theType.offset) {
+      end--;
   }
-  if (theType.be) {
-    endianness(buffer, theType.offset, index, len);
-  }
-  let outputIndex = 0;
-  let step = theType.offset;
-  for (let i = index; i < len; i += step) {
-    output.set([reader_(buffer, i)], outputIndex);
-    outputIndex++;
-  }
-  if (theType.be) {
-    endianness(buffer, theType.offset, index, len);
+  for (let i = 0; index < end; index += theType.offset, i++) {
+    output[i] = unpack(buffer, theType, index);
   }
 }
 
@@ -2167,7 +2176,7 @@ class BufferIO {
    */
   writeString_(str, maxSize, push=true) {
     /** @type {!Array<number>} */   
-    let bytes = packString(str);
+    let bytes = Array.prototype.slice.call(packString(str));
     if (push) {
       for (let i=bytes.length; i<maxSize; i++) {
         bytes.push(0);
@@ -2223,7 +2232,7 @@ class BufferIO {
     /** @type {number} */
     let size = bdType.bits / 8;
     /** @type {number} */
-    let value = unpackFrom(bytes, bdType, this.head_);
+    let value = unpack(bytes, bdType, this.head_);
     this.head_ += size;
     return value;
   }
@@ -2274,7 +2283,7 @@ function writeWavBuffer(wav) {
     getBextBytes_(wav, uInt32_, uInt16_),
     getFmtBytes_(wav, uInt32_, uInt16_),
     getFactBytes_(wav, uInt32_),
-    packString(wav.data.chunkId),
+    Array.prototype.slice.call(packString(wav.data.chunkId)),
     pack(wav.data.samples.length, uInt32_),
     wav.data.samples,
     getCueBytes_(wav, uInt32_),
@@ -2313,7 +2322,7 @@ function getBextBytes_(wav, uInt32_, uInt16_) {
   if (wav.bext.chunkId) {
     wav.bext.chunkSize = 602 + wav.bext.codingHistory.length;
     bytes = bytes.concat(
-      packString(wav.bext.chunkId),
+      Array.prototype.slice.call(packString(wav.bext.chunkId)),
       pack(602 + wav.bext.codingHistory.length, uInt32_),
       io.writeString_(wav.bext.description, 256),
       io.writeString_(wav.bext.originator, 32),
@@ -2323,7 +2332,7 @@ function getBextBytes_(wav, uInt32_, uInt16_) {
       pack(wav.bext.timeReference[0], uInt32_),
       pack(wav.bext.timeReference[1], uInt32_),
       pack(wav.bext.version, uInt16_),
-      io.writeString_(wav.bext.UMID, 64),
+      Array.prototype.slice.call(io.writeString_(wav.bext.UMID, 64)),
       pack(wav.bext.loudnessValue, uInt16_),
       pack(wav.bext.loudnessRange, uInt16_),
       pack(wav.bext.maxTruePeakLevel, uInt16_),
@@ -2366,7 +2375,7 @@ function getDs64Bytes_(wav, uInt32_) {
   let bytes = [];
   if (wav.ds64.chunkId) {
     bytes = bytes.concat(
-      packString(wav.ds64.chunkId),
+      Array.prototype.slice.call(packString(wav.ds64.chunkId)),
       pack(wav.ds64.chunkSize, uInt32_),
       pack(wav.ds64.riffSizeHigh, uInt32_),
       pack(wav.ds64.riffSizeLow, uInt32_),
@@ -2397,7 +2406,7 @@ function getCueBytes_(wav, uInt32_) {
     /** @type {!Array<number>} */
     let cuePointsBytes = getCuePointsBytes_(wav, uInt32_);
     bytes = bytes.concat(
-      packString(wav.cue.chunkId),
+      Array.prototype.slice.call(packString(wav.cue.chunkId)),
       pack(cuePointsBytes.length + 4, uInt32_),
       pack(wav.cue.dwCuePoints, uInt32_),
       cuePointsBytes);
@@ -2418,7 +2427,7 @@ function getCuePointsBytes_(wav, uInt32_) {
     points = points.concat(
       pack(wav.cue.points[i].dwName, uInt32_),
       pack(wav.cue.points[i].dwPosition, uInt32_),
-      packString(wav.cue.points[i].fccChunk),
+      Array.prototype.slice.call(packString(wav.cue.points[i].fccChunk)),
       pack(wav.cue.points[i].dwChunkStart, uInt32_),
       pack(wav.cue.points[i].dwBlockStart, uInt32_),
       pack(wav.cue.points[i].dwSampleOffset, uInt32_));
@@ -2439,7 +2448,7 @@ function getSmplBytes_(wav, uInt32_) {
     /** @type {!Array<number>} */
     let smplLoopsBytes = getSmplLoopsBytes_(wav, uInt32_);
     bytes = bytes.concat(
-      packString(wav.smpl.chunkId),
+      Array.prototype.slice.call(packString(wav.smpl.chunkId)),
       pack(smplLoopsBytes.length + 36, uInt32_),
       pack(wav.smpl.dwManufacturer, uInt32_),
       pack(wav.smpl.dwProduct, uInt32_),
@@ -2487,7 +2496,7 @@ function getFactBytes_(wav, uInt32_) {
   let bytes = [];
   if (wav.fact.chunkId) {
     bytes = bytes.concat(
-      packString(wav.fact.chunkId),
+      Array.prototype.slice.call(packString(wav.fact.chunkId)),
       pack(wav.fact.chunkSize, uInt32_),
       pack(wav.fact.dwSampleLength, uInt32_));
   }
@@ -2506,7 +2515,7 @@ function getFmtBytes_(wav, uInt32_, uInt16_) {
   let fmtBytes = [];
   if (wav.fmt.chunkId) {
     return fmtBytes.concat(
-      packString(wav.fmt.chunkId),
+      Array.prototype.slice.call(packString(wav.fmt.chunkId)),
       pack(wav.fmt.chunkSize, uInt32_),
       pack(wav.fmt.audioFormat, uInt16_),
       pack(wav.fmt.numChannels, uInt16_),
@@ -2563,9 +2572,9 @@ function getLISTBytes_(wav, uInt32_, uInt16_) {
     let subChunksBytes = getLISTSubChunksBytes_(
         wav.LIST[i].subChunks, wav.LIST[i].format, wav, uInt32_, uInt16_);
     bytes = bytes.concat(
-      packString(wav.LIST[i].chunkId),
+      Array.prototype.slice.call(packString(wav.LIST[i].chunkId)),
       pack(subChunksBytes.length + 4, uInt32_),
-      packString(wav.LIST[i].format),
+      Array.prototype.slice.call(packString(wav.LIST[i].format)),
       subChunksBytes);
   }
   return bytes;
@@ -2586,7 +2595,7 @@ function getLISTSubChunksBytes_(subChunks, format, wav, uInt32_, uInt16_) {
   for (let i=0; i<subChunks.length; i++) {
     if (format == 'INFO') {
       bytes = bytes.concat(
-        packString(subChunks[i].chunkId),
+        Array.prototype.slice.call(packString(subChunks[i].chunkId)),
         pack(subChunks[i].value.length + 1, uInt32_),
         io.writeString_(
           subChunks[i].value, subChunks[i].value.length));
@@ -2594,7 +2603,7 @@ function getLISTSubChunksBytes_(subChunks, format, wav, uInt32_, uInt16_) {
     } else if (format == 'adtl') {
       if (['labl', 'note'].indexOf(subChunks[i].chunkId) > -1) {
         bytes = bytes.concat(
-          packString(subChunks[i].chunkId),
+          Array.prototype.slice.call(packString(subChunks[i].chunkId)),
           pack(
             subChunks[i].value.length + 4 + 1, uInt32_),
           pack(subChunks[i].dwName, uInt32_),
@@ -2623,7 +2632,7 @@ function getLISTSubChunksBytes_(subChunks, format, wav, uInt32_, uInt16_) {
  */
 function getLtxtChunkBytes_(ltxt, wav, uInt32_, uInt16_) {
   return [].concat(
-    packString(ltxt.chunkId),
+    Array.prototype.slice.call(packString(ltxt.chunkId)),
     pack(ltxt.value.length + 20, uInt32_),
     pack(ltxt.dwName, uInt32_),
     pack(ltxt.dwSampleLength, uInt32_),
@@ -2646,7 +2655,7 @@ function getJunkBytes_(wav, uInt32_) {
   let bytes = [];
   if (wav.junk.chunkId) {
     return bytes.concat(
-      packString(wav.junk.chunkId),
+      Array.prototype.slice.call(packString(wav.junk.chunkId)),
       pack(wav.junk.chunkData.length, uInt32_),
       wav.junk.chunkData);
   }
@@ -2793,7 +2802,7 @@ function getChunkId_(buffer, index) {
  */
 function getChunkSize_(buffer, index) {
     head_ += 4;
-    return unpackFrom(buffer, uInt32_, index + 4);
+    return unpack(buffer, uInt32_, index + 4);
 }
 
 /*
@@ -3866,7 +3875,7 @@ class WaveFile extends WavBuffer {
     /** @type {!Object} */
     let tags = {};
     if (index !== null) {
-      for (let i=0; i<this.LIST[index].subChunks.length; i++) {
+      for (let i = 0, len = this.LIST[index].subChunks.length; i < len; i++) {
         tags[this.LIST[index].subChunks[i].chunkId] =
           this.LIST[index].subChunks[i].value;
       }
@@ -3908,7 +3917,7 @@ class WaveFile extends WavBuffer {
     if (len === 0) {
       this.setCuePoint_(position, 1, labl);
     } else {
-      for (let i=0; i<len; i++) {
+      for (let i = 0; i < len; i++) {
         if (existingPoints[i].dwPosition > position && !hasSet) {
           this.setCuePoint_(position, i + 1, labl);
           this.setCuePoint_(
@@ -3943,7 +3952,7 @@ class WaveFile extends WavBuffer {
     /** @type {number} */
     let len = this.cue.points.length;
     this.cue.points = [];
-    for (let i=0; i<len; i++) {
+    for (let i = 0; i < len; i++) {
       if (i + 1 !== index) {
         this.setCuePoint_(
           existingPoints[i].dwPosition,
@@ -3971,7 +3980,7 @@ class WaveFile extends WavBuffer {
   listCuePoints() {
     /** @type {!Array<!Object>} */
     let points = this.getCuePoints_();
-    for (let i=0; i<points.length; i++) {
+    for (let i = 0, len = points.length; i < len; i++) {
       points[i].milliseconds =
         (points[i].dwPosition / this.fmt.sampleRate) * 1000;
     }
@@ -3985,12 +3994,12 @@ class WaveFile extends WavBuffer {
    */
   updateLabel(pointIndex, label) {
     /** @type {?number} */
-    let adtlIndex = this.getAdtlChunk_();
-    if (adtlIndex !== null) {
-      for (let i=0; i<this.LIST[adtlIndex].subChunks.length; i++) {
-        if (this.LIST[adtlIndex].subChunks[i].dwName ==
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
             pointIndex) {
-          this.LIST[adtlIndex].subChunks[i].value = label;
+          this.LIST[cIndex].subChunks[i].value = label;
         }
       }
     }
@@ -4039,7 +4048,7 @@ class WaveFile extends WavBuffer {
   getCuePoints_() {
     /** @type {!Array<!Object>} */
     let points = [];
-    for (let i=0; i<this.cue.points.length; i++) {
+    for (let i = 0, len = this.cue.points.length; i < len; i++) {
       points.push({
         dwPosition: this.cue.points[i].dwPosition,
         label: this.getLabelForCuePoint_(
@@ -4056,12 +4065,12 @@ class WaveFile extends WavBuffer {
    */
   getLabelForCuePoint_(pointDwName) {
     /** @type {?number} */
-    let adtlIndex = this.getAdtlChunk_();
-    if (adtlIndex !== null) {
-      for (let i=0; i<this.LIST[adtlIndex].subChunks.length; i++) {
-        if (this.LIST[adtlIndex].subChunks[i].dwName ==
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
             pointDwName) {
-          return this.LIST[adtlIndex].subChunks[i].value;
+          return this.LIST[cIndex].subChunks[i].value;
         }
       }
     }
@@ -4073,7 +4082,7 @@ class WaveFile extends WavBuffer {
    * @private
    */
   clearLISTadtl_() {
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format == 'adtl') {
         this.LIST.splice(i);
       }
@@ -4123,7 +4132,7 @@ class WaveFile extends WavBuffer {
    * @private
    */
   getAdtlChunk_() {
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format == 'adtl') {
         return i;
       }
@@ -4139,7 +4148,7 @@ class WaveFile extends WavBuffer {
   getLISTINFOIndex_() {
     /** @type {?number} */
     let index = null;
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format === 'INFO') {
         index = i;
         break;
@@ -4159,10 +4168,10 @@ class WaveFile extends WavBuffer {
   getTagIndex_(tag) {
     /** @type {!Object<string, ?number>} */
     let index = {LIST: null, TAG: null};
-    for (let i=0; i<this.LIST.length; i++) {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
       if (this.LIST[i].format == 'INFO') {
         index.LIST = i;
-        for (let j=0; j<this.LIST[i].subChunks.length; j++) {
+        for (let j=0, subLen = this.LIST[i].subChunks.length; j < subLen; j++) {
           if (this.LIST[i].subChunks[j].chunkId == tag) {
             index.TAG = j;
             break;
@@ -4184,7 +4193,7 @@ class WaveFile extends WavBuffer {
     if (tag.constructor !== String) {
       throw new Error('Invalid tag name.');
     } else if (tag.length < 4) {
-      for (let i=0; i<4-tag.length; i++) {
+      for (let i = 0, len = 4 - tag.length; i < len; i++) {
         tag += ' ';
       }
     }
@@ -4230,7 +4239,8 @@ class WaveFile extends WavBuffer {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples The samples.
+   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView}
+   *   samples The samples.
    * @private
    */
   interleave_(samples) {
@@ -4238,8 +4248,8 @@ class WaveFile extends WavBuffer {
       if (samples[0].constructor === Array) {
         /** @type {!Array<number>} */
         let finalSamples = [];
-        for (let i=0; i < samples[0].length; i++) {
-          for (let j=0; j < samples.length; j++) {
+        for (let i = 0, len = samples[0].length; i < len; i++) {
+          for (let j = 0, subLen = samples.length; j < subLen; j++) {
             finalSamples.push(samples[j][i]);
           }
         }
@@ -4283,8 +4293,7 @@ class WaveFile extends WavBuffer {
    */
   truncateSamples_(samples) {
     /** @type {number} */   
-    let len = samples.length;
-    for (let i=0; i<len; i++) {
+    for (let i = 0, len = samples.length; i < len; i++) {
       if (samples[i] > 1) {
         samples[i] = 1;
       } else if (samples[i] < -1) {

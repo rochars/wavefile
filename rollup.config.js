@@ -8,13 +8,12 @@
  */
 
 import closure from 'rollup-plugin-closure-compiler-js';
-import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 
 // Read externs definitions
 const fs = require('fs');
-const externsSrc = fs.readFileSync('./externs/wavefile.js', 'utf8');
+const externsFile = fs.readFileSync('./externs/wavefile.js', 'utf8');
 
 // License notes
 const licenseSrc = fs.readFileSync('./LICENSE', 'utf8');
@@ -25,17 +24,18 @@ const license = '/*!\n'+
   licenseSrc +
   '\n */\n';
 
+// GCC wrapper
+const outputWrapper = license + 'var window=window||{};'+
+  '%output%' +
+  'var module=module||{};module.exports=exports;' +
+  'var define=define||function(){};' +
+'define(["exports"],function(exports){return module.exports;});'
+
 export default [
-  // cjs, es
+  // ES bundle
   {
     input: 'index.js',
     output: [
-      {
-        file: 'dist/wavefile.cjs.js',
-        name: 'wavefile',
-        footer: 'module.exports.default = WaveFile;',
-        format: 'cjs'
-      },
       {
         file: 'dist/wavefile.js',
         format: 'es'
@@ -46,32 +46,16 @@ export default [
       commonjs()
     ]
   },
-  // umd
+  // UMD dist
   {
     input: 'index.js',
     output: [
       {
         file: 'dist/wavefile.umd.js',
         name: 'WaveFile',
-        format: 'umd',
-      }
-    ],
-    plugins: [
-      resolve(),
-      commonjs(),
-      babel()
-    ]
-  },
-  // browser
-  {
-    input: 'index.js',
-    output: [
-      {
-        name: 'wavefile',
-        format: 'iife',
-        file: 'dist/wavefile.min.js',
-        banner: license,
-        footer: 'window["WaveFile"]=wavefile;'
+        format: 'cjs',
+        banner: 'var exports=exports||{};' +
+        'window["WaveFile"]=exports;'
       }
     ],
     plugins: [
@@ -82,8 +66,9 @@ export default [
         languageOut: 'ECMASCRIPT5',
         compilationLevel: 'ADVANCED',
         warningLevel: 'VERBOSE',
-        externs: [{src:externsSrc}]
-      })
+        outputWrapper: outputWrapper,
+        externs: [{src: externsFile + 'exports={};'}]
+      }),
     ]
   }
 ];
