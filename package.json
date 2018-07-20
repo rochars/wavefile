@@ -63,11 +63,12 @@
   ],
   "scripts": {
     "lint": "jshint index.js bin externs lib",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test --recursive -R dot --timeout=240000",
-    "test-esm": "node ./node_modules/mocha/bin/_mocha test --esm --recursive -R dot --timeout=240000",
-    "test-umd": "node ./node_modules/mocha/bin/_mocha test --umd --recursive -R dot --timeout=240000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src --recursive -R dot --timeout=240000",
+    "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist test/src --esm --recursive -R dot --timeout=240000",
+    "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
+    "test-tsc": "tsc ./test/TypeScript/index.ts && node ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
-    "test-dist": "npm run test-umd && npm run test-esm && npm run test-cli",
+    "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli",
     "rollup-bundle": "rollup --config && npm run test-dist",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs/api -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
@@ -86,7 +87,8 @@
     "rollup": "^0.61.2",
     "rollup-plugin-closure-compiler-js": "^1.0.6",
     "rollup-plugin-commonjs": "^9.1.3",
-    "rollup-plugin-node-resolve": "^3.3.0"
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "typescript": "^2.9.2"
   },
   "dependencies": {
     "alawmulaw": "^5.0.2",

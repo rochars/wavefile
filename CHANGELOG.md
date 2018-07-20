@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 9.0.0 (unreleased)
+- Update dist files: now only ES6 bundle and UMD.
+
 ## version 8.3.2 (2018-07-13)
 - Fix misssing properties in TypeScript declaration file.
 - Fix documentation issues.
