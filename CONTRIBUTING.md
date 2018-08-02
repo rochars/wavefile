@@ -73,8 +73,3 @@ By making a contribution to this project, I certify that:
   personal information I submit with it, including my sign-off) is
   maintained indefinitely and may be redistributed consistent with
   this project or the open source license(s) involved.
-
-## References:
-https://developercertificate.org/  
-https://github.com/nodejs/node/blob/master/CONTRIBUTING.md  
-https://google.github.io/styleguide/jsguide.html

@@ -71,26 +71,12 @@ Or load it from [unpkg](https://unpkg.com/wavefile):
 <script src="https://unpkg.com/wavefile"></script>
 ```
 
-Or load WaveFile a module using [jspm](https://jspm.io):
-```html
-<script type="module">
-  import WaveFile from 'https://dev.jspm.io/wavefile';
-  console.log(new WaveFile());
-</script>
-```
-
-### Browser compatibility
+#### Browser compatibility
 IE10+. Should work in all modern browsers that support ES5/ES6+.
 
 Cross-browser tests powered by  
 <a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a>
 
-### ES bundle
-Import WaveFile from **wavefile.js** in the *./dist* folder of this package:
-```javascript
-import WaveFile from './dist/wavefile.js';
-let wav = new WaveFile();
-```
 
 ### Command line
 To see the available options:
