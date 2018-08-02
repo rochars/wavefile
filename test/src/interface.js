@@ -11,7 +11,7 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('API properties', function() {
 
-    let wav = new WaveFile();
+    wav = new WaveFile();
     
     // WaveFile
     it('should create a WaveFile object', function() {
@@ -51,12 +51,12 @@ describe('API properties', function() {
 
 describe('API Methods', function() {
 
-    let wav = new WaveFile();
+    wav = new WaveFile();
 
     // methods
     it('should return a Uint8Array', function() {
         wav.fromScratch(1, 8000, '8', [0,0], {container: 'RIFX'});
-        let buffer = wav.toBuffer();
+        var buffer = wav.toBuffer();
         assert.equal(
         	buffer.constructor,
         	new Uint8Array().constructor);

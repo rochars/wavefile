@@ -8,13 +8,10 @@ https://github.com/rochars/wavefile
 Create, read and write wav files according to the specs.
 
 - **MIT licensed**
-- **Use it in the browser**
+- **Use it in the browser (IE10+)**
 - **Use it in Node.js**
 - **Use it as a command line tool**
-- **Use it with [TypeScript](https://www.typescriptlang.org/)**
 - **Handle files up to 2GB**
-- **Less than 10kb minified + compressed, less than 32kb minified**
-- **Made with [Closure Compiler](https://github.com/google/closure-compiler) in mind** (works great with others, too)
 
 With **wavefile** you can:
 
@@ -39,9 +36,6 @@ To use it from the [command line](#command-line), install it globally:
 ```
 npm install wavefile -g
 ```
-
-You can also download one of the files in the *./dist* folder:  
-https://github.com/rochars/wavefile/tree/master/dist
 
 ## Use
 
@@ -85,8 +79,11 @@ Or load WaveFile a module using [jspm](https://jspm.io):
 </script>
 ```
 
-#### Browser Compatibility
-All modern browsers should work fine. Cross-browser tests are on the [ROADMAP](https://github.com/rochars/wavefile/blob/master/ROADMAP.md).
+### Browser compatibility
+IE10+. Should work in all modern browsers that support ES5/ES6+.
+
+Cross-browser tests powered by  
+<a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a>
 
 ### ES bundle
 Import WaveFile from **wavefile.js** in the *./dist* folder of this package:

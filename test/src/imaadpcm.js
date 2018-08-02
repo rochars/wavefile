@@ -11,8 +11,8 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('16-bit to ADPCM', function() {
 
-    let wav = new WaveFile();
-    let samples = new Int16Array(1024);
+    var wav = new WaveFile();
+    var samples = new Int16Array(1024);
     wav.fromScratch(1, 8000, '16', samples);
     wav.toIMAADPCM();
 

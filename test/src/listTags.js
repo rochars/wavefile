@@ -13,9 +13,9 @@ var WaveFile = WaveFile || require('../loader.js');
 describe('listTags() of a 16-bit wave files from scratch', function() {
     
     it('should list the tags of a file created from scratch', function() {
-        let wav = new WaveFile();
-        let samples = [];
-        for (let i=0; i<8000; i++) {
+        var wav = new WaveFile();
+        var samples = [];
+        for (var i=0; i<8000; i++) {
             samples.push(0);
         }
         wav.fromScratch(1, 8000, '16', samples);
@@ -27,7 +27,7 @@ describe('listTags() of a 16-bit wave files from scratch', function() {
         });
     });
     it('should return a empty object if the file have no tags', function() {
-        let wav = new WaveFile();
+        var wav = new WaveFile();
         wav.fromScratch(1, 8000, '16', []);
         assert.deepEqual(wav.listTags(), {});
     });

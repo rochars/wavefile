@@ -11,12 +11,12 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('Create and delete cue points', function() {
     
-    let wav = new WaveFile();
-    let samples = [];
-    for (let i=0; i<128000; i++)  {
+    var wav = new WaveFile();
+    var samples = [];
+    for (var i=0; i<128000; i++)  {
         samples.push(0);
     }
-    let deInterleaved = [
+    var deInterleaved = [
         samples,
         samples
     ];

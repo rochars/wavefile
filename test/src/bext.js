@@ -12,7 +12,7 @@ var WaveFile = WaveFile || require('../loader.js');
 describe('Add BWF to a file with no BWF (just the timeReference field on bext)',
         function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 48000, '8', [0, 255, 2, 3]);
 
     // Add BWF timeReference

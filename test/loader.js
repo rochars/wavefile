@@ -30,6 +30,19 @@ if (process.argv[4] == '--umd') {
 	global.module = module;
 	wavefile = require('../dist/wavefile.js').default;
 
+// Min
+} else if (process.argv[4] == '--min') {
+	console.log('min tests');
+	global.window = {};
+	require('../dist/wavefile.min.js');
+	wavefile = window.WaveFile;
+// CJS
+} else if (process.argv[4] == '--cjs') {
+	console.log('cjs tests');
+	require = require("esm")(module);
+	global.module = module;
+	wavefile = require('../dist/wavefile.cjs.js');
+
 // Source
 } else {
 	console.log('Source tests');

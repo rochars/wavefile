@@ -11,7 +11,7 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('16-bit to 8-bit A-Law', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
     wav.toALaw();
 

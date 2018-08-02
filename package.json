@@ -1,14 +1,12 @@
 {
   "name": "wavefile",
-  "version": "9.0.0",
+  "version": "8.4.0",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
-  "main": "./dist/wavefile.umd.js",
   "module": "./index.js",
-  "es2015": "./dist/wavefile.js",
-  "types": "./index.d.ts",
+  "main": "./dist/wavefile.cjs.js",
   "bin": "./bin/wavefile.js",
   "engines": {
     "node": ">=8"
@@ -47,13 +45,15 @@
     "bin": "bin",
     "dist": "dist",
     "externs": "externs",
-    "lib": "lib"
+    "lib": "lib",
+    "scripts": "scripts"
   },
   "files": [
     "bin",
     "dist",
     "externs",
     "lib",
+    "scripts",
     "index.js",
     "index.d.ts",
     "LICENSE",
@@ -62,39 +62,46 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "lint": "jshint index.js bin externs lib",
+    "lint": "jshint index.js bin externs lib test/src",
     "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src --recursive -R dot --timeout=240000",
     "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist test/src --esm --recursive -R dot --timeout=240000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
-    "test-tsc": "tsc ./test/TypeScript/index.ts && node ./test/TypeScript/index.js",
+    "test-cjs": "node ./node_modules/mocha/bin/_mocha test/dist test/src --cjs --recursive -R dot --timeout=240000",
+    "test-min": "node ./node_modules/mocha/bin/_mocha test/dist test/src --min --recursive -R dot --timeout=240000",
+    "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
-    "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli",
+    "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli && npm run test-cjs && npm run test-min",
     "rollup-bundle": "rollup --config && npm run test-dist",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
     "codecov": "^3.0.2",
     "docdash": "^0.4.0",
     "esm": "^3.0.51",
-    "google-closure-compiler-js": "^20180610.0.0",
     "jsdoc": "^3.5.5",
     "jshint": "^2.9.5",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
     "nyc": "^12.0.2",
     "rollup": "^0.61.2",
-    "rollup-plugin-closure-compiler-js": "^1.0.6",
+    "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-terser": "^1.0.1",
+    "terser": "^3.8.1",
     "typescript": "^2.9.2"
   },
   "dependencies": {
     "alawmulaw": "^5.0.2",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.2",
-    "byte-data": "^15.0.0-alpha.0",
+    "byte-data": "^15.0.0",
     "imaadpcm": "^4.0.1"
   }
 }

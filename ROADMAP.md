@@ -34,7 +34,7 @@ This is why the bitDepth param is a string. It should be a number describing onl
 ## Chores
 
 ### Cross-browser tests
-To add a list of compatible browsers to the docs.
+Automate cross-browser tests and add browser compatibility badge to README.
 
 ### Fix the name of test wav files
 Update the name of the files in *test/files/* so they all follow the naming convention described in [CONTRIBUTING.md](CONTRIBUTING.md).

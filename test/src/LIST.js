@@ -11,9 +11,9 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('create 16-bit wave files with tags (LIST chunk)', function() {
 
-    let wav = new WaveFile();
-    let samples = [];
-    for (let i=0; i<8000; i++) {
+    var wav = new WaveFile();
+    var samples = [];
+    for (var i=0; i<8000; i++) {
         samples.push(0);
     }
     wav.fromScratch(1, 8000, '16', samples);
@@ -27,20 +27,20 @@ describe('create 16-bit wave files with tags (LIST chunk)', function() {
         assert.ok(wav.getTag("INEX") === null);
     });
     it("LISTChunks[0].chunkId should be 'LIST'", function() {
-        assert.equal(wav.LIST[0]["chunkId"], "LIST");
+        assert.equal(wav.LIST[0].chunkId, "LIST");
     });
     it("LISTChunks[0].format should be 'INFO'", function() {
-        assert.equal(wav.LIST[0]["format"], "INFO");
+        assert.equal(wav.LIST[0].format, "INFO");
     });
     it("LISTChunks[0].subChunks.length 2", function() {
-        assert.equal(wav.LIST[0]["subChunks"].length, 2);
+        assert.equal(wav.LIST[0].subChunks.length, 2);
     });
     // good tag
     it("LISTChunks[0].subChunks[0].chunkId should be 'WVFL'", function() {
         assert.equal(wav.LIST[0].subChunks[0].chunkId, "WVFL");
     });
     it("'WVFL' size", function() {
-        assert.equal(wav.LIST[0].subChunks[0].chunkSize, "5");
+        assert.equal(wav.LIST[0].subChunks[0].chunkSize, 5);
     });
     it("'WVFL' value", function() {
         assert.equal(wav.LIST[0].subChunks[0].value, "true");
@@ -50,7 +50,7 @@ describe('create 16-bit wave files with tags (LIST chunk)', function() {
         assert.equal(wav.LIST[0].subChunks[1].chunkId, "WVF ");
     });
     it("'WVF ' size", function() {
-        assert.equal(wav.LIST[0].subChunks[1].chunkSize, "6");
+        assert.equal(wav.LIST[0].subChunks[1].chunkSize, 6);
     });
     it("'WVF ' value", function() {
         assert.equal(wav.LIST[0].subChunks[1].value, "fixed");

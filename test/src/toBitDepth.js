@@ -11,8 +11,8 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe("8-bit mono to 16-bit", function() {
 
-    let wav = new WaveFile();
-    let samples = [0, 255];
+    var wav = new WaveFile();
+    var samples = [0, 255];
     wav.fromScratch(1, 8000, "8", samples);
     wav.toBitDepth("16");
 
@@ -56,8 +56,8 @@ describe("8-bit mono to 16-bit", function() {
 
 describe("24-bit mono to 16-bit", function() {
 
-    let wav = new WaveFile();
-    let samples = [-8388608, 8388607];
+    var wav = new WaveFile();
+    var samples = [-8388608, 8388607];
     wav.fromScratch(1, 8000, "24", samples);
     wav.toBitDepth("16");
 
@@ -101,8 +101,8 @@ describe("24-bit mono to 16-bit", function() {
 
 describe("32-bit FP to 16-bit", function() {
 
-    let wav = new WaveFile();
-    let samples = [-1, 1];
+    var wav = new WaveFile();
+    var samples = [-1, 1];
     wav.fromScratch(1, 8000, "32f", samples);
     wav.toBitDepth("16");
 
@@ -146,8 +146,8 @@ describe("32-bit FP to 16-bit", function() {
 
 describe("32-bit to 16-bit", function() {
 
-    let wav = new WaveFile();
-    let samples = [-2147483648, 2147483647];
+    var wav = new WaveFile();
+    var samples = [-2147483648, 2147483647];
     wav.fromScratch(1, 8000, "32", samples);
     wav.toBitDepth("16");
 
@@ -192,8 +192,8 @@ describe("32-bit to 16-bit", function() {
 
 describe("64-bit to 16-bit", function() {
 
-    let wav = new WaveFile();
-    let samples = [-1, 1];
+    var wav = new WaveFile();
+    var samples = [-1, 1];
     wav.fromScratch(1, 8000, "64", samples);
     wav.toBitDepth("16");
 
@@ -238,8 +238,8 @@ describe("64-bit to 16-bit", function() {
 
 describe("8-bit to 32-bit FP", function() {
 
-    let wav = new WaveFile();
-    let samples = [0, 255];
+    var wav = new WaveFile();
+    var samples = [0, 255];
     wav.fromScratch(1, 8000, "8", samples);
     wav.toBitDepth("32f");
 

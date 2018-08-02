@@ -14,7 +14,7 @@ describe('setSample(): 8-bit wave file from scratch', function() {
     var wav = new WaveFile();
     wav.fromScratch(1, 48000, '8', [0, 255, 2, 3]);
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, 2)
+    wav.setSample(1, 2);
 
     it('sample at 1 should be 2', function() {
         assert.equal(wav.getSample(1), 2);
@@ -32,7 +32,7 @@ describe('setSample(): 16-bit wave file from scratch', function() {
     var wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, -32768)
+    wav.setSample(1, -32768);
 
     it('sample at 0 should be 0', function() {
         assert.equal(wav.getSample(1), -32768);
@@ -50,7 +50,7 @@ describe('setSample(): 24-bit wave file from scratch', function() {
     var wav = new WaveFile();
     wav.fromScratch(1, 48000, '24', [0, 1, -8388608, 8388607]);
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, -83886)
+    wav.setSample(1, -83886);
 
     it('sample at 0 should be 0', function() {
         assert.equal(wav.getSample(1), -83886);
@@ -68,7 +68,7 @@ describe('setSample(): 32-bit wave file from scratch', function() {
     var wav = new WaveFile();
     wav.fromScratch(1, 44100, '32', [0, 1, -2147483648, 2147483647]);
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, -21474)
+    wav.setSample(1, -21474);
 
     it('sample at 0 should be 0', function() {
         assert.equal(wav.getSample(1), -21474);
@@ -86,7 +86,7 @@ describe('setSample(): 32-bit fp wave file from scratch', function() {
     var wav = new WaveFile();
     wav.fromScratch(1, 44100, '32f', [0, 1, 0.04029441, -0.04029440]);
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, 2)
+    wav.setSample(1, 2);
 
     it('sample at 0 should be 0', function() {
         assert.equal(wav.getSample(1), 2);
@@ -106,7 +106,7 @@ describe('setSample(): 64-bit wave file from scratch', function() {
         1, 44100, '64',
         [0.0, 1, 0.04029440055111987, -0.04029440055111987]);
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, 2)
+    wav.setSample(1, 2);
 
     it('sample at 0 should be 0', function() {
         assert.equal(wav.getSample(1), 2);
@@ -125,7 +125,7 @@ describe('setSample(): 16-bit RIFX wave file from scratch', function() {
     wav.fromScratch(
         1, 48000, '16', [0, 1, -32768, 32767], {container: "RIFX"});
     var byteCount = wav.data.samples.length;
-    wav.setSample(1, -32768)
+    wav.setSample(1, -32768);
 
     it('sample at 0 should be 0', function() {
         assert.equal(wav.getSample(1), -32768);

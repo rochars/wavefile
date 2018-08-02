@@ -7,68 +7,76 @@
  * @fileoverview rollup configuration file.
  */
 
-import closure from 'rollup-plugin-closure-compiler-js';
+import {terser} from 'rollup-plugin-terser';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
+import babel from 'rollup-plugin-babel';
 
 // Read externs definitions
 const fs = require('fs');
-const externsFile = fs.readFileSync('./externs/wavefile.js', 'utf8');
-
-// License notes
-const licenseSrc = fs.readFileSync('./LICENSE', 'utf8');
-const license = '/*!\n'+
-  'https://github.com/rochars/wavefile\n' +
-  'Copyright (c) 2017 Brett Zamir, 2012 Niklas von Hertzen.\n' +
-  'Copyright (c) 2016 acida, 2018 Rafael da Silva Rocha.\n' +
-  licenseSrc +
-  '\n */\n';
+const polyfills = fs.readFileSync('./scripts/polyfills.js', 'utf8');
 
 // GCC wrapper
-const outputWrapper = license + 'var window=window||{};'+
-  '%output%' +
-  'var module=module||{};module.exports=exports;module.exports.default=exports;' +
-  'var define=define||function(){};' +
-'define(["exports"],function(exports){return module.exports;});'
+const outputWrapper =
+  ";exports.default=exports;var WaveFile={};" +
+  "typeof module!=='undefined'?module.exports=exports :" +
+  "typeof define==='function'&&define.amd?define(['exports'],exports.default) :" +
+  "typeof global!=='undefined'?global.WaveFile=exports:WaveFile=exports;";
 
 export default [
-  // ES bundle
+  // ES6 bundle
   {
     input: 'index.js',
     output: [
       {
         file: 'dist/wavefile.js',
         format: 'es'
-      }
+      },
+      // kept for compatibility with version 8.x dist
+      {
+        file: 'dist/wavefile.cjs.js',
+        format: 'cjs'
+      },
+      
     ],
     plugins: [
       resolve(),
       commonjs()
     ]
   },
-  // UMD dist
+  // kept for compatibility with version 8.x dist
+  {
+    input: 'index.js',
+    output: [
+      {
+        file: 'dist/wavefile.min.js',
+        name: 'WaveFile',
+        format: 'iife',
+        footer: 'window["WaveFile"] = WaveFile;'
+      },
+    ],
+    plugins: [
+      resolve(),
+      commonjs(),
+      terser()
+    ]
+  },
+  // Main UMD dist
   {
     input: 'index.js',
     output: [
       {
         file: 'dist/wavefile.umd.js',
         name: 'WaveFile',
-        format: 'cjs',
-        banner: 'var exports=exports||{};' +
-        'window["WaveFile"]=exports;'
-      }
+        format: 'umd',
+        banner: polyfills
+      },
     ],
     plugins: [
       resolve(),
       commonjs(),
-      closure({
-        languageIn: 'ECMASCRIPT6',
-        languageOut: 'ECMASCRIPT5',
-        compilationLevel: 'ADVANCED',
-        warningLevel: 'VERBOSE',
-        outputWrapper: outputWrapper,
-        externs: [{src: externsFile + 'exports={};'}]
-      }),
+      babel(),
+      terser({mangle: false})
     ]
-  }
+  },
 ];

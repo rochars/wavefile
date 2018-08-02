@@ -50,7 +50,7 @@ import WavBuffer from './lib/wav-buffer.js';
 export default class WaveFile extends WavBuffer {
 
   /**
-   * @param {?Uint8Array} bytes A wave file buffer.
+   * @param {?Uint8Array=} bytes A wave file buffer.
    * @throws {Error} If no 'RIFF' chunk is found.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.

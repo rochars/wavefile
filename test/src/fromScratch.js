@@ -11,7 +11,7 @@ var WaveFile = WaveFile || require('../loader.js');
 
 describe('create a 8-bit wave file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 48000, '8', [0, 255, 2, 3]);
 
     it('chunkId should be "RIFF"', function() {
@@ -57,7 +57,7 @@ describe('create a 8-bit wave file from scratch', function() {
 
 describe('create a 16-bit wave file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767]);
 
     it('chunkId should be "RIFF"', function() {
@@ -103,7 +103,7 @@ describe('create a 16-bit wave file from scratch', function() {
 
 describe('create a 24-bit wave file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 48000, '24', [0, 1, -8388608, 8388607]);
 
     it('chunkId should be "RIFF"', function() {
@@ -149,7 +149,7 @@ describe('create a 24-bit wave file from scratch', function() {
 
 describe('create a 32-bit wave file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
 
     it('chunkId should be "RIFF"', function() {
@@ -195,7 +195,7 @@ describe('create a 32-bit wave file from scratch', function() {
 
 describe('create a 32-bit FP wave file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(1, 44100, '32f', [0, 0.04029441, -0.04029440, 1]);
 
     it('chunkId should be "RIFF"', function() {
@@ -241,7 +241,7 @@ describe('create a 32-bit FP wave file from scratch', function() {
 
 describe('create a 64-bit wave file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(
         1, 44100, '64',
         [0.0, 0.04029440055111987, -0.04029440055111987, 1.0]);
@@ -289,7 +289,7 @@ describe('create a 64-bit wave file from scratch', function() {
 
 describe('create 16-bit RIFX file from scratch', function() {
     
-    let wav = new WaveFile();
+    var wav = new WaveFile();
     wav.fromScratch(
         1, 48000, '16', [0, 1, -32768, 32767], {container: "RIFX"});
 
