@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## version 8.4.1 (2018-08-06)
-- Update dependencies to improve performance.
+- Update dependencies.
 
 ## version 8.4.0 (2018-08-02)
 - Compatible with IE10+
