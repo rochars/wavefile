@@ -948,66 +948,6 @@ function swap(bytes, offset, index) {
  */
 
 /**
- * @fileoverview The utf8-buffer-size API.
- * @see https://github.com/rochars/utf8-buffer-size
- */
-
-/** @module utf8BufferSize */
-
-/**
- * Returns how many bytes are needed to serialize a UTF-8 string.
- * @see https://encoding.spec.whatwg.org/#utf-8-encoder
- * @param {string} str The string to pack.
- * @return {number} The number of bytes needed to serialize the string.
- */
-function utf8BufferSize(str) {
-  /** @type {number} */
-  let bytes = 0;
-  for (let i = 0, len = str.length; i < len; i++) {
-    /** @type {number} */
-    let codePoint = str.codePointAt(i);
-    if (codePoint < 128) {
-      bytes++;
-    } else {
-      if (codePoint <= 2047) {
-        bytes++;
-      } else if(codePoint <= 65535) {
-        bytes+=2;
-      } else if(codePoint <= 1114111) {
-        i++;
-        bytes+=3;
-      }
-      bytes++;
-    }
-  }
-  return bytes;
-}
-
-/*
- * Copyright (c) 2018 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
  * @fileoverview Functions to serialize and deserialize UTF-8 strings.
  * @see https://github.com/rochars/utf8-buffer
  * @see https://encoding.spec.whatwg.org/#the-encoding
@@ -1024,11 +964,10 @@ function utf8BufferSize(str) {
  * @param {!Uint8Array|!Array<number>} buffer A byte buffer.
  * @param {number=} start The buffer index to start reading.
  * @param {?number=} end The buffer index to stop reading.
- *    If end is null will read until the end of the buffer.
+ *   Assumes the buffer length if undefined.
  * @return {string}
  */
-function unpack(buffer, start=0, end=null) {
-  end = end !== null ? end + 1 : buffer.length;
+function unpack(buffer, start=0, end=buffer.length) {
   /** @type {string} */
   let str = "";
   for(let index = start; index < end;) {
@@ -1131,6 +1070,301 @@ function pack(str, buffer, index=0) {
     }
   }
   return index;
+}
+
+/*
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview Functions to validate input.
+ * @see https://github.com/rochars/byte-data
+ */
+
+const TYPE_ERR = 'Unsupported type';
+
+/**
+ * Validate that the value is not null or undefined.
+ * @param {*} value The value.y.
+ * @throws {Error} If the value is not Number or Boolean.
+ * @throws {Error} If the value is NaN, Infinity or -Infinity.
+ */
+function validateIsInt(value) {
+  validateIsNumber(value);
+  if (value !== value || value === Infinity || value === -Infinity) {
+    throwValueErr_('integer');
+  }
+}
+
+/**
+ * Validate that the value is not null or undefined.
+ * @param {*} value The value.
+ * @throws {Error} If the value is not Number or Boolean.
+ */
+function validateIsNumber(value) {
+  if (value === undefined || value === null) {
+    throwValueErr_();
+  }
+  if (value.constructor != Number && value.constructor != Boolean) {
+    throwValueErr_();
+  }
+}
+
+/**
+ * Validate the type definition of floating-point numbers.
+ * @param {number} bits The number of bits.
+ * @throws {Error} If the type definition is not valid.
+ * @private
+ */
+function validateFloatType(bits) {
+  if (!bits || bits !== 16 && bits !== 32 && bits !== 64) {
+    throw new Error(TYPE_ERR + ': float, bits: ' + bits);
+  }
+}
+
+/**
+ * Validate the type definition of integers.
+ * @param {number} bits The number of bits.
+ * @throws {Error} If the type definition is not valid.
+ * @private
+ */
+function validateIntType(bits) {
+  if (!bits || bits < 1 || bits > 53) {
+    throw new Error(TYPE_ERR + ': int, bits: ' + bits);
+  }
+}
+
+/**
+ * Throw a error about the input value.
+ * @param {string} theType The name of the type the value was expected to be.
+ * @throws {Error} Always when called.
+ * @private
+ */
+function throwValueErr_(theType='valid number') {
+  throw new Error('Argument is not a ' + theType);
+}
+
+/*
+ * Copyright (c) 2018 Rafael da Silva Rocha.
+ * Copyright (c) 2013 DeNA Co., Ltd.
+ * Copyright (c) 2010, Linden Research, Inc
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview Encode and decode IEEE 754 floating point numbers.
+ * @see https://github.com/rochars/ieee754-buffer
+ * @see https://bitbucket.org/lindenlab/llsd/raw/7d2646cd3f9b4c806e73aebc4b32bd81e4047fdc/js/typedarray.js
+ * @see https://github.com/kazuho/ieee754.js/blob/master/ieee754.js
+ */
+
+/** 
+ * @module IEEE754Buffer
+ * @ignore
+ */
+
+/**
+ * A class to encode and decode IEEE 754 floating-point numbers.
+ */
+class IEEE754Buffer {
+
+  /**
+   * Pack a IEEE 754 floating point number.
+   * @param {number} ebits The exponent bits.
+   * @param {number} fbits The fraction bits.
+   */
+  constructor(ebits, fbits) {
+    this.ebits = ebits;
+    this.fbits = fbits;
+    this.bias = (1 << (ebits - 1)) - 1;
+    this.numBytes = Math.ceil((ebits + fbits) / 8);
+    this.biasP2 = Math.pow(2, this.bias + 1);
+    this.ebitsFbits = (ebits + fbits);
+    this.fbias = Math.pow(2, -(8 * this.numBytes - 1 - ebits));
+  }
+
+  /**
+   * Pack a IEEE 754 floating point number.
+   * @param {!Uint8Array|!Array<number>} buffer The buffer.
+   * @param {number} num The number.
+   * @param {number} index The index to write on the buffer.
+   * @return {number} The next index to write on the buffer.
+   */
+  pack(buffer, num, index) {
+    // Round overflows
+    if (Math.abs(num) > this.biasP2 - (this.ebitsFbits * 2)) {
+      num = num < 0 ? -Infinity : Infinity;
+    }
+    /**
+     * sign, need this to handle negative zero
+     * @see http://cwestblog.com/2014/02/25/javascript-testing-for-negative-zero/
+     * @type {number}
+     */
+    let sign = (((num = +num) || 1 / num) < 0) ? 1 : num < 0 ? 1 : 0;
+    num = Math.abs(num);
+    /** @type {number} */
+    let exp = Math.min(Math.floor(Math.log(num) / Math.LN2), 1023);
+    /** @type {number} */
+    let fraction = this.roundToEven(num / Math.pow(2, exp) * Math.pow(2, this.fbits));
+    // NaN
+    if (num !== num) {
+      fraction = Math.pow(2, this.fbits - 1);
+      exp = (1 << this.ebits) - 1;
+    // Number
+    } else if (num !== 0) {
+      if (num >= Math.pow(2, 1 - this.bias)) {
+        if (fraction / Math.pow(2, this.fbits) >= 2) {
+          exp = exp + 1;
+          fraction = 1;
+        }
+        // Overflow
+        if (exp > this.bias) {
+          exp = (1 << this.ebits) - 1;
+          fraction = 0;
+        } else {
+          exp = exp + this.bias;
+          fraction = this.roundToEven(fraction) - Math.pow(2, this.fbits);
+        }
+      } else {
+        fraction = this.roundToEven(num / Math.pow(2, 1 - this.bias - this.fbits));
+        exp = 0;
+      } 
+    }
+    return this.packFloatBits_(buffer, index, sign, exp, fraction);
+  }
+
+  /**
+   * Unpack a IEEE 754 floating point number.
+   * Derived from IEEE754 by DeNA Co., Ltd., MIT License. 
+   * Adapted to handle NaN. Should port the solution to the original repo.
+   * @param {!Uint8Array|!Array<number>} buffer The buffer.
+   * @param {number} index The index to read from the buffer.
+   * @return {number} The floating point number.
+   */
+  unpack(buffer, index) {
+    /** @type {number} */
+    let eMax = (1 << this.ebits) - 1;
+    /** @type {number} */
+    let significand;
+    /** @type {string} */
+    let leftBits = "";
+    for (let i = this.numBytes - 1; i >= 0 ; i--) {
+      /** @type {string} */
+      let t = buffer[i + index].toString(2);
+      leftBits += "00000000".substring(t.length) + t;
+    }
+    /** @type {number} */
+    let sign = leftBits.charAt(0) == "1" ? -1 : 1;
+    leftBits = leftBits.substring(1);
+    /** @type {number} */
+    let exponent = parseInt(leftBits.substring(0, this.ebits), 2);
+    leftBits = leftBits.substring(this.ebits);
+    if (exponent == eMax) {
+      if (parseInt(leftBits, 2) !== 0) {
+        return NaN;
+      }
+      return sign * Infinity;  
+    } else if (exponent === 0) {
+      exponent += 1;
+      significand = parseInt(leftBits, 2);
+    } else {
+      significand = parseInt("1" + leftBits, 2);
+    }
+    return sign * significand * this.fbias * Math.pow(2, exponent - this.bias);
+  }
+
+  /**
+   * Pack a IEEE754 from its sign, exponent and fraction bits
+   * and place it in a byte buffer.
+   * @param {!Uint8Array|!Array<number>} buffer The byte buffer to write to.
+   * @param {number} index The buffer index to write.
+   * @param {number} sign The sign.
+   * @param {number} exp the exponent.
+   * @param {number} fraction The fraction.
+   * @return {number}
+   * @private
+   */
+  packFloatBits_(buffer, index, sign, exp, fraction) {
+    /** @type {!Array<number>} */
+    let bits = [];
+    // the sign
+    bits.push(sign);
+    // the exponent
+    for (let i = this.ebits; i > 0; i -= 1) {
+      bits[i] = (exp % 2 ? 1 : 0);
+      exp = Math.floor(exp / 2);
+    }
+    // the fraction
+    let len = bits.length;
+    for (let i = this.fbits; i > 0; i -= 1) {
+      bits[len + i] = (fraction % 2 ? 1 : 0);
+      fraction = Math.floor(fraction / 2);
+    }
+    // pack as bytes
+    /** @type {string} */
+    let str = bits.join('');
+    /** @type {number} */
+    let numBytes = this.numBytes + index - 1;
+    /** @type {number} */
+    let k = index;
+    while (numBytes >= index) {
+      buffer[numBytes] = parseInt(str.substring(0, 8), 2);
+      str = str.substring(8);
+      numBytes--;
+      k++;
+    }
+    return k;
+  }
+
+  roundToEven(n) {
+    var w = Math.floor(n), f = n - w;
+    if (f < 0.5) {
+      return w;
+    }
+    if (f > 0.5) {
+      return w + 1;
+    }
+    return w % 2 ? w + 1 : w;
+  }
 }
 
 /*
@@ -1370,351 +1604,6 @@ class TwosComplementBuffer extends UintBuffer {
 }
 
 /*
- * Copyright (c) 2018 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * A class to write and read two's complement ints and unsigned ints
- * to and from byte buffers.
- */
-class IntBuffer {
-  
-  /**
-   * @param {number} bits The number of bits used by the integer.
-   * @param {boolean} signed True if the integer is signed.
-   */
-  constructor(bits, signed) {
-    /** @type {TwosComplementBuffer|UintBuffer} */
-    this.parser = signed ?
-      new TwosComplementBuffer(bits) : new UintBuffer(bits);
-  }
-
-  /**
-   * Write one unsigned integer to a byte buffer.
-   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
-   * @param {number} num The number.
-   * @param {number=} index The index being written in the byte buffer.
-   * @return {number} The next index to write on the byte buffer.
-   * @throws {Error} If num is NaN.
-   * @throws {Error} On overflow.
-   */
-  pack(buffer, num, index=0) {
-    return this.parser.pack(buffer, num, index);
-  }
-
-  /**
-   * Read one unsigned integer from a byte buffer.
-   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
-   * @param {number=} index The index to read.
-   * @return {number} The number.
-   * @throws {Error} On overflow.
-   */
-  unpack(buffer, index=0) {
-    return this.parser.unpack(buffer, index);
-  }
-}
-
-/*
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * @fileoverview Functions to validate input.
- * @see https://github.com/rochars/byte-data
- */
-
-const typeDefinition = 'Unsupported type';
-
-/**
- * Validate that the value is not null or undefined.
- * @param {number} value The value.
- * @throws {Error} If the value is not null, Number or Boolean.
- */
-function validateValueType(value) {
-  if (value === undefined) {
-    throw new Error('Undefined value');
-  }
-  if (value !== null) {
-      if (value.constructor != Number && value.constructor != Boolean) {
-      throw new Error(
-        'Can\'t pack ' + value.constructor);
-    }
-  }
-}
-
-/**
- * Validate the type definition.
- * @param {!Object} theType The type definition.
- * @throws {Error} If the type definition is not valid.
- */
-function validateType(theType) {
-  if (!theType) {
-    throw new Error(typeDefinition);
-  }
-  if (theType.float) {
-    validateFloatType_(theType);
-  } else {
-    validateIntType_(theType);
-  }
-}
-
-/**
- * Validate the type definition of floating point numbers.
- * @param {!Object} theType The type definition.
- * @throws {Error} If the type definition is not valid.
- * @private
- */
-function validateFloatType_(theType) {
-  if (theType.bits != 16 && theType.bits != 32 && theType.bits != 64) {
-    throw new Error(typeDefinition);
-  }
-}
-
-/**
- * Validate the type definition of integers.
- * @param {!Object} theType The type definition.
- * @throws {Error} If the type definition is not valid.
- * @private
- */
-function validateIntType_(theType) {
-  if (theType.bits < 1 || theType.bits > 53) {
-    throw new Error(typeDefinition);
-  }
-}
-
-/*
- * Copyright (c) 2018 Rafael da Silva Rocha.
- * Copyright (c) 2013 DeNA Co., Ltd.
- * Copyright (c) 2010, Linden Research, Inc
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * @fileoverview Functions to pack and unpack IEEE 754 floating point numbers.
- * @see https://github.com/rochars/ieee754-buffer
- */
-
-/** @module ieee754Buffer */
-
-/**
- * Pack a IEEE 754 floating point number.
- * Derived from typedarray.js by Linden Research, MIT License.
- * @see https://bitbucket.org/lindenlab/llsd/raw/7d2646cd3f9b4c806e73aebc4b32bd81e4047fdc/js/typedarray.js
- * @param {!Uint8Array|!Array<number>} buffer The buffer.
- * @param {number} index The index to write on the buffer.
- * @param {number} num The number.
- * @param {number} ebits The number of bits of the exponent.
- * @param {number} fbits The number of bits of the fraction.
- * @return {number} The next index to write on the buffer.
- */
-function pack$1(buffer, index, num, ebits, fbits) {
-  /** @type {number} */
-  let bias = (1 << (ebits - 1)) - 1;
-  // Round overflows
-  if (Math.abs(num) > Math.pow(2, bias + 1) - ((ebits + fbits) * 2)) {
-    num = num < 0 ? -Infinity : Infinity;
-  }
-  /**
-   * sign, need this to handle negative zero
-   * @see http://cwestblog.com/2014/02/25/javascript-testing-for-negative-zero/
-   * @type {number}
-   */
-  let sign = (((num = +num) || 1 / num) < 0) ? 1 : num < 0 ? 1 : 0;
-  num = Math.abs(num);
-  /** @type {number} */
-  let exp = Math.min(Math.floor(Math.log(num) / Math.LN2), 1023);
-  /** @type {number} */
-  let fraction = roundToEven(num / Math.pow(2, exp) * Math.pow(2, fbits));
-  // NaN
-  if (num !== num) {
-    fraction = Math.pow(2, fbits - 1);
-    exp = (1 << ebits) - 1;
-  // Number
-  } else if (num !== 0) {
-    if (num >= Math.pow(2, 1 - bias)) {
-      if (fraction / Math.pow(2, fbits) >= 2) {
-        exp = exp + 1;
-        fraction = 1;
-      }
-      // Overflow
-      if (exp > bias) {
-        exp = (1 << ebits) - 1;
-        fraction = 0;
-      } else {
-        exp = exp + bias;
-        fraction = roundToEven(fraction) - Math.pow(2, fbits);
-      }
-    } else {
-      fraction = roundToEven(num / Math.pow(2, 1 - bias - fbits));
-      exp = 0;
-    } 
-  }
-  return packFloatBits_(buffer, index, ebits, fbits, sign, exp, fraction);
-}
-
-/**
- * Unpack a IEEE 754 floating point number.
- * Derived from IEEE754 by DeNA Co., Ltd., MIT License. 
- * Adapted to handle NaN. Should port the solution to the original repo.
- * @see https://github.com/kazuho/ieee754.js/blob/master/ieee754.js
- * @param {!Uint8Array|!Array<number>} buffer The buffer.
- * @param {number} index The index to read from the buffer.
- * @param {number} ebits The number of bits of the exponent.
- * @param {number} fbits The number of bits of the fraction.
- * @return {number} The floating point number.
- */
-function unpack$1(buffer, index, ebits, fbits) {
-  let exponentBias = (1 << (ebits - 1)) - 1;
-  let numBytes = Math.ceil((ebits + fbits) / 8);
-  /** @type {number} */
-  let eMax = (1 << ebits) - 1;
-  /** @type {number} */
-  let bias = Math.pow(2, -(8 * numBytes - 1 - ebits));
-  /** @type {number} */
-  let significand;
-  /** @type {string} */
-  let leftBits = "";
-  for (let i = numBytes - 1; i >= 0 ; i--) {
-    /** @type {string} */
-    let t = buffer[i + index].toString(2);
-    leftBits += "00000000".substring(t.length) + t;
-  }
-  /** @type {number} */
-  let sign = leftBits.charAt(0) == "1" ? -1 : 1;
-  leftBits = leftBits.substring(1);
-  /** @type {number} */
-  let exponent = parseInt(leftBits.substring(0, ebits), 2);
-  leftBits = leftBits.substring(ebits);
-  if (exponent == eMax) {
-    if (parseInt(leftBits, 2) !== 0) {
-      return NaN;
-    }
-    return sign * Infinity;  
-  } else if (exponent === 0) {
-    exponent += 1;
-    significand = parseInt(leftBits, 2);
-  } else {
-    significand = parseInt("1" + leftBits, 2);
-  }
-  return sign * significand * bias * Math.pow(2, exponent - exponentBias);
-}
-
-/**
- * Pack a IEEE754 from its sign, exponent and fraction bits
- * and place it in a byte buffer.
- * @param {!Uint8Array|!Array<number>} buffer The byte buffer to write to.
- * @param {number} index The buffer index to write.
- * @param {number} ebits The number of bits of the exponent.
- * @param {number} fbits The number of bits of the fraction.
- * @param {number} sign The sign.
- * @param {number} exp the exponent.
- * @param {number} fraction The fraction.
- * @return {number}
- * @private
- */
-function packFloatBits_(buffer, index, ebits, fbits, sign, exp, fraction) {
-  /** @type {!Array<number>} */
-  let bits = [];
-  // the sign
-  bits.push(sign);
-  // the exponent
-  for (let i = ebits; i > 0; i -= 1) {
-    bits[i] = (exp % 2 ? 1 : 0);
-    exp = Math.floor(exp / 2);
-  }
-  // the fraction
-  let len = bits.length;
-  for (let i = fbits; i > 0; i -= 1) {
-    bits[len + i] = (fraction % 2 ? 1 : 0);
-    fraction = Math.floor(fraction / 2);
-  }
-  // pack as bytes
-  /** @type {string} */
-  let str = bits.join('');
-  /** @type {number} */
-  let numBytes = Math.floor((ebits + fbits + 1) / 8) + index - 1;
-  /** @type {number} */
-  let k = index;
-  while (numBytes >= index) {
-    buffer[numBytes] = parseInt(str.substring(0, 8), 2);
-    str = str.substring(8);
-    numBytes--;
-    k++;
-  }
-  return k;
-}
-
-function roundToEven(n) {
-  var w = Math.floor(n), f = n - w;
-  if (f < 0.5) {
-    return w;
-  }
-  if (f > 0.5) {
-    return w + 1;
-  }
-  return w % 2 ? w + 1 : w;
-}
-
-/*
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -1741,111 +1630,68 @@ function roundToEven(n) {
 /**
  * A class to pack and unpack integers and floating-point numbers.
  * Signed integers are two's complement.
- * Floating point are IEEE 754 standard.
- * @extends {IntBuffer}
+ * Floating-point numbers are IEEE 754 standard.
  */
-class NumberBuffer extends IntBuffer {
+class NumberBuffer {
   
-  constructor(theType) {
-    validateType(theType);
-    theType.signed = theType.float ? false : theType.signed;
-    super(theType.bits, theType.signed);
-    this.offset = this.parser.bytes;
-    this.parser.bytes = this.parser.bits === 64 ? 4 : this.parser.bytes;
-    this.setReaderAndWriter_(theType);
-  }
-
   /**
-   * Read 1 16-bit float from bytes.
-   * @see https://stackoverflow.com/a/8796597
-   * @param {!Uint8Array|!Array<number>} bytes An array of bytes.
-   * @param {number=} i The index to read.
-   * @return {number}
-   * @private
+   * Read one number from a byte buffer.
+   * @param {number} bits The number of bits of the number.
+   * @param {boolean} fp Tue for floating-point numbers.
+   * @param {boolean} signed True for signed numbers.
+   * @throws {Error} If the type definition is not valid.
    */
-  read16F_(bytes, i=0) {
-    return unpack$1(bytes, i, 5, 11);
-  }
-
-  /**
-   * Read 1 32-bit float from bytes using a TypedArray.
-   * @param {!Uint8Array|!Array<number>} bytes An array of bytes.
-   * @param {number=} i The index to read.
-   * @return {number}
-   * @private
-   */
-  read32F_(bytes, i=0) {
-    return unpack$1(bytes, i, 8, 23);
-  }
-
-  /**
-   * Read 1 64-bit float from bytes using a TypedArray.
-   * Thanks https://gist.github.com/kg/2192799
-   * @param {!Uint8Array|!Array<number>} bytes An array of bytes.
-   * @param {number=} i The index to read.
-   * @return {number}
-   * @private
-   */
-  read64F_(bytes, i=0) {
-    return unpack$1(bytes, i, 11, 52);
-  }
-
-  /**
-   * Write one 16-bit float as a binary value.
-   * @param {!Uint8Array|!Array<number>} bytes An array of bytes.
-   * @param {number} num The number to write as bytes.
-   * @param {number=} j The index being written in the byte buffer.
-   * @return {number} The next index to write on the byte buffer.
-   * @private
-   */
-  write16F_(bytes, num, j=0) {
-    return pack$1(bytes, j, num, 5, 11);
-  }
-
-  /**
-   * Write one 32-bit float as a binary value using a TypedArray.
-   * @param {!Uint8Array|!Array<number>} bytes An array of bytes.
-   * @param {number} num The number to write as bytes.
-   * @param {number=} j The index being written in the byte buffer.
-   * @return {number} The next index to write on the byte buffer.
-   * @private
-   */
-  write32F_(bytes, num, j=0) {
-      return pack$1(bytes, j, num, 8, 23);
-  }
-
-  /**
-   * Write one 64-bit float as a binary value using a TypedArray.
-   * @param {!Uint8Array|!Array<number>} bytes An array of bytes.
-   * @param {number} num The number to write as bytes.
-   * @param {number=} j The index being written in the byte buffer.
-   * @return {number} The next index to write on the byte buffer.
-   * @private
-   */
-  write64F_(bytes, num, j=0) {
-      return pack$1(bytes, j, num, 11, 52);
-  }
-
-  /**
-   * Set the functions to pack and unpack numbers.
-   * @param {!Object} theType The type definition.
-   * @private
-   */
-  setReaderAndWriter_(theType) {
-    if (theType.float) {
-      if (theType.bits == 16) {
-        this.unpack = this.read16F_;
-        this.pack = this.write16F_;
-      } else if(theType.bits == 32) {
-        this.unpack = this.read32F_;
-        this.pack = this.write32F_;
-      } else {
-        this.unpack = this.read64F_;
-        this.pack = this.write64F_;
-      }
+  constructor(bits, fp, signed) {
+    /** @type {TwosComplementBuffer|UintBuffer|IEEE754Buffer} */
+    this.parser = null;
+    if (fp) {
+      validateFloatType(bits);
+      this.parser = this.getFPParser_(bits);
     } else {
-      this.unpack = super.unpack;
-      this.pack = super.pack;
+      validateIntType(bits);
+      this.parser = signed ?
+        new TwosComplementBuffer(bits) : new UintBuffer(bits);
+      this.parser.bytes = this.parser.bytes === 8 ? 4 : this.parser.bytes;
+    }
+  }
+
+  /**
+   * Read one number from a byte buffer.
+   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
+   * @param {number=} index The index to read.
+   * @return {number} The number.
+   * @throws {Error} On overflow.
+   */
+  unpack(buffer, index=0) {
+    return this.parser.unpack(buffer, index);
+  }
+
+  /**
+   * Write one number to a byte buffer.
+   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
+   * @param {number} num The number.
+   * @param {number=} index The index being written in the byte buffer.
+   * @return {number} The next index to write on the byte buffer.
+   * @throws {Error} If num is NaN.
+   * @throws {Error} On overflow.
+   */
+  pack(buffer, num, index=0) {
+    return this.parser.pack(buffer, num, index);
+  }
+
+  /**
+   * Return a instance of IEEE754Buffer.
+   * @param {number} bits The number of bits.
+   * @return {IEEE754Buffer}
+   * @private
+   */
+  getFPParser_(bits) {
+    if (bits === 16) {
+      return new IEEE754Buffer(5, 11);
+    } else if(bits === 32) {
+      return new IEEE754Buffer(8, 23);
+    } else {
+      return new IEEE754Buffer(11, 52);
     }
   }
 }
@@ -1878,22 +1724,22 @@ class NumberBuffer extends IntBuffer {
  * Read a string of UTF-8 characters from a byte buffer.
  * @param {!Uint8Array|!Array<number>} buffer A byte buffer.
  * @param {number=} index The buffer index to start reading.
- * @param {?number=} end The buffer index to stop reading.
- *   If end is null will read until the end of the buffer.
+ * @param {number=} end The buffer index to stop reading, non inclusive.
+ *   Assumes buffer length if undefined.
  * @return {string}
  */
-function unpackString(buffer, index=0, end=null) {
+function unpackString(buffer, index=0, end=buffer.length) {
   return unpack(buffer, index, end);
 }
 
 /**
  * Write a string of UTF-8 characters as a byte buffer.
  * @param {string} str The string to pack.
- * @return {!Uint8Array} The buffer with the packed string written.
+ * @return {!Array<number>} The UTF-8 string bytes.
  */ 
 function packString(str) {
-  /** @type {!Uint8Array} */
-  let buffer = new Uint8Array(utf8BufferSize(str));
+  /** @type {!Array<number>} */
+  let buffer = [];
   pack(str, buffer, 0);
   return buffer;
 }
@@ -1919,7 +1765,7 @@ function packStringTo(str, buffer, index=0) {
  * @throws {Error} If the type definition is not valid.
  * @throws {Error} If the value is not valid.
  */
-function pack$2(value, theType) {
+function pack$1(value, theType) {
   /** @type {!Array<number>} */
   let output = [];
   packTo(value, theType, output);
@@ -1952,20 +1798,28 @@ function packTo(value, theType, buffer, index=0) {
  * @throws {Error} If the value is not valid.
  */
 function packArrayTo(values, theType, buffer, index=0) {
+  theType = theType || {};
   /** @type {NumberBuffer} */
-  let packer = new NumberBuffer(theType);
-  let valuesLen = values.length;
-  for (let i = 0; i < valuesLen; i++) {
-    validateValueType(values[i]);
-    /** @type {number} */
-    let len = index + packer.offset;
-    while (index < len) {
-      index = packer.pack(buffer, values[i], index);
+  let packer = new NumberBuffer(
+    theType.bits, theType.fp, theType.signed);
+  /** @type {number} */
+  let offset = offset_(theType.bits);
+  /** @type {Function} */
+  let validateInput = theType.fp ? validateIsNumber : validateIsInt;
+  /** @type {number} */
+  let i = 0;
+  try {
+    for (let valuesLen = values.length; i < valuesLen; i++) {
+      validateInput(values[i]);
+      /** @type {number} */
+      let len = index + offset;
+      while (index < len) {
+        index = packer.pack(buffer, values[i], index);
+      }
+      swap_(theType.be, buffer, offset, index - offset, index);
     }
-    if (theType.be) {
-      endianness(
-        buffer, packer.offset, index - packer.offset, index);
-    }
+  } catch (e) {
+    throw new Error(e.message + ' at input index ' + i);
   }
   return index;
 }
@@ -1978,39 +1832,34 @@ function packArrayTo(values, theType, buffer, index=0) {
  * @return {number}
  * @throws {Error} If the type definition is not valid
  * @throws {Error} On bad buffer length.
+ * @throws {Error} On overflow
  */
-function unpack$2(buffer, theType, index=0) {
-  /** @type {NumberBuffer} */
-  let packer = new NumberBuffer(theType);
-  if ((packer.offset + index) > buffer.length) {
-    throw Error('Bad buffer length');
-  }
-  if (theType.be) {
-    endianness(buffer, packer.offset, index, index + packer.offset);
-  }
-  /** @type {number} */
-  let value = packer.unpack(buffer, index);
-  if (theType.be) {
-    endianness(buffer, packer.offset, index, index + packer.offset);
-  }
-  return value;
+function unpack$1(buffer, theType, index=0) {
+  return unpackArray(
+    buffer, theType, index, index + offset_(theType.bits), true)[0];
 }
 
 /**
  * Unpack an array of numbers from a byte buffer.
  * @param {!Uint8Array|!Array<number>} buffer The byte buffer.
  * @param {!Object} theType The type definition.
- * @param {number=} index The buffer index to start reading.
+ * @param {number=} start The buffer index to start reading.
  *   Assumes zero if undefined.
  * @param {number=} end The buffer index to stop reading.
  *   Assumes the buffer length if undefined.
+ * @param {boolean=} safe If set to false, extra bytes in the end of
+ *   the array are ignored and input buffers with insufficient bytes will
+ *   output a empty array. If safe is set to true the function
+ *   will throw a 'Bad buffer length' error. Defaults to false.
  * @return {!Array<number>}
  * @throws {Error} If the type definition is not valid
+ * @throws {Error} On overflow
  */
-function unpackArray(buffer, theType, index=0, end=buffer.length) {
+function unpackArray(
+    buffer, theType, start=0, end=buffer.length, safe=false) {
   /** @type {!Array<number>} */
   let output = [];
-  unpackArrayTo(buffer, theType, output, index, end);
+  unpackArrayTo(buffer, theType, output, start, end, safe);
   return output;
 }
 
@@ -2019,31 +1868,67 @@ function unpackArray(buffer, theType, index=0, end=buffer.length) {
  * @param {!Uint8Array|!Array<number>} buffer The byte buffer.
  * @param {!Object} theType The type definition.
  * @param {!TypedArray|!Array<number>} output The output array.
- * @param {number=} index The buffer index to start reading.
+ * @param {number=} start The buffer index to start reading.
  *   Assumes zero if undefined.
  * @param {number=} end The buffer index to stop reading.
  *   Assumes the buffer length if undefined.
+ * @param {boolean=} safe If set to false, extra bytes in the end of
+ *   the array are ignored and input buffers with insufficient bytes will
+ *   write nothing to the output array. If safe is set to true the function
+ *   will throw a 'Bad buffer length' error. Defaults to false.
  * @throws {Error} If the type definition is not valid
+ * @throws {Error} On overflow
  */
 function unpackArrayTo(
-    buffer, theType, output, index=0, end=buffer.length) {
+    buffer, theType, output, start=0, end=buffer.length, safe=false) {
+  theType = theType || {};
   /** @type {NumberBuffer} */
-  let packer = new NumberBuffer(theType);
+  let packer = new NumberBuffer(
+    theType.bits, theType.fp, theType.signed);
   /** @type {number} */
-  let originalIndex = index;
-  while ((end - index) % packer.offset) {
-      end--;
+  let offset = offset_(theType.bits);
+  /** @type {number} */
+  let extra = (end - start) % offset;
+  if (safe && (extra || buffer.length < offset)) {
+    throw new Error('Bad buffer length');
   }
-  if (theType.be) {
-    endianness(buffer, packer.offset, index, end);
+  end -= extra;
+  /** @type {number} */
+  let i = 0;
+  try {
+    swap_(theType.be, buffer, offset, start, end);
+    for (let j = start; j < end; j += offset, i++) {
+      output[i] = packer.unpack(buffer, j);
+    }
+    swap_(theType.be, buffer, offset, start, end);
+  } catch (e) {
+    throw new Error(e.message + ' at output index ' + i);
   }
-  for (let i = 0; index < end; index += packer.offset) {
-    output[i] = packer.unpack(buffer, index);
-    i++;
+}
+
+/**
+ * Swap endianness in a slice of an array when flip == true.
+ * @param {boolean} flip True if should swap endianness.
+ * @param {!Uint8Array|!Array<number>} buffer The buffer.
+ * @param {number} offset The number of bytes each value use.
+ * @param {number} start The buffer index to start the swap.
+ * @param {number} end The buffer index to end the swap.
+ * @throws {Error} On bad buffer length for the swap.
+ * @private
+ */
+function swap_(flip, buffer, offset, start, end) {
+  if (flip) {
+    endianness(buffer, offset, start, end);
   }
-  if (theType.be) {
-    endianness(buffer, packer.offset, originalIndex, end);
-  }
+}
+
+/**
+ * Get the byte offset of a type based on its number of bits.
+ * @param {number} bits The number of bits.
+ * @private
+ */
+function offset_(bits) {
+  return bits < 8 ? 1 : Math.ceil(bits / 8);
 }
 
 /*
@@ -2423,7 +2308,7 @@ class BufferIO {
    */
   writeString_(str, maxSize, push=true) {
     /** @type {!Array<number>} */   
-    let bytes = Array.prototype.slice.call(packString(str));
+    let bytes = packString(str);
     if (push) {
       for (let i=bytes.length; i<maxSize; i++) {
         bytes.push(0);
@@ -2441,12 +2326,12 @@ class BufferIO {
   readZSTR_(bytes, index=0) {
     /** @type {string} */
     let str = '';
-    for (let i=index; i<bytes.length; i++) {
+    for (let i = index; i < bytes.length; i++) {
       this.head_++;
       if (bytes[i] === 0) {
         break;
       }
-      str += unpackString(bytes, i, i);
+      str += unpackString(bytes, i, i + 1);
     }
     return str;
   }
@@ -2461,7 +2346,7 @@ class BufferIO {
   readString_(bytes, maxSize) {
     /** @type {string} */
     let str = '';
-    str = unpackString(bytes, this.head_, this.head_ + maxSize - 1);
+    str = unpackString(bytes, this.head_, this.head_ + maxSize);
     this.head_ += maxSize;
     return str;
   }
@@ -2477,7 +2362,7 @@ class BufferIO {
     /** @type {number} */
     let size = bdType.bits / 8;
     /** @type {number} */
-    let value = unpack$2(bytes, bdType, this.head_);
+    let value = unpack$1(bytes, bdType, this.head_);
     this.head_ += size;
     return value;
   }
@@ -2528,8 +2413,8 @@ function writeWavBuffer(wav) {
     getBextBytes_(wav, uInt32_, uInt16_),
     getFmtBytes_(wav, uInt32_, uInt16_),
     getFactBytes_(wav, uInt32_),
-    Array.prototype.slice.call(packString(wav.data.chunkId)),
-    pack$2(wav.data.samples.length, uInt32_),
+    packString(wav.data.chunkId),
+    pack$1(wav.data.samples.length, uInt32_),
     wav.data.samples,
     getCueBytes_(wav, uInt32_),
     getSmplBytes_(wav, uInt32_),
@@ -2567,22 +2452,22 @@ function getBextBytes_(wav, uInt32_, uInt16_) {
   if (wav.bext.chunkId) {
     wav.bext.chunkSize = 602 + wav.bext.codingHistory.length;
     bytes = bytes.concat(
-      Array.prototype.slice.call(packString(wav.bext.chunkId)),
-      pack$2(602 + wav.bext.codingHistory.length, uInt32_),
+      packString(wav.bext.chunkId),
+      pack$1(602 + wav.bext.codingHistory.length, uInt32_),
       io.writeString_(wav.bext.description, 256),
       io.writeString_(wav.bext.originator, 32),
       io.writeString_(wav.bext.originatorReference, 32),
       io.writeString_(wav.bext.originationDate, 10),
       io.writeString_(wav.bext.originationTime, 8),
-      pack$2(wav.bext.timeReference[0], uInt32_),
-      pack$2(wav.bext.timeReference[1], uInt32_),
-      pack$2(wav.bext.version, uInt16_),
-      Array.prototype.slice.call(io.writeString_(wav.bext.UMID, 64)),
-      pack$2(wav.bext.loudnessValue, uInt16_),
-      pack$2(wav.bext.loudnessRange, uInt16_),
-      pack$2(wav.bext.maxTruePeakLevel, uInt16_),
-      pack$2(wav.bext.maxMomentaryLoudness, uInt16_),
-      pack$2(wav.bext.maxShortTermLoudness, uInt16_),
+      pack$1(wav.bext.timeReference[0], uInt32_),
+      pack$1(wav.bext.timeReference[1], uInt32_),
+      pack$1(wav.bext.version, uInt16_),
+      io.writeString_(wav.bext.UMID, 64),
+      pack$1(wav.bext.loudnessValue, uInt16_),
+      pack$1(wav.bext.loudnessRange, uInt16_),
+      pack$1(wav.bext.maxTruePeakLevel, uInt16_),
+      pack$1(wav.bext.maxMomentaryLoudness, uInt16_),
+      pack$1(wav.bext.maxShortTermLoudness, uInt16_),
       io.writeString_(wav.bext.reserved, 180),
       io.writeString_(
         wav.bext.codingHistory, wav.bext.codingHistory.length));
@@ -2620,15 +2505,15 @@ function getDs64Bytes_(wav, uInt32_) {
   let bytes = [];
   if (wav.ds64.chunkId) {
     bytes = bytes.concat(
-      Array.prototype.slice.call(packString(wav.ds64.chunkId)),
-      pack$2(wav.ds64.chunkSize, uInt32_),
-      pack$2(wav.ds64.riffSizeHigh, uInt32_),
-      pack$2(wav.ds64.riffSizeLow, uInt32_),
-      pack$2(wav.ds64.dataSizeHigh, uInt32_),
-      pack$2(wav.ds64.dataSizeLow, uInt32_),
-      pack$2(wav.ds64.originationTime, uInt32_),
-      pack$2(wav.ds64.sampleCountHigh, uInt32_),
-      pack$2(wav.ds64.sampleCountLow, uInt32_));
+      packString(wav.ds64.chunkId),
+      pack$1(wav.ds64.chunkSize, uInt32_),
+      pack$1(wav.ds64.riffSizeHigh, uInt32_),
+      pack$1(wav.ds64.riffSizeLow, uInt32_),
+      pack$1(wav.ds64.dataSizeHigh, uInt32_),
+      pack$1(wav.ds64.dataSizeLow, uInt32_),
+      pack$1(wav.ds64.originationTime, uInt32_),
+      pack$1(wav.ds64.sampleCountHigh, uInt32_),
+      pack$1(wav.ds64.sampleCountLow, uInt32_));
   }
   //if (this.ds64.tableLength) {
   //  ds64Bytes = ds64Bytes.concat(
@@ -2651,9 +2536,9 @@ function getCueBytes_(wav, uInt32_) {
     /** @type {!Array<number>} */
     let cuePointsBytes = getCuePointsBytes_(wav, uInt32_);
     bytes = bytes.concat(
-      Array.prototype.slice.call(packString(wav.cue.chunkId)),
-      pack$2(cuePointsBytes.length + 4, uInt32_),
-      pack$2(wav.cue.dwCuePoints, uInt32_),
+      packString(wav.cue.chunkId),
+      pack$1(cuePointsBytes.length + 4, uInt32_),
+      pack$1(wav.cue.dwCuePoints, uInt32_),
       cuePointsBytes);
   }
   return bytes;
@@ -2670,12 +2555,12 @@ function getCuePointsBytes_(wav, uInt32_) {
   let points = [];
   for (let i=0; i<wav.cue.dwCuePoints; i++) {
     points = points.concat(
-      pack$2(wav.cue.points[i].dwName, uInt32_),
-      pack$2(wav.cue.points[i].dwPosition, uInt32_),
-      Array.prototype.slice.call(packString(wav.cue.points[i].fccChunk)),
-      pack$2(wav.cue.points[i].dwChunkStart, uInt32_),
-      pack$2(wav.cue.points[i].dwBlockStart, uInt32_),
-      pack$2(wav.cue.points[i].dwSampleOffset, uInt32_));
+      pack$1(wav.cue.points[i].dwName, uInt32_),
+      pack$1(wav.cue.points[i].dwPosition, uInt32_),
+      packString(wav.cue.points[i].fccChunk),
+      pack$1(wav.cue.points[i].dwChunkStart, uInt32_),
+      pack$1(wav.cue.points[i].dwBlockStart, uInt32_),
+      pack$1(wav.cue.points[i].dwSampleOffset, uInt32_));
   }
   return points;
 }
@@ -2693,17 +2578,17 @@ function getSmplBytes_(wav, uInt32_) {
     /** @type {!Array<number>} */
     let smplLoopsBytes = getSmplLoopsBytes_(wav, uInt32_);
     bytes = bytes.concat(
-      Array.prototype.slice.call(packString(wav.smpl.chunkId)),
-      pack$2(smplLoopsBytes.length + 36, uInt32_),
-      pack$2(wav.smpl.dwManufacturer, uInt32_),
-      pack$2(wav.smpl.dwProduct, uInt32_),
-      pack$2(wav.smpl.dwSamplePeriod, uInt32_),
-      pack$2(wav.smpl.dwMIDIUnityNote, uInt32_),
-      pack$2(wav.smpl.dwMIDIPitchFraction, uInt32_),
-      pack$2(wav.smpl.dwSMPTEFormat, uInt32_),
-      pack$2(wav.smpl.dwSMPTEOffset, uInt32_),
-      pack$2(wav.smpl.dwNumSampleLoops, uInt32_),
-      pack$2(wav.smpl.dwSamplerData, uInt32_),
+      packString(wav.smpl.chunkId),
+      pack$1(smplLoopsBytes.length + 36, uInt32_),
+      pack$1(wav.smpl.dwManufacturer, uInt32_),
+      pack$1(wav.smpl.dwProduct, uInt32_),
+      pack$1(wav.smpl.dwSamplePeriod, uInt32_),
+      pack$1(wav.smpl.dwMIDIUnityNote, uInt32_),
+      pack$1(wav.smpl.dwMIDIPitchFraction, uInt32_),
+      pack$1(wav.smpl.dwSMPTEFormat, uInt32_),
+      pack$1(wav.smpl.dwSMPTEOffset, uInt32_),
+      pack$1(wav.smpl.dwNumSampleLoops, uInt32_),
+      pack$1(wav.smpl.dwSamplerData, uInt32_),
       smplLoopsBytes);
   }
   return bytes;
@@ -2720,12 +2605,12 @@ function getSmplLoopsBytes_(wav, uInt32_) {
   let loops = [];
   for (let i=0; i<wav.smpl.dwNumSampleLoops; i++) {
     loops = loops.concat(
-      pack$2(wav.smpl.loops[i].dwName, uInt32_),
-      pack$2(wav.smpl.loops[i].dwType, uInt32_),
-      pack$2(wav.smpl.loops[i].dwStart, uInt32_),
-      pack$2(wav.smpl.loops[i].dwEnd, uInt32_),
-      pack$2(wav.smpl.loops[i].dwFraction, uInt32_),
-      pack$2(wav.smpl.loops[i].dwPlayCount, uInt32_));
+      pack$1(wav.smpl.loops[i].dwName, uInt32_),
+      pack$1(wav.smpl.loops[i].dwType, uInt32_),
+      pack$1(wav.smpl.loops[i].dwStart, uInt32_),
+      pack$1(wav.smpl.loops[i].dwEnd, uInt32_),
+      pack$1(wav.smpl.loops[i].dwFraction, uInt32_),
+      pack$1(wav.smpl.loops[i].dwPlayCount, uInt32_));
   }
   return loops;
 }
@@ -2741,9 +2626,9 @@ function getFactBytes_(wav, uInt32_) {
   let bytes = [];
   if (wav.fact.chunkId) {
     bytes = bytes.concat(
-      Array.prototype.slice.call(packString(wav.fact.chunkId)),
-      pack$2(wav.fact.chunkSize, uInt32_),
-      pack$2(wav.fact.dwSampleLength, uInt32_));
+      packString(wav.fact.chunkId),
+      pack$1(wav.fact.chunkSize, uInt32_),
+      pack$1(wav.fact.dwSampleLength, uInt32_));
   }
   return bytes;
 }
@@ -2760,14 +2645,14 @@ function getFmtBytes_(wav, uInt32_, uInt16_) {
   let fmtBytes = [];
   if (wav.fmt.chunkId) {
     return fmtBytes.concat(
-      Array.prototype.slice.call(packString(wav.fmt.chunkId)),
-      pack$2(wav.fmt.chunkSize, uInt32_),
-      pack$2(wav.fmt.audioFormat, uInt16_),
-      pack$2(wav.fmt.numChannels, uInt16_),
-      pack$2(wav.fmt.sampleRate, uInt32_),
-      pack$2(wav.fmt.byteRate, uInt32_),
-      pack$2(wav.fmt.blockAlign, uInt16_),
-      pack$2(wav.fmt.bitsPerSample, uInt16_),
+      packString(wav.fmt.chunkId),
+      pack$1(wav.fmt.chunkSize, uInt32_),
+      pack$1(wav.fmt.audioFormat, uInt16_),
+      pack$1(wav.fmt.numChannels, uInt16_),
+      pack$1(wav.fmt.sampleRate, uInt32_),
+      pack$1(wav.fmt.byteRate, uInt32_),
+      pack$1(wav.fmt.blockAlign, uInt16_),
+      pack$1(wav.fmt.bitsPerSample, uInt16_),
       getFmtExtensionBytes_(wav, uInt32_, uInt16_));
   }
   throw Error('Could not find the "fmt " chunk');
@@ -2784,22 +2669,22 @@ function getFmtExtensionBytes_(wav, uInt32_, uInt16_) {
   let extension = [];
   if (wav.fmt.chunkSize > 16) {
     extension = extension.concat(
-      pack$2(wav.fmt.cbSize, uInt16_));
+      pack$1(wav.fmt.cbSize, uInt16_));
   }
   if (wav.fmt.chunkSize > 18) {
     extension = extension.concat(
-      pack$2(wav.fmt.validBitsPerSample, uInt16_));
+      pack$1(wav.fmt.validBitsPerSample, uInt16_));
   }
   if (wav.fmt.chunkSize > 20) {
     extension = extension.concat(
-      pack$2(wav.fmt.dwChannelMask, uInt32_));
+      pack$1(wav.fmt.dwChannelMask, uInt32_));
   }
   if (wav.fmt.chunkSize > 24) {
     extension = extension.concat(
-      pack$2(wav.fmt.subformat[0], uInt32_),
-      pack$2(wav.fmt.subformat[1], uInt32_),
-      pack$2(wav.fmt.subformat[2], uInt32_),
-      pack$2(wav.fmt.subformat[3], uInt32_));
+      pack$1(wav.fmt.subformat[0], uInt32_),
+      pack$1(wav.fmt.subformat[1], uInt32_),
+      pack$1(wav.fmt.subformat[2], uInt32_),
+      pack$1(wav.fmt.subformat[3], uInt32_));
   }
   return extension;
 }
@@ -2817,9 +2702,9 @@ function getLISTBytes_(wav, uInt32_, uInt16_) {
     let subChunksBytes = getLISTSubChunksBytes_(
         wav.LIST[i].subChunks, wav.LIST[i].format, wav, uInt32_, uInt16_);
     bytes = bytes.concat(
-      Array.prototype.slice.call(packString(wav.LIST[i].chunkId)),
-      pack$2(subChunksBytes.length + 4, uInt32_),
-      Array.prototype.slice.call(packString(wav.LIST[i].format)),
+      packString(wav.LIST[i].chunkId),
+      pack$1(subChunksBytes.length + 4, uInt32_),
+      packString(wav.LIST[i].format),
       subChunksBytes);
   }
   return bytes;
@@ -2840,18 +2725,18 @@ function getLISTSubChunksBytes_(subChunks, format, wav, uInt32_, uInt16_) {
   for (let i=0; i<subChunks.length; i++) {
     if (format == 'INFO') {
       bytes = bytes.concat(
-        Array.prototype.slice.call(packString(subChunks[i].chunkId)),
-        pack$2(subChunks[i].value.length + 1, uInt32_),
+        packString(subChunks[i].chunkId),
+        pack$1(subChunks[i].value.length + 1, uInt32_),
         io.writeString_(
           subChunks[i].value, subChunks[i].value.length));
       bytes.push(0);
     } else if (format == 'adtl') {
       if (['labl', 'note'].indexOf(subChunks[i].chunkId) > -1) {
         bytes = bytes.concat(
-          Array.prototype.slice.call(packString(subChunks[i].chunkId)),
-          pack$2(
+          packString(subChunks[i].chunkId),
+          pack$1(
             subChunks[i].value.length + 4 + 1, uInt32_),
-          pack$2(subChunks[i].dwName, uInt32_),
+          pack$1(subChunks[i].dwName, uInt32_),
           io.writeString_(
             subChunks[i].value,
             subChunks[i].value.length));
@@ -2877,15 +2762,15 @@ function getLISTSubChunksBytes_(subChunks, format, wav, uInt32_, uInt16_) {
  */
 function getLtxtChunkBytes_(ltxt, wav, uInt32_, uInt16_) {
   return [].concat(
-    Array.prototype.slice.call(packString(ltxt.chunkId)),
-    pack$2(ltxt.value.length + 20, uInt32_),
-    pack$2(ltxt.dwName, uInt32_),
-    pack$2(ltxt.dwSampleLength, uInt32_),
-    pack$2(ltxt.dwPurposeID, uInt32_),
-    pack$2(ltxt.dwCountry, uInt16_),
-    pack$2(ltxt.dwLanguage, uInt16_),
-    pack$2(ltxt.dwDialect, uInt16_),
-    pack$2(ltxt.dwCodePage, uInt16_),
+    packString(ltxt.chunkId),
+    pack$1(ltxt.value.length + 20, uInt32_),
+    pack$1(ltxt.dwName, uInt32_),
+    pack$1(ltxt.dwSampleLength, uInt32_),
+    pack$1(ltxt.dwPurposeID, uInt32_),
+    pack$1(ltxt.dwCountry, uInt16_),
+    pack$1(ltxt.dwLanguage, uInt16_),
+    pack$1(ltxt.dwDialect, uInt16_),
+    pack$1(ltxt.dwCodePage, uInt16_),
     io.writeString_(ltxt.value, ltxt.value.length));
 }
 
@@ -2900,8 +2785,8 @@ function getJunkBytes_(wav, uInt32_) {
   let bytes = [];
   if (wav.junk.chunkId) {
     return bytes.concat(
-      Array.prototype.slice.call(packString(wav.junk.chunkId)),
-      pack$2(wav.junk.chunkData.length, uInt32_),
+      packString(wav.junk.chunkId),
+      pack$1(wav.junk.chunkData.length, uInt32_),
       wav.junk.chunkData);
   }
   return bytes;
@@ -2945,7 +2830,7 @@ function riffChunks(buffer) {
     head_ = 0;
     let chunkId = getChunkId_(buffer, 0);
     uInt32_.be = chunkId == 'RIFX';
-    let format = unpackString(buffer, 8, 11);
+    let format = unpackString(buffer, 8, 12);
     head_ += 4;
     return {
         chunkId: chunkId,
@@ -3011,7 +2896,7 @@ function getSubChunkIndex_(buffer, index) {
         chunkSize: getChunkSize_(buffer, index),
     };
     if (chunk.chunkId == 'LIST') {
-        chunk.format = unpackString(buffer, index + 8, index + 11);
+        chunk.format = unpackString(buffer, index + 8, index + 12);
         head_ += 4;
         chunk.subChunks = getSubChunksIndex_(buffer);
     } else {
@@ -3035,7 +2920,7 @@ function getSubChunkIndex_(buffer, index) {
  */
 function getChunkId_(buffer, index) {
     head_ += 4;
-    return unpackString(buffer, index, index + 3);
+    return unpackString(buffer, index, index + 4);
 }
 
 /**
@@ -3047,7 +2932,7 @@ function getChunkId_(buffer, index) {
  */
 function getChunkSize_(buffer, index) {
     head_ += 4;
-    return unpack$2(buffer, uInt32_, index + 4);
+    return unpack$1(buffer, uInt32_, index + 4);
 }
 
 /*
@@ -3764,7 +3649,7 @@ class WaveFile extends WavBuffer {
     if (index + this.dataType.bits / 8 > this.data.samples.length) {
       throw new Error('Range error');
     }
-    return unpack$2(
+    return unpack$1(
       this.data.samples.slice(index, index + this.dataType.bits / 8),
       this.dataType);
   }
@@ -4512,7 +4397,7 @@ class WaveFile extends WavBuffer {
     /** @type {!Object} */
     this.dataType = {
       bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      float: this.bitDepth == '32f' || this.bitDepth == '64',
+      fp: this.bitDepth == '32f' || this.bitDepth == '64',
       signed: this.bitDepth != '8',
       be: this.container == 'RIFX'
     };

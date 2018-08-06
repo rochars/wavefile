@@ -833,7 +833,7 @@ export default class WaveFile extends WavBuffer {
     /** @type {!Object} */
     this.dataType = {
       bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      float: this.bitDepth == '32f' || this.bitDepth == '64',
+      fp: this.bitDepth == '32f' || this.bitDepth == '64',
       signed: this.bitDepth != '8',
       be: this.container == 'RIFX'
     };
