@@ -125,7 +125,7 @@ declare class WaveFile {
         numChannels: number,
         sampleRate: number,
         bitDepthCode: string,
-        samples: Array<number>,
+        samples: any,
         options?: object): void;
 
     /**
