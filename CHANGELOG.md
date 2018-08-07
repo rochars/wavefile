@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 8.4.3 (unreleased)
+## version 8.4.3 (2018-08-07)
 - Fix: Stop adding a extra sample when changing the bit depth
 - Fix: Add padding byte if sample buffer lenght is odd
 
