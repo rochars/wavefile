@@ -10,6 +10,14 @@
 import WaveFile from '../../index.js'
 
 let wav = new WaveFile();
+wav.fromScratch(1, 8000, "32", new Uint32Array([0]));
+wav.fromScratch(1, 8000, "32", new Float64Array([0]));
 wav.fromScratch(1, 8000, "32", [0]);
+wav.fromScratch(1, 8000, "32", [[0],[0]]);
+
+try {
+	wav.fromBuffer(new Uint8Array([0]));
+} catch (e) {
+}
 
 console.log(wav);
