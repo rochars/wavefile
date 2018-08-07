@@ -1,6 +1,29 @@
-/**
- * @fileoverview Externs for wavefile 9.0
+/*
+ * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview Externs for wavefile 8.4
  * @see https://github.com/rochars/wavefile
  * @externs
  */
@@ -13,22 +36,22 @@ var WaveFile = {};
  * RIFF, RIFX and RF64 are supported.
  * @type {string}
  */
-WaveFile.container = '';
+WaveFile.prototype.container = '';
 /**
  * @type {number}
  */
-WaveFile.chunkSize = 0;
+WaveFile.prototype.chunkSize = 0;
 /**
  * The format.
  * Always WAVE.
  * @type {string}
  */
-WaveFile.format = '';
+WaveFile.prototype.format = '';
 /**
  * The data of the fmt chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.fmt = {
+WaveFile.prototype.fmt = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -61,7 +84,7 @@ WaveFile.fmt = {
  * The data of the fact chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.fact = {
+WaveFile.prototype.fact = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -73,7 +96,7 @@ WaveFile.fact = {
  * The data of the cue  chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.cue = {
+WaveFile.prototype.cue = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -95,7 +118,7 @@ WaveFile.cue = {
  * The data of the smpl chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.smpl = {
+WaveFile.prototype.smpl = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -134,7 +157,7 @@ WaveFile.smpl = {
  * The data of the bext chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.bext = {
+WaveFile.prototype.bext = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -178,7 +201,7 @@ WaveFile.bext = {
  * Used only with RF64 files.
  * @type {!Object<string, *>}
  */
-WaveFile.ds64 = {
+WaveFile.prototype.ds64 = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -202,7 +225,7 @@ WaveFile.ds64 = {
  * The data of the data chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.data = {
+WaveFile.prototype.data = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -214,7 +237,7 @@ WaveFile.data = {
  * The data of the LIST chunks.
  * @type {!Array<!Object>}
  */
-WaveFile.LIST = [
+WaveFile.prototype.LIST = [
   {
     chunkId: '',
     chunkSize: 0,
@@ -252,7 +275,7 @@ WaveFile.LIST = [
  * The data of the junk chunk.
  * @type {!Object<string, *>}
  */
-WaveFile.junk = {
+WaveFile.prototype.junk = {
   /** @type {string} */
   chunkId: '',
   /** @type {number} */
@@ -264,7 +287,7 @@ WaveFile.junk = {
  * The bit depth code according to the samples.
  * @type {string}
  */
-WaveFile.bitDepth = '';
+WaveFile.prototype.bitDepth = '';
 
 /**
  * Return the sample at a given index.
@@ -272,7 +295,7 @@ WaveFile.bitDepth = '';
  * @return {number} The sample.
  * @throws {Error} If the sample index is off range.
  */
-WaveFile.getSample = function(index) {};
+WaveFile.prototype.getSample = function(index) {};
 
 /**
  * Set the sample at a given index.
@@ -280,7 +303,7 @@ WaveFile.getSample = function(index) {};
  * @param {number} sample The sample.
  * @throws {Error} If the sample index is off range.
  */
-WaveFile.setSample = function(index, sample) {};
+WaveFile.prototype.setSample = function(index, sample) {};
 
 /**
  * Set up the WaveFile object based on the arguments passed.
@@ -298,8 +321,9 @@ WaveFile.setSample = function(index, sample) {};
  *      as RIFX with {container: RIFX}
  * @throws {Error} If any argument does not meet the criteria.
  */
-WaveFile.fromScratch = function(
-  numChannels, sampleRate, bitDepthCode, samples, options={container:'RIFF'}) {};
+WaveFile.prototype.fromScratch = function(
+  numChannels, sampleRate, bitDepthCode, samples, options={
+    container:'RIFF'}) {};
 
 /**
  * Set up the WaveFile object from a byte buffer.
@@ -309,7 +333,7 @@ WaveFile.fromScratch = function(
  * @throws {Error} If no fmt  chunk is found.
  * @throws {Error} If no data chunk is found.
  */
-WaveFile.fromBuffer = function(bytes, samples=true) {};
+WaveFile.prototype.fromBuffer = function(bytes, samples=true) {};
 
 /**
  * Return a byte buffer representig the WaveFile object as a .wav file.
@@ -317,21 +341,21 @@ WaveFile.fromBuffer = function(bytes, samples=true) {};
  * @return {!Uint8Array} A .wav file.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.toBuffer = function() {};
+WaveFile.prototype.toBuffer = function() {};
 
 /**
  * Use a .wav file encoded as a base64 string to load the WaveFile object.
  * @param {string} base64String A .wav file as a base64 string.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.fromBase64 = function(base64String) {};
+WaveFile.prototype.fromBase64 = function(base64String) {};
 
 /**
  * Return a base64 string representig the WaveFile object as a .wav file.
  * @return {string} A .wav file as a base64 string.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.toBase64 = function() {};
+WaveFile.prototype.toBase64 = function() {};
 
 /**
  * Return a DataURI string representig the WaveFile object as a .wav file.
@@ -339,24 +363,24 @@ WaveFile.toBase64 = function() {};
  * @return {string} A .wav file as a DataURI.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.toDataURI = function() {};
+WaveFile.prototype.toDataURI = function() {};
 
 /**
  * Use a .wav file encoded as a DataURI to load the WaveFile object.
  * @param {string} dataURI A .wav file as DataURI.
  * @throws {Error} If any property of the object appears invalid.
  */
-WaveFile.fromDataURI = function(dataURI) {};
+WaveFile.prototype.fromDataURI = function(dataURI) {};
 
 /**
  * Force a file as RIFF.
  */
-WaveFile.toRIFF = function() {};
+WaveFile.prototype.toRIFF = function() {};
 
 /**
  * Force a file as RIFX.
  */
-WaveFile.toRIFX = function() {};
+WaveFile.prototype.toRIFX = function() {};
 
 /**
  * Change the bit depth of the samples.
@@ -366,14 +390,14 @@ WaveFile.toRIFX = function() {};
  *      resolution of samples should be actually changed or not.
  * @throws {Error} If the bit depth is not valid.
  */
-WaveFile.toBitDepth = function(newBitDepth, changeResolution=true) {};
+WaveFile.prototype.toBitDepth = function(newBitDepth, changeResolution=true) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.
  * @throws {Error} If sample rate is not 8000.
  * @throws {Error} If number of channels is not 1.
  */
-WaveFile.toIMAADPCM = function() {};
+WaveFile.prototype.toIMAADPCM = function() {};
 
 /**
  * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
@@ -381,12 +405,12 @@ WaveFile.toIMAADPCM = function() {};
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromIMAADPCM = function(bitDepthCode='16') {};
+WaveFile.prototype.fromIMAADPCM = function(bitDepthCode='16') {};
 
 /**
  * Encode 16-bit wave file as 8-bit A-Law.
  */
-WaveFile.toALaw = function() {};
+WaveFile.prototype.toALaw = function() {};
 
 /**
  * Decode a 8-bit A-Law wave file into a 16-bit wave file.
@@ -394,12 +418,12 @@ WaveFile.toALaw = function() {};
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromALaw = function(bitDepthCode='16') {};
+WaveFile.prototype.fromALaw = function(bitDepthCode='16') {};
 
 /**
  * Encode 16-bit wave file as 8-bit mu-Law.
  */
-WaveFile.toMuLaw = function() {};
+WaveFile.prototype.toMuLaw = function() {};
 
 /**
  * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
@@ -407,7 +431,7 @@ WaveFile.toMuLaw = function() {};
  *      One of 8 ... 32 (integers), 32f or 64 (floats).
  *      Optional. Default is 16.
  */
-WaveFile.fromMuLaw = function(bitDepthCode='16') {};
+WaveFile.prototype.fromMuLaw = function(bitDepthCode='16') {};
 
 /**
  * Write a RIFF tag in the INFO chunk. If the tag do not exist,
@@ -416,48 +440,48 @@ WaveFile.fromMuLaw = function(bitDepthCode='16') {};
  * @param {string} value The tag value.
  * @throws {Error} If the tag name is not valid.
  */
-WaveFile.setTag = function(tag, value) {};
+WaveFile.prototype.setTag = function(tag, value) {};
 
 /**
  * Return the value of a RIFF tag in the INFO chunk.
  * @param {string} tag The tag name.
  * @return {?string} The value if the tag is found, null otherwise.
  */
-WaveFile.getTag = function(tag) {};
+WaveFile.prototype.getTag = function(tag) {};
 
 /**
  * Remove a RIFF tag in the INFO chunk.
  * @param {string} tag The tag name.
  * @return {boolean} True if a tag was deleted.
  */
-WaveFile.deleteTag = function(tag) {};
+WaveFile.prototype.deleteTag = function(tag) {};
 
 /**
  * Create a cue point in the wave file.
  * @param {number} position The cue point position in milliseconds.
  * @param {string} labl The LIST adtl labl text of the marker. Optional.
  */
-WaveFile.setCuePoint = function(position, labl='') {};
+WaveFile.prototype.setCuePoint = function(position, labl='') {};
 
 /**
  * Remove a cue point from a wave file.
  * @param {number} index the index of the point. First is 1,
  *      second is 2, and so on.
  */
-WaveFile.deleteCuePoint = function(index) {};
+WaveFile.prototype.deleteCuePoint = function(index) {};
 
 /**
  * Update the label of a cue point.
  * @param {number} pointIndex The ID of the cue point.
  * @param {string} label The new text for the label.
  */
-WaveFile.updateLabel = function(pointIndex, label) {};
+WaveFile.prototype.updateLabel = function(pointIndex, label) {};
 
 /**
  * Return a Object<tag, value> with the RIFF tags in the file.
  * @return {!Object<string, string>} The file tags.
  */
-WaveFile.listTags = function() {};
+WaveFile.prototype.listTags = function() {};
 
 /**
  * Return an array with all cue points in the file, in the order they appear
@@ -468,4 +492,4 @@ WaveFile.listTags = function() {};
  * @return {!Array<!Object>}
  * @private
  */
-WaveFile.listCuePoints = function() {};
+WaveFile.prototype.listCuePoints = function() {};
