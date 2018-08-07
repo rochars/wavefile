@@ -1104,19 +1104,7 @@ function pack(str, buffer, index=0) {
  */
 
 const TYPE_ERR = 'Unsupported type';
-
-/**
- * Validate that the value is not null or undefined.
- * @param {*} value The value.y.
- * @throws {Error} If the value is not Number or Boolean.
- * @throws {Error} If the value is NaN, Infinity or -Infinity.
- */
-function validateIsInt(value) {
-  validateIsNumber(value);
-  if (value !== value || value === Infinity || value === -Infinity) {
-    throwValueErr_('integer');
-  }
-}
+const TYPE_NAN = 'Argument is not a valid number';
 
 /**
  * Validate that the value is not null or undefined.
@@ -1125,10 +1113,9 @@ function validateIsInt(value) {
  */
 function validateIsNumber(value) {
   if (value === undefined || value === null) {
-    throwValueErr_();
-  }
-  if (value.constructor != Number && value.constructor != Boolean) {
-    throwValueErr_();
+    throw new Error(TYPE_NAN);
+  } else if (value.constructor != Number && value.constructor != Boolean) {
+    throw new Error(TYPE_NAN);
   }
 }
 
@@ -1154,16 +1141,6 @@ function validateIntType(bits) {
   if (!bits || bits < 1 || bits > 53) {
     throw new Error(TYPE_ERR + ': int, bits: ' + bits);
   }
-}
-
-/**
- * Throw a error about the input value.
- * @param {string} theType The name of the type the value was expected to be.
- * @throws {Error} Always when called.
- * @private
- */
-function throwValueErr_(theType='valid number') {
-  throw new Error('Argument is not a ' + theType);
 }
 
 /*
@@ -1645,18 +1622,18 @@ class NumberBuffer {
    */
   constructor(bits, fp, signed) {
     /** @type {TwosComplementBuffer|UintBuffer|IEEE754Buffer} */
-    this.parser = null;
+    let parser;
     if (fp) {
       validateFloatType(bits);
-      this.parser = this.getFPParser_(bits);
+      parser = this.getFPParser_(bits);
     } else {
       validateIntType(bits);
-      this.parser = signed ?
-        new TwosComplementBuffer(bits) : new UintBuffer(bits);
-      this.parser.bytes = this.parser.bytes === 8 ? 4 : this.parser.bytes;
+      parser = signed ? new TwosComplementBuffer(bits) : new UintBuffer(bits);
     }
+    /** @type {TwosComplementBuffer|UintBuffer|IEEE754Buffer} */
+    this.parser = parser;
   }
-
+  
   /**
    * Read one number from a byte buffer.
    * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
@@ -1805,14 +1782,12 @@ function packArrayTo(values, theType, buffer, index=0) {
   let packer = new NumberBuffer(
     theType.bits, theType.fp, theType.signed);
   /** @type {number} */
-  let offset = offset_(theType.bits);
-  /** @type {Function} */
-  let validateInput = theType.fp ? validateIsNumber : validateIsInt;
+  let offset = Math.ceil(theType.bits / 8);
   /** @type {number} */
   let i = 0;
   try {
     for (let valuesLen = values.length; i < valuesLen; i++) {
-      validateInput(values[i]);
+      validateIsNumber(values[i]);
       /** @type {number} */
       let len = index + offset;
       while (index < len) {
@@ -1821,7 +1796,14 @@ function packArrayTo(values, theType, buffer, index=0) {
       swap_(theType.be, buffer, offset, index - offset, index);
     }
   } catch (e) {
-    throw new Error(e.message + ' at input index ' + i);
+    /** @type {*} */
+    let value = values[i];
+    if (!theType.fp && (
+        value === Infinity || value === -Infinity || value !== value)) {
+      throw new Error('Argument is not a integer at input index ' + i);
+    } else {
+      throw new Error(e.message + ' at input index ' + i);
+    }
   }
   return index;
 }
@@ -1838,7 +1820,7 @@ function packArrayTo(values, theType, buffer, index=0) {
  */
 function unpack$1(buffer, theType, index=0) {
   return unpackArray(
-    buffer, theType, index, index + offset_(theType.bits), true)[0];
+    buffer, theType, index, index + Math.ceil(theType.bits / 8), true)[0];
 }
 
 /**
@@ -1888,7 +1870,7 @@ function unpackArrayTo(
   let packer = new NumberBuffer(
     theType.bits, theType.fp, theType.signed);
   /** @type {number} */
-  let offset = offset_(theType.bits);
+  let offset = Math.ceil(theType.bits / 8);
   /** @type {number} */
   let extra = (end - start) % offset;
   if (safe && (extra || buffer.length < offset)) {
@@ -1922,15 +1904,6 @@ function swap_(flip, buffer, offset, start, end) {
   if (flip) {
     endianness(buffer, offset, start, end);
   }
-}
-
-/**
- * Get the byte offset of a type based on its number of bits.
- * @param {number} bits The number of bits.
- * @private
- */
-function offset_(bits) {
-  return bits < 8 ? 1 : Math.ceil(bits / 8);
 }
 
 /*
@@ -2017,6 +1990,7 @@ var WAV_AUDIO_FORMATS = {
  */
 function makeWavHeader(
   bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+  /** @type {!Object} */
   let header = {};
   if (bitDepthCode == '4') {
     header = createADPCMHeader_(
@@ -2084,6 +2058,7 @@ function createPCMHeader_(
  */
 function createADPCMHeader_(
   bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+  /** @type {!Object} */
   let header = createPCMHeader_(
     bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
   header.chunkSize = 40 + samplesLength;
@@ -2113,6 +2088,7 @@ function createADPCMHeader_(
  */
 function createExtensibleHeader_(
     bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+  /** @type {!Object} */
   let header = createPCMHeader_(
     bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
   header.chunkSize = 36 + 24 + samplesLength;
@@ -2139,6 +2115,7 @@ function createExtensibleHeader_(
  */
 function createALawMulawHeader_(
     bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
+  /** @type {!Object} */
   let header = createPCMHeader_(
     bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
   header.chunkSize = 40 + samplesLength;
@@ -2483,7 +2460,7 @@ function getBextBytes_(wav, uInt32_, uInt16_) {
  * @private
  */
 function enforceBext_(wav) {
-  for (var prop in wav.bext) {
+  for (let prop in wav.bext) {
     if (wav.bext.hasOwnProperty(prop)) {
       if (wav.bext[prop] && prop != 'timeReference') {
         wav.bext.chunkId = 'bext';
@@ -2830,8 +2807,10 @@ let head_ = 0;
  */
 function riffChunks(buffer) {
     head_ = 0;
+    /** @type {string} */
     let chunkId = getChunkId_(buffer, 0);
     uInt32_.be = chunkId == 'RIFX';
+    /** @type {string} */
     let format = unpackString(buffer, 8, 12);
     head_ += 4;
     return {
@@ -2875,7 +2854,9 @@ function findChunk(chunks, chunkId, multiple=false) {
  * @private
  */
 function getSubChunksIndex_(buffer) {
+    /** @type {!Array<!Object>} */
     let chunks = [];
+    /** @type {number} */
     let i = head_;
     while(i <= buffer.length - 8) {
         chunks.push(getSubChunkIndex_(buffer, i));
@@ -2893,6 +2874,7 @@ function getSubChunksIndex_(buffer) {
  * @private
  */
 function getSubChunkIndex_(buffer, index) {
+    /** @type {!Object} */
     let chunk = {
         chunkId: getChunkId_(buffer, index),
         chunkSize: getChunkSize_(buffer, index),
@@ -2902,6 +2884,7 @@ function getSubChunkIndex_(buffer, index) {
         head_ += 4;
         chunk.subChunks = getSubChunksIndex_(buffer);
     } else {
+        /** @type {number} */
         let realChunkSize = chunk.chunkSize % 2 ?
             chunk.chunkSize + 1 : chunk.chunkSize;
         head_ = index + 8 + realChunkSize;
@@ -2961,6 +2944,7 @@ function getChunkSize_(buffer, index) {
  *
  */
 
+/** @type {!BufferIO} */
 let io$1 = new BufferIO();
 
 /**
@@ -2974,7 +2958,9 @@ let io$1 = new BufferIO();
  */
 function readWavBuffer(buffer, samples, wav) {
   io$1.head_ = 0;
+  /** @type {!Object} */
   let uInt32_ = {bits: 32, be: false};
+  /** @type {!Object} */
   let uInt16_ = {bits: 16, be: false};
   readRIFFChunk_(buffer, wav, uInt32_, uInt16_);
   /** @type {!Object} */
@@ -3611,7 +3597,6 @@ class WavBuffer {
 /**
  * Class representing a wav file.
  * @extends WavBuffer
- * @ignore
  */
 class WaveFile extends WavBuffer {
 
@@ -3855,6 +3840,7 @@ class WaveFile extends WavBuffer {
         'Only mono files can be compressed as IMA-ADPCM.');
     } else {
       this.assure16Bit_();
+      /** @type {!Int16Array} */
       let output = new Int16Array(this.data.samples.length / 2);
       unpackArrayTo(this.data.samples, this.dataType, output);
       this.fromScratch(
@@ -3889,6 +3875,7 @@ class WaveFile extends WavBuffer {
    */
   toALaw() {
     this.assure16Bit_();
+    /** @type {!Int16Array} */
     let output = new Int16Array(this.data.samples.length / 2);
     unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromScratch(
@@ -3922,6 +3909,7 @@ class WaveFile extends WavBuffer {
    */
   toMuLaw() {
     this.assure16Bit_();
+    /** @type {!Int16Array} */
     let output = new Int16Array(this.data.samples.length / 2);
     unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromScratch(
@@ -4396,7 +4384,6 @@ class WaveFile extends WavBuffer {
    * @private
    */
   updateDataType_() {
-    /** @type {!Object} */
     this.dataType = {
       bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
       fp: this.bitDepth == '32f' || this.bitDepth == '64',

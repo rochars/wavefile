@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "8.4.1",
+  "version": "8.4.2",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -71,7 +71,7 @@
     "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli && npm run test-cjs && npm run test-min",
-    "rollup-bundle": "rollup --config && npm run test-dist",
+    "rollup-bundle": "rollup -c && npm run test-dist",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
@@ -83,6 +83,7 @@
     "codecov": "^3.0.2",
     "docdash": "^0.4.0",
     "esm": "^3.0.74",
+    "google-closure-compiler": "^20180716.0.1",
     "jsdoc": "^3.5.5",
     "jshint": "^2.9.6",
     "mocha": "^5.2.0",
@@ -90,6 +91,7 @@
     "nyc": "^12.0.2",
     "rollup": "^0.61.2",
     "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-closure-compiler-js": "^1.0.6",
     "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^1.0.1",
@@ -100,7 +102,7 @@
     "alawmulaw": "^5.0.2",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.2",
-    "byte-data": "^16.0.1",
+    "byte-data": "^16.0.2",
     "imaadpcm": "^4.0.1"
   }
 }

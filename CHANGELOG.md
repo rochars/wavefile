@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## version 8.4.2 (2018-08-06)
+- Use ArrayBufferView to represent TypedArray in index.d.ts
+- Use WaveFile.prototype in externs/wavefile.js
+
 ## version 8.4.1 (2018-08-06)
 - Update dependencies.
 

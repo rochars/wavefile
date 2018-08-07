@@ -45,7 +45,6 @@ import WavBuffer from './lib/wav-buffer.js';
 /**
  * Class representing a wav file.
  * @extends WavBuffer
- * @ignore
  */
 export default class WaveFile extends WavBuffer {
 
@@ -289,6 +288,7 @@ export default class WaveFile extends WavBuffer {
         'Only mono files can be compressed as IMA-ADPCM.');
     } else {
       this.assure16Bit_();
+      /** @type {!Int16Array} */
       let output = new Int16Array(this.data.samples.length / 2);
       unpackArrayTo(this.data.samples, this.dataType, output);
       this.fromScratch(
@@ -323,6 +323,7 @@ export default class WaveFile extends WavBuffer {
    */
   toALaw() {
     this.assure16Bit_();
+    /** @type {!Int16Array} */
     let output = new Int16Array(this.data.samples.length / 2);
     unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromScratch(
@@ -356,6 +357,7 @@ export default class WaveFile extends WavBuffer {
    */
   toMuLaw() {
     this.assure16Bit_();
+    /** @type {!Int16Array} */
     let output = new Int16Array(this.data.samples.length / 2);
     unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromScratch(
@@ -830,7 +832,6 @@ export default class WaveFile extends WavBuffer {
    * @private
    */
   updateDataType_() {
-    /** @type {!Object} */
     this.dataType = {
       bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
       fp: this.bitDepth == '32f' || this.bitDepth == '64',
