@@ -1,20 +1,22 @@
 /*
- * https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  */
 
 /**
  * @fileoverview rollup configuration file.
+ * @see https://github.com/rochars/wavefile
  */
 
 import {terser} from 'rollup-plugin-terser';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+import closure from 'rollup-plugin-closure-compiler-js';
 
 // Read externs definitions
 const fs = require('fs');
 const polyfills = fs.readFileSync('./scripts/polyfills.js', 'utf8');
+const externs = fs.readFileSync('./externs/wavefile.js', 'utf8');
 
 // GCC wrapper
 const outputWrapper =
@@ -50,15 +52,21 @@ export default [
     output: [
       {
         file: 'dist/wavefile.min.js',
-        name: 'WaveFile',
+        name: 'WaveFileModule',
         format: 'iife',
-        footer: 'window["WaveFile"] = WaveFile;'
+        footer: 'window["WaveFile"] = WaveFileModule;'
       },
     ],
     plugins: [
       resolve(),
       commonjs(),
-      terser()
+      closure({
+        languageIn: 'ECMASCRIPT6',
+        languageOut: 'ECMASCRIPT5',
+        compilationLevel: 'ADVANCED',
+        warningLevel: 'VERBOSE',
+        externs: [{src: externs}]
+      }),
     ]
   },
   // Main UMD dist
