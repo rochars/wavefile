@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## version 8.4.3 (unreleased)
+- Fix: Stop adding a extra sample when changing the bit depth
+- Fix: Add padding byte if sample buffer lenght is odd
+
 ## version 8.4.2 (2018-08-06)
 - Use ArrayBufferView to represent TypedArray in index.d.ts
 - Use WaveFile.prototype in externs/wavefile.js
