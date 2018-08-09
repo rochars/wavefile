@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.4.4 (2018-08-09)
+- Fix: browser directive in package.json
+
 ## version 8.4.3 (2018-08-07)
 - Fix: Stop adding a extra sample when changing the bit depth
 - Fix: Add padding byte if sample buffer lenght is odd

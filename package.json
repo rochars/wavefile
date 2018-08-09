@@ -1,12 +1,13 @@
 {
   "name": "wavefile",
-  "version": "8.4.3",
+  "version": "8.4.4",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "module": "./index.js",
   "main": "./dist/wavefile.cjs.js",
+  "browser": "./dist/wavefile.min.js",
   "bin": "./bin/wavefile.js",
   "engines": {
     "node": ">=8"
@@ -100,7 +101,7 @@
     "alawmulaw": "^5.0.2",
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.2",
-    "byte-data": "^16.0.2",
+    "byte-data": "^16.0.3",
     "imaadpcm": "^4.0.1"
   }
 }
