@@ -20,6 +20,8 @@ Items in this list should not require a major version update.
 ## Planned changes
 Items in this list may require a major version update.
 
+### Make it easier to manipulate the samples in a WaveFile object
+
 ### Better handling of cue points and their labels
 Cue points (and associated data) currently need to be referenced by the point index (the dwName property), but the index of the points may change if a point is created or removed. This is unpractical and should be better.
 

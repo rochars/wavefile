@@ -27,7 +27,6 @@ With **wavefile** you can:
 And more.
 
 ## Install
-To use it in your programs:
 ```
 npm install wavefile
 ```
@@ -119,7 +118,7 @@ The available options:
 ```javascript
 const WaveFile = require('wavefile');
 
-// Load a wav file from disk into a WaveFile object
+// Load a wav file buffer as a WaveFile object
 let wav = new WaveFile(buffer);
 
 // Check some of the file properties
@@ -156,7 +155,6 @@ let wavDataURI = wav.toDataURI();
     + [Sample loops](#sample-loops)
     + [LIST chunk](#list-chunk)
 - [The samples](#the-samples)
-- [Distribution](#distribution)
 - [Contributing to wavefile](#contributing-to-wavefile)
 - [References](#references)
 - [Legal](#legal)
@@ -164,7 +162,7 @@ let wavDataURI = wav.toDataURI();
 ## Operation Manual
 
 ### Create wave files from scratch
-You must inform the number of channels, the sample rate, the bit depth and the samples (in this order).
+Use the ```fromScratch(numChannels, sampleRate, bitDepth, samples)``` method.
 
 #### Mono:
 ```javascript
@@ -564,7 +562,7 @@ This method returns a list like this:
   {
     milliseconds: 1000, // the position in milliseconds
     dwPosition: 8000, // the sample offset of the point
-    label: "cue marker 2" // the label of the point
+    label: "some cue marker" // the label of the point
   },
 ]
 ```
@@ -793,7 +791,7 @@ WaveFile.bitDepth =  '';
 ```
 
 #### Cue points
-Items in *cue.points* are objects that look like this:
+Items in *cue.points* are objects like this:
 ```javascript
 {
     /** @type {number} */
@@ -812,7 +810,7 @@ Items in *cue.points* are objects that look like this:
 ```
 
 #### Sample loops
-Items in *smpl.loops* are objects that look like this:
+Items in *smpl.loops* are objects like this:
 ```javascript
 {
     /** @type {string} */
@@ -840,7 +838,7 @@ Items in *smpl.loops* are objects that look like this:
 WaveFile.LIST = [];
 ```
 
-Items in *WaveFile.LIST* are objects that look like this:
+Items in *WaveFile.LIST* are objects like this:
 ```javascript
 {
     /** @type {string} */
