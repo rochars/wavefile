@@ -7,7 +7,7 @@ https://github.com/rochars/wavefile
 
 
 ## Notice
-My country, Brazil, is under a fascist government that is hunting and killing oppositors. I've been threatened too and am away from dev. I'll be back. #EleNão
+My country, Brazil, is under a fascist government that is hunting and killing its opponents. I've been threatened too. #EleNão
 
 
 Create, read and write wav files according to the specs.
