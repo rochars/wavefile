@@ -81,7 +81,6 @@
     "babel-preset-env": "^1.7.0",
     "codecov": "^3.5.0",
     "docdash": "^0.4.0",
-    "esm": "^3.0.74",
     "google-closure-compiler": "^20180716.0.1",
     "jsdoc": "^3.6.3",
     "jshint": "^2.10.2",
@@ -102,6 +101,7 @@
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.2",
     "byte-data": "^16.0.3",
+    "esm": "^3.2.25",
     "imaadpcm": "^4.0.1"
   }
 }
