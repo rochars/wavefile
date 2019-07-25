@@ -16,6 +16,8 @@ Items in this list should not require a major version update.
 - Handle ID3 tags
 - Handle RF64 (fully)
 - Handle Wave64
+- Convert mono to stereo and stereo to mono
+- Concat two or more wave files
 
 ## Planned changes
 Items in this list may require a major version update.
