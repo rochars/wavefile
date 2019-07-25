@@ -1,5 +1,5 @@
 # wavefile
-Copyright (c) 2017-2018 Rafael da Silva Rocha.  
+Copyright (c) 2017-2019 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/docs) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/test/browser.html)  
