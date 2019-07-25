@@ -939,7 +939,7 @@ https://google.github.io/styleguide/jsguide.html
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large)
 
 ### LICENSE
-Copyright (c) 2017-2018 Rafael da Silva Rocha.
+Copyright (c) 2017-2019 Rafael da Silva Rocha.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

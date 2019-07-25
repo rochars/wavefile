@@ -46,8 +46,13 @@
 
 
     <section class="readme">
-        <article><h1>wavefile</h1><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>https://github.com/rochars/wavefile</p>
-<p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/docs"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rochars.github.io/wavefile/test/browser.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br><a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
+        <article><h1>wavefile</h1>
+<p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>
+https://github.com/rochars/wavefile</p>
+<p><a href="https://www.npmjs.com/package/wavefile"><img src="https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge" alt="NPM version"></a> <a href="https://rochars.github.io/wavefile/docs"><img src="https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge" alt="Docs"></a> <a href="https://rochars.github.io/wavefile/test/browser.html"><img src="https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge" alt="Tests"></a><br>
+<a href="https://codecov.io/gh/rochars/wavefile"><img src="https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square" alt="Codecov"></a> <a href="https://travis-ci.org/rochars/wavefile"><img src="https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square" alt="Unix Build"></a> <a href="https://ci.appveyor.com/project/rochars/wavefile"><img src="https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&amp;logo=appveyor" alt="Windows Build"></a> <a href="https://scrutinizer-ci.com/g/rochars/wavefile/"><img src="https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&amp;logo=scrutinizer" alt="Scrutinizer"></a> <a href="https://bestpractices.coreinfrastructure.org/projects/1880"><img src="https://bestpractices.coreinfrastructure.org/projects/1880/badge" alt="CII Best Practices"></a></p>
+<h2>Notice</h2>
+<p>My country, Brazil, is under a fascist government that is hunting and killing its opponents. I've been threatened too. #EleNão</p>
 <p>Create, read and write wav files according to the specs.</p>
 <ul>
 <li><strong>MIT licensed</strong></li>
@@ -68,21 +73,44 @@
 <li>Create or edit BWF metadata (&quot;bext&quot; chunk)</li>
 </ul>
 <p>And more.</p>
-<h2>Install</h2><pre class="prettyprint source"><code>npm install wavefile</code></pre><p>To use it from the <a href="#command-line">command line</a>, install it globally:</p>
-<pre class="prettyprint source"><code>npm install wavefile -g</code></pre><h2>Use</h2><h3>Node</h3><p><strong>import WaveFile from wavefile</strong>:</p>
+<h2>Install</h2>
+<pre class="prettyprint source"><code>npm install wavefile
+</code></pre>
+<p>To use it from the <a href="#command-line">command line</a>, install it globally:</p>
+<pre class="prettyprint source"><code>npm install wavefile -g
+</code></pre>
+<h2>Use</h2>
+<h3>Node</h3>
+<p><strong>import WaveFile from wavefile</strong>:</p>
 <pre class="prettyprint source lang-javascript"><code>import WaveFile from 'wavefile';
-let wav = new WaveFile();</code></pre><p>Or <strong>require</strong>:</p>
+let wav = new WaveFile();
+</code></pre>
+<p>Or <strong>require</strong>:</p>
 <pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
-let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Load <strong>wavefile.umd.js</strong> with <code>&lt;script&gt;</code> tags:</p>
+let wav = new WaveFile();
+</code></pre>
+<h3>Browser</h3>
+<p>Load <strong>wavefile.umd.js</strong> with <code>&lt;script&gt;</code> tags:</p>
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;./dist/wavefile.umd.js&quot;>&lt;/script>
 &lt;script>
   var WaveFile = new WaveFile();
-&lt;/script></code></pre><p>Or load it from the <a href="https://cdn.jsdelivr.net/npm/wavefile">jsDelivr</a> CDN:</p>
-<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile&quot;>&lt;/script></code></pre><p>Or load it from <a href="https://unpkg.com/wavefile">unpkg</a>:</p>
-<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/wavefile&quot;>&lt;/script></code></pre><h4>Browser compatibility</h4><p>IE10+. Should work in all modern browsers that support ES5/ES6+.</p>
-<p>Cross-browser tests powered by<br><a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a></p>
-<h3>Command line</h3><p>To see the available options:</p>
-<pre class="prettyprint source"><code>wavefile --help</code></pre><p>The available options:</p>
+&lt;/script>
+</code></pre>
+<p>Or load it from the <a href="https://cdn.jsdelivr.net/npm/wavefile">jsDelivr</a> CDN:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/wavefile&quot;>&lt;/script>
+</code></pre>
+<p>Or load it from <a href="https://unpkg.com/wavefile">unpkg</a>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/wavefile&quot;>&lt;/script>
+</code></pre>
+<h4>Browser compatibility</h4>
+<p>IE10+. Should work in all modern browsers that support ES5/ES6+.</p>
+<p>Cross-browser tests powered by<br>
+<a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a></p>
+<h3>Command line</h3>
+<p>To see the available options:</p>
+<pre class="prettyprint source"><code>wavefile --help
+</code></pre>
+<p>The available options:</p>
 <pre class="prettyprint source"><code>  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
                Change the bit depth.
                The input file is not affected.
@@ -109,7 +137,10 @@ let wav = new WaveFile();</code></pre><h3>Browser</h3><p>Load <strong>wavefile.u
                Print the sample rate of the file.
 
   --help       Ex: --help
-               Show this help page.</code></pre><h2>Node.js Example</h2><pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
+               Show this help page.
+</code></pre>
+<h2>Node.js Example</h2>
+<pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile');
 
 // Load a wav file buffer as a WaveFile object
 let wav = new WaveFile(buffer);
@@ -124,10 +155,14 @@ console.log(wav.fmt.chunkId);
 let wavBuffer = wav.toBuffer();
 
 // Call toDataURI() to get the file as a DataURI:
-let wavDataURI = wav.toDataURI();</code></pre><h2>Table of Contents</h2><ul>
+let wavDataURI = wav.toDataURI();
+</code></pre>
+<h2>Table of Contents</h2>
+<ul>
 <li><a href="#install">Install</a></li>
 <li><a href="#use">Use</a></li>
-<li><a href="#operation-manual">Operation Manual</a><ul>
+<li><a href="#operation-manual">Operation Manual</a>
+<ul>
 <li><a href="#create-wave-files-from-scratch">Create wave files from scratch</a></li>
 <li><a href="#add-riff-tags-to-files">Add RIFF tags to files</a></li>
 <li><a href="#add-cue-points-to-files">Add cue points to files</a></li>
@@ -140,9 +175,11 @@ let wavDataURI = wav.toDataURI();</code></pre><h2>Table of Contents</h2><ul>
 <li><a href="#rf64">RF64</a></li>
 </ul>
 </li>
-<li><a href="#api">API</a><ul>
+<li><a href="#api">API</a>
+<ul>
 <li><a href="#the-wavefile-methods-">The WaveFile methods:</a></li>
-<li><a href="#the-wavefile-properties">The WaveFile properties</a><ul>
+<li><a href="#the-wavefile-properties">The WaveFile properties</a>
+<ul>
 <li><a href="#cue-points">Cue points</a></li>
 <li><a href="#sample-loops">Sample loops</a></li>
 <li><a href="#list-chunk">LIST chunk</a></li>
@@ -155,58 +192,115 @@ let wavDataURI = wav.toDataURI();</code></pre><h2>Table of Contents</h2><ul>
 <li><a href="#references">References</a></li>
 <li><a href="#legal">Legal</a></li>
 </ul>
-<h2>Operation Manual</h2><h3>Create wave files from scratch</h3><p>Use the <code>fromScratch(numChannels, sampleRate, bitDepth, samples)</code> method.</p>
-<h4>Mono:</h4><pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
+<h2>Operation Manual</h2>
+<h3>Create wave files from scratch</h3>
+<p>Use the <code>fromScratch(numChannels, sampleRate, bitDepth, samples)</code> method.</p>
+<h4>Mono:</h4>
+<pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
 wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
-fs.writeFileSync(path, wav.toBuffer());</code></pre><h4>Stereo:</h4><p>Samples can be informed interleaved or de-interleaved. If they are de-interleaved, WaveFile will interleave them. In this example they are de-interleaved.</p>
+fs.writeFileSync(path, wav.toBuffer());
+</code></pre>
+<h4>Stereo:</h4>
+<p>Samples can be informed interleaved or de-interleaved. If they are de-interleaved, WaveFile will interleave them. In this example they are de-interleaved.</p>
 <pre class="prettyprint source lang-javascript"><code>// Stereo, 48 kHz, 8-bit, de-interleaved samples
 // WaveFile interleave the samples automatically
 wav.fromScratch(2, 48000, '8', [
     [0, -2, 4, 3],
     [0, -1, 4, 3]
 ]);
-fs.writeFileSync(path, wav.toBuffer());</code></pre><p>Possible values for the bit depth are:<br>&quot;4&quot; - 4-bit IMA-ADPCM<br>&quot;8&quot; - 8-bit<br>&quot;8a&quot; - 8-bit A-Law<br>&quot;8m&quot; - 8-bit mu-Law<br>&quot;16&quot; - 16-bit<br>&quot;24&quot; - 24-bit<br>&quot;32&quot; - 32-bit<br>&quot;32f&quot; - 32-bit floating point<br>&quot;64&quot; - 64-bit floating point</p>
+fs.writeFileSync(path, wav.toBuffer());
+</code></pre>
+<p>Possible values for the bit depth are:<br>
+&quot;4&quot; - 4-bit IMA-ADPCM<br>
+&quot;8&quot; - 8-bit<br>
+&quot;8a&quot; - 8-bit A-Law<br>
+&quot;8m&quot; - 8-bit mu-Law<br>
+&quot;16&quot; - 16-bit<br>
+&quot;24&quot; - 24-bit<br>
+&quot;32&quot; - 32-bit<br>
+&quot;32f&quot; - 32-bit floating point<br>
+&quot;64&quot; - 64-bit floating point</p>
 <p>You can also use any bit depth between &quot;8&quot; and &quot;53&quot;, like <strong>&quot;11&quot;, &quot;12&quot;, &quot;17&quot;, &quot;20&quot; and so on</strong>.</p>
-<h4>A word on bit depth</h4><p>Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.</p>
-<h3>Add RIFF tags to files</h3><p>You can create (or overwrite) tags on files with the <strong>WaveFile.setTag()</strong> method.</p>
+<h4>A word on bit depth</h4>
+<p>Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.</p>
+<h3>Add RIFF tags to files</h3>
+<p>You can create (or overwrite) tags on files with the <strong>WaveFile.setTag()</strong> method.</p>
 <pre class="prettyprint source lang-javascript"><code>// Write the ICMT tag with some comments to the file
-wav.setTag(&quot;ICMT&quot;, &quot;some comments&quot;);</code></pre><p>To get the value of a tag (if it exists), use <strong>WaveFile.getTag()</strong>:</p>
+wav.setTag(&quot;ICMT&quot;, &quot;some comments&quot;);
+</code></pre>
+<p>To get the value of a tag (if it exists), use <strong>WaveFile.getTag()</strong>:</p>
 <pre class="prettyprint source lang-javascript"><code>console.log(wav.getTag(&quot;ICMT&quot;));
-// some comments</code></pre><p>You can delete a tag with <strong>WaveFile.deleteTag()</strong>:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.deleteTag(&quot;ICMT&quot;);</code></pre><h3>Add cue points to files</h3><p>You can create cue points using the <strong>WaveFile.setCuePoint()</strong> method. The method takes time in milliseconds, a text label and creates a cue point in the corresponding position of the file:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.setCuePoint(1750, &quot;some label for the cue point&quot;);</code></pre><p>To delete a cue point use <strong>WaveFile.deleteCuePoint()</strong> informing the index of the point. Points are ordered according to their position. The first point is indexed as 1.</p>
-<pre class="prettyprint source lang-javascript"><code>wav.deleteCuePoint(1);</code></pre><p>Mind that creating or deleting cue points will change the index of other points if they exist.</p>
-<h3>RIFX</h3><p><strong>wavefile</strong> can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {&quot;container&quot;: &quot;RIFX&quot;});</code></pre><p>RIFX to RIFF and RIFF to RIFX:</p>
+// some comments
+</code></pre>
+<p>You can delete a tag with <strong>WaveFile.deleteTag()</strong>:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.deleteTag(&quot;ICMT&quot;);
+</code></pre>
+<h3>Add cue points to files</h3>
+<p>You can create cue points using the <strong>WaveFile.setCuePoint()</strong> method. The method takes time in milliseconds, a text label and creates a cue point in the corresponding position of the file:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.setCuePoint(1750, &quot;some label for the cue point&quot;);
+</code></pre>
+<p>To delete a cue point use <strong>WaveFile.deleteCuePoint()</strong> informing the index of the point. Points are ordered according to their position. The first point is indexed as 1.</p>
+<pre class="prettyprint source lang-javascript"><code>wav.deleteCuePoint(1);
+</code></pre>
+<p>Mind that creating or deleting cue points will change the index of other points if they exist.</p>
+<h3>RIFX</h3>
+<p><strong>wavefile</strong> can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {&quot;container&quot;: &quot;RIFX&quot;});
+</code></pre>
+<p>RIFX to RIFF and RIFF to RIFX:</p>
 <pre class="prettyprint source lang-javascript"><code>// Turn a RIFF file to a RIFX file
 wav.toRIFX();
 
 // Turn a RIFX file to a RIFF file
-wav.toRIFF();</code></pre><h3>IMA-ADPCM</h3><p>16-bit 8000 Hz mono wave files can be compressed as IMA-ADPCM:</p>
+wav.toRIFF();
+</code></pre>
+<h3>IMA-ADPCM</h3>
+<p>16-bit 8000 Hz mono wave files can be compressed as IMA-ADPCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Encode a 16-bit wave file as 4-bit IMA-ADPCM:
-wav.toIMAADPCM();</code></pre><p>IMA-ADPCM files compressed with <strong>wavefile</strong> will have a block align of 256 bytes.</p>
+wav.toIMAADPCM();
+</code></pre>
+<p>IMA-ADPCM files compressed with <strong>wavefile</strong> will have a block align of 256 bytes.</p>
 <p>If the audio is not 16-bit it will be converted to 16-bit before compressing. Compressing audio with sample rate different from 8000 Hz or more than one channel is not supported and will throw errors.</p>
 <p>To decode 4-bit IMA-ADPCM as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 4-bit IMA-ADPCM as 16-bit:
-wav.fromIMAADPCM();</code></pre><p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
+wav.fromIMAADPCM();
+</code></pre>
+<p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 4-bit IMA-ADPCM as 24-bit:
-wav.fromIMAADPCM(&quot;24&quot;);</code></pre><h3>A-Law</h3><p>16-bit wave files (mono or stereo) can be encoded as A-Law:</p>
+wav.fromIMAADPCM(&quot;24&quot;);
+</code></pre>
+<h3>A-Law</h3>
+<p>16-bit wave files (mono or stereo) can be encoded as A-Law:</p>
 <pre class="prettyprint source lang-javascript"><code>// Encode a 16-bit wave file as 8-bit A-law:
-wav.toALaw();</code></pre><p>If the audio is not 16-bit it will be converted to 16-bit before compressing.</p>
+wav.toALaw();
+</code></pre>
+<p>If the audio is not 16-bit it will be converted to 16-bit before compressing.</p>
 <p>To decode 8-bit A-Law as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit A-Law as 16-bit:
-wav.fromALaw();</code></pre><p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
+wav.fromALaw();
+</code></pre>
+<p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit A-Law as 24-bit:
-wav.fromALaw(&quot;24&quot;);</code></pre><h3>mu-Law</h3><p>16-bit wave files (mono or stereo) can be encoded as mu-Law:</p>
+wav.fromALaw(&quot;24&quot;);
+</code></pre>
+<h3>mu-Law</h3>
+<p>16-bit wave files (mono or stereo) can be encoded as mu-Law:</p>
 <pre class="prettyprint source lang-javascript"><code>// Encode a 16-bit wave file as 8-bit mu-law:
-wav.toMuLaw();</code></pre><p>If the audio is not 16-bit it will be converted to 16-bit before compressing.</p>
+wav.toMuLaw();
+</code></pre>
+<p>If the audio is not 16-bit it will be converted to 16-bit before compressing.</p>
 <p>To decode 8-bit mu-Law as 16-bit linear PCM:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 16-bit:
-wav.fromMuLaw();</code></pre><p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
+wav.fromMuLaw();
+</code></pre>
+<p>Decoding always result in 16-bit audio. To decode to another bit depth:</p>
 <pre class="prettyprint source lang-javascript"><code>// Decode 8-bit mu-Law as 24-bit:
-wav.fromMuLaw(&quot;24&quot;);</code></pre><h3>Change the bit depth</h3><p>You can change the bit depth of the audio with the <strong>toBitDepth(bitDepth)</strong> method.</p>
+wav.fromMuLaw(&quot;24&quot;);
+</code></pre>
+<h3>Change the bit depth</h3>
+<p>You can change the bit depth of the audio with the <strong>toBitDepth(bitDepth)</strong> method.</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
 let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
@@ -214,7 +308,10 @@ let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 wav.toBitDepth(&quot;24&quot;);
 
 // Write the new 24-bit file
-fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());</code></pre><h3>Add BWF metadata</h3><p>To add BWF data to a file you can use the <strong>bext</strong> property:</p>
+fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
+</code></pre>
+<h3>Add BWF metadata</h3>
+<p>To add BWF data to a file you can use the <strong>bext</strong> property:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with no &quot;bext&quot;
 let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
@@ -222,16 +319,23 @@ let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 wav.bext.originator = &quot;wavefile&quot;;
 
 // Write the new BWF file
-fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());</code></pre><p>By default <strong>wavefile</strong> will not insert a &quot;bext&quot; chunk in new files or in files that do not already have a &quot;bext&quot; chunk unless a property of <strong>WaveFile.bext</strong> is changed from it's default value. See below the full list of properties in <strong>WaveFile.bext</strong>.</p>
-<h3>RF64</h3><p><strong>wavefile</strong> have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
-<h2>API</h2><p>To create a WaveFile object:</p>
+fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());
+</code></pre>
+<p>By default <strong>wavefile</strong> will not insert a &quot;bext&quot; chunk in new files or in files that do not already have a &quot;bext&quot; chunk unless a property of <strong>WaveFile.bext</strong> is changed from it's default value. See below the full list of properties in <strong>WaveFile.bext</strong>.</p>
+<h3>RF64</h3>
+<p><strong>wavefile</strong> have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
+<h2>API</h2>
+<p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>/**
  * @param {?Uint8Array} bytes A wave file buffer.
  * @throws {Error} If no &quot;RIFF&quot; chunk is found.
  * @throws {Error} If no &quot;fmt &quot; chunk is found.
  * @throws {Error} If no &quot;data&quot; chunk is found.
  */
-WaveFile(bytes=null);</code></pre><h3>The WaveFile methods</h3><pre class="prettyprint source lang-javascript"><code>/**
+WaveFile(bytes=null);
+</code></pre>
+<h3>The WaveFile methods</h3>
+<pre class="prettyprint source lang-javascript"><code>/**
  * Set up the WaveFile object based on the arguments passed.
  * @param {number} numChannels The number of channels
  *      (Integer numbers: 1 for mono, 2 stereo and so on).
@@ -430,15 +534,21 @@ WaveFile.getSample(index) {};
  * @param {number} sample The sample.
  * @throws {Error} If the sample index is off range.
  */
-WaveFile.setSample(index, sample) {};</code></pre><h4>WaveFile.listCuePoints()</h4><p>This method returns a list like this:</p>
+WaveFile.setSample(index, sample) {};
+</code></pre>
+<h4>WaveFile.listCuePoints()</h4>
+<p>This method returns a list like this:</p>
 <pre class="prettyprint source lang-javascript"><code>[
   {
     milliseconds: 1000, // the position in milliseconds
     dwPosition: 8000, // the sample offset of the point
     label: &quot;some cue marker&quot; // the label of the point
   },
-]</code></pre><p>The list order reflects the order of the points in the file.</p>
-<h3>The WaveFile properties</h3><pre class="prettyprint source lang-javascript"><code>/**
+]
+</code></pre>
+<p>The list order reflects the order of the points in the file.</p>
+<h3>The WaveFile properties</h3>
+<pre class="prettyprint source lang-javascript"><code>/**
  * The container identifier.
  * &quot;RIFF&quot;, &quot;RIFX&quot; and &quot;RF64&quot; are supported.
  * @type {string}
@@ -655,7 +765,10 @@ WaveFile.junk = {
  * The bit depth code according to the samples.
  * @type {string}
  */
-WaveFile.bitDepth =  '';</code></pre><h4>Cue points</h4><p>Items in <em>cue.points</em> are objects like this:</p>
+WaveFile.bitDepth =  '';
+</code></pre>
+<h4>Cue points</h4>
+<p>Items in <em>cue.points</em> are objects like this:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {number} */
     dwName: 0, // a cue point ID
@@ -669,7 +782,10 @@ WaveFile.bitDepth =  '';</code></pre><h4>Cue points</h4><p>Items in <em>cue.poin
     dwBlockStart: 0,
     /** @type {number} */
     dwSampleOffset: 0
-}</code></pre><h4>Sample loops</h4><p>Items in <em>smpl.loops</em> are objects like this:</p>
+}
+</code></pre>
+<h4>Sample loops</h4>
+<p>Items in <em>smpl.loops</em> are objects like this:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {string} */
     dwName: '', // a cue point ID
@@ -683,12 +799,17 @@ WaveFile.bitDepth =  '';</code></pre><h4>Cue points</h4><p>Items in <em>cue.poin
     dwFraction: 0,
     /** @type {number} */
     dwPlayCount: 0
-}</code></pre><h4>LIST chunk</h4><p>&quot;LIST&quot; chunk data is stored as follows:</p>
+}
+</code></pre>
+<h4>LIST chunk</h4>
+<p>&quot;LIST&quot; chunk data is stored as follows:</p>
 <pre class="prettyprint source lang-javascript"><code>/**
  * An array of the &quot;LIST&quot; chunks present in the file.
  * @type {!Array&lt;!Object>}
  */
-WaveFile.LIST = [];</code></pre><p>Items in <em>WaveFile.LIST</em> are objects like this:</p>
+WaveFile.LIST = [];
+</code></pre>
+<p>Items in <em>WaveFile.LIST</em> are objects like this:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {string} */
     chunkId: '', // always 'LIST'
@@ -698,7 +819,9 @@ WaveFile.LIST = [];</code></pre><p>Items in <em>WaveFile.LIST</em> are objects l
     format: '', // 'adtl' or 'INFO'
     /** @type {!Array&lt;!Object>} */
     subChunks: []
-};</code></pre><p>Where &quot;subChunks&quot; are the subChunks of the &quot;LIST&quot; chunk. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same. <strong>wavefile</strong> can read and write &quot;LIST&quot; chunks of format &quot;INFO&quot; and &quot;adtl&quot;.</p>
+};
+</code></pre>
+<p>Where &quot;subChunks&quot; are the subChunks of the &quot;LIST&quot; chunk. A single file may have many &quot;LIST&quot; chunks as long as their formats (&quot;INFO&quot;, &quot;adtl&quot;, etc) are not the same. <strong>wavefile</strong> can read and write &quot;LIST&quot; chunks of format &quot;INFO&quot; and &quot;adtl&quot;.</p>
 <p>For &quot;LIST&quot; chunks with the &quot;INFO&quot; format, &quot;subChunks&quot; will be an array of objects like this:</p>
 <pre class="prettyprint source lang-javascript"><code>{
     /** @type {string} */
@@ -707,8 +830,12 @@ WaveFile.LIST = [];</code></pre><p>Items in <em>WaveFile.LIST</em> are objects l
     chunkSize 0,
     /** @type {string} */
     value: ''
-}</code></pre><p>Where &quot;chunkId&quot; may be any RIFF tag:<br>https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
-<h2>The samples</h2><p>Samples are stored in WaveFile.data.samples as a Uint8Array representing a byte buffer. Once you inform the samples with fromScratch() they are packed as bytes and stay that way.</p>
+}
+</code></pre>
+<p>Where &quot;chunkId&quot; may be any RIFF tag:<br>
+https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
+<h2>The samples</h2>
+<p>Samples are stored in WaveFile.data.samples as a Uint8Array representing a byte buffer. Once you inform the samples with fromScratch() they are packed as bytes and stay that way.</p>
 <p>To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.</p>
 <p>Example:</p>
 <pre class="prettyprint source lang-javascript"><code>wav = new WaveFile();
@@ -722,7 +849,9 @@ wav.fromScratch(1, 8000, &quot;16&quot;, samples);
 // Getting and setting a sample in the WaveFile instance:
 wav.getSample(1); // return 1200, the value of the second sample
 wav.setSample(1, 10); // change the second sample to 10
-wav.getSample(1); // return 10, the new value of the second sample</code></pre><p>Range:</p>
+wav.getSample(1); // return 10, the new value of the second sample
+</code></pre>
+<p>Range:</p>
 <ul>
 <li>0 to 255 for 8-bit</li>
 <li>-32768 to 32767 for 16-bit</li>
@@ -731,15 +860,36 @@ wav.getSample(1); // return 10, the new value of the second sample</code></pre><
 <li>-1.0 to 1.0 for 32-bit (float)</li>
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
-<h2>Contributing to wavefile</h2><p><strong>wavefile</strong> welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.</p>
+<h2>Contributing to wavefile</h2>
+<p><strong>wavefile</strong> welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.</p>
 <p>See <a href="https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for details.</p>
-<h3>Style guide</h3><p><strong>wavefile</strong> code should follow the Google JavaScript Style Guide:<br>https://google.github.io/styleguide/jsguide.html</p>
-<h3>Code of conduct</h3><p>This project is bound by a Code of Conduct: The <a href="https://github.com/rochars/wavefile/blob/master/CODE_OF_CONDUCT.md">Contributor Covenant, version 1.4</a>, also available at https://<a href="http://www.contributor-covenant.org/version/1/4/code-of-conduct.html">www.contributor-covenant.org/version/1/4/code-of-conduct.html</a></p>
-<h2>References</h2><h3>Papers</h3><p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>https://<a href="http://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml">www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml</a><br>http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf<br>https://sites.google.com/site/musicgapi/technical-documents/wav-file-format<br>http://<a href="http://www.neurophys.wisc.edu/auditory/riff-format.txt">www.neurophys.wisc.edu/auditory/riff-format.txt</a><br>https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
-<h3>Software</h3><p>https://github.com/erikd/libsndfile<br>https://gist.github.com/hackNightly/3776503<br>https://github.com/chirlu/sox/blob/master/src/wav.c</p>
-<h3>Other</h3><p>https://developercertificate.org/<br>https://<a href="http://www.contributor-covenant.org/version/1/4/code-of-conduct.html">www.contributor-covenant.org/version/1/4/code-of-conduct.html</a><br>https://google.github.io/styleguide/jsguide.html</p>
-<h2>Legal</h2><p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large" alt="FOSSA Status"></a></p>
-<h3>LICENSE</h3><p>Copyright (c) 2017-2018 Rafael da Silva Rocha.</p>
+<h3>Style guide</h3>
+<p><strong>wavefile</strong> code should follow the Google JavaScript Style Guide:<br>
+https://google.github.io/styleguide/jsguide.html</p>
+<h3>Code of conduct</h3>
+<p>This project is bound by a Code of Conduct: The <a href="https://github.com/rochars/wavefile/blob/master/CODE_OF_CONDUCT.md">Contributor Covenant, version 1.4</a>, also available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html</p>
+<h2>References</h2>
+<h3>Papers</h3>
+<p>https://tech.ebu.ch/docs/tech/tech3285.pdf<br>
+https://tech.ebu.ch/docs/tech/tech3306-2009.pdf<br>
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html<br>
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml<br>
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf<br>
+https://sites.google.com/site/musicgapi/technical-documents/wav-file-format<br>
+http://www.neurophys.wisc.edu/auditory/riff-format.txt<br>
+https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
+<h3>Software</h3>
+<p>https://github.com/erikd/libsndfile<br>
+https://gist.github.com/hackNightly/3776503<br>
+https://github.com/chirlu/sox/blob/master/src/wav.c</p>
+<h3>Other</h3>
+<p>https://developercertificate.org/<br>
+https://www.contributor-covenant.org/version/1/4/code-of-conduct.html<br>
+https://google.github.io/styleguide/jsguide.html</p>
+<h2>Legal</h2>
+<p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large" alt="FOSSA Status"></a></p>
+<h3>LICENSE</h3>
+<p>Copyright (c) 2017-2019 Rafael da Silva Rocha.</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 &quot;Software&quot;), to deal in the Software without restriction, including
@@ -869,7 +1019,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Dec 05 2018 13:23:19 GMT-0200 (Horário brasileiro de verão) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Thu Jul 25 2019 14:55:21 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

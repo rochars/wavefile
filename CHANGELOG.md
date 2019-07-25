@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.4.5 (unreleased)
+- Fix: read UTF8 chars in cue points (https://github.com/rochars/wavefile/issues/13)
+
 ## version 8.4.4 (2018-08-09)
 - Fix: browser directive in package.json
 

@@ -1919,7 +1919,7 @@ function unpack$1(buffer, theType, index=0) {
 }
 
 /*
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -4090,20 +4090,18 @@ class WaveFile {
   /**
    * Read bytes as a ZSTR string.
    * @param {!Uint8Array} bytes The bytes.
+   * @param {number} index the index to start reading.
    * @return {string} The string.
    * @private
    */
   readZSTR_(bytes, index=0) {
-    /** @type {string} */
-    let str = '';
     for (let i = index; i < bytes.length; i++) {
       this.head_++;
       if (bytes[i] === 0) {
         break;
       }
-      str += unpackString(bytes, i, i + 1);
     }
-    return str;
+    return unpackString(bytes, index, this.head_ - 1);
   }
 
   /**

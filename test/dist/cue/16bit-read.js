@@ -1,6 +1,6 @@
 /**
  * WaveFile: https://github.com/rochars/wavefile
- * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha. MIT License.
  *
  * Test reading the "cue " chunk.
  * 
@@ -127,5 +127,52 @@ describe("16-bit cue reading (file with 2 markers)", function() {
     });
     it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
+    });
+
+    it("reads the markers in the file", function() {
+        assert.deepEqual(wav.listCuePoints(), [
+            {
+                dwPosition: 24000,
+                label: "wave1",
+                milliseconds: 1500
+            },
+            {
+                dwPosition: 72000,
+                label: "wave2",
+                milliseconds: 4500
+            }
+        ]);
+    });
+
+});
+
+describe("16-bit cue reading (file with 1 UTF8 marker)", function() {
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+    wav.LISTChunks = [];
+    it("read UTF8 in cue point markers", function() {
+        assert.deepEqual(wav.listCuePoints(), [
+            {
+                dwPosition: 4000,
+                label: "\u03A9",
+                
+                milliseconds: 500
+            }
+        ]);
+    });
+});
+
+describe("16-bit cue reading (https://github.com/rochars/wavefile/issues/13)", function() {
+    let wav = new WaveFile(
+        fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue-issue13.wav"));
+    wav.LISTChunks = [];
+    it("read UTF8 in cue point markers", function() {
+        assert.deepEqual(wav.listCuePoints(), [
+            {
+                dwPosition: 4000,
+                label: "Marker 01 abcäöüß",
+                milliseconds: 500
+            }
+        ]);
     });
 });
