@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 8.5.0 (unreleased)
+- Fix: JSDoc type annotation for samples in *WaveFile.fromScratch()*.
+
 ## version 8.4.5 (2019-07-25)
 - Fix: read UTF8 chars in cue points (https://github.com/rochars/wavefile/issues/13)
 

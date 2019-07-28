@@ -2253,7 +2253,7 @@ class WaveFile {
    * @param {string} bitDepthCode The audio bit depth code.
    *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
    *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
+   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
    *    The samples. Must be in the correct range according to the bit depth.
    * @param {?Object} options Optional. Used to force the container
    *    as RIFX with {'container': 'RIFX'}
@@ -2940,9 +2940,10 @@ class WaveFile {
   }
 
   /**
-   * Set up the WaveFile object from a byte buffer.
-   * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView}
-   *   samples The samples.
+   * Interleave de-interleaved samples.
+   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+   *    The samples.
+   * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
    * @private
    */
   interleave_(samples) {
