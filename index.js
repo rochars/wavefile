@@ -35,7 +35,7 @@ import * as alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
 import RIFFFile from './lib/riff-file';
 import writeString from './lib/write-string';
-import {unpackArray, packArrayTo, unpackArrayTo, unpackString,
+import {unpackArray, packArrayTo, unpackArrayTo,
   unpack, packTo, packStringTo, packString, pack} from 'byte-data';
 
 /**
