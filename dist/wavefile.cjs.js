@@ -2197,7 +2197,6 @@ class RIFFFile {
  * @param {number} maxSize the max size of the string.
  * @param {boolean} fixedSize If the string is of fixed size or not.
  * @return {!Array<number>} The packed string.
- * @private
  */
 function writeString(str, maxSize, fixedSize=true) {
   /** @type {!Array<number>} */   
@@ -2243,7 +2242,6 @@ function writeString(str, maxSize, fixedSize=true) {
  * Return the value for dwChannelMask according to the number of channels.
  * @param {number} numChannels the number of channels.
  * @return {number} the dwChannelMask value.
- * @private
  */
 function dwChannelMask(numChannels) {
   /** @type {number} */
@@ -2301,7 +2299,6 @@ function dwChannelMask(numChannels) {
  * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
  *    The samples.
  * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
- * @private
  */
 function interleave(samples) {
   if (samples.length > 0) {
@@ -2351,7 +2348,6 @@ function interleave(samples) {
 /**
  * Truncate float samples on overflow.
  * @param {Float64Array} samples the samples.
- * @private
  */
 function truncateSamples(samples) {
   for (let i = 0, len = samples.length; i < len; i++) {
@@ -2396,7 +2392,6 @@ function truncateSamples(samples) {
  * Fix a RIFF tag format if possible, throw an error otherwise.
  * @param {string} tag The tag name.
  * @return {string} The tag name in proper fourCC format.
- * @private
  */
 function fixRIFFTag(tag) {
   if (tag.constructor !== String) {
