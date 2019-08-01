@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "8.4.5",
+  "version": "8.4.6",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -46,12 +46,14 @@
     "bin": "bin",
     "dist": "dist",
     "externs": "externs",
+    "lib": "lib",
     "scripts": "scripts"
   },
   "files": [
     "bin",
     "dist",
     "externs",
+    "lib",
     "scripts",
     "index.js",
     "index.d.ts",
@@ -61,7 +63,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "lint": "jshint index.js bin externs test/src",
+    "lint": "jshint index.js bin externs lib test/src",
     "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src --recursive -R dot --timeout=240000",
     "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist test/src --esm --recursive -R dot --timeout=240000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
