@@ -2347,7 +2347,8 @@ function interleave(samples) {
  */
 
 /**
- * Truncate float samples on over and underflow.
+ * Truncate float samples on overflow.
+ * @param {Float64Array} samples the samples.
  * @private
  */
 function truncateSamples(samples) {
