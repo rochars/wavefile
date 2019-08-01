@@ -356,16 +356,30 @@ export default class WaveFile extends RIFFFile {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Uint8Array} bytes The buffer.
+   * @param {!Uint8Array} wavBuffer The buffer.
    * @param {boolean=} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
-  fromBuffer(bytes, samples=true) {
+  fromBuffer(wavBuffer, samples=true) {
     this.clearHeader_();
-    this.readWavBuffer(bytes, samples);
+    this.head_ = 0;
+    this.readRIFFChunk(wavBuffer);
+    if (this.format != 'WAVE') {
+      throw Error('Could not find the "WAVE" format identifier');
+    }
+    this.setSignature(wavBuffer);
+    this.readDs64Chunk_(wavBuffer);
+    this.readFmtChunk_(wavBuffer);
+    this.readFactChunk_(wavBuffer);
+    this.readBextChunk_(wavBuffer);
+    this.readCueChunk_(wavBuffer);
+    this.readSmplChunk_(wavBuffer);
+    this.readDataChunk_(wavBuffer, samples);
+    this.readJunkChunk_(wavBuffer);
+    this.readLISTChunk_(wavBuffer);
     this.bitDepthFromFmt_();
     this.updateDataType_();
   }
@@ -378,7 +392,7 @@ export default class WaveFile extends RIFFFile {
    */
   toBuffer() {
     this.validateWavHeader_();
-    return this.writeWavBuffer();
+    return this.writeWavBuffer_();
   }
 
   /**
@@ -1030,7 +1044,7 @@ export default class WaveFile extends RIFFFile {
    * @return {!Uint8Array} The wav file bytes.
    * @private
    */
-  writeWavBuffer() {
+  writeWavBuffer_() {
     this.uInt16_.be = this.container === 'RIFX';
     this.uInt32_.be = this.uInt16_.be;
     /** @type {!Array<!Array<number>>} */
@@ -1400,33 +1414,6 @@ export default class WaveFile extends RIFFFile {
         this.junk.chunkData);
     }
     return bytes;
-  }
-
-  /**
-   * Set up the WaveFile object from a byte buffer.
-   * @param {!Uint8Array} wavBuffer The buffer.
-   * @param {boolean} samples True if the samples should be loaded.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  readWavBuffer(wavBuffer, samples) {
-    this.head_ = 0;
-    this.readRIFFChunk(wavBuffer);
-    if (this.format != 'WAVE') {
-      throw Error('Could not find the "WAVE" format identifier');
-    }
-    this.setSignature(wavBuffer);
-    this.readDs64Chunk_(wavBuffer);
-    this.readFmtChunk_(wavBuffer);
-    this.readFactChunk_(wavBuffer);
-    this.readBextChunk_(wavBuffer);
-    this.readCueChunk_(wavBuffer);
-    this.readSmplChunk_(wavBuffer);
-    this.readDataChunk_(wavBuffer, samples);
-    this.readJunkChunk_(wavBuffer);
-    this.readLISTChunk_(wavBuffer);
   }
 
   /**
