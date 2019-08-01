@@ -37,6 +37,7 @@ import RIFFFile from './lib/riff-file';
 import writeString from './lib/write-string';
 import dwChannelMask from './lib/dw-channel-mask';
 import interleave from './lib/interleave';
+import truncateSamples from './lib/truncate-samples';
 import {unpackArray, packArrayTo, unpackArrayTo,
   unpack, packTo, packStringTo, packString, pack} from 'byte-data';
 
@@ -467,7 +468,7 @@ export default class WaveFile extends RIFFFile {
     let typedSamplesOutput = new Float64Array(sampleCount);
     unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
     if (thisBitDepth == "32f" || thisBitDepth == "64") {
-      this.truncateSamples_(typedSamplesInput);
+      truncateSamples(typedSamplesInput);
     }
     bitDepthLib(
       typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
@@ -1035,20 +1036,6 @@ export default class WaveFile extends RIFFFile {
    */
   correctContainer_() {
     return this.container == 'RF64' ? 'RIFF' : this.container;
-  }
-
-  /**
-   * Truncate float samples on over and underflow.
-   * @private
-   */
-  truncateSamples_(samples) {
-    for (let i = 0, len = samples.length; i < len; i++) {
-      if (samples[i] > 1) {
-        samples[i] = 1;
-      } else if (samples[i] < -1) {
-        samples[i] = -1;
-      }
-    }
   }
 
   /**
