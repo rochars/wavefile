@@ -1979,16 +1979,6 @@ class RIFFFile {
   }
 
   /**
-   * Load a RIFF file.
-   * @param {!Uint8Array} buffer The file bytes.
-   */
-  loadRIFF(buffer) {
-    this.head_ = 0;
-    this.readRIFFChunk_(buffer);
-    this.getSignature_(buffer);
-  }
-
-  /**
    * Return the chunks in a RIFF/RIFX file.
    * @param {!Uint8Array} buffer The file bytes.
    */
@@ -2123,10 +2113,6 @@ class RIFFFile {
     this.uInt16_.be = this.container === 'RIFX';
     this.uInt32_.be = this.uInt16_.be;
     this.chunkSize = this.read_(bytes, this.uInt32_);
-    this.format = this.readString_(bytes, 4);
-    if (this.format != 'WAVE') {
-      throw Error('Could not find the "WAVE" format identifier');
-    }
   }
 
   /**
@@ -3720,14 +3706,18 @@ class WaveFile extends RIFFFile {
    * @param {!Uint8Array} wavBuffer The buffer.
    * @param {boolean} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
   readWavBuffer(wavBuffer, samples) {
     this.head_ = 0;
-    //this.readRIFFChunk_(buffer);
-    //this.getSignature_(buffer);
-    this.loadRIFF(wavBuffer);
+    this.readRIFFChunk_(wavBuffer);
+    this.format = this.readString_(wavBuffer, 4);
+    if (this.format != 'WAVE') {
+      throw Error('Could not find the "WAVE" format identifier');
+    }
+    this.getSignature_(wavBuffer);
     this.readDs64Chunk_(wavBuffer);
     this.readFmtChunk_(wavBuffer);
     this.readFactChunk_(wavBuffer);
