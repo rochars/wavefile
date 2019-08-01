@@ -33,22 +33,24 @@ import bitDepthLib from 'bitdepth';
 import * as imaadpcm from 'imaadpcm';
 import * as alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
+import RIFFFile from './lib/riff-file';
+import writeString from './lib/write-string';
 import {unpackArray, packArrayTo, unpackArrayTo, unpackString,
   unpack, packTo, packStringTo, packString, pack} from 'byte-data';
 
 /**
  * A class to read, write and process wav files.
  */
-export default class WaveFile {
+export default class WaveFile extends RIFFFile {
 
   /**
-   * @param {?Uint8Array=} bytes A wave file buffer.
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
    * @throws {Error} If no 'RIFF' chunk is found.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
-  constructor(bytes=null) {
-    
+  constructor(wavBuffer=null) {
+    super();
     /**
      * Audio formats.
      * Formats not listed here should be set to 65534,
@@ -67,28 +69,6 @@ export default class WaveFile {
       '32f': 3,
       '64': 3
     };
-    /** @type {number} */
-    this.head_ = 0;
-    /** @type {!Object} */
-    this.uInt32_ = {bits: 32, be: false};
-    /** @type {!Object} */
-    this.uInt16_ = {bits: 16, be: false};
-    /**
-     * The container identifier.
-     * 'RIFF', 'RIFX' and 'RF64' are supported.
-     * @type {string}
-     */
-    this.container = '';
-    /**
-     * @type {number}
-     */
-    this.chunkSize = 0;
-    /**
-     * The format.
-     * Always 'WAVE'.
-     * @type {string}
-     */
-    this.format = '';
     /**
      * The data of the 'fmt' chunk.
      * @type {!Object<string, *>}
@@ -292,19 +272,14 @@ export default class WaveFile {
      */
     this.bitDepth = '0';
     /**
-     * A object defining the start and end of all chunks in a wav buffer.
-     * @type {!Object}
-     */
-    this.signature = {};
-    /**
      * @type {!Object}
      * @private
      */
     this.dataType = {};
     // Load a file from the buffer if one was passed
     // when creating the object
-    if (bytes) {
-      this.fromBuffer(bytes);
+    if (wavBuffer) {
+      this.fromBuffer(wavBuffer);
     }
   }
 
@@ -1152,22 +1127,22 @@ export default class WaveFile {
       bytes = bytes.concat(
         packString(this.bext.chunkId),
         pack(602 + this.bext.codingHistory.length, this.uInt32_),
-        this.writeString_(this.bext.description, 256),
-        this.writeString_(this.bext.originator, 32),
-        this.writeString_(this.bext.originatorReference, 32),
-        this.writeString_(this.bext.originationDate, 10),
-        this.writeString_(this.bext.originationTime, 8),
+        writeString(this.bext.description, 256),
+        writeString(this.bext.originator, 32),
+        writeString(this.bext.originatorReference, 32),
+        writeString(this.bext.originationDate, 10),
+        writeString(this.bext.originationTime, 8),
         pack(this.bext.timeReference[0], this.uInt32_),
         pack(this.bext.timeReference[1], this.uInt32_),
         pack(this.bext.version, this.uInt16_),
-        this.writeString_(this.bext.UMID, 64),
+        writeString(this.bext.UMID, 64),
         pack(this.bext.loudnessValue, this.uInt16_),
         pack(this.bext.loudnessRange, this.uInt16_),
         pack(this.bext.maxTruePeakLevel, this.uInt16_),
         pack(this.bext.maxMomentaryLoudness, this.uInt16_),
         pack(this.bext.maxShortTermLoudness, this.uInt16_),
-        this.writeString_(this.bext.reserved, 180),
-        this.writeString_(
+        writeString(this.bext.reserved, 180),
+        writeString(
           this.bext.codingHistory, this.bext.codingHistory.length));
     }
     return bytes;
@@ -1414,7 +1389,7 @@ export default class WaveFile {
         bytes = bytes.concat(
           packString(subChunks[i].chunkId),
           pack(subChunks[i].value.length + 1, this.uInt32_),
-          this.writeString_(
+          writeString(
             subChunks[i].value, subChunks[i].value.length));
         bytes.push(0);
       } else if (format == 'adtl') {
@@ -1424,7 +1399,7 @@ export default class WaveFile {
             pack(
               subChunks[i].value.length + 4 + 1, this.uInt32_),
             pack(subChunks[i].dwName, this.uInt32_),
-            this.writeString_(
+            writeString(
               subChunks[i].value,
               subChunks[i].value.length));
           bytes.push(0);
@@ -1456,7 +1431,7 @@ export default class WaveFile {
       pack(ltxt.dwLanguage, this.uInt16_),
       pack(ltxt.dwDialect, this.uInt16_),
       pack(ltxt.dwCodePage, this.uInt16_),
-      this.writeString_(ltxt.value, ltxt.value.length));
+      writeString(ltxt.value, ltxt.value.length));
   }
 
   /**
@@ -1477,168 +1452,26 @@ export default class WaveFile {
 
   /**
    * Set up the WaveFile object from a byte buffer.
-   * @param {!Uint8Array} buffer The buffer.
+   * @param {!Uint8Array} wavBuffer The buffer.
    * @param {boolean} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
-  readWavBuffer(buffer, samples) {
+  readWavBuffer(wavBuffer, samples) {
     this.head_ = 0;
-    this.readRIFFChunk_(buffer);
-    this.getSignature_(buffer);
-    this.readDs64Chunk_(buffer);
-    this.readFmtChunk_(buffer);
-    this.readFactChunk_(buffer);
-    this.readBextChunk_(buffer);
-    this.readCueChunk_(buffer);
-    this.readSmplChunk_(buffer);
-    this.readDataChunk_(buffer, samples);
-    this.readJunkChunk_(buffer);
-    this.readLISTChunk_(buffer);
-  }
-
-  /**
-   * Return the chunks in a RIFF/RIFX file.
-   * @param {!Uint8Array} buffer The file bytes.
-   */
-  getSignature_(buffer) {
-      this.head_ = 0;
-      /** @type {string} */
-      let chunkId = this.getChunkId_(buffer, 0);
-      this.uInt32_.be = chunkId == 'RIFX';
-      /** @type {string} */
-      let format = unpackString(buffer, 8, 12);
-      this.head_ += 4;
-      this.signature = {
-          chunkId: chunkId,
-          chunkSize: this.getChunkSize_(buffer, 0),
-          format: format,
-          subChunks: this.getSubChunksIndex_(buffer)
-      };
-  }
-
-  /**
-    * Find a chunk by its fourCC_ in a array of RIFF chunks.
-    * @param {string} chunkId The chunk fourCC_.
-    * @param {boolean} multiple True if there may be multiple chunks
-    *    with the same chunkId.
-    * @return {Object}
-    */
-  findChunk_(chunkId, multiple=false) {
-    /** @type {!Array<!Object>} */
-    let chunks = this.signature.subChunks;
-    /** @type {!Array<!Object>} */
-    let chunk = [];
-    for (let i=0; i<chunks.length; i++) {
-      if (chunks[i].chunkId == chunkId) {
-        if (multiple) {
-          chunk.push(chunks[i]);
-        } else {
-          return chunks[i];
-        }
-      }
-    }
-    if (chunkId == 'LIST') {
-      return chunk.length ? chunk : null;
-    }
-    return null;
-  }
-
-  /**
-   * Return the sub chunks of a RIFF file.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @return {!Array<Object>} The subchunks of a RIFF/RIFX or LIST chunk.
-   * @private
-   */
-  getSubChunksIndex_(buffer) {
-      /** @type {!Array<!Object>} */
-      let chunks = [];
-      /** @type {number} */
-      let i = this.head_;
-      while(i <= buffer.length - 8) {
-          chunks.push(this.getSubChunkIndex_(buffer, i));
-          i += 8 + chunks[chunks.length - 1].chunkSize;
-          i = i % 2 ? i + 1 : i;
-      }
-      return chunks;
-  }
-
-  /**
-   * Return a sub chunk from a RIFF file.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @param {number} index The start index of the chunk.
-   * @return {!Object} A subchunk of a RIFF/RIFX or LIST chunk.
-   * @private
-   */
-  getSubChunkIndex_(buffer, index) {
-      /** @type {!Object} */
-      let chunk = {
-          chunkId: this.getChunkId_(buffer, index),
-          chunkSize: this.getChunkSize_(buffer, index),
-      };
-      if (chunk.chunkId == 'LIST') {
-          chunk.format = unpackString(buffer, index + 8, index + 12);
-          this.head_ += 4;
-          chunk.subChunks = this.getSubChunksIndex_(buffer);
-      } else {
-          /** @type {number} */
-          let realChunkSize = chunk.chunkSize % 2 ?
-              chunk.chunkSize + 1 : chunk.chunkSize;
-          this.head_ = index + 8 + realChunkSize;
-          chunk.chunkData = {
-              start: index + 8,
-              end: this.head_
-          };
-      }
-      return chunk;
-  }
-
-  /**
-   * Return the fourCC_ of a chunk.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @param {number} index The start index of the chunk.
-   * @return {string} The id of the chunk.
-   * @private
-   */
-  getChunkId_(buffer, index) {
-      this.head_ += 4;
-      return unpackString(buffer, index, index + 4);
-  }
-
-  /**
-   * Return the size of a chunk.
-   * @param {!Uint8Array} buffer the RIFF file bytes.
-   * @param {number} index The start index of the chunk.
-   * @return {number} The size of the chunk without the id and size fields.
-   * @private
-   */
-  getChunkSize_(buffer, index) {
-      this.head_ += 4;
-      return unpack(buffer, this.uInt32_, index + 4);
-  }
-
-
-
-  /**
-   * Read the RIFF chunk a wave file.
-   * @param {!Uint8Array} bytes A wav buffer.
-   * @throws {Error} If no 'RIFF' chunk is found.
-   * @private
-   */
-  readRIFFChunk_(bytes) {
-    this.head_ = 0;
-    this.container = this.readString_(bytes, 4);
-    if (['RIFF', 'RIFX', 'RF64'].indexOf(this.container) === -1) {
-      throw Error('Not a supported format.');
-    }
-    this.uInt16_.be = this.container === 'RIFX';
-    this.uInt32_.be = this.uInt16_.be;
-    this.chunkSize = this.read_(bytes, this.uInt32_);
-    this.format = this.readString_(bytes, 4);
-    if (this.format != 'WAVE') {
-      throw Error('Could not find the "WAVE" format identifier');
-    }
+    //this.readRIFFChunk_(buffer);
+    //this.getSignature_(buffer);
+    this.loadRIFF(wavBuffer);
+    this.readDs64Chunk_(wavBuffer);
+    this.readFmtChunk_(wavBuffer);
+    this.readFactChunk_(wavBuffer);
+    this.readBextChunk_(wavBuffer);
+    this.readCueChunk_(wavBuffer);
+    this.readSmplChunk_(wavBuffer);
+    this.readDataChunk_(wavBuffer, samples);
+    this.readJunkChunk_(wavBuffer);
+    this.readLISTChunk_(wavBuffer);
   }
 
   /**
@@ -2161,72 +1994,5 @@ export default class WaveFile {
       throw new Error('Invalid sample rate.');
     }
     return true;
-  }
-
-  /**
-   * Write a variable size string as bytes. If the string is smaller
-   * than the max size the output array is filled with 0s.
-   * @param {string} str The string to be written as bytes.
-   * @param {number} maxSize the max size of the string.
-   * @return {!Array<number>} The bytes.
-   * @private
-   */
-  writeString_(str, maxSize, push=true) {
-    /** @type {!Array<number>} */   
-    let bytes = packString(str);
-    if (push) {
-      for (let i=bytes.length; i<maxSize; i++) {
-        bytes.push(0);
-      }  
-    }
-    return bytes;
-  }
-
-  /**
-   * Read bytes as a ZSTR string.
-   * @param {!Uint8Array} bytes The bytes.
-   * @param {number} index the index to start reading.
-   * @return {string} The string.
-   * @private
-   */
-  readZSTR_(bytes, index=0) {
-    for (let i = index; i < bytes.length; i++) {
-      this.head_++;
-      if (bytes[i] === 0) {
-        break;
-      }
-    }
-    return unpackString(bytes, index, this.head_ - 1);
-  }
-
-  /**
-   * Read bytes as a string from a RIFF chunk.
-   * @param {!Uint8Array} bytes The bytes.
-   * @param {number} maxSize the max size of the string.
-   * @return {string} The string.
-   * @private
-   */
-  readString_(bytes, maxSize) {
-    /** @type {string} */
-    let str = '';
-    str = unpackString(bytes, this.head_, this.head_ + maxSize);
-    this.head_ += maxSize;
-    return str;
-  }
-
-  /**
-   * Read a number from a chunk.
-   * @param {!Uint8Array} bytes The chunk bytes.
-   * @param {!Object} bdType The type definition.
-   * @return {number} The number.
-   * @private
-   */
-  read_(bytes, bdType) {
-    /** @type {number} */
-    let size = bdType.bits / 8;
-    /** @type {number} */
-    let value = unpack(bytes, bdType, this.head_);
-    this.head_ += size;
-    return value;
   }
 }
