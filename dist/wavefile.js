@@ -1965,7 +1965,6 @@ class RIFFFile {
     this.chunkSize = 0;
     /**
      * The format.
-     * Always 'WAVE'.
      * @type {string}
      */
     this.format = '';
@@ -2097,8 +2096,8 @@ class RIFFFile {
   }
 
   /**
-   * Read the RIFF chunk a wave file.
-   * @param {!Uint8Array} bytes A wav buffer.
+   * Read the main chunk of a RIFF file.
+   * @param {!Uint8Array} bytes A RIFF file buffer.
    * @throws {Error} If no 'RIFF' chunk is found.
    * @private
    */
@@ -2111,6 +2110,7 @@ class RIFFFile {
     this.uInt16_.be = this.container === 'RIFX';
     this.uInt32_.be = this.uInt16_.be;
     this.chunkSize = this.read_(bytes, this.uInt32_);
+    this.format = this.readString_(bytes, 4);
   }
 
   /**
@@ -3711,7 +3711,6 @@ class WaveFile extends RIFFFile {
   readWavBuffer(wavBuffer, samples) {
     this.head_ = 0;
     this.readRIFFChunk_(wavBuffer);
-    this.format = this.readString_(wavBuffer, 4);
     if (this.format != 'WAVE') {
       throw Error('Could not find the "WAVE" format identifier');
     }

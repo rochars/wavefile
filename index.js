@@ -1463,7 +1463,6 @@ export default class WaveFile extends RIFFFile {
   readWavBuffer(wavBuffer, samples) {
     this.head_ = 0;
     this.readRIFFChunk_(wavBuffer);
-    this.format = this.readString_(wavBuffer, 4);
     if (this.format != 'WAVE') {
       throw Error('Could not find the "WAVE" format identifier');
     }
