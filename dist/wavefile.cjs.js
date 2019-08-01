@@ -2290,6 +2290,58 @@ function dwChannelMask(numChannels) {
  */
 
 /**
+ * @fileoverview The interleave function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Interleave de-interleaved samples.
+ * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+ *    The samples.
+ * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
+ * @private
+ */
+function interleave(samples) {
+  if (samples.length > 0) {
+    if (samples[0].constructor === Array) {
+      /** @type {!Array<number>} */
+      let finalSamples = [];
+      for (let i = 0, len = samples[0].length; i < len; i++) {
+        for (let j = 0, subLen = samples.length; j < subLen; j++) {
+          finalSamples.push(samples[j][i]);
+        }
+      }
+      samples = finalSamples;
+    }
+  }
+  return samples;
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
  * A class to read, write and process wav files.
  */
 class WaveFile extends RIFFFile {
@@ -2585,7 +2637,7 @@ class WaveFile extends RIFFFile {
     }
     this.container = options.container;
     this.bitDepth = bitDepthCode;
-    samples = this.interleave_(samples);
+    samples = interleave(samples);
     this.updateDataType_();
     /** @type {number} */
     let numBytes = this.dataType.bits / 8;
@@ -3257,29 +3309,6 @@ class WaveFile extends RIFFFile {
     } else if (this.bitDepth == '4') {
       this.fromIMAADPCM();
     }
-  }
-
-  /**
-   * Interleave de-interleaved samples.
-   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
-   *    The samples.
-   * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
-   * @private
-   */
-  interleave_(samples) {
-    if (samples.length > 0) {
-      if (samples[0].constructor === Array) {
-        /** @type {!Array<number>} */
-        let finalSamples = [];
-        for (let i = 0, len = samples[0].length; i < len; i++) {
-          for (let j = 0, subLen = samples.length; j < subLen; j++) {
-            finalSamples.push(samples[j][i]);
-          }
-        }
-        samples = finalSamples;
-      }
-    }
-    return samples;
   }
 
   /**

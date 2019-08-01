@@ -36,6 +36,7 @@ import {encode, decode} from 'base64-arraybuffer-es6';
 import RIFFFile from './lib/riff-file';
 import writeString from './lib/write-string';
 import dwChannelMask from './lib/dw-channel-mask';
+import interleave from './lib/interleave';
 import {unpackArray, packArrayTo, unpackArrayTo,
   unpack, packTo, packStringTo, packString, pack} from 'byte-data';
 
@@ -335,7 +336,7 @@ export default class WaveFile extends RIFFFile {
     }
     this.container = options.container;
     this.bitDepth = bitDepthCode;
-    samples = this.interleave_(samples);
+    samples = interleave(samples);
     this.updateDataType_();
     /** @type {number} */
     let numBytes = this.dataType.bits / 8;
@@ -1007,29 +1008,6 @@ export default class WaveFile extends RIFFFile {
     } else if (this.bitDepth == '4') {
       this.fromIMAADPCM();
     }
-  }
-
-  /**
-   * Interleave de-interleaved samples.
-   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
-   *    The samples.
-   * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
-   * @private
-   */
-  interleave_(samples) {
-    if (samples.length > 0) {
-      if (samples[0].constructor === Array) {
-        /** @type {!Array<number>} */
-        let finalSamples = [];
-        for (let i = 0, len = samples[0].length; i < len; i++) {
-          for (let j = 0, subLen = samples.length; j < subLen; j++) {
-            finalSamples.push(samples[j][i]);
-          }
-        }
-        samples = finalSamples;
-      }
-    }
-    return samples;
   }
 
   /**
