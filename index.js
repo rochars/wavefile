@@ -38,6 +38,7 @@ import writeString from './lib/write-string';
 import dwChannelMask from './lib/dw-channel-mask';
 import interleave from './lib/interleave';
 import truncateSamples from './lib/truncate-samples';
+import fixRIFFTag from './lib/fix-riff-tag';
 import {unpackArray, packArrayTo, unpackArrayTo,
   unpack, packTo, packStringTo, packString, pack} from 'byte-data';
 
@@ -600,7 +601,7 @@ export default class WaveFile extends RIFFFile {
    * @throws {Error} If the tag name is not valid.
    */
   setTag(tag, value) {
-    tag = this.fixTagName_(tag);
+    tag = fixRIFFTag(tag);
     /** @type {!Object} */
     let index = this.getTagIndex_(tag);
     if (index.TAG !== null) {
@@ -955,23 +956,6 @@ export default class WaveFile extends RIFFFile {
       }
     }
     return index;
-  }
-
-  /**
-   * Fix a RIFF tag format if possible, throw an error otherwise.
-   * @param {string} tag The tag name.
-   * @return {string} The tag name in proper fourCC format.
-   * @private
-   */
-  fixTagName_(tag) {
-    if (tag.constructor !== String) {
-      throw new Error('Invalid tag name.');
-    } else if (tag.length < 4) {
-      for (let i = 0, len = 4 - tag.length; i < len; i++) {
-        tag += ' ';
-      }
-    }
-    return tag;
   }
 
   /**
