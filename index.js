@@ -49,7 +49,8 @@ export default class WaveFile extends RIFFFile {
 
   /**
    * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If no 'RIFF' chunk is found.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
@@ -358,6 +359,7 @@ export default class WaveFile extends RIFFFile {
    * @param {!Uint8Array} bytes The buffer.
    * @param {boolean=} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
