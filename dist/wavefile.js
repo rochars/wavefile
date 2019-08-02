@@ -2232,156 +2232,6 @@ function writeString(str, maxSize, fixedSize=true) {
  */
 
 /**
- * @fileoverview The dwChannelMask function.
- * @see https://github.com/rochars/wavefile
- */
-
-/**
- * Return the value for dwChannelMask according to the number of channels.
- * @param {number} numChannels the number of channels.
- * @return {number} the dwChannelMask value.
- */
-function dwChannelMask(numChannels) {
-  /** @type {number} */
-  let mask = 0;
-  // mono = FC
-  if (numChannels === 1) {
-    mask = 0x4;
-  // stereo = FL, FR
-  } else if (numChannels === 2) {
-    mask = 0x3;
-  // quad = FL, FR, BL, BR
-  } else if (numChannels === 4) {
-    mask = 0x33;
-  // 5.1 = FL, FR, FC, LF, BL, BR
-  } else if (numChannels === 6) {
-    mask = 0x3F;
-  // 7.1 = FL, FR, FC, LF, BL, BR, SL, SR
-  } else if (numChannels === 8) {
-    mask = 0x63F;
-  }
-  return mask;
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * @fileoverview The interleave function.
- * @see https://github.com/rochars/wavefile
- */
-
-/**
- * Interleave de-interleaved samples.
- * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
- *    The samples.
- * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
- */
-function interleave(samples) {
-  if (samples.length > 0) {
-    if (samples[0].constructor === Array) {
-      /** @type {!Array<number>} */
-      let finalSamples = [];
-      for (let i = 0, len = samples[0].length; i < len; i++) {
-        for (let j = 0, subLen = samples.length; j < subLen; j++) {
-          finalSamples.push(samples[j][i]);
-        }
-      }
-      samples = finalSamples;
-    }
-  }
-  return samples;
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * @fileoverview The truncateSamples function.
- * @see https://github.com/rochars/wavefile
- */
-
-/**
- * Truncate float samples on overflow.
- * @param {Float64Array} samples the samples.
- */
-function truncateSamples(samples) {
-  for (let i = 0, len = samples.length; i < len; i++) {
-    if (samples[i] > 1) {
-      samples[i] = 1;
-    } else if (samples[i] < -1) {
-      samples[i] = -1;
-    }
-  }
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
  * @fileoverview The fixRIFFTag function.
  * @see https://github.com/rochars/wavefile
  */
@@ -2427,18 +2277,11 @@ function fixRIFFTag(tag) {
  */
 
 /**
- * A class to read, write and process wav files.
+ * A class to read and write wav files.
  */
-class WaveFile extends RIFFFile {
+class WaveFileParser extends RIFFFile {
 
-  /**
-   * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  constructor(wavBuffer=null) {
+  constructor() {
     super();
     /**
      * Audio formats.
@@ -2665,89 +2508,19 @@ class WaveFile extends RIFFFile {
      * @private
      */
     this.dataType = {};
-    // Load a file from the buffer if one was passed
-    // when creating the object
-    if (wavBuffer) {
-      this.fromBuffer(wavBuffer);
-    }
   }
 
   /**
-   * Return the sample at a given index.
-   * @param {number} index The sample index.
-   * @return {number} The sample.
-   * @throws {Error} If the sample index is off range.
-   */
-  getSample(index) {
-    index = index * (this.dataType.bits / 8);
-    if (index + this.dataType.bits / 8 > this.data.samples.length) {
-      throw new Error('Range error');
-    }
-    return unpack$1(
-      this.data.samples.slice(index, index + this.dataType.bits / 8),
-      this.dataType);
-  }
-
-  /**
-   * Set the sample at a given index.
-   * @param {number} index The sample index.
-   * @param {number} sample The sample.
-   * @throws {Error} If the sample index is off range.
-   */
-  setSample(index, sample) {
-    index = index * (this.dataType.bits / 8);
-    if (index + this.dataType.bits / 8 > this.data.samples.length) {
-      throw new Error('Range error');
-    }
-    packTo(sample, this.dataType, this.data.samples, index);
-  }
-
-  /**
-   * Set up the WaveFile object based on the arguments passed.
-   * @param {number} numChannels The number of channels
-   *    (Integer numbers: 1 for mono, 2 stereo and so on).
-   * @param {number} sampleRate The sample rate.
-   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
-   * @param {string} bitDepthCode The audio bit depth code.
-   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
-   *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
-   *    The samples. Must be in the correct range according to the bit depth.
-   * @param {?Object} options Optional. Used to force the container
-   *    as RIFX with {'container': 'RIFX'}
-   * @throws {Error} If any argument does not meet the criteria.
-   */
-  fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
-    if (!options.container) {
-      options.container = 'RIFF';
-    }
-    this.container = options.container;
-    this.bitDepth = bitDepthCode;
-    samples = interleave(samples);
-    this.updateDataType_();
-    /** @type {number} */
-    let numBytes = this.dataType.bits / 8;
-    this.data.samples = new Uint8Array(samples.length * numBytes);
-    packArrayTo(samples, this.dataType, this.data.samples);
-    this.clearHeader_();
-    this.makeWavHeader(
-      bitDepthCode, numChannels, sampleRate,
-      numBytes, this.data.samples.length, options);
-    this.data.chunkId = 'data';
-    this.data.chunkSize = this.data.samples.length;
-    this.validateWavHeader_();
-  }
-
-  /**
-   * Set up the WaveFile object from a byte buffer.
+   * Set up the WaveFileParser object from a byte buffer.
    * @param {!Uint8Array} wavBuffer The buffer.
    * @param {boolean=} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
+   * @protected
    */
-  fromBuffer(wavBuffer, samples=true) {
+  readBuffer(wavBuffer, samples=true) {
     this.clearHeader_();
     this.head_ = 0;
     this.readRIFFChunk(wavBuffer);
@@ -2769,415 +2542,17 @@ class WaveFile extends RIFFFile {
   }
 
   /**
-   * Return a byte buffer representig the WaveFile object as a .wav file.
+   * Return a byte buffer representig the WaveFileParser object as a .wav file.
    * The return value of this method can be written straight to disk.
-   * @return {!Uint8Array} A .wav file.
-   * @throws {Error} If any property of the object appears invalid.
+   * @return {!Uint8Array} A wav file.
+   * @throws {Error} If bit depth is invalid.
+   * @throws {Error} If the number of channels is invalid.
+   * @throws {Error} If the sample rate is invalid.
+   * @protected
    */
-  toBuffer() {
+  writeBuffer() {
     this.validateWavHeader_();
     return this.writeWavBuffer_();
-  }
-
-  /**
-   * Use a .wav file encoded as a base64 string to load the WaveFile object.
-   * @param {string} base64String A .wav file as a base64 string.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  fromBase64(base64String) {
-    this.fromBuffer(new Uint8Array(decode$3(base64String)));
-  }
-
-  /**
-   * Return a base64 string representig the WaveFile object as a .wav file.
-   * @return {string} A .wav file as a base64 string.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  toBase64() {
-    /** @type {!Uint8Array} */
-    let buffer = this.toBuffer();
-    return encode$3(buffer, 0, buffer.length);
-  }
-
-  /**
-   * Return a DataURI string representig the WaveFile object as a .wav file.
-   * The return of this method can be used to load the audio in browsers.
-   * @return {string} A .wav file as a DataURI.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  toDataURI() {
-    return 'data:audio/wav;base64,' + this.toBase64();
-  }
-
-  /**
-   * Use a .wav file encoded as a DataURI to load the WaveFile object.
-   * @param {string} dataURI A .wav file as DataURI.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  fromDataURI(dataURI) {
-    this.fromBase64(dataURI.replace('data:audio/wav;base64,', ''));
-  }
-
-  /**
-   * Force a file as RIFF.
-   */
-  toRIFF() {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      this.bitDepth,
-      unpackArray(this.data.samples, this.dataType));
-  }
-
-  /**
-   * Force a file as RIFX.
-   */
-  toRIFX() {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      this.bitDepth,
-      unpackArray(this.data.samples, this.dataType),
-      {container: 'RIFX'});
-  }
-
-  /**
-   * Change the bit depth of the samples.
-   * @param {string} newBitDepth The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats)
-   * @param {boolean} changeResolution A boolean indicating if the
-   *    resolution of samples should be actually changed or not.
-   * @throws {Error} If the bit depth is not valid.
-   */
-  toBitDepth(newBitDepth, changeResolution=true) {
-    /** @type {string} */
-    let toBitDepth = newBitDepth;
-    /** @type {string} */
-    let thisBitDepth = this.bitDepth;
-    if (!changeResolution) {
-      if (newBitDepth != '32f') {
-        toBitDepth = this.dataType.bits.toString();
-      }
-      thisBitDepth = this.dataType.bits;
-    }
-    this.assureUncompressed_();
-    /** @type {number} */
-    let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
-    /** @type {!Float64Array} */
-    let typedSamplesInput = new Float64Array(sampleCount);
-    /** @type {!Float64Array} */
-    let typedSamplesOutput = new Float64Array(sampleCount);
-    unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
-    if (thisBitDepth == "32f" || thisBitDepth == "64") {
-      truncateSamples(typedSamplesInput);
-    }
-    bitDepth(
-      typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      newBitDepth,
-      typedSamplesOutput,
-      {container: this.correctContainer_()});
-  }
-
-  /**
-   * Encode a 16-bit wave file as 4-bit IMA ADPCM.
-   * @throws {Error} If sample rate is not 8000.
-   * @throws {Error} If number of channels is not 1.
-   */
-  toIMAADPCM() {
-    if (this.fmt.sampleRate !== 8000) {
-      throw new Error(
-        'Only 8000 Hz files can be compressed as IMA-ADPCM.');
-    } else if (this.fmt.numChannels !== 1) {
-      throw new Error(
-        'Only mono files can be compressed as IMA-ADPCM.');
-    } else {
-      this.assure16Bit_();
-      /** @type {!Int16Array} */
-      let output = new Int16Array(this.data.samples.length / 2);
-      unpackArrayTo(this.data.samples, this.dataType, output);
-      this.fromScratch(
-        this.fmt.numChannels,
-        this.fmt.sampleRate,
-        '4',
-        encode(output),
-        {container: this.correctContainer_()});
-    }
-  }
-
-  /**
-   * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
-   */
-  fromIMAADPCM(bitDepthCode='16') {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '16',
-      decode(this.data.samples, this.fmt.blockAlign),
-      {container: this.correctContainer_()});
-    if (bitDepthCode != '16') {
-      this.toBitDepth(bitDepthCode);
-    }
-  }
-
-  /**
-   * Encode a 16-bit wave file as 8-bit A-Law.
-   */
-  toALaw() {
-    this.assure16Bit_();
-    /** @type {!Int16Array} */
-    let output = new Int16Array(this.data.samples.length / 2);
-    unpackArrayTo(this.data.samples, this.dataType, output);
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '8a',
-      encode$1(output),
-      {container: this.correctContainer_()});
-  }
-
-  /**
-   * Decode a 8-bit A-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
-   */
-  fromALaw(bitDepthCode='16') {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '16',
-      decode$1(this.data.samples),
-      {container: this.correctContainer_()});
-    if (bitDepthCode != '16') {
-      this.toBitDepth(bitDepthCode);
-    }
-  }
-
-  /**
-   * Encode 16-bit wave file as 8-bit mu-Law.
-   */
-  toMuLaw() {
-    this.assure16Bit_();
-    /** @type {!Int16Array} */
-    let output = new Int16Array(this.data.samples.length / 2);
-    unpackArrayTo(this.data.samples, this.dataType, output);
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '8m',
-      encode$2(output),
-      {container: this.correctContainer_()});
-  }
-
-  /**
-   * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
-   */
-  fromMuLaw(bitDepthCode='16') {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '16',
-      decode$2(this.data.samples),
-      {container: this.correctContainer_()});
-    if (bitDepthCode != '16') {
-      this.toBitDepth(bitDepthCode);
-    }
-  }
-
-  /**
-   * Write a RIFF tag in the INFO chunk. If the tag do not exist,
-   * then it is created. It if exists, it is overwritten.
-   * @param {string} tag The tag name.
-   * @param {string} value The tag value.
-   * @throws {Error} If the tag name is not valid.
-   */
-  setTag(tag, value) {
-    tag = fixRIFFTag(tag);
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      this.LIST[index.LIST].subChunks[index.TAG].chunkSize =
-        value.length + 1;
-      this.LIST[index.LIST].subChunks[index.TAG].value = value;
-    } else if (index.LIST !== null) {
-      this.LIST[index.LIST].subChunks.push({
-        chunkId: tag,
-        chunkSize: value.length + 1,
-        value: value});
-    } else {
-      this.LIST.push({
-        chunkId: 'LIST',
-        chunkSize: 8 + value.length + 1,
-        format: 'INFO',
-        subChunks: []});
-      this.LIST[this.LIST.length - 1].subChunks.push({
-        chunkId: tag,
-        chunkSize: value.length + 1,
-        value: value});
-    }
-  }
-
-  /**
-   * Return the value of a RIFF tag in the INFO chunk.
-   * @param {string} tag The tag name.
-   * @return {?string} The value if the tag is found, null otherwise.
-   */
-  getTag(tag) {
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      return this.LIST[index.LIST].subChunks[index.TAG].value;
-    }
-    return null;
-  }
-
-  /**
-   * Return a Object<tag, value> with the RIFF tags in the file.
-   * @return {!Object<string, string>} The file tags.
-   */
-  listTags() {
-    /** @type {?number} */
-    let index = this.getLISTINFOIndex_();
-    /** @type {!Object} */
-    let tags = {};
-    if (index !== null) {
-      for (let i = 0, len = this.LIST[index].subChunks.length; i < len; i++) {
-        tags[this.LIST[index].subChunks[i].chunkId] =
-          this.LIST[index].subChunks[i].value;
-      }
-    }
-    return tags;
-  }
-
-  /**
-   * Remove a RIFF tag in the INFO chunk.
-   * @param {string} tag The tag name.
-   * @return {boolean} True if a tag was deleted.
-   */
-  deleteTag(tag) {
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      this.LIST[index.LIST].subChunks.splice(index.TAG, 1);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Create a cue point in the wave file.
-   * @param {number} position The cue point position in milliseconds.
-   * @param {string} labl The LIST adtl labl text of the marker. Optional.
-   */
-  setCuePoint(position, labl='') {
-    this.cue.chunkId = 'cue ';
-    position = (position * this.fmt.sampleRate) / 1000;
-    /** @type {!Array<!Object>} */
-    let existingPoints = this.getCuePoints_();
-    this.clearLISTadtl_();
-    /** @type {number} */
-    let len = this.cue.points.length;
-    this.cue.points = [];
-    /** @type {boolean} */
-    let hasSet = false;
-    if (len === 0) {
-      this.setCuePoint_(position, 1, labl);
-    } else {
-      for (let i = 0; i < len; i++) {
-        if (existingPoints[i].dwPosition > position && !hasSet) {
-          this.setCuePoint_(position, i + 1, labl);
-          this.setCuePoint_(
-            existingPoints[i].dwPosition,
-            i + 2,
-            existingPoints[i].label);
-          hasSet = true;
-        } else {
-          this.setCuePoint_(
-            existingPoints[i].dwPosition,
-            i + 1,
-            existingPoints[i].label);
-        }
-      }
-      if (!hasSet) {
-        this.setCuePoint_(position, this.cue.points.length + 1, labl);
-      }
-    }
-    this.cue.dwCuePoints = this.cue.points.length;
-  }
-
-  /**
-   * Remove a cue point from a wave file.
-   * @param {number} index the index of the point. First is 1,
-   *    second is 2, and so on.
-   */
-  deleteCuePoint(index) {
-    this.cue.chunkId = 'cue ';
-    /** @type {!Array<!Object>} */
-    let existingPoints = this.getCuePoints_();
-    this.clearLISTadtl_();
-    /** @type {number} */
-    let len = this.cue.points.length;
-    this.cue.points = [];
-    for (let i = 0; i < len; i++) {
-      if (i + 1 !== index) {
-        this.setCuePoint_(
-          existingPoints[i].dwPosition,
-          i + 1,
-          existingPoints[i].label);
-      }
-    }
-    this.cue.dwCuePoints = this.cue.points.length;
-    if (this.cue.dwCuePoints) {
-      this.cue.chunkId = 'cue ';
-    } else {
-      this.cue.chunkId = '';
-      this.clearLISTadtl_();
-    }
-  }
-
-  /**
-   * Return an array with all cue points in the file, in the order they appear
-   * in the file.
-   * The difference between this method and using the list in WaveFile.cue
-   * is that the return value of this method includes the position in
-   * milliseconds of each cue point (WaveFile.cue only have the sample offset)
-   * @return {!Array<!Object>}
-   */
-  listCuePoints() {
-    /** @type {!Array<!Object>} */
-    let points = this.getCuePoints_();
-    for (let i = 0, len = points.length; i < len; i++) {
-      points[i].milliseconds =
-        (points[i].dwPosition / this.fmt.sampleRate) * 1000;
-    }
-    return points;
-  }
-
-  /**
-   * Update the label of a cue point.
-   * @param {number} pointIndex The ID of the cue point.
-   * @param {string} label The new text for the label.
-   */
-  updateLabel(pointIndex, label) {
-    /** @type {?number} */
-    let cIndex = this.getAdtlChunk_();
-    if (cIndex !== null) {
-      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
-        if (this.LIST[cIndex].subChunks[i].dwName ==
-            pointIndex) {
-          this.LIST[cIndex].subChunks[i].value = label;
-        }
-      }
-    }
   }
 
   /**
@@ -3195,172 +2570,9 @@ class WaveFile extends RIFFFile {
       this.bitDepth = this.fmt.bitsPerSample.toString();
     }
   }
-  
-  /**
-   * Push a new cue point in this.cue.points.
-   * @param {number} position The position in milliseconds.
-   * @param {number} dwName the dwName of the cue point
-   * @private
-   */
-  setCuePoint_(position, dwName, label) {
-    this.cue.points.push({
-      dwName: dwName,
-      dwPosition: position,
-      fccChunk: 'data',
-      dwChunkStart: 0,
-      dwBlockStart: 0,
-      dwSampleOffset: position,
-    });
-    this.setLabl_(dwName, label);
-  }
 
   /**
-   * Return an array with all cue points in the file, in the order they appear
-   * in the file.
-   * @return {!Array<!Object>}
-   * @private
-   */
-  getCuePoints_() {
-    /** @type {!Array<!Object>} */
-    let points = [];
-    for (let i = 0, len = this.cue.points.length; i < len; i++) {
-      points.push({
-        dwPosition: this.cue.points[i].dwPosition,
-        label: this.getLabelForCuePoint_(
-          this.cue.points[i].dwName)});
-    }
-    return points;
-  }
-
-  /**
-   * Return the label of a cue point.
-   * @param {number} pointDwName The ID of the cue point.
-   * @return {string}
-   * @private
-   */
-  getLabelForCuePoint_(pointDwName) {
-    /** @type {?number} */
-    let cIndex = this.getAdtlChunk_();
-    if (cIndex !== null) {
-      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
-        if (this.LIST[cIndex].subChunks[i].dwName ==
-            pointDwName) {
-          return this.LIST[cIndex].subChunks[i].value;
-        }
-      }
-    }
-    return '';
-  }
-
-  /**
-   * Clear any LIST chunk labeled as 'adtl'.
-   * @private
-   */
-  clearLISTadtl_() {
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format == 'adtl') {
-        this.LIST.splice(i);
-      }
-    }
-  }
-
-  /**
-   * Create a new 'labl' subchunk in a 'LIST' chunk of type 'adtl'.
-   * @param {number} dwName The ID of the cue point.
-   * @param {string} label The label for the cue point.
-   * @private
-   */
-  setLabl_(dwName, label) {
-    /** @type {?number} */
-    let adtlIndex = this.getAdtlChunk_();
-    if (adtlIndex === null) {
-      this.LIST.push({
-        chunkId: 'LIST',
-        chunkSize: 4,
-        format: 'adtl',
-        subChunks: []});
-      adtlIndex = this.LIST.length - 1;
-    }
-    this.setLabelText_(adtlIndex === null ? 0 : adtlIndex, dwName, label);
-  }
-
-  /**
-   * Create a new 'labl' subchunk in a 'LIST' chunk of type 'adtl'.
-   * @param {number} adtlIndex The index of the 'adtl' LIST in this.LIST.
-   * @param {number} dwName The ID of the cue point.
-   * @param {string} label The label for the cue point.
-   * @private
-   */
-  setLabelText_(adtlIndex, dwName, label) {
-    this.LIST[adtlIndex].subChunks.push({
-      chunkId: 'labl',
-      chunkSize: label.length,
-      dwName: dwName,
-      value: label
-    });
-    this.LIST[adtlIndex].chunkSize += label.length + 4 + 4 + 4 + 1;
-  }
-
-  /**
-   * Return the index of the 'adtl' LIST in this.LIST.
-   * @return {?number}
-   * @private
-   */
-  getAdtlChunk_() {
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format == 'adtl') {
-        return i;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Return the index of the INFO chunk in the LIST chunk.
-   * @return {?number} the index of the INFO chunk.
-   * @private
-   */
-  getLISTINFOIndex_() {
-    /** @type {?number} */
-    let index = null;
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format === 'INFO') {
-        index = i;
-        break;
-      }
-    }
-    return index;
-  }
-
-  /**
-   * Return the index of a tag in a FILE chunk.
-   * @param {string} tag The tag name.
-   * @return {!Object<string, ?number>}
-   *    Object.LIST is the INFO index in LIST
-   *    Object.TAG is the tag index in the INFO
-   * @private
-   */
-  getTagIndex_(tag) {
-    /** @type {!Object<string, ?number>} */
-    let index = {LIST: null, TAG: null};
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format == 'INFO') {
-        index.LIST = i;
-        for (let j=0, subLen = this.LIST[i].subChunks.length; j < subLen; j++) {
-          if (this.LIST[i].subChunks[j].chunkId == tag) {
-            index.TAG = j;
-            break;
-          }
-        }
-        break;
-      }
-    }
-    return index;
-  }
-
-  /**
-   * Reset attributes that should emptied when a file is
-   * created with the fromScratch() or fromBuffer() methods.
+   * Reset some attributes of the object.
    * @private
    */
   clearHeader_() {
@@ -3368,31 +2580,6 @@ class WaveFile extends RIFFFile {
     this.fmt.validBitsPerSample = 0;
     this.fact.chunkId = '';
     this.ds64.chunkId = '';
-  }
-
-  /**
-   * Make the file 16-bit if it is not.
-   * @private
-   */
-  assure16Bit_() {
-    this.assureUncompressed_();
-    if (this.bitDepth != '16') {
-      this.toBitDepth('16');
-    }
-  }
-
-  /**
-   * Uncompress the samples in case of a compressed file.
-   * @private
-   */
-  assureUncompressed_() {
-    if (this.bitDepth == '8a') {
-      this.fromALaw();
-    } else if (this.bitDepth == '8m') {
-      this.fromMuLaw();
-    } else if (this.bitDepth == '4') {
-      this.fromIMAADPCM();
-    }
   }
 
   /**
@@ -3413,17 +2600,7 @@ class WaveFile extends RIFFFile {
   }
 
   /**
-   * Return 'RIFF' if the container is 'RF64', the current container name
-   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
-   * @return {string}
-   * @private
-   */
-  correctContainer_() {
-    return this.container == 'RF64' ? 'RIFF' : this.container;
-  }
-
-  /**
-   * Return a .wav file byte buffer with the data from the WaveFile object.
+   * Return a .wav file byte buffer with the data from the WaveFileParser object.
    * The return value of this method can be written straight to disk.
    * @return {!Uint8Array} The wav file bytes.
    * @private
@@ -3706,6 +2883,7 @@ class WaveFile extends RIFFFile {
   /**
    * Return the bytes of the 'LIST' chunk.
    * @return {!Array<number>} The 'LIST' chunk bytes.
+   * @private
    */
   getLISTBytes_() {
     /** @type {!Array<number>} */
@@ -4096,6 +3274,952 @@ class WaveFile extends RIFFFile {
   }
 
   /**
+   * Validate the header of the file.
+   * @throws {Error} If bit depth is invalid.
+   * @throws {Error} If the number of channels is invalid.
+   * @throws {Error} If the sample rate is invalid.
+   * @private
+   */
+  validateWavHeader_() {
+    this.validateBitDepth_();
+    this.validateNumChannels_();
+    this.validateSampleRate_();
+  }
+
+  /**
+   * Validate the bit depth.
+   * @return {boolean} True is the bit depth is valid.
+   * @throws {Error} If bit depth is invalid.
+   * @private
+   */
+  validateBitDepth_() {
+    if (!this.WAV_AUDIO_FORMATS[this.bitDepth]) {
+      if (parseInt(this.bitDepth, 10) > 8 &&
+          parseInt(this.bitDepth, 10) < 54) {
+        return true;
+      }
+      throw new Error('Invalid bit depth.');
+    }
+    return true;
+  }
+
+  /**
+   * Validate the number of channels.
+   * @return {boolean} True is the number of channels is valid.
+   * @throws {Error} If the number of channels is invalid.
+   * @private
+   */
+  validateNumChannels_() {
+    /** @type {number} */
+    let blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
+    if (this.fmt.numChannels < 1 || blockAlign > 65535) {
+      throw new Error('Invalid number of channels.');
+    }
+    return true;
+  }
+
+  /**
+   * Validate the sample rate value.
+   * @return {boolean} True is the sample rate is valid.
+   * @throws {Error} If the sample rate is invalid.
+   * @private
+   */
+  validateSampleRate_() {
+    /** @type {number} */
+    let byteRate = this.fmt.numChannels *
+      (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
+    if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
+      throw new Error('Invalid sample rate.');
+    }
+    return true;
+  }
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The truncateSamples function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Truncate float samples on overflow.
+ * @param {Float64Array} samples the samples.
+ */
+function truncateSamples(samples) {
+  for (let i = 0, len = samples.length; i < len; i++) {
+    if (samples[i] > 1) {
+      samples[i] = 1;
+    } else if (samples[i] < -1) {
+      samples[i] = -1;
+    }
+  }
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The interleave function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Interleave de-interleaved samples.
+ * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+ *    The samples.
+ * @return {!Array<number>|!Array<!Array<number>>|!TypedArray}
+ */
+function interleave(samples) {
+  if (samples.length > 0) {
+    if (samples[0].constructor === Array) {
+      /** @type {!Array<number>} */
+      let finalSamples = [];
+      for (let i = 0, len = samples[0].length; i < len; i++) {
+        for (let j = 0, subLen = samples.length; j < subLen; j++) {
+          finalSamples.push(samples[j][i]);
+        }
+      }
+      samples = finalSamples;
+    }
+  }
+  return samples;
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The dwChannelMask function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Return the value for dwChannelMask according to the number of channels.
+ * @param {number} numChannels the number of channels.
+ * @return {number} the dwChannelMask value.
+ */
+function dwChannelMask(numChannels) {
+  /** @type {number} */
+  let mask = 0;
+  // mono = FC
+  if (numChannels === 1) {
+    mask = 0x4;
+  // stereo = FL, FR
+  } else if (numChannels === 2) {
+    mask = 0x3;
+  // quad = FL, FR, BL, BR
+  } else if (numChannels === 4) {
+    mask = 0x33;
+  // 5.1 = FL, FR, FC, LF, BL, BR
+  } else if (numChannels === 6) {
+    mask = 0x3F;
+  // 7.1 = FL, FR, FC, LF, BL, BR, SL, SR
+  } else if (numChannels === 8) {
+    mask = 0x63F;
+  }
+  return mask;
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * A class to read, write and process wav files.
+ */
+class WaveFile extends WaveFileParser {
+
+  /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(wavBuffer=null) {
+    super();
+    // Load a file from the buffer if one was passed
+    // when creating the object
+    if (wavBuffer) {
+      this.fromBuffer(wavBuffer);
+    }
+  }
+
+  /**
+   * Set up the WaveFile object based on the arguments passed.
+   * @param {number} numChannels The number of channels
+   *    (Integer numbers: 1 for mono, 2 stereo and so on).
+   * @param {number} sampleRate The sample rate.
+   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
+   * @param {string} bitDepthCode The audio bit depth code.
+   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+   *    or any value between '8' and '32' (like '12').
+   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+   *    The samples. Must be in the correct range according to the bit depth.
+   * @param {?Object} options Optional. Used to force the container
+   *    as RIFX with {'container': 'RIFX'}
+   * @throws {Error} If any argument does not meet the criteria.
+   */
+  fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
+    if (!options.container) {
+      options.container = 'RIFF';
+    }
+    this.container = options.container;
+    this.bitDepth = bitDepthCode;
+    samples = interleave(samples);
+    this.updateDataType_();
+    /** @type {number} */
+    let numBytes = this.dataType.bits / 8;
+    this.data.samples = new Uint8Array(samples.length * numBytes);
+    packArrayTo(samples, this.dataType, this.data.samples);
+    this.clearHeader_();
+    this.makeWavHeader_(
+      bitDepthCode, numChannels, sampleRate,
+      numBytes, this.data.samples.length, options);
+    this.data.chunkId = 'data';
+    this.data.chunkSize = this.data.samples.length;
+    this.validateWavHeader_();
+  }
+
+  /**
+   * Set up the WaveFile object from a byte buffer.
+   * @param {!Uint8Array} wavBuffer The buffer.
+   * @param {boolean=} samples True if the samples should be loaded.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  fromBuffer(wavBuffer, samples=true) {
+    this.readBuffer(wavBuffer, samples);
+  }
+
+  /**
+   * Return a byte buffer representig the WaveFile object as a .wav file.
+   * The return value of this method can be written straight to disk.
+   * @return {!Uint8Array} A wav file.
+   * @throws {Error} If bit depth is invalid.
+   * @throws {Error} If the number of channels is invalid.
+   * @throws {Error} If the sample rate is invalid.
+   */
+  toBuffer() {
+    return this.writeBuffer();
+  }
+
+  /**
+   * Force a file as RIFF.
+   */
+  toRIFF() {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      this.bitDepth,
+      unpackArray(this.data.samples, this.dataType));
+  }
+
+  /**
+   * Force a file as RIFX.
+   */
+  toRIFX() {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      this.bitDepth,
+      unpackArray(this.data.samples, this.dataType),
+      {container: 'RIFX'});
+  }
+
+  /**
+   * Encode a 16-bit wave file as 4-bit IMA ADPCM.
+   * @throws {Error} If sample rate is not 8000.
+   * @throws {Error} If number of channels is not 1.
+   */
+  toIMAADPCM() {
+    if (this.fmt.sampleRate !== 8000) {
+      throw new Error(
+        'Only 8000 Hz files can be compressed as IMA-ADPCM.');
+    } else if (this.fmt.numChannels !== 1) {
+      throw new Error(
+        'Only mono files can be compressed as IMA-ADPCM.');
+    } else {
+      this.assure16Bit_();
+      /** @type {!Int16Array} */
+      let output = new Int16Array(this.data.samples.length / 2);
+      unpackArrayTo(this.data.samples, this.dataType, output);
+      this.fromScratch(
+        this.fmt.numChannels,
+        this.fmt.sampleRate,
+        '4',
+        encode(output),
+        {container: this.correctContainer_()});
+    }
+  }
+
+  /**
+   * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
+   * @param {string} bitDepthCode The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
+   *    Optional. Default is 16.
+   */
+  fromIMAADPCM(bitDepthCode='16') {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '16',
+      decode(this.data.samples, this.fmt.blockAlign),
+      {container: this.correctContainer_()});
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
+    }
+  }
+
+  /**
+   * Encode a 16-bit wave file as 8-bit A-Law.
+   */
+  toALaw() {
+    this.assure16Bit_();
+    /** @type {!Int16Array} */
+    let output = new Int16Array(this.data.samples.length / 2);
+    unpackArrayTo(this.data.samples, this.dataType, output);
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '8a',
+      encode$1(output),
+      {container: this.correctContainer_()});
+  }
+
+  /**
+   * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+   * @param {string} bitDepthCode The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
+   *    Optional. Default is 16.
+   */
+  fromALaw(bitDepthCode='16') {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '16',
+      decode$1(this.data.samples),
+      {container: this.correctContainer_()});
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
+    }
+  }
+
+  /**
+   * Encode 16-bit wave file as 8-bit mu-Law.
+   */
+  toMuLaw() {
+    this.assure16Bit_();
+    /** @type {!Int16Array} */
+    let output = new Int16Array(this.data.samples.length / 2);
+    unpackArrayTo(this.data.samples, this.dataType, output);
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '8m',
+      encode$2(output),
+      {container: this.correctContainer_()});
+  }
+
+  /**
+   * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+   * @param {string} bitDepthCode The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
+   *    Optional. Default is 16.
+   */
+  fromMuLaw(bitDepthCode='16') {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '16',
+      decode$2(this.data.samples),
+      {container: this.correctContainer_()});
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
+    }
+  }
+
+  /**
+   * Return the sample at a given index.
+   * @param {number} index The sample index.
+   * @return {number} The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  getSample(index) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    return unpack$1(
+      this.data.samples.slice(index, index + this.dataType.bits / 8),
+      this.dataType);
+  }
+
+  /**
+   * Set the sample at a given index.
+   * @param {number} index The sample index.
+   * @param {number} sample The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  setSample(index, sample) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    packTo(sample, this.dataType, this.data.samples, index);
+  }
+
+  /**
+   * Use a .wav file encoded as a base64 string to load the WaveFile object.
+   * @param {string} base64String A .wav file as a base64 string.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  fromBase64(base64String) {
+    this.fromBuffer(new Uint8Array(decode$3(base64String)));
+  }
+
+  /**
+   * Return a base64 string representig the WaveFile object as a .wav file.
+   * @return {string} A .wav file as a base64 string.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  toBase64() {
+    /** @type {!Uint8Array} */
+    let buffer = this.toBuffer();
+    return encode$3(buffer, 0, buffer.length);
+  }
+
+  /**
+   * Return a DataURI string representig the WaveFile object as a .wav file.
+   * The return of this method can be used to load the audio in browsers.
+   * @return {string} A .wav file as a DataURI.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  toDataURI() {
+    return 'data:audio/wav;base64,' + this.toBase64();
+  }
+
+  /**
+   * Use a .wav file encoded as a DataURI to load the WaveFile object.
+   * @param {string} dataURI A .wav file as DataURI.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  fromDataURI(dataURI) {
+    this.fromBase64(dataURI.replace('data:audio/wav;base64,', ''));
+  }
+
+  /**
+   * Change the bit depth of the samples.
+   * @param {string} newBitDepth The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats)
+   * @param {boolean} changeResolution A boolean indicating if the
+   *    resolution of samples should be actually changed or not.
+   * @throws {Error} If the bit depth is not valid.
+   */
+  toBitDepth(newBitDepth, changeResolution=true) {
+    /** @type {string} */
+    let toBitDepth = newBitDepth;
+    /** @type {string} */
+    let thisBitDepth = this.bitDepth;
+    if (!changeResolution) {
+      if (newBitDepth != '32f') {
+        toBitDepth = this.dataType.bits.toString();
+      }
+      thisBitDepth = this.dataType.bits;
+    }
+    this.assureUncompressed_();
+    /** @type {number} */
+    let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
+    /** @type {!Float64Array} */
+    let typedSamplesInput = new Float64Array(sampleCount);
+    /** @type {!Float64Array} */
+    let typedSamplesOutput = new Float64Array(sampleCount);
+    unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
+    if (thisBitDepth == "32f" || thisBitDepth == "64") {
+      truncateSamples(typedSamplesInput);
+    }
+    bitDepth(
+      typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      newBitDepth,
+      typedSamplesOutput,
+      {container: this.correctContainer_()});
+  }
+
+  /**
+   * Write a RIFF tag in the INFO chunk. If the tag do not exist,
+   * then it is created. It if exists, it is overwritten.
+   * @param {string} tag The tag name.
+   * @param {string} value The tag value.
+   * @throws {Error} If the tag name is not valid.
+   */
+  setTag(tag, value) {
+    tag = fixRIFFTag(tag);
+    /** @type {!Object} */
+    let index = this.getTagIndex_(tag);
+    if (index.TAG !== null) {
+      this.LIST[index.LIST].subChunks[index.TAG].chunkSize =
+        value.length + 1;
+      this.LIST[index.LIST].subChunks[index.TAG].value = value;
+    } else if (index.LIST !== null) {
+      this.LIST[index.LIST].subChunks.push({
+        chunkId: tag,
+        chunkSize: value.length + 1,
+        value: value});
+    } else {
+      this.LIST.push({
+        chunkId: 'LIST',
+        chunkSize: 8 + value.length + 1,
+        format: 'INFO',
+        subChunks: []});
+      this.LIST[this.LIST.length - 1].subChunks.push({
+        chunkId: tag,
+        chunkSize: value.length + 1,
+        value: value});
+    }
+  }
+
+  /**
+   * Return the value of a RIFF tag in the INFO chunk.
+   * @param {string} tag The tag name.
+   * @return {?string} The value if the tag is found, null otherwise.
+   */
+  getTag(tag) {
+    /** @type {!Object} */
+    let index = this.getTagIndex_(tag);
+    if (index.TAG !== null) {
+      return this.LIST[index.LIST].subChunks[index.TAG].value;
+    }
+    return null;
+  }
+
+  /**
+   * Return a Object<tag, value> with the RIFF tags in the file.
+   * @return {!Object<string, string>} The file tags.
+   */
+  listTags() {
+    /** @type {?number} */
+    let index = this.getLISTINFOIndex_();
+    /** @type {!Object} */
+    let tags = {};
+    if (index !== null) {
+      for (let i = 0, len = this.LIST[index].subChunks.length; i < len; i++) {
+        tags[this.LIST[index].subChunks[i].chunkId] =
+          this.LIST[index].subChunks[i].value;
+      }
+    }
+    return tags;
+  }
+
+  /**
+   * Remove a RIFF tag in the INFO chunk.
+   * @param {string} tag The tag name.
+   * @return {boolean} True if a tag was deleted.
+   */
+  deleteTag(tag) {
+    /** @type {!Object} */
+    let index = this.getTagIndex_(tag);
+    if (index.TAG !== null) {
+      this.LIST[index.LIST].subChunks.splice(index.TAG, 1);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Create a cue point in the wave file.
+   * @param {number} position The cue point position in milliseconds.
+   * @param {string} labl The LIST adtl labl text of the marker. Optional.
+   */
+  setCuePoint(position, labl='') {
+    this.cue.chunkId = 'cue ';
+    position = (position * this.fmt.sampleRate) / 1000;
+    /** @type {!Array<!Object>} */
+    let existingPoints = this.getCuePoints_();
+    this.clearLISTadtl_();
+    /** @type {number} */
+    let len = this.cue.points.length;
+    this.cue.points = [];
+    /** @type {boolean} */
+    let hasSet = false;
+    if (len === 0) {
+      this.setCuePoint_(position, 1, labl);
+    } else {
+      for (let i = 0; i < len; i++) {
+        if (existingPoints[i].dwPosition > position && !hasSet) {
+          this.setCuePoint_(position, i + 1, labl);
+          this.setCuePoint_(
+            existingPoints[i].dwPosition,
+            i + 2,
+            existingPoints[i].label);
+          hasSet = true;
+        } else {
+          this.setCuePoint_(
+            existingPoints[i].dwPosition,
+            i + 1,
+            existingPoints[i].label);
+        }
+      }
+      if (!hasSet) {
+        this.setCuePoint_(position, this.cue.points.length + 1, labl);
+      }
+    }
+    this.cue.dwCuePoints = this.cue.points.length;
+  }
+
+  /**
+   * Remove a cue point from a wave file.
+   * @param {number} index the index of the point. First is 1,
+   *    second is 2, and so on.
+   */
+  deleteCuePoint(index) {
+    this.cue.chunkId = 'cue ';
+    /** @type {!Array<!Object>} */
+    let existingPoints = this.getCuePoints_();
+    this.clearLISTadtl_();
+    /** @type {number} */
+    let len = this.cue.points.length;
+    this.cue.points = [];
+    for (let i = 0; i < len; i++) {
+      if (i + 1 !== index) {
+        this.setCuePoint_(
+          existingPoints[i].dwPosition,
+          i + 1,
+          existingPoints[i].label);
+      }
+    }
+    this.cue.dwCuePoints = this.cue.points.length;
+    if (this.cue.dwCuePoints) {
+      this.cue.chunkId = 'cue ';
+    } else {
+      this.cue.chunkId = '';
+      this.clearLISTadtl_();
+    }
+  }
+
+  /**
+   * Return an array with all cue points in the file, in the order they appear
+   * in the file.
+   * The difference between this method and using the list in WaveFile.cue
+   * is that the return value of this method includes the position in
+   * milliseconds of each cue point (WaveFile.cue only have the sample offset)
+   * @return {!Array<!Object>}
+   */
+  listCuePoints() {
+    /** @type {!Array<!Object>} */
+    let points = this.getCuePoints_();
+    for (let i = 0, len = points.length; i < len; i++) {
+      points[i].milliseconds =
+        (points[i].dwPosition / this.fmt.sampleRate) * 1000;
+    }
+    return points;
+  }
+
+  /**
+   * Update the label of a cue point.
+   * @param {number} pointIndex The ID of the cue point.
+   * @param {string} label The new text for the label.
+   */
+  updateLabel(pointIndex, label) {
+    /** @type {?number} */
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
+            pointIndex) {
+          this.LIST[cIndex].subChunks[i].value = label;
+        }
+      }
+    }
+  }
+
+  /**
+   * Make the file 16-bit if it is not.
+   * @private
+   */
+  assure16Bit_() {
+    this.assureUncompressed_();
+    if (this.bitDepth != '16') {
+      this.toBitDepth('16');
+    }
+  }
+
+  /**
+   * Uncompress the samples in case of a compressed file.
+   * @private
+   */
+  assureUncompressed_() {
+    if (this.bitDepth == '8a') {
+      this.fromALaw();
+    } else if (this.bitDepth == '8m') {
+      this.fromMuLaw();
+    } else if (this.bitDepth == '4') {
+      this.fromIMAADPCM();
+    }
+  }
+  
+  /**
+   * Push a new cue point in this.cue.points.
+   * @param {number} position The position in milliseconds.
+   * @param {number} dwName the dwName of the cue point
+   * @private
+   */
+  setCuePoint_(position, dwName, label) {
+    this.cue.points.push({
+      dwName: dwName,
+      dwPosition: position,
+      fccChunk: 'data',
+      dwChunkStart: 0,
+      dwBlockStart: 0,
+      dwSampleOffset: position,
+    });
+    this.setLabl_(dwName, label);
+  }
+
+  /**
+   * Return an array with all cue points in the file, in the order they appear
+   * in the file.
+   * @return {!Array<!Object>}
+   * @private
+   */
+  getCuePoints_() {
+    /** @type {!Array<!Object>} */
+    let points = [];
+    for (let i = 0, len = this.cue.points.length; i < len; i++) {
+      points.push({
+        dwPosition: this.cue.points[i].dwPosition,
+        label: this.getLabelForCuePoint_(
+          this.cue.points[i].dwName)});
+    }
+    return points;
+  }
+
+  /**
+   * Return the label of a cue point.
+   * @param {number} pointDwName The ID of the cue point.
+   * @return {string}
+   * @private
+   */
+  getLabelForCuePoint_(pointDwName) {
+    /** @type {?number} */
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
+            pointDwName) {
+          return this.LIST[cIndex].subChunks[i].value;
+        }
+      }
+    }
+    return '';
+  }
+
+  /**
+   * Clear any LIST chunk labeled as 'adtl'.
+   * @private
+   */
+  clearLISTadtl_() {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format == 'adtl') {
+        this.LIST.splice(i);
+      }
+    }
+  }
+
+  /**
+   * Create a new 'labl' subchunk in a 'LIST' chunk of type 'adtl'.
+   * @param {number} dwName The ID of the cue point.
+   * @param {string} label The label for the cue point.
+   * @private
+   */
+  setLabl_(dwName, label) {
+    /** @type {?number} */
+    let adtlIndex = this.getAdtlChunk_();
+    if (adtlIndex === null) {
+      this.LIST.push({
+        chunkId: 'LIST',
+        chunkSize: 4,
+        format: 'adtl',
+        subChunks: []});
+      adtlIndex = this.LIST.length - 1;
+    }
+    this.setLabelText_(adtlIndex === null ? 0 : adtlIndex, dwName, label);
+  }
+
+  /**
+   * Create a new 'labl' subchunk in a 'LIST' chunk of type 'adtl'.
+   * @param {number} adtlIndex The index of the 'adtl' LIST in this.LIST.
+   * @param {number} dwName The ID of the cue point.
+   * @param {string} label The label for the cue point.
+   * @private
+   */
+  setLabelText_(adtlIndex, dwName, label) {
+    this.LIST[adtlIndex].subChunks.push({
+      chunkId: 'labl',
+      chunkSize: label.length,
+      dwName: dwName,
+      value: label
+    });
+    this.LIST[adtlIndex].chunkSize += label.length + 4 + 4 + 4 + 1;
+  }
+
+  /**
+   * Return the index of the 'adtl' LIST in this.LIST.
+   * @return {?number}
+   * @private
+   */
+  getAdtlChunk_() {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format == 'adtl') {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Return the index of the INFO chunk in the LIST chunk.
+   * @return {?number} the index of the INFO chunk.
+   * @private
+   */
+  getLISTINFOIndex_() {
+    /** @type {?number} */
+    let index = null;
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format === 'INFO') {
+        index = i;
+        break;
+      }
+    }
+    return index;
+  }
+
+  /**
+   * Return the index of a tag in a FILE chunk.
+   * @param {string} tag The tag name.
+   * @return {!Object<string, ?number>}
+   *    Object.LIST is the INFO index in LIST
+   *    Object.TAG is the tag index in the INFO
+   * @private
+   */
+  getTagIndex_(tag) {
+    /** @type {!Object<string, ?number>} */
+    let index = {LIST: null, TAG: null};
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format == 'INFO') {
+        index.LIST = i;
+        for (let j=0, subLen = this.LIST[i].subChunks.length; j < subLen; j++) {
+          if (this.LIST[i].subChunks[j].chunkId == tag) {
+            index.TAG = j;
+            break;
+          }
+        }
+        break;
+      }
+    }
+    return index;
+  }
+
+  /**
+   * Return 'RIFF' if the container is 'RF64', the current container name
+   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
+   * @return {string}
+   * @private
+   */
+  correctContainer_() {
+    return this.container == 'RF64' ? 'RIFF' : this.container;
+  }
+
+  /**
    * Define the header of a wav file.
    * @param {string} bitDepthCode The audio bit depth
    * @param {number} numChannels The number of channels
@@ -4105,7 +4229,7 @@ class WaveFile extends RIFFFile {
    * @param {!Object} options The extra options, like container defintion.
    * @private
    */
-  makeWavHeader(
+  makeWavHeader_(
     bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
     if (bitDepthCode == '4') {
       this.createADPCMHeader_(
@@ -4234,65 +4358,6 @@ class WaveFile extends RIFFFile {
       chunkSize: 4,
       dwSampleLength: samplesLength
     };
-  }
-
-  /**
-   * Validate the header of the file.
-   * @throws {Error} If any property of the object appears invalid.
-   * @private
-   */
-  validateWavHeader_() {
-    this.validateBitDepth_();
-    this.validateNumChannels_();
-    this.validateSampleRate_();
-  }
-
-  /**
-   * Validate the bit depth.
-   * @return {boolean} True is the bit depth is valid.
-   * @throws {Error} If bit depth is invalid.
-   * @private
-   */
-  validateBitDepth_() {
-    if (!this.WAV_AUDIO_FORMATS[this.bitDepth]) {
-      if (parseInt(this.bitDepth, 10) > 8 &&
-          parseInt(this.bitDepth, 10) < 54) {
-        return true;
-      }
-      throw new Error('Invalid bit depth.');
-    }
-    return true;
-  }
-
-  /**
-   * Validate the number of channels.
-   * @return {boolean} True is the number of channels is valid.
-   * @throws {Error} If the number of channels is invalid.
-   * @private
-   */
-  validateNumChannels_() {
-    /** @type {number} */
-    let blockAlign = this.fmt.numChannels * this.fmt.bitsPerSample / 8;
-    if (this.fmt.numChannels < 1 || blockAlign > 65535) {
-      throw new Error('Invalid number of channels.');
-    }
-    return true;
-  }
-
-  /**
-   * Validate the sample rate value.
-   * @return {boolean} True is the sample rate is valid.
-   * @throws {Error} If the sample rate is invalid.
-   * @private
-   */
-  validateSampleRate_() {
-    /** @type {number} */
-    let byteRate = this.fmt.numChannels *
-      (this.fmt.bitsPerSample / 8) * this.fmt.sampleRate;
-    if (this.fmt.sampleRate < 1 || byteRate > 4294967295) {
-      throw new Error('Invalid sample rate.');
-    }
-    return true;
   }
 }
 
