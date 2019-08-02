@@ -433,7 +433,7 @@ export default class WaveFile extends WaveFileParser {
   }
 
   /**
-   * Remove a RIFF tag in the INFO chunk.
+   * Remove a RIFF tag from the INFO chunk.
    * @param {string} tag The tag name.
    * @return {boolean} True if a tag was deleted.
    */
