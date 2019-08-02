@@ -64,7 +64,7 @@
   ],
   "scripts": {
     "lint": "jshint index.js bin externs lib test/src",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src --recursive -R dot --timeout=240000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src test/wavefile-parser --recursive -R dot --timeout=240000",
     "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist test/src --esm --recursive -R dot --timeout=240000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
     "test-cjs": "node ./node_modules/mocha/bin/_mocha test/dist test/src --cjs --recursive -R dot --timeout=240000",
