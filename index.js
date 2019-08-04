@@ -84,18 +84,18 @@ export default class WaveFile extends WaveFileParser {
     this.container = options.container;
     this.bitDepth = bitDepthCode;
     samples = interleave(samples);
-    this.updateDataType_();
+    this.updateDataType();
     /** @type {number} */
     let numBytes = this.dataType.bits / 8;
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
-    this.clearHeader_();
+    this.clearHeader();
     this.makeWavHeader_(
       bitDepthCode, numChannels, sampleRate,
       numBytes, this.data.samples.length, options);
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
-    this.validateWavHeader_();
+    this.validateWavHeader();
   }
 
   /**

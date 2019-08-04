@@ -2243,7 +2243,7 @@ class WaveFileParser extends RIFFFile {
      * Formats not listed here should be set to 65534,
      * the code for WAVE_FORMAT_EXTENSIBLE
      * @enum {number}
-     * @private
+     * @protected
      */
     this.WAV_AUDIO_FORMATS = {
       '4': 17,
@@ -2460,7 +2460,7 @@ class WaveFileParser extends RIFFFile {
     this.bitDepth = '0';
     /**
      * @type {!Object}
-     * @private
+     * @protected
      */
     this.dataType = {};
   }
@@ -2473,10 +2473,9 @@ class WaveFileParser extends RIFFFile {
    * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
-   * @protected
    */
   readBuffer(wavBuffer, samples=true) {
-    this.clearHeader_();
+    this.clearHeader();
     this.head_ = 0;
     this.readRIFFChunk(wavBuffer);
     if (this.format != 'WAVE') {
@@ -2493,7 +2492,7 @@ class WaveFileParser extends RIFFFile {
     this.readJunkChunk_(wavBuffer);
     this.readLISTChunk_(wavBuffer);
     this.bitDepthFromFmt_();
-    this.updateDataType_();
+    this.updateDataType();
   }
 
   /**
@@ -2503,11 +2502,51 @@ class WaveFileParser extends RIFFFile {
    * @throws {Error} If bit depth is invalid.
    * @throws {Error} If the number of channels is invalid.
    * @throws {Error} If the sample rate is invalid.
-   * @protected
    */
   writeBuffer() {
-    this.validateWavHeader_();
+    this.validateWavHeader();
     return this.writeWavBuffer_();
+  }
+
+  /**
+   * Reset some attributes of the object.
+   * @protected
+   */
+  clearHeader() {
+    this.fmt.cbSize = 0;
+    this.fmt.validBitsPerSample = 0;
+    this.fact.chunkId = '';
+    this.ds64.chunkId = '';
+  }
+
+  /**
+   * Validate the header of the file.
+   * @throws {Error} If bit depth is invalid.
+   * @throws {Error} If the number of channels is invalid.
+   * @throws {Error} If the sample rate is invalid.
+   * @protected
+   */
+  validateWavHeader() {
+    this.validateBitDepth_();
+    this.validateNumChannels_();
+    this.validateSampleRate_();
+  }
+
+  /**
+   * Update the type definition used to read and write the samples.
+   * @protected
+   */
+  updateDataType() {
+    this.dataType = {
+      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+      fp: this.bitDepth == '32f' || this.bitDepth == '64',
+      signed: this.bitDepth != '8',
+      be: this.container == 'RIFX'
+    };
+    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
+      this.dataType.bits = 8;
+      this.dataType.signed = false;
+    }
   }
 
   /**
@@ -2523,34 +2562,6 @@ class WaveFileParser extends RIFFFile {
       this.bitDepth = '8m';
     } else {
       this.bitDepth = this.fmt.bitsPerSample.toString();
-    }
-  }
-
-  /**
-   * Reset some attributes of the object.
-   * @private
-   */
-  clearHeader_() {
-    this.fmt.cbSize = 0;
-    this.fmt.validBitsPerSample = 0;
-    this.fact.chunkId = '';
-    this.ds64.chunkId = '';
-  }
-
-  /**
-   * Update the type definition used to read and write the samples.
-   * @private
-   */
-  updateDataType_() {
-    this.dataType = {
-      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      fp: this.bitDepth == '32f' || this.bitDepth == '64',
-      signed: this.bitDepth != '8',
-      be: this.container == 'RIFX'
-    };
-    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
-      this.dataType.bits = 8;
-      this.dataType.signed = false;
     }
   }
 
@@ -3229,19 +3240,6 @@ class WaveFileParser extends RIFFFile {
   }
 
   /**
-   * Validate the header of the file.
-   * @throws {Error} If bit depth is invalid.
-   * @throws {Error} If the number of channels is invalid.
-   * @throws {Error} If the sample rate is invalid.
-   * @private
-   */
-  validateWavHeader_() {
-    this.validateBitDepth_();
-    this.validateNumChannels_();
-    this.validateSampleRate_();
-  }
-
-  /**
    * Validate the bit depth.
    * @return {boolean} True is the bit depth is valid.
    * @throws {Error} If bit depth is invalid.
@@ -3552,18 +3550,18 @@ class WaveFile extends WaveFileParser {
     this.container = options.container;
     this.bitDepth = bitDepthCode;
     samples = interleave(samples);
-    this.updateDataType_();
+    this.updateDataType();
     /** @type {number} */
     let numBytes = this.dataType.bits / 8;
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
-    this.clearHeader_();
+    this.clearHeader();
     this.makeWavHeader_(
       bitDepthCode, numChannels, sampleRate,
       numBytes, this.data.samples.length, options);
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
-    this.validateWavHeader_();
+    this.validateWavHeader();
   }
 
   /**
