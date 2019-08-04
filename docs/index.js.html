@@ -72,18 +72,15 @@ import bitDepthLib from 'bitdepth';
 import * as imaadpcm from 'imaadpcm';
 import * as alawmulaw from 'alawmulaw';
 import {encode, decode} from 'base64-arraybuffer-es6';
-import WaveFileParser from './lib/wavefile-parser';
+import WaveFileCreator from './lib/wavefile-creator';
 import truncateSamples from './lib/truncate-samples';
 import fixRIFFTag from './lib/fix-riff-tag';
-import interleave from './lib/interleave';
-import dwChannelMask from './lib/dw-channel-mask';
-import {unpackArray, packArrayTo, unpackArrayTo, unpack,
-  packTo} from 'byte-data';
+import {unpackArray, unpackArrayTo, unpack, packTo} from 'byte-data';
 
 /**
- * A class to read, write and process wav files.
+ * A class to represent and manipulate wav files.
  */
-export default class WaveFile extends WaveFileParser {
+export default class WaveFile extends WaveFileCreator {
 
   /**
    * @param {?Uint8Array=} wavBuffer A wave file buffer.
@@ -117,24 +114,7 @@ export default class WaveFile extends WaveFileParser {
    * @throws {Error} If any argument does not meet the criteria.
    */
   fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
-    if (!options.container) {
-      options.container = 'RIFF';
-    }
-    this.container = options.container;
-    this.bitDepth = bitDepthCode;
-    samples = interleave(samples);
-    this.updateDataType();
-    /** @type {number} */
-    let numBytes = this.dataType.bits / 8;
-    this.data.samples = new Uint8Array(samples.length * numBytes);
-    packArrayTo(samples, this.dataType, this.data.samples);
-    this.clearHeader();
-    this.makeWavHeader_(
-      bitDepthCode, numChannels, sampleRate,
-      numBytes, this.data.samples.length, options);
-    this.data.chunkId = 'data';
-    this.data.chunkSize = this.data.samples.length;
-    this.validateWavHeader();
+    this.create(numChannels, sampleRate, bitDepthCode, samples, options);
   }
 
   /**
@@ -789,147 +769,6 @@ export default class WaveFile extends WaveFileParser {
   correctContainer_() {
     return this.container == 'RF64' ? 'RIFF' : this.container;
   }
-
-  /**
-   * Define the header of a wav file.
-   * @param {string} bitDepthCode The audio bit depth
-   * @param {number} numChannels The number of channels
-   * @param {number} sampleRate The sample rate.
-   * @param {number} numBytes The number of bytes each sample use.
-   * @param {number} samplesLength The length of the samples in bytes.
-   * @param {!Object} options The extra options, like container defintion.
-   * @private
-   */
-  makeWavHeader_(
-    bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
-    if (bitDepthCode == '4') {
-      this.createADPCMHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-
-    } else if (bitDepthCode == '8a' || bitDepthCode == '8m') {
-      this.createALawMulawHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-
-    } else if(Object.keys(this.WAV_AUDIO_FORMATS).indexOf(bitDepthCode) == -1 ||
-        numChannels > 2) {
-      this.createExtensibleHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-
-    } else {
-      this.createPCMHeader_(
-        bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);      
-    }
-  }
-
-  /**
-   * Create the header of a linear PCM wave file.
-   * @param {string} bitDepthCode The audio bit depth
-   * @param {number} numChannels The number of channels
-   * @param {number} sampleRate The sample rate.
-   * @param {number} numBytes The number of bytes each sample use.
-   * @param {number} samplesLength The length of the samples in bytes.
-   * @param {!Object} options The extra options, like container defintion.
-   * @private
-   */
-  createPCMHeader_(
-    bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
-    this.container = options.container;
-    this.chunkSize = 36 + samplesLength;
-    this.format = 'WAVE';
-    this.bitDepth = bitDepthCode;
-    this.fmt = {
-      chunkId: 'fmt ',
-      chunkSize: 16,
-      audioFormat: this.WAV_AUDIO_FORMATS[bitDepthCode] || 65534,
-      numChannels: numChannels,
-      sampleRate: sampleRate,
-      byteRate: (numChannels * numBytes) * sampleRate,
-      blockAlign: numChannels * numBytes,
-      bitsPerSample: parseInt(bitDepthCode, 10),
-      cbSize: 0,
-      validBitsPerSample: 0,
-      dwChannelMask: 0,
-      subformat: []
-    };
-  }
-
-  /**
-   * Create the header of a ADPCM wave file.
-   * @param {string} bitDepthCode The audio bit depth
-   * @param {number} numChannels The number of channels
-   * @param {number} sampleRate The sample rate.
-   * @param {number} numBytes The number of bytes each sample use.
-   * @param {number} samplesLength The length of the samples in bytes.
-   * @param {!Object} options The extra options, like container defintion.
-   * @private
-   */
-  createADPCMHeader_(
-    bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
-    this.createPCMHeader_(
-      bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-    this.chunkSize = 40 + samplesLength;
-    this.fmt.chunkSize = 20;
-    this.fmt.byteRate = 4055;
-    this.fmt.blockAlign = 256;
-    this.fmt.bitsPerSample = 4;
-    this.fmt.cbSize = 2;
-    this.fmt.validBitsPerSample = 505;
-    this.fact = {
-      chunkId: 'fact',
-      chunkSize: 4,
-      dwSampleLength: samplesLength * 2
-    };
-  }
-
-  /**
-   * Create the header of WAVE_FORMAT_EXTENSIBLE file.
-   * @param {string} bitDepthCode The audio bit depth
-   * @param {number} numChannels The number of channels
-   * @param {number} sampleRate The sample rate.
-   * @param {number} numBytes The number of bytes each sample use.
-   * @param {number} samplesLength The length of the samples in bytes.
-   * @param {!Object} options The extra options, like container defintion.
-   * @private
-   */
-  createExtensibleHeader_(
-      bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
-    this.createPCMHeader_(
-      bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-    this.chunkSize = 36 + 24 + samplesLength;
-    this.fmt.chunkSize = 40;
-    this.fmt.bitsPerSample = ((parseInt(bitDepthCode, 10) - 1) | 7) + 1;
-    this.fmt.cbSize = 22;
-    this.fmt.validBitsPerSample = parseInt(bitDepthCode, 10);
-    this.fmt.dwChannelMask = dwChannelMask(numChannels);
-    // subformat 128-bit GUID as 4 32-bit values
-    // only supports uncompressed integer PCM samples
-    this.fmt.subformat = [1, 1048576, 2852126848, 1905997824];
-  }
-
-  /**
-   * Create the header of mu-Law and A-Law wave files.
-   * @param {string} bitDepthCode The audio bit depth
-   * @param {number} numChannels The number of channels
-   * @param {number} sampleRate The sample rate.
-   * @param {number} numBytes The number of bytes each sample use.
-   * @param {number} samplesLength The length of the samples in bytes.
-   * @param {!Object} options The extra options, like container defintion.
-   * @private
-   */
-  createALawMulawHeader_(
-      bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options) {
-    this.createPCMHeader_(
-      bitDepthCode, numChannels, sampleRate, numBytes, samplesLength, options);
-    this.chunkSize = 40 + samplesLength;
-    this.fmt.chunkSize = 20;
-    this.fmt.cbSize = 2;
-    this.fmt.validBitsPerSample = 8;
-    this.fact = {
-      chunkId: 'fact',
-      chunkSize: 4,
-      dwSampleLength: samplesLength
-    };
-  }
 }
 </code></pre>
         </article>
@@ -943,7 +782,7 @@ export default class WaveFile extends WaveFileParser {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 04 2019 03:51:57 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 04 2019 04:21:36 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
