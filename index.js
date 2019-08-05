@@ -39,7 +39,7 @@ import fixRIFFTag from './lib/fix-riff-tag';
 import {unpackArray, unpackArrayTo, unpack, packTo} from 'byte-data';
 
 /**
- * A class to represent and manipulate wav files.
+ * A class to manipulate wav files.
  */
 export default class WaveFile extends WaveFileCreator {
 

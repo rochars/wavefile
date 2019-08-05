@@ -3490,7 +3490,7 @@ function dwChannelMask(numChannels) {
 class WaveFileCreator extends WaveFileParser {
 
   /**
-   * Set up the WaveFile object based on the arguments passed.
+   * Set up the WaveFileCreator object based on the arguments passed.
    * @param {number} numChannels The number of channels
    *    (Integer numbers: 1 for mono, 2 stereo and so on).
    * @param {number} sampleRate The sample rate.
@@ -3780,7 +3780,7 @@ function fixRIFFTag(tag) {
  */
 
 /**
- * A class to represent and manipulate wav files.
+ * A class to manipulate wav files.
  */
 class WaveFile extends WaveFileCreator {
 
