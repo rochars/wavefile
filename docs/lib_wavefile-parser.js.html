@@ -1,4 +1,43 @@
-/*
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/wavefile-parser.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setSample">setSample</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateDataType">updateDataType</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setSample">setSample</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateDataType">updateDataType</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/wavefile-parser.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
  * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -112,7 +151,7 @@ export default class WaveFileParser extends WaveFileReader {
   writeWavBuffer_() {
     this.uInt16_.be = this.container === 'RIFX';
     this.uInt32_.be = this.uInt16_.be;
-    /** @type {!Array<!Array<number>>} */
+    /** @type {!Array&lt;!Array&lt;number>>} */
     let fileBody = [
       this.getJunkBytes_(),
       this.getDs64Bytes_(),
@@ -128,7 +167,7 @@ export default class WaveFileParser extends WaveFileReader {
     ];
     /** @type {number} */
     let fileBodyLength = 0;
-    for (let i=0; i<fileBody.length; i++) {
+    for (let i=0; i&lt;fileBody.length; i++) {
       fileBodyLength += fileBody[i].length;
     }
     /** @type {!Uint8Array} */
@@ -138,7 +177,7 @@ export default class WaveFileParser extends WaveFileReader {
     index = packStringTo(this.container, file, index);
     index = packTo(fileBodyLength + 4, this.uInt32_, file, index);
     index = packStringTo(this.format, file, index);
-    for (let i=0; i<fileBody.length; i++) {
+    for (let i=0; i&lt;fileBody.length; i++) {
       file.set(fileBody[i], index);
       index += fileBody[i].length;
     }
@@ -150,7 +189,7 @@ export default class WaveFileParser extends WaveFileReader {
    * @private
    */
   getBextBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
     this.enforceBext_();
     if (this.bext.chunkId) {
@@ -186,7 +225,7 @@ export default class WaveFileParser extends WaveFileReader {
   enforceBext_() {
     for (let prop in this.bext) {
       if (this.bext.hasOwnProperty(prop)) {
-        if (this.bext[prop] && prop != 'timeReference') {
+        if (this.bext[prop] &amp;&amp; prop != 'timeReference') {
           this.bext.chunkId = 'bext';
           break;
         }
@@ -199,11 +238,11 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'ds64' chunk.
-   * @return {!Array<number>} The 'ds64' chunk bytes.
+   * @return {!Array&lt;number>} The 'ds64' chunk bytes.
    * @private
    */
   getDs64Bytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
     if (this.ds64.chunkId) {
       bytes = bytes.concat(
@@ -227,14 +266,14 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'cue ' chunk.
-   * @return {!Array<number>} The 'cue ' chunk bytes.
+   * @return {!Array&lt;number>} The 'cue ' chunk bytes.
    * @private
    */
   getCueBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
     if (this.cue.chunkId) {
-      /** @type {!Array<number>} */
+      /** @type {!Array&lt;number>} */
       let cuePointsBytes = this.getCuePointsBytes_();
       bytes = bytes.concat(
         packString(this.cue.chunkId),
@@ -247,13 +286,13 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'cue ' points.
-   * @return {!Array<number>} The 'cue ' points as an array of bytes.
+   * @return {!Array&lt;number>} The 'cue ' points as an array of bytes.
    * @private
    */
   getCuePointsBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let points = [];
-    for (let i=0; i<this.cue.dwCuePoints; i++) {
+    for (let i=0; i&lt;this.cue.dwCuePoints; i++) {
       points = points.concat(
         pack(this.cue.points[i].dwName, this.uInt32_),
         pack(this.cue.points[i].dwPosition, this.uInt32_),
@@ -267,14 +306,14 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'smpl' chunk.
-   * @return {!Array<number>} The 'smpl' chunk bytes.
+   * @return {!Array&lt;number>} The 'smpl' chunk bytes.
    * @private
    */
   getSmplBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
     if (this.smpl.chunkId) {
-      /** @type {!Array<number>} */
+      /** @type {!Array&lt;number>} */
       let smplLoopsBytes = this.getSmplLoopsBytes_();
       bytes = bytes.concat(
         packString(this.smpl.chunkId),
@@ -295,13 +334,13 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'smpl' loops.
-   * @return {!Array<number>} The 'smpl' loops as an array of bytes.
+   * @return {!Array&lt;number>} The 'smpl' loops as an array of bytes.
    * @private
    */
   getSmplLoopsBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let loops = [];
-    for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
+    for (let i=0; i&lt;this.smpl.dwNumSampleLoops; i++) {
       loops = loops.concat(
         pack(this.smpl.loops[i].dwName, this.uInt32_),
         pack(this.smpl.loops[i].dwType, this.uInt32_),
@@ -315,11 +354,11 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'fact' chunk.
-   * @return {!Array<number>} The 'fact' chunk bytes.
+   * @return {!Array&lt;number>} The 'fact' chunk bytes.
    * @private
    */
   getFactBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
     if (this.fact.chunkId) {
       bytes = bytes.concat(
@@ -332,12 +371,12 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'fmt ' chunk.
-   * @return {!Array<number>} The 'fmt' chunk bytes.
+   * @return {!Array&lt;number>} The 'fmt' chunk bytes.
    * @throws {Error} if no 'fmt ' chunk is present.
    * @private
    */
   getFmtBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let fmtBytes = [];
     if (this.fmt.chunkId) {
       return fmtBytes.concat(
@@ -356,11 +395,11 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the fmt extension fields.
-   * @return {!Array<number>} The fmt extension bytes.
+   * @return {!Array&lt;number>} The fmt extension bytes.
    * @private
    */
   getFmtExtensionBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let extension = [];
     if (this.fmt.chunkSize > 16) {
       extension = extension.concat(
@@ -386,14 +425,14 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the 'LIST' chunk.
-   * @return {!Array<number>} The 'LIST' chunk bytes.
+   * @return {!Array&lt;number>} The 'LIST' chunk bytes.
    * @private
    */
   getLISTBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
-    for (let i=0; i<this.LIST.length; i++) {
-      /** @type {!Array<number>} */
+    for (let i=0; i&lt;this.LIST.length; i++) {
+      /** @type {!Array&lt;number>} */
       let subChunksBytes = this.getLISTSubChunksBytes_(
           this.LIST[i].subChunks, this.LIST[i].format);
       bytes = bytes.concat(
@@ -407,16 +446,16 @@ export default class WaveFileParser extends WaveFileReader {
 
   /**
    * Return the bytes of the sub chunks of a 'LIST' chunk.
-   * @param {!Array<!Object>} subChunks The 'LIST' sub chunks.
+   * @param {!Array&lt;!Object>} subChunks The 'LIST' sub chunks.
    * @param {string} format The format of the 'LIST' chunk.
    *    Currently supported values are 'adtl' or 'INFO'.
-   * @return {!Array<number>} The sub chunk bytes.
+   * @return {!Array&lt;number>} The sub chunk bytes.
    * @private
    */
   getLISTSubChunksBytes_(subChunks, format) {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
-    for (let i=0; i<subChunks.length; i++) {
+    for (let i=0; i&lt;subChunks.length; i++) {
       if (format == 'INFO') {
         bytes = bytes.concat(
           packString(subChunks[i].chunkId),
@@ -471,7 +510,7 @@ export default class WaveFileParser extends WaveFileReader {
    * @private
    */
   getJunkBytes_() {
-    /** @type {!Array<number>} */
+    /** @type {!Array&lt;number>} */
     let bytes = [];
     if (this.junk.chunkId) {
       return bytes.concat(
@@ -490,8 +529,8 @@ export default class WaveFileParser extends WaveFileReader {
    */
   validateBitDepth_() {
     if (!this.WAV_AUDIO_FORMATS[this.bitDepth]) {
-      if (parseInt(this.bitDepth, 10) > 8 &&
-          parseInt(this.bitDepth, 10) < 54) {
+      if (parseInt(this.bitDepth, 10) > 8 &amp;&amp;
+          parseInt(this.bitDepth, 10) &lt; 54) {
         return true;
       }
       throw new Error('Invalid bit depth.');
@@ -499,3 +538,22 @@ export default class WaveFileParser extends WaveFileReader {
     return true;
   }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Wed Aug 07 2019 14:41:57 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

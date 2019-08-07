@@ -2603,6 +2603,7 @@ class WaveFileReader extends RIFFFile {
   /**
    * Reset some attributes of the object.
    * @protected
+   * @ignore
    */
   clearHeader() {
     this.fmt.cbSize = 0;
@@ -2966,6 +2967,7 @@ class WaveFileReader extends RIFFFile {
 
 /**
  * A class to read and write wav files.
+ * @extends WaveFileReader
  */
 class WaveFileParser extends WaveFileReader {
 
@@ -3017,6 +3019,7 @@ class WaveFileParser extends WaveFileReader {
    * @throws {Error} If bit depth is invalid.
    * @throws {Error} If the number of channels is invalid.
    * @throws {Error} If the sample rate is invalid.
+   * @ignore
    * @protected
    */
   validateWavHeader() {
@@ -3560,6 +3563,7 @@ function dwChannelMask(numChannels) {
 
 /**
  * A class to read, write and create wav files.
+ * @extends WaveFileParser
  */
 class WaveFileCreator extends WaveFileParser {
 
@@ -3810,6 +3814,7 @@ function truncateSamples(samples) {
 
 /**
  * A class to manipulate wav files.
+ * @extends WaveFileCreator
  */
 class WaveFileConverter extends WaveFileCreator {
 
@@ -4095,6 +4100,7 @@ function fixRIFFTag(tag) {
 
 /**
  * A class to manipulate wav files.
+ * @extends WaveFileConverter
  */
 class WaveFile extends WaveFileConverter {
 

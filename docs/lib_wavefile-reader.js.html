@@ -1,4 +1,43 @@
-/*
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/wavefile-reader.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setSample">setSample</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateDataType">updateDataType</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setSample">setSample</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateDataType">updateDataType</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/wavefile-reader.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
  * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -69,7 +108,7 @@ export default class WaveFileReader extends RIFFFile {
     };
     /**
      * The data of the 'fmt' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.fmt = {
       /** @type {string} */
@@ -96,13 +135,13 @@ export default class WaveFileReader extends RIFFFile {
       dwChannelMask: 0,
       /**
        * 4 32-bit values representing a 128-bit ID
-       * @type {!Array<number>}
+       * @type {!Array&lt;number>}
        */
       subformat: []
     };
     /**
      * The data of the 'fact' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.fact = {
       /** @type {string} */
@@ -114,7 +153,7 @@ export default class WaveFileReader extends RIFFFile {
     };
     /**
      * The data of the 'cue ' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.cue = {
       /** @type {string} */
@@ -123,12 +162,12 @@ export default class WaveFileReader extends RIFFFile {
       chunkSize: 0,
       /** @type {number} */
       dwCuePoints: 0,
-      /** @type {!Array<!Object>} */
+      /** @type {!Array&lt;!Object>} */
       points: [],
     };
     /**
      * The data of the 'smpl' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.smpl = {
       /** @type {string} */
@@ -153,12 +192,12 @@ export default class WaveFileReader extends RIFFFile {
       dwNumSampleLoops: 0,
       /** @type {number} */
       dwSamplerData: 0,
-      /** @type {!Array<!Object>} */
+      /** @type {!Array&lt;!Object>} */
       loops: []
     };
     /**
      * The data of the 'bext' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.bext = {
       /** @type {string} */
@@ -177,7 +216,7 @@ export default class WaveFileReader extends RIFFFile {
       originationTime: '', //8
       /**
        * 2 32-bit values, timeReference high and low
-       * @type {!Array<number>}
+       * @type {!Array&lt;number>}
        */
       timeReference: [0, 0],
       /** @type {number} */
@@ -202,7 +241,7 @@ export default class WaveFileReader extends RIFFFile {
     /**
      * The data of the 'ds64' chunk.
      * Used only with RF64 files.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.ds64 = {
       /** @type {string} */
@@ -225,12 +264,12 @@ export default class WaveFileReader extends RIFFFile {
       sampleCountLow: 0 // DWORD
       /** @type {number} */
       //'tableLength': 0, // DWORD
-      /** @type {!Array<number>} */
+      /** @type {!Array&lt;number>} */
       //'table': []
     };
     /**
      * The data of the 'data' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.data = {
       /** @type {string} */
@@ -249,19 +288,19 @@ export default class WaveFileReader extends RIFFFile {
      *      format: '',
      *      subChunks: []
      *   }
-     * @type {!Array<!Object>}
+     * @type {!Array&lt;!Object>}
      */
     this.LIST = [];
     /**
      * The data of the 'junk' chunk.
-     * @type {!Object<string, *>}
+     * @type {!Object&lt;string, *>}
      */
     this.junk = {
       /** @type {string} */
       chunkId: '',
       /** @type {number} */
       chunkSize: 0,
-      /** @type {!Array<number>} */
+      /** @type {!Array&lt;number>} */
       chunkData: []
     };
     /**
@@ -345,7 +384,7 @@ export default class WaveFileReader extends RIFFFile {
    * @private
    */
   bitDepthFromFmt_() {
-    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
+    if (this.fmt.audioFormat === 3 &amp;&amp; this.fmt.bitsPerSample === 32) {
       this.bitDepth = '32f';
     } else if (this.fmt.audioFormat === 6) {
       this.bitDepth = '8a';
@@ -432,7 +471,7 @@ export default class WaveFileReader extends RIFFFile {
       this.cue.chunkId = chunk.chunkId;
       this.cue.chunkSize = chunk.chunkSize;
       this.cue.dwCuePoints = this.readNumber(buffer, this.uInt32_);
-      for (let i = 0; i < this.cue.dwCuePoints; i++) {
+      for (let i = 0; i &lt; this.cue.dwCuePoints; i++) {
         this.cue.points.push({
           dwName: this.readNumber(buffer, this.uInt32_),
           dwPosition: this.readNumber(buffer, this.uInt32_),
@@ -466,7 +505,7 @@ export default class WaveFileReader extends RIFFFile {
       this.smpl.dwSMPTEOffset = this.readNumber(buffer, this.uInt32_);
       this.smpl.dwNumSampleLoops = this.readNumber(buffer, this.uInt32_);
       this.smpl.dwSamplerData = this.readNumber(buffer, this.uInt32_);
-      for (let i = 0; i < this.smpl.dwNumSampleLoops; i++) {
+      for (let i = 0; i &lt; this.smpl.dwNumSampleLoops; i++) {
         this.smpl.loops.push({
           dwName: this.readNumber(buffer, this.uInt32_),
           dwType: this.readNumber(buffer, this.uInt32_),
@@ -577,7 +616,7 @@ export default class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let listChunks = this.findChunk('LIST', true);
     if (listChunks !== null) {
-      for (let j=0; j < listChunks.length; j++) {
+      for (let j=0; j &lt; listChunks.length; j++) {
         /** @type {!Object} */
         let subChunk = listChunks[j];
         this.LIST.push({
@@ -585,7 +624,7 @@ export default class WaveFileReader extends RIFFFile {
           chunkSize: subChunk.chunkSize,
           format: subChunk.format,
           subChunks: []});
-        for (let x=0; x<subChunk.subChunks.length; x++) {
+        for (let x=0; x&lt;subChunk.subChunks.length; x++) {
           this.readLISTSubChunks_(subChunk.subChunks[x],
             subChunk.format, buffer);
         }
@@ -604,7 +643,7 @@ export default class WaveFileReader extends RIFFFile {
     if (format == 'adtl') {
       if (['labl', 'note','ltxt'].indexOf(subChunk.chunkId) > -1) {
         this.head_ = subChunk.chunkData.start;
-        /** @type {!Object<string, string|number>} */
+        /** @type {!Object&lt;string, string|number>} */
         let item = {
           chunkId: subChunk.chunkId,
           chunkSize: subChunk.chunkSize,
@@ -651,3 +690,22 @@ export default class WaveFileReader extends RIFFFile {
     }
   }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Wed Aug 07 2019 14:41:57 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,4 +1,43 @@
-/*
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/wavefile-creator.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setSample">setSample</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateDataType">updateDataType</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.html#fromBuffer">fromBuffer</a></li><li data-type='method'><a href="module-wavefile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#fromScratch">fromScratch</a></li><li data-type='method'><a href="module-wavefile.html#getSample">getSample</a></li><li data-type='method'><a href="module-wavefile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.html#setSample">setSample</a></li><li data-type='method'><a href="module-wavefile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.html#toBuffer">toBuffer</a></li><li data-type='method'><a href="module-wavefile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.html#updateDataType">updateDataType</a></li><li data-type='method'><a href="module-wavefile.html#updateLabel">updateLabel</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/wavefile-creator.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
  * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -49,7 +88,7 @@ export default class WaveFileCreator extends WaveFileParser {
    * @param {string} bitDepthCode The audio bit depth code.
    *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
    *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+   * @param {!Array&lt;number>|!Array&lt;!Array&lt;number>>|!TypedArray} samples
    *    The samples. Must be in the correct range according to the bit depth.
    * @param {?Object} options Optional. Used to force the container
    *    as RIFX with {'container': 'RIFX'}
@@ -217,3 +256,22 @@ export default class WaveFileCreator extends WaveFileParser {
     };
   }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Wed Aug 07 2019 14:41:57 GMT-0300 (Hora oficial do Brasil) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

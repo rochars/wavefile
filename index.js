@@ -35,6 +35,7 @@ import fixRIFFTag from './lib/fix-riff-tag';
 
 /**
  * A class to manipulate wav files.
+ * @extends WaveFileConverter
  */
 export default class WaveFile extends WaveFileConverter {
 
