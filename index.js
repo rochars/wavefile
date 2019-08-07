@@ -36,7 +36,7 @@ import {encode, decode} from 'base64-arraybuffer-es6';
 import WaveFileCreator from './lib/wavefile-creator';
 import truncateSamples from './lib/truncate-samples';
 import fixRIFFTag from './lib/fix-riff-tag';
-import {unpackArray, unpackArrayTo, unpack, packTo} from 'byte-data';
+import {unpackArray, unpackArrayTo} from 'byte-data';
 
 /**
  * A class to manipulate wav files.
@@ -176,36 +176,6 @@ export default class WaveFile extends WaveFileCreator {
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
     }
-  }
-
-  /**
-   * Return the sample at a given index.
-   * @param {number} index The sample index.
-   * @return {number} The sample.
-   * @throws {Error} If the sample index is off range.
-   */
-  getSample(index) {
-    index = index * (this.dataType.bits / 8);
-    if (index + this.dataType.bits / 8 > this.data.samples.length) {
-      throw new Error('Range error');
-    }
-    return unpack(
-      this.data.samples.slice(index, index + this.dataType.bits / 8),
-      this.dataType);
-  }
-
-  /**
-   * Set the sample at a given index.
-   * @param {number} index The sample index.
-   * @param {number} sample The sample.
-   * @throws {Error} If the sample index is off range.
-   */
-  setSample(index, sample) {
-    index = index * (this.dataType.bits / 8);
-    if (index + this.dataType.bits / 8 > this.data.samples.length) {
-      throw new Error('Range error');
-    }
-    packTo(sample, this.dataType, this.data.samples, index);
   }
 
   /**
