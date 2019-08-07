@@ -2329,7 +2329,14 @@ function validateSampleRate(channels, bits, sampleRate) {
  */
 class WaveFileParser extends RIFFFile {
 
-  constructor() {
+  /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(wavBuffer=null) {
     super();
     /**
      * Audio formats.
@@ -2556,6 +2563,11 @@ class WaveFileParser extends RIFFFile {
      * @protected
      */
     this.dataType = {};
+    // Load a file from the buffer if one was passed
+    // when creating the object
+    if (wavBuffer) {
+      this.fromBuffer(wavBuffer);
+    }
   }
 
   /**
@@ -2567,7 +2579,7 @@ class WaveFileParser extends RIFFFile {
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
-  readBuffer(wavBuffer, samples=true) {
+  fromBuffer(wavBuffer, samples=true) {
     this.clearHeader();
     this.head_ = 0;
     this.readRIFFChunk(wavBuffer);
@@ -2596,7 +2608,7 @@ class WaveFileParser extends RIFFFile {
    * @throws {Error} If the number of channels is invalid.
    * @throws {Error} If the sample rate is invalid.
    */
-  writeBuffer() {
+  toBuffer() {
     this.validateWavHeader();
     return this.writeWavBuffer_();
   }
@@ -3506,7 +3518,7 @@ class WaveFileCreator extends WaveFileParser {
    *    as RIFX with {'container': 'RIFX'}
    * @throws {Error} If any argument does not meet the criteria.
    */
-  create(numChannels, sampleRate, bitDepthCode, samples, options={}) {
+  fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
     if (!options.container) {
       options.container = 'RIFF';
     }
@@ -3785,66 +3797,6 @@ function fixRIFFTag(tag) {
  * A class to manipulate wav files.
  */
 class WaveFile extends WaveFileCreator {
-
-  /**
-   * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  constructor(wavBuffer=null) {
-    super();
-    // Load a file from the buffer if one was passed
-    // when creating the object
-    if (wavBuffer) {
-      this.fromBuffer(wavBuffer);
-    }
-  }
-
-  /**
-   * Set up the WaveFile object based on the arguments passed.
-   * @param {number} numChannels The number of channels
-   *    (Integer numbers: 1 for mono, 2 stereo and so on).
-   * @param {number} sampleRate The sample rate.
-   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
-   * @param {string} bitDepthCode The audio bit depth code.
-   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
-   *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
-   *    The samples. Must be in the correct range according to the bit depth.
-   * @param {?Object} options Optional. Used to force the container
-   *    as RIFX with {'container': 'RIFX'}
-   * @throws {Error} If any argument does not meet the criteria.
-   */
-  fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
-    this.create(numChannels, sampleRate, bitDepthCode, samples, options);
-  }
-
-  /**
-   * Set up the WaveFile object from a byte buffer.
-   * @param {!Uint8Array} wavBuffer The buffer.
-   * @param {boolean=} samples True if the samples should be loaded.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  fromBuffer(wavBuffer, samples=true) {
-    this.readBuffer(wavBuffer, samples);
-  }
-
-  /**
-   * Return a byte buffer representig the WaveFile object as a .wav file.
-   * The return value of this method can be written straight to disk.
-   * @return {!Uint8Array} A wav file.
-   * @throws {Error} If bit depth is invalid.
-   * @throws {Error} If the number of channels is invalid.
-   * @throws {Error} If the sample rate is invalid.
-   */
-  toBuffer() {
-    return this.writeBuffer();
-  }
 
   /**
    * Force a file as RIFF.

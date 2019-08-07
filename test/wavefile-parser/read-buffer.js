@@ -2,7 +2,7 @@
  * WaveFile: https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  *
- * Tests for the WaveFileParser class readBuffer method.
+ * Tests for the WaveFileParser class fromBuffer method.
  * 
  */
 
@@ -15,7 +15,7 @@ describe("16-bit reading", function() {
     
     let wBytes = fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav");
     let wav = new WaveFileParser();
-    wav.readBuffer(wBytes);
+    wav.fromBuffer(wBytes);
 
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav.container, "RIFF");
