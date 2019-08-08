@@ -1956,6 +1956,13 @@ class RIFFFile {
     /** @type {!Object} */
     this.uInt16_ = {bits: 16, be: false};
     /**
+     * The list of supported containers.
+     * Any format different from RIFX will be treated as RIFF.
+     * @type {!Array<string>}
+     * @protected
+     */
+    this.supported_containers = ['RIFF', 'RIFX'];
+    /**
      * The container identifier.
      * 'RIFF', 'RIFX' and 'RF64' are supported.
      * @type {string}
@@ -1984,16 +1991,26 @@ class RIFFFile {
    */
   setSignature(buffer) {
       this.head_ = 0;
-      /** @type {string} */
-      let chunkId = this.getChunkId_(buffer, 0);
-      this.uInt32_.be = chunkId == 'RIFX';
-      /** @type {string} */
-      let format = unpackString(buffer, 8, 12);
-      this.head_ += 4;
+
+      // TODO the container should always come from this.signature
+      this.container = this.readString(buffer, 4);
+      if (this.supported_containers.indexOf(this.container) === -1) {
+        throw Error('Not a supported format.');
+      }
+
+      // If its RIFX data should be BE
+      this.uInt16_.be = this.container === 'RIFX';
+      this.uInt32_.be = this.uInt16_.be;
+
+      // TODO chunkSize and format should always come from this.signature
+      this.chunkSize = this.readNumber(buffer, this.uInt32_);
+      this.format = this.readString(buffer, 4);
+
+      // The RIFF file signature
       this.signature = {
-          chunkId: chunkId,
-          chunkSize: this.getChunkSize_(buffer, 0),
-          format: format,
+          chunkId: this.container,
+          chunkSize: this.chunkSize,
+          format: this.format,
           subChunks: this.getSubChunksIndex_(buffer)
       };
   }
@@ -2024,24 +2041,6 @@ class RIFFFile {
       return chunk.length ? chunk : null;
     }
     return null;
-  }
-
-  /**
-   * Read the main chunk of a RIFF file.
-   * @param {!Uint8Array} bytes A RIFF file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @protected
-   */
-  readRIFFChunk(bytes) {
-    this.head_ = 0;
-    this.container = this.readString(bytes, 4);
-    if (['RIFF', 'RIFX', 'RF64'].indexOf(this.container) === -1) {
-      throw Error('Not a supported format.');
-    }
-    this.uInt16_.be = this.container === 'RIFX';
-    this.uInt32_.be = this.uInt16_.be;
-    this.chunkSize = this.readNumber(bytes, this.uInt32_);
-    this.format = this.readString(bytes, 4);
   }
 
   /**
@@ -2321,6 +2320,8 @@ class WaveFileReader extends RIFFFile {
    */
   constructor(wavBuffer=null) {
     super();
+    // Include 'RF64' as a supported container format
+    this.supported_containers.push('RF64');
     /**
      * Audio formats.
      * Formats not listed here should be set to 65534,
@@ -2564,12 +2565,10 @@ class WaveFileReader extends RIFFFile {
    */
   fromBuffer(wavBuffer, samples=true) {
     this.clearHeader();
-    this.head_ = 0;
-    this.readRIFFChunk(wavBuffer);
+    this.setSignature(wavBuffer);
     if (this.format != 'WAVE') {
       throw Error('Could not find the "WAVE" format identifier');
     }
-    this.setSignature(wavBuffer);
     this.readDs64Chunk_(wavBuffer);
     this.readFmtChunk_(wavBuffer);
     this.readFactChunk_(wavBuffer);
