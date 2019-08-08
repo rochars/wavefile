@@ -2045,23 +2045,6 @@ class RIFFFile {
   }
 
   /**
-   * Read bytes as a ZSTR string.
-   * @param {!Uint8Array} bytes The bytes.
-   * @param {number} index the index to start reading.
-   * @return {string} The string.
-   * @protected
-   */
-  readZSTR(bytes, index=0) {
-    for (let i = index; i < bytes.length; i++) {
-      this.head_++;
-      if (bytes[i] === 0) {
-        break;
-      }
-    }
-    return unpackString(bytes, index, this.head_ - 1);
-  }
-
-  /**
    * Read bytes as a string from a RIFF chunk.
    * @param {!Uint8Array} bytes The bytes.
    * @param {number} maxSize the max size of the string.
@@ -2938,6 +2921,23 @@ class WaveFileReader extends RIFFFile {
           chunk.chunkData.end))
       };
     }
+  }
+
+  /**
+   * Read bytes as a ZSTR string.
+   * @param {!Uint8Array} bytes The bytes.
+   * @param {number} index the index to start reading.
+   * @return {string} The string.
+   * @protected
+   */
+  readZSTR(bytes, index=0) {
+    for (let i = index; i < bytes.length; i++) {
+      this.head_++;
+      if (bytes[i] === 0) {
+        break;
+      }
+    }
+    return unpackString(bytes, index, this.head_ - 1);
   }
 }
 
