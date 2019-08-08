@@ -1946,20 +1946,6 @@ function unpack$1(buffer, theType, index=0) {
 class RIFFFile {
 
   constructor() {
-    
-    /** @type {number} */
-    this.head_ = 0;
-    /** @type {!Object} */
-    this.uInt32_ = {bits: 32, be: false};
-    /** @type {!Object} */
-    this.uInt16_ = {bits: 16, be: false};
-    /**
-     * The list of supported containers.
-     * Any format different from RIFX will be treated as RIFF.
-     * @type {!Array<string>}
-     * @protected
-     */
-    this.supported_containers = ['RIFF', 'RIFX'];
     /**
      * The container identifier.
      * 'RIFF', 'RIFX' and 'RF64' are supported.
@@ -1980,6 +1966,28 @@ class RIFFFile {
      * @type {!Object}
      */
     this.signature = {};
+    /**
+     * @type {number}
+     * @protected
+     */
+    this.head = 0;
+    /**
+     * @type {!Object}
+     * @protected
+     */
+    this.uInt32 = {bits: 32, be: false};
+    /**
+     * @type {!Object}
+     * @protected
+     */
+    this.uInt16 = {bits: 16, be: false};
+    /**
+     * The list of supported containers.
+     * Any format different from RIFX will be treated as RIFF.
+     * @type {!Array<string>}
+     * @protected
+     */
+    this.supported_containers = ['RIFF', 'RIFX'];
   }
 
   /**
@@ -1988,7 +1996,7 @@ class RIFFFile {
    * @protected
    */
   setSignature(buffer) {
-      this.head_ = 0;
+      this.head = 0;
 
       // TODO the container should always come from this.signature
       this.container = this.readString(buffer, 4);
@@ -1997,8 +2005,8 @@ class RIFFFile {
       }
 
       // If its RIFX data should be BE
-      this.uInt16_.be = this.container === 'RIFX';
-      this.uInt32_.be = this.uInt16_.be;
+      this.uInt16.be = this.container === 'RIFX';
+      this.uInt32.be = this.uInt16.be;
 
       // TODO chunkSize and format should always come from this.signature
       this.chunkSize = this.readUInt32(buffer);
@@ -2051,8 +2059,8 @@ class RIFFFile {
   readString(bytes, maxSize) {
     /** @type {string} */
     let str = '';
-    str = unpackString(bytes, this.head_, this.head_ + maxSize);
-    this.head_ += maxSize;
+    str = unpackString(bytes, this.head, this.head + maxSize);
+    this.head += maxSize;
     return str;
   }
 
@@ -2064,8 +2072,8 @@ class RIFFFile {
    */
   readUInt16(bytes) {
     /** @type {number} */
-    let value = unpack$1(bytes, this.uInt16_, this.head_);
-    this.head_ += 2;
+    let value = unpack$1(bytes, this.uInt16, this.head);
+    this.head += 2;
     return value;
   }
 
@@ -2077,8 +2085,8 @@ class RIFFFile {
    */
   readUInt32(bytes) {
     /** @type {number} */
-    let value = unpack$1(bytes, this.uInt32_, this.head_);
-    this.head_ += 4;
+    let value = unpack$1(bytes, this.uInt32, this.head);
+    this.head += 4;
     return value;
   }
 
@@ -2092,7 +2100,7 @@ class RIFFFile {
       /** @type {!Array<!Object>} */
       let chunks = [];
       /** @type {number} */
-      let i = this.head_;
+      let i = this.head;
       while(i <= buffer.length - 8) {
           chunks.push(this.getSubChunkIndex_(buffer, i));
           i += 8 + chunks[chunks.length - 1].chunkSize;
@@ -2116,16 +2124,16 @@ class RIFFFile {
       };
       if (chunk.chunkId == 'LIST') {
           chunk.format = unpackString(buffer, index + 8, index + 12);
-          this.head_ += 4;
+          this.head += 4;
           chunk.subChunks = this.getSubChunksIndex_(buffer);
       } else {
           /** @type {number} */
           let realChunkSize = chunk.chunkSize % 2 ?
               chunk.chunkSize + 1 : chunk.chunkSize;
-          this.head_ = index + 8 + realChunkSize;
+          this.head = index + 8 + realChunkSize;
           chunk.chunkData = {
               start: index + 8,
-              end: this.head_
+              end: this.head
           };
       }
       return chunk;
@@ -2139,7 +2147,7 @@ class RIFFFile {
    * @private
    */
   getChunkId_(buffer, index) {
-      this.head_ += 4;
+      this.head += 4;
       return unpackString(buffer, index, index + 4);
   }
 
@@ -2151,8 +2159,8 @@ class RIFFFile {
    * @private
    */
   getChunkSize_(buffer, index) {
-      this.head_ += 4;
-      return unpack$1(buffer, this.uInt32_, index + 4);
+      this.head += 4;
+      return unpack$1(buffer, this.uInt32, index + 4);
   }
 }
 
@@ -2645,7 +2653,7 @@ class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let chunk = this.findChunk('fmt ');
     if (chunk) {
-      this.head_ = chunk.chunkData.start;
+      this.head = chunk.chunkData.start;
       this.fmt.chunkId = chunk.chunkId;
       this.fmt.chunkSize = chunk.chunkSize;
       this.fmt.audioFormat = this.readUInt16(buffer);
@@ -2691,7 +2699,7 @@ class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let chunk = this.findChunk('fact');
     if (chunk) {
-      this.head_ = chunk.chunkData.start;
+      this.head = chunk.chunkData.start;
       this.fact.chunkId = chunk.chunkId;
       this.fact.chunkSize = chunk.chunkSize;
       this.fact.dwSampleLength = this.readUInt32(buffer);
@@ -2707,7 +2715,7 @@ class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let chunk = this.findChunk('cue ');
     if (chunk) {
-      this.head_ = chunk.chunkData.start;
+      this.head = chunk.chunkData.start;
       this.cue.chunkId = chunk.chunkId;
       this.cue.chunkSize = chunk.chunkSize;
       this.cue.dwCuePoints = this.readUInt32(buffer);
@@ -2733,7 +2741,7 @@ class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let chunk = this.findChunk('smpl');
     if (chunk) {
-      this.head_ = chunk.chunkData.start;
+      this.head = chunk.chunkData.start;
       this.smpl.chunkId = chunk.chunkId;
       this.smpl.chunkSize = chunk.chunkSize;
       this.smpl.dwManufacturer = this.readUInt32(buffer);
@@ -2790,7 +2798,7 @@ class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let chunk = this.findChunk('bext');
     if (chunk) {
-      this.head_ = chunk.chunkData.start;
+      this.head = chunk.chunkData.start;
       this.bext.chunkId = chunk.chunkId;
       this.bext.chunkSize = chunk.chunkSize;
       this.bext.description = this.readString(buffer, 256);
@@ -2824,7 +2832,7 @@ class WaveFileReader extends RIFFFile {
     /** @type {?Object} */
     let chunk = this.findChunk('ds64');
     if (chunk) {
-      this.head_ = chunk.chunkData.start;
+      this.head = chunk.chunkData.start;
       this.ds64.chunkId = chunk.chunkId;
       this.ds64.chunkSize = chunk.chunkSize;
       this.ds64.riffSizeHigh = this.readUInt32(buffer);
@@ -2882,7 +2890,7 @@ class WaveFileReader extends RIFFFile {
   readLISTSubChunks_(subChunk, format, buffer) {
     if (format == 'adtl') {
       if (['labl', 'note','ltxt'].indexOf(subChunk.chunkId) > -1) {
-        this.head_ = subChunk.chunkData.start;
+        this.head = subChunk.chunkData.start;
         /** @type {!Object<string, string|number>} */
         let item = {
           chunkId: subChunk.chunkId,
@@ -2897,16 +2905,16 @@ class WaveFileReader extends RIFFFile {
           item.dwDialect = this.readUInt16(buffer);
           item.dwCodePage = this.readUInt16(buffer);
         }
-        item.value = this.readZSTR(buffer, this.head_);
+        item.value = this.readZSTR(buffer, this.head);
         this.LIST[this.LIST.length - 1].subChunks.push(item);
       }
     // RIFF INFO tags like ICRD, ISFT, ICMT
     } else if(format == 'INFO') {
-      this.head_ = subChunk.chunkData.start;
+      this.head = subChunk.chunkData.start;
       this.LIST[this.LIST.length - 1].subChunks.push({
         chunkId: subChunk.chunkId,
         chunkSize: subChunk.chunkSize,
-        value: this.readZSTR(buffer, this.head_)
+        value: this.readZSTR(buffer, this.head)
       });
     }
   }
@@ -2939,12 +2947,12 @@ class WaveFileReader extends RIFFFile {
    */
   readZSTR(bytes, index=0) {
     for (let i = index; i < bytes.length; i++) {
-      this.head_++;
+      this.head++;
       if (bytes[i] === 0) {
         break;
       }
     }
-    return unpackString(bytes, index, this.head_ - 1);
+    return unpackString(bytes, index, this.head - 1);
   }
 }
 
@@ -3047,8 +3055,8 @@ class WaveFileParser extends WaveFileReader {
    * @private
    */
   writeWavBuffer_() {
-    this.uInt16_.be = this.container === 'RIFX';
-    this.uInt32_.be = this.uInt16_.be;
+    this.uInt16.be = this.container === 'RIFX';
+    this.uInt32.be = this.uInt16.be;
     /** @type {!Array<!Array<number>>} */
     let fileBody = [
       this.getJunkBytes_(),
@@ -3057,7 +3065,7 @@ class WaveFileParser extends WaveFileReader {
       this.getFmtBytes_(),
       this.getFactBytes_(),
       packString(this.data.chunkId),
-      pack$1(this.data.samples.length, this.uInt32_),
+      pack$1(this.data.samples.length, this.uInt32),
       this.data.samples,
       this.getCueBytes_(),
       this.getSmplBytes_(),
@@ -3073,7 +3081,7 @@ class WaveFileParser extends WaveFileReader {
     /** @type {number} */
     let index = 0;
     index = packStringTo(this.container, file, index);
-    index = packTo(fileBodyLength + 4, this.uInt32_, file, index);
+    index = packTo(fileBodyLength + 4, this.uInt32, file, index);
     index = packStringTo(this.format, file, index);
     for (let i=0; i<fileBody.length; i++) {
       file.set(fileBody[i], index);
@@ -3094,21 +3102,21 @@ class WaveFileParser extends WaveFileReader {
       this.bext.chunkSize = 602 + this.bext.codingHistory.length;
       bytes = bytes.concat(
         packString(this.bext.chunkId),
-        pack$1(602 + this.bext.codingHistory.length, this.uInt32_),
+        pack$1(602 + this.bext.codingHistory.length, this.uInt32),
         writeString(this.bext.description, 256),
         writeString(this.bext.originator, 32),
         writeString(this.bext.originatorReference, 32),
         writeString(this.bext.originationDate, 10),
         writeString(this.bext.originationTime, 8),
-        pack$1(this.bext.timeReference[0], this.uInt32_),
-        pack$1(this.bext.timeReference[1], this.uInt32_),
-        pack$1(this.bext.version, this.uInt16_),
+        pack$1(this.bext.timeReference[0], this.uInt32),
+        pack$1(this.bext.timeReference[1], this.uInt32),
+        pack$1(this.bext.version, this.uInt16),
         writeString(this.bext.UMID, 64),
-        pack$1(this.bext.loudnessValue, this.uInt16_),
-        pack$1(this.bext.loudnessRange, this.uInt16_),
-        pack$1(this.bext.maxTruePeakLevel, this.uInt16_),
-        pack$1(this.bext.maxMomentaryLoudness, this.uInt16_),
-        pack$1(this.bext.maxShortTermLoudness, this.uInt16_),
+        pack$1(this.bext.loudnessValue, this.uInt16),
+        pack$1(this.bext.loudnessRange, this.uInt16),
+        pack$1(this.bext.maxTruePeakLevel, this.uInt16),
+        pack$1(this.bext.maxMomentaryLoudness, this.uInt16),
+        pack$1(this.bext.maxShortTermLoudness, this.uInt16),
         writeString(this.bext.reserved, 180),
         writeString(
           this.bext.codingHistory, this.bext.codingHistory.length));
@@ -3145,18 +3153,18 @@ class WaveFileParser extends WaveFileReader {
     if (this.ds64.chunkId) {
       bytes = bytes.concat(
         packString(this.ds64.chunkId),
-        pack$1(this.ds64.chunkSize, this.uInt32_),
-        pack$1(this.ds64.riffSizeHigh, this.uInt32_),
-        pack$1(this.ds64.riffSizeLow, this.uInt32_),
-        pack$1(this.ds64.dataSizeHigh, this.uInt32_),
-        pack$1(this.ds64.dataSizeLow, this.uInt32_),
-        pack$1(this.ds64.originationTime, this.uInt32_),
-        pack$1(this.ds64.sampleCountHigh, this.uInt32_),
-        pack$1(this.ds64.sampleCountLow, this.uInt32_));
+        pack$1(this.ds64.chunkSize, this.uInt32),
+        pack$1(this.ds64.riffSizeHigh, this.uInt32),
+        pack$1(this.ds64.riffSizeLow, this.uInt32),
+        pack$1(this.ds64.dataSizeHigh, this.uInt32),
+        pack$1(this.ds64.dataSizeLow, this.uInt32),
+        pack$1(this.ds64.originationTime, this.uInt32),
+        pack$1(this.ds64.sampleCountHigh, this.uInt32),
+        pack$1(this.ds64.sampleCountLow, this.uInt32));
     }
     //if (this.ds64.tableLength) {
     //  ds64Bytes = ds64Bytes.concat(
-    //    pack(this.ds64.tableLength, this.uInt32_),
+    //    pack(this.ds64.tableLength, this.uInt32),
     //    this.ds64.table);
     //}
     return bytes;
@@ -3175,8 +3183,8 @@ class WaveFileParser extends WaveFileReader {
       let cuePointsBytes = this.getCuePointsBytes_();
       bytes = bytes.concat(
         packString(this.cue.chunkId),
-        pack$1(cuePointsBytes.length + 4, this.uInt32_),
-        pack$1(this.cue.dwCuePoints, this.uInt32_),
+        pack$1(cuePointsBytes.length + 4, this.uInt32),
+        pack$1(this.cue.dwCuePoints, this.uInt32),
         cuePointsBytes);
     }
     return bytes;
@@ -3192,12 +3200,12 @@ class WaveFileParser extends WaveFileReader {
     let points = [];
     for (let i=0; i<this.cue.dwCuePoints; i++) {
       points = points.concat(
-        pack$1(this.cue.points[i].dwName, this.uInt32_),
-        pack$1(this.cue.points[i].dwPosition, this.uInt32_),
+        pack$1(this.cue.points[i].dwName, this.uInt32),
+        pack$1(this.cue.points[i].dwPosition, this.uInt32),
         packString(this.cue.points[i].fccChunk),
-        pack$1(this.cue.points[i].dwChunkStart, this.uInt32_),
-        pack$1(this.cue.points[i].dwBlockStart, this.uInt32_),
-        pack$1(this.cue.points[i].dwSampleOffset, this.uInt32_));
+        pack$1(this.cue.points[i].dwChunkStart, this.uInt32),
+        pack$1(this.cue.points[i].dwBlockStart, this.uInt32),
+        pack$1(this.cue.points[i].dwSampleOffset, this.uInt32));
     }
     return points;
   }
@@ -3215,16 +3223,16 @@ class WaveFileParser extends WaveFileReader {
       let smplLoopsBytes = this.getSmplLoopsBytes_();
       bytes = bytes.concat(
         packString(this.smpl.chunkId),
-        pack$1(smplLoopsBytes.length + 36, this.uInt32_),
-        pack$1(this.smpl.dwManufacturer, this.uInt32_),
-        pack$1(this.smpl.dwProduct, this.uInt32_),
-        pack$1(this.smpl.dwSamplePeriod, this.uInt32_),
-        pack$1(this.smpl.dwMIDIUnityNote, this.uInt32_),
-        pack$1(this.smpl.dwMIDIPitchFraction, this.uInt32_),
-        pack$1(this.smpl.dwSMPTEFormat, this.uInt32_),
-        pack$1(this.smpl.dwSMPTEOffset, this.uInt32_),
-        pack$1(this.smpl.dwNumSampleLoops, this.uInt32_),
-        pack$1(this.smpl.dwSamplerData, this.uInt32_),
+        pack$1(smplLoopsBytes.length + 36, this.uInt32),
+        pack$1(this.smpl.dwManufacturer, this.uInt32),
+        pack$1(this.smpl.dwProduct, this.uInt32),
+        pack$1(this.smpl.dwSamplePeriod, this.uInt32),
+        pack$1(this.smpl.dwMIDIUnityNote, this.uInt32),
+        pack$1(this.smpl.dwMIDIPitchFraction, this.uInt32),
+        pack$1(this.smpl.dwSMPTEFormat, this.uInt32),
+        pack$1(this.smpl.dwSMPTEOffset, this.uInt32),
+        pack$1(this.smpl.dwNumSampleLoops, this.uInt32),
+        pack$1(this.smpl.dwSamplerData, this.uInt32),
         smplLoopsBytes);
     }
     return bytes;
@@ -3240,12 +3248,12 @@ class WaveFileParser extends WaveFileReader {
     let loops = [];
     for (let i=0; i<this.smpl.dwNumSampleLoops; i++) {
       loops = loops.concat(
-        pack$1(this.smpl.loops[i].dwName, this.uInt32_),
-        pack$1(this.smpl.loops[i].dwType, this.uInt32_),
-        pack$1(this.smpl.loops[i].dwStart, this.uInt32_),
-        pack$1(this.smpl.loops[i].dwEnd, this.uInt32_),
-        pack$1(this.smpl.loops[i].dwFraction, this.uInt32_),
-        pack$1(this.smpl.loops[i].dwPlayCount, this.uInt32_));
+        pack$1(this.smpl.loops[i].dwName, this.uInt32),
+        pack$1(this.smpl.loops[i].dwType, this.uInt32),
+        pack$1(this.smpl.loops[i].dwStart, this.uInt32),
+        pack$1(this.smpl.loops[i].dwEnd, this.uInt32),
+        pack$1(this.smpl.loops[i].dwFraction, this.uInt32),
+        pack$1(this.smpl.loops[i].dwPlayCount, this.uInt32));
     }
     return loops;
   }
@@ -3261,8 +3269,8 @@ class WaveFileParser extends WaveFileReader {
     if (this.fact.chunkId) {
       bytes = bytes.concat(
         packString(this.fact.chunkId),
-        pack$1(this.fact.chunkSize, this.uInt32_),
-        pack$1(this.fact.dwSampleLength, this.uInt32_));
+        pack$1(this.fact.chunkSize, this.uInt32),
+        pack$1(this.fact.dwSampleLength, this.uInt32));
     }
     return bytes;
   }
@@ -3279,13 +3287,13 @@ class WaveFileParser extends WaveFileReader {
     if (this.fmt.chunkId) {
       return fmtBytes.concat(
         packString(this.fmt.chunkId),
-        pack$1(this.fmt.chunkSize, this.uInt32_),
-        pack$1(this.fmt.audioFormat, this.uInt16_),
-        pack$1(this.fmt.numChannels, this.uInt16_),
-        pack$1(this.fmt.sampleRate, this.uInt32_),
-        pack$1(this.fmt.byteRate, this.uInt32_),
-        pack$1(this.fmt.blockAlign, this.uInt16_),
-        pack$1(this.fmt.bitsPerSample, this.uInt16_),
+        pack$1(this.fmt.chunkSize, this.uInt32),
+        pack$1(this.fmt.audioFormat, this.uInt16),
+        pack$1(this.fmt.numChannels, this.uInt16),
+        pack$1(this.fmt.sampleRate, this.uInt32),
+        pack$1(this.fmt.byteRate, this.uInt32),
+        pack$1(this.fmt.blockAlign, this.uInt16),
+        pack$1(this.fmt.bitsPerSample, this.uInt16),
         this.getFmtExtensionBytes_());
     }
     throw Error('Could not find the "fmt " chunk');
@@ -3301,22 +3309,22 @@ class WaveFileParser extends WaveFileReader {
     let extension = [];
     if (this.fmt.chunkSize > 16) {
       extension = extension.concat(
-        pack$1(this.fmt.cbSize, this.uInt16_));
+        pack$1(this.fmt.cbSize, this.uInt16));
     }
     if (this.fmt.chunkSize > 18) {
       extension = extension.concat(
-        pack$1(this.fmt.validBitsPerSample, this.uInt16_));
+        pack$1(this.fmt.validBitsPerSample, this.uInt16));
     }
     if (this.fmt.chunkSize > 20) {
       extension = extension.concat(
-        pack$1(this.fmt.dwChannelMask, this.uInt32_));
+        pack$1(this.fmt.dwChannelMask, this.uInt32));
     }
     if (this.fmt.chunkSize > 24) {
       extension = extension.concat(
-        pack$1(this.fmt.subformat[0], this.uInt32_),
-        pack$1(this.fmt.subformat[1], this.uInt32_),
-        pack$1(this.fmt.subformat[2], this.uInt32_),
-        pack$1(this.fmt.subformat[3], this.uInt32_));
+        pack$1(this.fmt.subformat[0], this.uInt32),
+        pack$1(this.fmt.subformat[1], this.uInt32),
+        pack$1(this.fmt.subformat[2], this.uInt32),
+        pack$1(this.fmt.subformat[3], this.uInt32));
     }
     return extension;
   }
@@ -3335,7 +3343,7 @@ class WaveFileParser extends WaveFileReader {
           this.LIST[i].subChunks, this.LIST[i].format);
       bytes = bytes.concat(
         packString(this.LIST[i].chunkId),
-        pack$1(subChunksBytes.length + 4, this.uInt32_),
+        pack$1(subChunksBytes.length + 4, this.uInt32),
         packString(this.LIST[i].format),
         subChunksBytes);
     }
@@ -3357,7 +3365,7 @@ class WaveFileParser extends WaveFileReader {
       if (format == 'INFO') {
         bytes = bytes.concat(
           packString(subChunks[i].chunkId),
-          pack$1(subChunks[i].value.length + 1, this.uInt32_),
+          pack$1(subChunks[i].value.length + 1, this.uInt32),
           writeString(
             subChunks[i].value, subChunks[i].value.length));
         bytes.push(0);
@@ -3366,8 +3374,8 @@ class WaveFileParser extends WaveFileReader {
           bytes = bytes.concat(
             packString(subChunks[i].chunkId),
             pack$1(
-              subChunks[i].value.length + 4 + 1, this.uInt32_),
-            pack$1(subChunks[i].dwName, this.uInt32_),
+              subChunks[i].value.length + 4 + 1, this.uInt32),
+            pack$1(subChunks[i].dwName, this.uInt32),
             writeString(
               subChunks[i].value,
               subChunks[i].value.length));
@@ -3392,14 +3400,14 @@ class WaveFileParser extends WaveFileReader {
   getLtxtChunkBytes_(ltxt) {
     return [].concat(
       packString(ltxt.chunkId),
-      pack$1(ltxt.value.length + 20, this.uInt32_),
-      pack$1(ltxt.dwName, this.uInt32_),
-      pack$1(ltxt.dwSampleLength, this.uInt32_),
-      pack$1(ltxt.dwPurposeID, this.uInt32_),
-      pack$1(ltxt.dwCountry, this.uInt16_),
-      pack$1(ltxt.dwLanguage, this.uInt16_),
-      pack$1(ltxt.dwDialect, this.uInt16_),
-      pack$1(ltxt.dwCodePage, this.uInt16_),
+      pack$1(ltxt.value.length + 20, this.uInt32),
+      pack$1(ltxt.dwName, this.uInt32),
+      pack$1(ltxt.dwSampleLength, this.uInt32),
+      pack$1(ltxt.dwPurposeID, this.uInt32),
+      pack$1(ltxt.dwCountry, this.uInt16),
+      pack$1(ltxt.dwLanguage, this.uInt16),
+      pack$1(ltxt.dwDialect, this.uInt16),
+      pack$1(ltxt.dwCodePage, this.uInt16),
       writeString(ltxt.value, ltxt.value.length));
   }
 
@@ -3413,7 +3421,7 @@ class WaveFileParser extends WaveFileReader {
     if (this.junk.chunkId) {
       return bytes.concat(
         packString(this.junk.chunkId),
-        pack$1(this.junk.chunkData.length, this.uInt32_),
+        pack$1(this.junk.chunkData.length, this.uInt32),
         this.junk.chunkData);
     }
     return bytes;
