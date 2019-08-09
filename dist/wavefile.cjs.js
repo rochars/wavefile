@@ -1979,11 +1979,6 @@ class RIFFFile {
      */
     this.uInt32 = {bits: 32, be: false};
     /**
-     * @type {!Object}
-     * @protected
-     */
-    this.uInt16 = {bits: 16, be: false};
-    /**
      * The list of supported containers.
      * Any format different from RIFX will be treated as RIFF.
      * @type {!Array<string>}
@@ -1999,21 +1994,13 @@ class RIFFFile {
    */
   setSignature(buffer) {
       this.head = 0;
-
-      // TODO the container should always come from this.signature
       this.container = this.readString(buffer, 4);
       if (this.supported_containers.indexOf(this.container) === -1) {
         throw Error('Not a supported format.');
       }
-
-      // If its RIFX data should be BE
-      this.uInt16.be = this.container === 'RIFX';
-      this.uInt32.be = this.uInt16.be;
-
-      // TODO chunkSize and format should always come from this.signature
+      this.uInt32.be = this.container === 'RIFX';
       this.chunkSize = this.readUInt32(buffer);
       this.format = this.readString(buffer, 4);
-
       // The RIFF file signature
       this.signature = {
           chunkId: this.container,
@@ -2064,19 +2051,6 @@ class RIFFFile {
     str = unpackString(bytes, this.head, this.head + maxSize);
     this.head += maxSize;
     return str;
-  }
-
-  /**
-   * Read a number from a chunk.
-   * @param {!Uint8Array} bytes The chunk bytes.
-   * @return {number} The number.
-   * @protected
-   */
-  readUInt16(bytes) {
-    /** @type {number} */
-    let value = unpack$1(bytes, this.uInt16, this.head);
-    this.head += 2;
-    return value;
   }
 
   /**
@@ -2565,6 +2539,11 @@ class WaveFileReader extends RIFFFile {
      * @protected
      */
     this.dataType = {};
+    /**
+     * @type {!Object}
+     * @protected
+     */
+    this.uInt16 = {bits: 16, be: false};
     // Load a file from the buffer if one was passed
     // when creating the object
     if (wavBuffer) {
@@ -2584,6 +2563,7 @@ class WaveFileReader extends RIFFFile {
   fromBuffer(wavBuffer, samples=true) {
     this.clearHeader();
     this.setSignature(wavBuffer);
+    this.uInt16.be = this.uInt32.be;
     if (this.format != 'WAVE') {
       throw Error('Could not find the "WAVE" format identifier');
     }
@@ -2955,6 +2935,19 @@ class WaveFileReader extends RIFFFile {
       }
     }
     return unpackString(bytes, index, this.head - 1);
+  }
+
+  /**
+   * Read a number from a chunk.
+   * @param {!Uint8Array} bytes The chunk bytes.
+   * @return {number} The number.
+   * @protected
+   */
+  readUInt16(bytes) {
+    /** @type {number} */
+    let value = unpack$1(bytes, this.uInt16, this.head);
+    this.head += 2;
+    return value;
   }
 }
 
