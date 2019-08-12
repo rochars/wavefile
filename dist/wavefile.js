@@ -2163,49 +2163,6 @@ class RIFFFile {
  */
 
 /**
- * Pack a string an array of bytes. If the string is smaller than the max size
- * and the string is of fixed size, the output array is filled with 0s.
- * @param {string} str The string to be written as bytes.
- * @param {number} maxSize the max size of the string.
- * @param {boolean} fixedSize If the string is of fixed size or not.
- * @return {!Array<number>} The packed string.
- */
-function writeString(str, maxSize, fixedSize=true) {
-  /** @type {!Array<number>} */   
-  let packedString = packString(str);
-  if (fixedSize) {
-    for (let i=packedString.length; i<maxSize; i++) {
-      packedString.push(0);
-    }  
-  }
-  return packedString;
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
  * @fileoverview The validateNumChannels function.
  * @see https://github.com/rochars/wavefile
  */
@@ -2579,6 +2536,56 @@ class WaveFileReader extends RIFFFile {
   }
 
   /**
+   * Return the value of a RIFF tag in the INFO chunk.
+   * @param {string} tag The tag name.
+   * @return {?string} The value if the tag is found, null otherwise.
+   */
+  getTag(tag) {
+    /** @type {!Object} */
+    let index = this.getTagIndex_(tag);
+    if (index.TAG !== null) {
+      return this.LIST[index.LIST].subChunks[index.TAG].value;
+    }
+    return null;
+  }
+
+  /**
+   * Return a Object<tag, value> with the RIFF tags in the file.
+   * @return {!Object<string, string>} The file tags.
+   */
+  listTags() {
+    /** @type {?number} */
+    let index = this.getLISTINFOIndex_();
+    /** @type {!Object} */
+    let tags = {};
+    if (index !== null) {
+      for (let i = 0, len = this.LIST[index].subChunks.length; i < len; i++) {
+        tags[this.LIST[index].subChunks[i].chunkId] =
+          this.LIST[index].subChunks[i].value;
+      }
+    }
+    return tags;
+  }
+
+  /**
+   * Return an array with all cue points in the file, in the order they appear
+   * in the file.
+   * The difference between this method and using the list in WaveFile.cue
+   * is that the return value of this method includes the position in
+   * milliseconds of each cue point (WaveFile.cue only have the sample offset)
+   * @return {!Array<!Object>}
+   */
+  listCuePoints() {
+    /** @type {!Array<!Object>} */
+    let points = this.getCuePoints_();
+    for (let i = 0, len = points.length; i < len; i++) {
+      points[i].milliseconds =
+        (points[i].dwPosition / this.fmt.sampleRate) * 1000;
+    }
+    return points;
+  }
+
+  /**
    * Reset some attributes of the object.
    * @protected
    * @ignore
@@ -2621,6 +2628,101 @@ class WaveFileReader extends RIFFFile {
     } else {
       this.bitDepth = this.fmt.bitsPerSample.toString();
     }
+  }
+
+  /**
+   * Return an array with all cue points in the file, in the order they appear
+   * in the file.
+   * @return {!Array<!Object>}
+   * @private
+   */
+  getCuePoints_() {
+    /** @type {!Array<!Object>} */
+    let points = [];
+    for (let i = 0, len = this.cue.points.length; i < len; i++) {
+      points.push({
+        dwPosition: this.cue.points[i].dwPosition,
+        label: this.getLabelForCuePoint_(
+          this.cue.points[i].dwName)});
+    }
+    return points;
+  }
+
+  /**
+   * Return the label of a cue point.
+   * @param {number} pointDwName The ID of the cue point.
+   * @return {string}
+   * @private
+   */
+  getLabelForCuePoint_(pointDwName) {
+    /** @type {?number} */
+    let cIndex = this.getAdtlChunk_();
+    if (cIndex !== null) {
+      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
+        if (this.LIST[cIndex].subChunks[i].dwName ==
+            pointDwName) {
+          return this.LIST[cIndex].subChunks[i].value;
+        }
+      }
+    }
+    return '';
+  }
+
+  /**
+   * Return the index of the INFO chunk in the LIST chunk.
+   * @return {?number} the index of the INFO chunk.
+   * @private
+   */
+  getLISTINFOIndex_() {
+    /** @type {?number} */
+    let index = null;
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format === 'INFO') {
+        index = i;
+        break;
+      }
+    }
+    return index;
+  }
+
+  /**
+   * Return the index of the 'adtl' LIST in this.LIST.
+   * @return {?number}
+   * @private
+   */
+  getAdtlChunk_() {
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format == 'adtl') {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Return the index of a tag in a FILE chunk.
+   * @param {string} tag The tag name.
+   * @return {!Object<string, ?number>}
+   *    Object.LIST is the INFO index in LIST
+   *    Object.TAG is the tag index in the INFO
+   * @private
+   */
+  getTagIndex_(tag) {
+    /** @type {!Object<string, ?number>} */
+    let index = {LIST: null, TAG: null};
+    for (let i = 0, len = this.LIST.length; i < len; i++) {
+      if (this.LIST[i].format == 'INFO') {
+        index.LIST = i;
+        for (let j=0, subLen = this.LIST[i].subChunks.length; j < subLen; j++) {
+          if (this.LIST[i].subChunks[j].chunkId == tag) {
+            index.TAG = j;
+            break;
+          }
+        }
+        break;
+      }
+    }
+    return index;
   }
 
   /**
@@ -2947,6 +3049,49 @@ class WaveFileReader extends RIFFFile {
     this.head += 2;
     return value;
   }
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * Pack a string an array of bytes. If the string is smaller than the max size
+ * and the string is of fixed size, the output array is filled with 0s.
+ * @param {string} str The string to be written as bytes.
+ * @param {number} maxSize the max size of the string.
+ * @param {boolean} fixedSize If the string is of fixed size or not.
+ * @return {!Array<number>} The packed string.
+ */
+function writeString(str, maxSize, fixedSize=true) {
+  /** @type {!Array<number>} */   
+  let packedString = packString(str);
+  if (fixedSize) {
+    for (let i=packedString.length; i<maxSize; i++) {
+      packedString.push(0);
+    }  
+  }
+  return packedString;
 }
 
 /*
@@ -4185,38 +4330,6 @@ class WaveFile extends WaveFileConverter {
   }
 
   /**
-   * Return the value of a RIFF tag in the INFO chunk.
-   * @param {string} tag The tag name.
-   * @return {?string} The value if the tag is found, null otherwise.
-   */
-  getTag(tag) {
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      return this.LIST[index.LIST].subChunks[index.TAG].value;
-    }
-    return null;
-  }
-
-  /**
-   * Return a Object<tag, value> with the RIFF tags in the file.
-   * @return {!Object<string, string>} The file tags.
-   */
-  listTags() {
-    /** @type {?number} */
-    let index = this.getLISTINFOIndex_();
-    /** @type {!Object} */
-    let tags = {};
-    if (index !== null) {
-      for (let i = 0, len = this.LIST[index].subChunks.length; i < len; i++) {
-        tags[this.LIST[index].subChunks[i].chunkId] =
-          this.LIST[index].subChunks[i].value;
-      }
-    }
-    return tags;
-  }
-
-  /**
    * Remove a RIFF tag from the INFO chunk.
    * @param {string} tag The tag name.
    * @return {boolean} True if a tag was deleted.
@@ -4303,24 +4416,6 @@ class WaveFile extends WaveFileConverter {
   }
 
   /**
-   * Return an array with all cue points in the file, in the order they appear
-   * in the file.
-   * The difference between this method and using the list in WaveFile.cue
-   * is that the return value of this method includes the position in
-   * milliseconds of each cue point (WaveFile.cue only have the sample offset)
-   * @return {!Array<!Object>}
-   */
-  listCuePoints() {
-    /** @type {!Array<!Object>} */
-    let points = this.getCuePoints_();
-    for (let i = 0, len = points.length; i < len; i++) {
-      points[i].milliseconds =
-        (points[i].dwPosition / this.fmt.sampleRate) * 1000;
-    }
-    return points;
-  }
-
-  /**
    * Update the label of a cue point.
    * @param {number} pointIndex The ID of the cue point.
    * @param {string} label The new text for the label.
@@ -4354,44 +4449,6 @@ class WaveFile extends WaveFileConverter {
       dwSampleOffset: position,
     });
     this.setLabl_(dwName, label);
-  }
-
-  /**
-   * Return an array with all cue points in the file, in the order they appear
-   * in the file.
-   * @return {!Array<!Object>}
-   * @private
-   */
-  getCuePoints_() {
-    /** @type {!Array<!Object>} */
-    let points = [];
-    for (let i = 0, len = this.cue.points.length; i < len; i++) {
-      points.push({
-        dwPosition: this.cue.points[i].dwPosition,
-        label: this.getLabelForCuePoint_(
-          this.cue.points[i].dwName)});
-    }
-    return points;
-  }
-
-  /**
-   * Return the label of a cue point.
-   * @param {number} pointDwName The ID of the cue point.
-   * @return {string}
-   * @private
-   */
-  getLabelForCuePoint_(pointDwName) {
-    /** @type {?number} */
-    let cIndex = this.getAdtlChunk_();
-    if (cIndex !== null) {
-      for (let i = 0, len = this.LIST[cIndex].subChunks.length; i < len; i++) {
-        if (this.LIST[cIndex].subChunks[i].dwName ==
-            pointDwName) {
-          return this.LIST[cIndex].subChunks[i].value;
-        }
-      }
-    }
-    return '';
   }
 
   /**
@@ -4441,63 +4498,6 @@ class WaveFile extends WaveFileConverter {
       value: label
     });
     this.LIST[adtlIndex].chunkSize += label.length + 4 + 4 + 4 + 1;
-  }
-
-  /**
-   * Return the index of the 'adtl' LIST in this.LIST.
-   * @return {?number}
-   * @private
-   */
-  getAdtlChunk_() {
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format == 'adtl') {
-        return i;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Return the index of the INFO chunk in the LIST chunk.
-   * @return {?number} the index of the INFO chunk.
-   * @private
-   */
-  getLISTINFOIndex_() {
-    /** @type {?number} */
-    let index = null;
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format === 'INFO') {
-        index = i;
-        break;
-      }
-    }
-    return index;
-  }
-
-  /**
-   * Return the index of a tag in a FILE chunk.
-   * @param {string} tag The tag name.
-   * @return {!Object<string, ?number>}
-   *    Object.LIST is the INFO index in LIST
-   *    Object.TAG is the tag index in the INFO
-   * @private
-   */
-  getTagIndex_(tag) {
-    /** @type {!Object<string, ?number>} */
-    let index = {LIST: null, TAG: null};
-    for (let i = 0, len = this.LIST.length; i < len; i++) {
-      if (this.LIST[i].format == 'INFO') {
-        index.LIST = i;
-        for (let j=0, subLen = this.LIST[i].subChunks.length; j < subLen; j++) {
-          if (this.LIST[i].subChunks[j].chunkId == tag) {
-            index.TAG = j;
-            break;
-          }
-        }
-        break;
-      }
-    }
-    return index;
   }
 }
 
