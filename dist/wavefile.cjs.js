@@ -3784,290 +3784,6 @@ class WaveFileCreator extends WaveFileParser {
  */
 
 /**
- * @fileoverview The truncateSamples function.
- * @see https://github.com/rochars/wavefile
- */
-
-/**
- * Truncate float samples on overflow.
- * @param {Float64Array} samples the samples.
- */
-function truncateSamples(samples) {
-  for (let i = 0, len = samples.length; i < len; i++) {
-    if (samples[i] > 1) {
-      samples[i] = 1;
-    } else if (samples[i] < -1) {
-      samples[i] = -1;
-    }
-  }
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * A class to manipulate wav files.
- * @extends WaveFileCreator
- */
-class WaveFileConverter extends WaveFileCreator {
-
-  /**
-   * Force a file as RIFF.
-   */
-  toRIFF() {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      this.bitDepth,
-      unpackArray(this.data.samples, this.dataType));
-  }
-
-  /**
-   * Force a file as RIFX.
-   */
-  toRIFX() {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      this.bitDepth,
-      unpackArray(this.data.samples, this.dataType),
-      {container: 'RIFX'});
-  }
-
-  /**
-   * Encode a 16-bit wave file as 4-bit IMA ADPCM.
-   * @throws {Error} If sample rate is not 8000.
-   * @throws {Error} If number of channels is not 1.
-   */
-  toIMAADPCM() {
-    if (this.fmt.sampleRate !== 8000) {
-      throw new Error(
-        'Only 8000 Hz files can be compressed as IMA-ADPCM.');
-    } else if (this.fmt.numChannels !== 1) {
-      throw new Error(
-        'Only mono files can be compressed as IMA-ADPCM.');
-    } else {
-      this.assure16Bit_();
-      /** @type {!Int16Array} */
-      let output = new Int16Array(this.data.samples.length / 2);
-      unpackArrayTo(this.data.samples, this.dataType, output);
-      this.fromScratch(
-        this.fmt.numChannels,
-        this.fmt.sampleRate,
-        '4',
-        encode$1(output),
-        {container: this.correctContainer_()});
-    }
-  }
-
-  /**
-   * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
-   */
-  fromIMAADPCM(bitDepthCode='16') {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '16',
-      decode$1(this.data.samples, this.fmt.blockAlign),
-      {container: this.correctContainer_()});
-    if (bitDepthCode != '16') {
-      this.toBitDepth(bitDepthCode);
-    }
-  }
-
-  /**
-   * Encode a 16-bit wave file as 8-bit A-Law.
-   */
-  toALaw() {
-    this.assure16Bit_();
-    /** @type {!Int16Array} */
-    let output = new Int16Array(this.data.samples.length / 2);
-    unpackArrayTo(this.data.samples, this.dataType, output);
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '8a',
-      encode$2(output),
-      {container: this.correctContainer_()});
-  }
-
-  /**
-   * Decode a 8-bit A-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
-   */
-  fromALaw(bitDepthCode='16') {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '16',
-      decode$2(this.data.samples),
-      {container: this.correctContainer_()});
-    if (bitDepthCode != '16') {
-      this.toBitDepth(bitDepthCode);
-    }
-  }
-
-  /**
-   * Encode 16-bit wave file as 8-bit mu-Law.
-   */
-  toMuLaw() {
-    this.assure16Bit_();
-    /** @type {!Int16Array} */
-    let output = new Int16Array(this.data.samples.length / 2);
-    unpackArrayTo(this.data.samples, this.dataType, output);
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '8m',
-      encode$3(output),
-      {container: this.correctContainer_()});
-  }
-
-  /**
-   * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
-   */
-  fromMuLaw(bitDepthCode='16') {
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      '16',
-      decode$3(this.data.samples),
-      {container: this.correctContainer_()});
-    if (bitDepthCode != '16') {
-      this.toBitDepth(bitDepthCode);
-    }
-  }
-
-  /**
-   * Change the bit depth of the samples.
-   * @param {string} newBitDepth The new bit depth of the samples.
-   *    One of '8' ... '32' (integers), '32f' or '64' (floats)
-   * @param {boolean} changeResolution A boolean indicating if the
-   *    resolution of samples should be actually changed or not.
-   * @throws {Error} If the bit depth is not valid.
-   */
-  toBitDepth(newBitDepth, changeResolution=true) {
-    /** @type {string} */
-    let toBitDepth = newBitDepth;
-    /** @type {string} */
-    let thisBitDepth = this.bitDepth;
-    if (!changeResolution) {
-      if (newBitDepth != '32f') {
-        toBitDepth = this.dataType.bits.toString();
-      }
-      thisBitDepth = this.dataType.bits;
-    }
-    this.assureUncompressed_();
-    /** @type {number} */
-    let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
-    /** @type {!Float64Array} */
-    let typedSamplesInput = new Float64Array(sampleCount);
-    /** @type {!Float64Array} */
-    let typedSamplesOutput = new Float64Array(sampleCount);
-    unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
-    if (thisBitDepth == "32f" || thisBitDepth == "64") {
-      truncateSamples(typedSamplesInput);
-    }
-    bitDepth(
-      typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
-    this.fromScratch(
-      this.fmt.numChannels,
-      this.fmt.sampleRate,
-      newBitDepth,
-      typedSamplesOutput,
-      {container: this.correctContainer_()});
-  }
-
-  /**
-   * Make the file 16-bit if it is not.
-   * @private
-   */
-  assure16Bit_() {
-    this.assureUncompressed_();
-    if (this.bitDepth != '16') {
-      this.toBitDepth('16');
-    }
-  }
-
-  /**
-   * Uncompress the samples in case of a compressed file.
-   * @private
-   */
-  assureUncompressed_() {
-    if (this.bitDepth == '8a') {
-      this.fromALaw();
-    } else if (this.bitDepth == '8m') {
-      this.fromMuLaw();
-    } else if (this.bitDepth == '4') {
-      this.fromIMAADPCM();
-    }
-  }
-
-  /**
-   * Return 'RIFF' if the container is 'RF64', the current container name
-   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
-   * @return {string}
-   * @private
-   */
-  correctContainer_() {
-    return this.container == 'RF64' ? 'RIFF' : this.container;
-  }
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
  * @fileoverview The fixRIFFTag function.
  * @see https://github.com/rochars/wavefile
  */
@@ -4113,63 +3829,10 @@ function fixRIFFTag(tag) {
  */
 
 /**
- * A class to manipulate wav files.
- * @extends WaveFileConverter
+ * A class to edit meta information in wav files.
+ * @extends WaveFileCreator
  */
-class WaveFile extends WaveFileConverter {
-
-  /**
-   * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  constructor(wavBuffer=null) {
-    super();
-    if (wavBuffer) {
-      this.fromBuffer(wavBuffer);
-    }
-  }
-
-  /**
-   * Use a .wav file encoded as a base64 string to load the WaveFile object.
-   * @param {string} base64String A .wav file as a base64 string.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  fromBase64(base64String) {
-    this.fromBuffer(new Uint8Array(decode(base64String)));
-  }
-
-  /**
-   * Return a base64 string representig the WaveFile object as a .wav file.
-   * @return {string} A .wav file as a base64 string.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  toBase64() {
-    /** @type {!Uint8Array} */
-    let buffer = this.toBuffer();
-    return encode(buffer, 0, buffer.length);
-  }
-
-  /**
-   * Return a DataURI string representig the WaveFile object as a .wav file.
-   * The return of this method can be used to load the audio in browsers.
-   * @return {string} A .wav file as a DataURI.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  toDataURI() {
-    return 'data:audio/wav;base64,' + this.toBase64();
-  }
-
-  /**
-   * Use a .wav file encoded as a DataURI to load the WaveFile object.
-   * @param {string} dataURI A .wav file as DataURI.
-   * @throws {Error} If any property of the object appears invalid.
-   */
-  fromDataURI(dataURI) {
-    this.fromBase64(dataURI.replace('data:audio/wav;base64,', ''));
-  }
+class WaveFileMetaEditor extends WaveFileCreator {
 
   /**
    * Return the value of a RIFF tag in the INFO chunk.
@@ -4518,6 +4181,374 @@ class WaveFile extends WaveFileConverter {
       value: label
     });
     this.LIST[adtlIndex].chunkSize += label.length + 4 + 4 + 4 + 1;
+  }
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The truncateSamples function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Truncate float samples on overflow.
+ * @param {Float64Array} samples the samples.
+ */
+function truncateSamples(samples) {
+  for (let i = 0, len = samples.length; i < len; i++) {
+    if (samples[i] > 1) {
+      samples[i] = 1;
+    } else if (samples[i] < -1) {
+      samples[i] = -1;
+    }
+  }
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * A class to convert wav files to other types of wav files.
+ * @extends WaveFileMetaEditor
+ */
+class WaveFileConverter extends WaveFileMetaEditor {
+
+  /**
+   * Force a file as RIFF.
+   */
+  toRIFF() {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      this.bitDepth,
+      unpackArray(this.data.samples, this.dataType));
+  }
+
+  /**
+   * Force a file as RIFX.
+   */
+  toRIFX() {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      this.bitDepth,
+      unpackArray(this.data.samples, this.dataType),
+      {container: 'RIFX'});
+  }
+
+  /**
+   * Encode a 16-bit wave file as 4-bit IMA ADPCM.
+   * @throws {Error} If sample rate is not 8000.
+   * @throws {Error} If number of channels is not 1.
+   */
+  toIMAADPCM() {
+    if (this.fmt.sampleRate !== 8000) {
+      throw new Error(
+        'Only 8000 Hz files can be compressed as IMA-ADPCM.');
+    } else if (this.fmt.numChannels !== 1) {
+      throw new Error(
+        'Only mono files can be compressed as IMA-ADPCM.');
+    } else {
+      this.assure16Bit_();
+      /** @type {!Int16Array} */
+      let output = new Int16Array(this.data.samples.length / 2);
+      unpackArrayTo(this.data.samples, this.dataType, output);
+      this.fromScratch(
+        this.fmt.numChannels,
+        this.fmt.sampleRate,
+        '4',
+        encode$1(output),
+        {container: this.correctContainer_()});
+    }
+  }
+
+  /**
+   * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
+   * @param {string} bitDepthCode The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
+   *    Optional. Default is 16.
+   */
+  fromIMAADPCM(bitDepthCode='16') {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '16',
+      decode$1(this.data.samples, this.fmt.blockAlign),
+      {container: this.correctContainer_()});
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
+    }
+  }
+
+  /**
+   * Encode a 16-bit wave file as 8-bit A-Law.
+   */
+  toALaw() {
+    this.assure16Bit_();
+    /** @type {!Int16Array} */
+    let output = new Int16Array(this.data.samples.length / 2);
+    unpackArrayTo(this.data.samples, this.dataType, output);
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '8a',
+      encode$2(output),
+      {container: this.correctContainer_()});
+  }
+
+  /**
+   * Decode a 8-bit A-Law wave file into a 16-bit wave file.
+   * @param {string} bitDepthCode The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
+   *    Optional. Default is 16.
+   */
+  fromALaw(bitDepthCode='16') {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '16',
+      decode$2(this.data.samples),
+      {container: this.correctContainer_()});
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
+    }
+  }
+
+  /**
+   * Encode 16-bit wave file as 8-bit mu-Law.
+   */
+  toMuLaw() {
+    this.assure16Bit_();
+    /** @type {!Int16Array} */
+    let output = new Int16Array(this.data.samples.length / 2);
+    unpackArrayTo(this.data.samples, this.dataType, output);
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '8m',
+      encode$3(output),
+      {container: this.correctContainer_()});
+  }
+
+  /**
+   * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
+   * @param {string} bitDepthCode The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats).
+   *    Optional. Default is 16.
+   */
+  fromMuLaw(bitDepthCode='16') {
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      '16',
+      decode$3(this.data.samples),
+      {container: this.correctContainer_()});
+    if (bitDepthCode != '16') {
+      this.toBitDepth(bitDepthCode);
+    }
+  }
+
+  /**
+   * Change the bit depth of the samples.
+   * @param {string} newBitDepth The new bit depth of the samples.
+   *    One of '8' ... '32' (integers), '32f' or '64' (floats)
+   * @param {boolean} changeResolution A boolean indicating if the
+   *    resolution of samples should be actually changed or not.
+   * @throws {Error} If the bit depth is not valid.
+   */
+  toBitDepth(newBitDepth, changeResolution=true) {
+    /** @type {string} */
+    let toBitDepth = newBitDepth;
+    /** @type {string} */
+    let thisBitDepth = this.bitDepth;
+    if (!changeResolution) {
+      if (newBitDepth != '32f') {
+        toBitDepth = this.dataType.bits.toString();
+      }
+      thisBitDepth = this.dataType.bits;
+    }
+    this.assureUncompressed_();
+    /** @type {number} */
+    let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
+    /** @type {!Float64Array} */
+    let typedSamplesInput = new Float64Array(sampleCount);
+    /** @type {!Float64Array} */
+    let typedSamplesOutput = new Float64Array(sampleCount);
+    unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
+    if (thisBitDepth == "32f" || thisBitDepth == "64") {
+      truncateSamples(typedSamplesInput);
+    }
+    bitDepth(
+      typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
+    this.fromScratch(
+      this.fmt.numChannels,
+      this.fmt.sampleRate,
+      newBitDepth,
+      typedSamplesOutput,
+      {container: this.correctContainer_()});
+  }
+
+  /**
+   * Make the file 16-bit if it is not.
+   * @private
+   */
+  assure16Bit_() {
+    this.assureUncompressed_();
+    if (this.bitDepth != '16') {
+      this.toBitDepth('16');
+    }
+  }
+
+  /**
+   * Uncompress the samples in case of a compressed file.
+   * @private
+   */
+  assureUncompressed_() {
+    if (this.bitDepth == '8a') {
+      this.fromALaw();
+    } else if (this.bitDepth == '8m') {
+      this.fromMuLaw();
+    } else if (this.bitDepth == '4') {
+      this.fromIMAADPCM();
+    }
+  }
+
+  /**
+   * Return 'RIFF' if the container is 'RF64', the current container name
+   * otherwise. Used to enforce 'RIFF' when RF64 is not allowed.
+   * @return {string}
+   * @private
+   */
+  correctContainer_() {
+    return this.container == 'RF64' ? 'RIFF' : this.container;
+  }
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * A class to manipulate wav files.
+ * @extends WaveFileConverter
+ */
+class WaveFile extends WaveFileConverter {
+
+  /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(wavBuffer=null) {
+    super();
+    if (wavBuffer) {
+      this.fromBuffer(wavBuffer);
+    }
+  }
+
+  /**
+   * Use a .wav file encoded as a base64 string to load the WaveFile object.
+   * @param {string} base64String A .wav file as a base64 string.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  fromBase64(base64String) {
+    this.fromBuffer(new Uint8Array(decode(base64String)));
+  }
+
+  /**
+   * Return a base64 string representig the WaveFile object as a .wav file.
+   * @return {string} A .wav file as a base64 string.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  toBase64() {
+    /** @type {!Uint8Array} */
+    let buffer = this.toBuffer();
+    return encode(buffer, 0, buffer.length);
+  }
+
+  /**
+   * Return a DataURI string representig the WaveFile object as a .wav file.
+   * The return of this method can be used to load the audio in browsers.
+   * @return {string} A .wav file as a DataURI.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  toDataURI() {
+    return 'data:audio/wav;base64,' + this.toBase64();
+  }
+
+  /**
+   * Use a .wav file encoded as a DataURI to load the WaveFile object.
+   * @param {string} dataURI A .wav file as DataURI.
+   * @throws {Error} If any property of the object appears invalid.
+   */
+  fromDataURI(dataURI) {
+    this.fromBase64(dataURI.replace('data:audio/wav;base64,', ''));
   }
 }
 
