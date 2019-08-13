@@ -2376,16 +2376,6 @@ class WaveFileReader extends RIFFFile {
       chunkData: []
     };
     /**
-     * The bit depth code according to the samples.
-     * @type {string}
-     */
-    this.bitDepth = '0';
-    /**
-     * @type {!Object}
-     * @protected
-     */
-    this.dataType = {};
-    /**
      * @type {!Object}
      * @protected
      */
@@ -2398,7 +2388,7 @@ class WaveFileReader extends RIFFFile {
   }
 
   /**
-   * Set up the WaveFileParser object from a byte buffer.
+   * Set up the WaveFileReader object from a byte buffer.
    * @param {!Uint8Array} wavBuffer The buffer.
    * @param {boolean=} samples True if the samples should be loaded.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
@@ -2422,8 +2412,6 @@ class WaveFileReader extends RIFFFile {
     this.readDataChunk_(wavBuffer, samples);
     this.readJunkChunk_(wavBuffer);
     this.readLISTChunk_(wavBuffer);
-    this.bitDepthFromFmt_();
-    this.updateDataType();
   }
 
   /**
@@ -2486,39 +2474,6 @@ class WaveFileReader extends RIFFFile {
     this.fmt.validBitsPerSample = 0;
     this.fact.chunkId = '';
     this.ds64.chunkId = '';
-  }
-
-  /**
-   * Update the type definition used to read and write the samples.
-   * @protected
-   */
-  updateDataType() {
-    this.dataType = {
-      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      fp: this.bitDepth == '32f' || this.bitDepth == '64',
-      signed: this.bitDepth != '8',
-      be: this.container == 'RIFX'
-    };
-    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
-      this.dataType.bits = 8;
-      this.dataType.signed = false;
-    }
-  }
-
-  /**
-   * Set the string code of the bit depth based on the 'fmt ' chunk.
-   * @private
-   */
-  bitDepthFromFmt_() {
-    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
-      this.bitDepth = '32f';
-    } else if (this.fmt.audioFormat === 6) {
-      this.bitDepth = '8a';
-    } else if (this.fmt.audioFormat === 7) {
-      this.bitDepth = '8m';
-    } else {
-      this.bitDepth = this.fmt.bitsPerSample.toString();
-    }
   }
 
   /**
@@ -3109,6 +3064,16 @@ class WaveFileParser extends WaveFileReader {
   constructor(wavBuffer=null) {
     super(wavBuffer);
     /**
+     * The bit depth code according to the samples.
+     * @type {string}
+     */
+    this.bitDepth = '0';
+    /**
+     * @type {!Object}
+     * @protected
+     */
+    this.dataType = {};
+    /**
      * Audio formats.
      * Formats not listed here should be set to 65534,
      * the code for WAVE_FORMAT_EXTENSIBLE
@@ -3126,6 +3091,25 @@ class WaveFileParser extends WaveFileReader {
       '32f': 3,
       '64': 3
     };
+    if (wavBuffer) {
+      this.bitDepthFromFmt_();
+      this.updateDataType();
+    }
+  }
+
+  /**
+   * Set up the WaveFileParser object from a byte buffer.
+   * @param {!Uint8Array} wavBuffer The buffer.
+   * @param {boolean=} samples True if the samples should be loaded.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  fromBuffer(wavBuffer, samples=true) {
+    super.fromBuffer(wavBuffer, samples);
+    this.bitDepthFromFmt_();
+    this.updateDataType();
   }
 
   /**
@@ -3187,6 +3171,39 @@ class WaveFileParser extends WaveFileReader {
     if (!validateSampleRate(
         this.fmt.numChannels, this.fmt.bitsPerSample, this.fmt.sampleRate)) {
       throw new Error('Invalid sample rate.');
+    }
+  }
+
+  /**
+   * Update the type definition used to read and write the samples.
+   * @protected
+   */
+  updateDataType() {
+    this.dataType = {
+      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+      fp: this.bitDepth == '32f' || this.bitDepth == '64',
+      signed: this.bitDepth != '8',
+      be: this.container == 'RIFX'
+    };
+    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
+      this.dataType.bits = 8;
+      this.dataType.signed = false;
+    }
+  }
+
+  /**
+   * Set the string code of the bit depth based on the 'fmt ' chunk.
+   * @private
+   */
+  bitDepthFromFmt_() {
+    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
+      this.bitDepth = '32f';
+    } else if (this.fmt.audioFormat === 6) {
+      this.bitDepth = '8a';
+    } else if (this.fmt.audioFormat === 7) {
+      this.bitDepth = '8m';
+    } else {
+      this.bitDepth = this.fmt.bitsPerSample.toString();
     }
   }
 
