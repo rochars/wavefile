@@ -2383,6 +2383,7 @@ class WaveFileReader extends RIFFFile {
    * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
+   * @ignore
    */
   fromBuffer(wavBuffer, samples=true) {
     this.clearHeader();
@@ -2817,6 +2818,7 @@ class WaveFileParser extends WaveFileReader {
    * Return a byte buffer representig the WaveFileParser object as a .wav file.
    * The return value of this method can be written straight to disk.
    * @return {!Uint8Array} A wav file.
+   * @ignore
    */
   toBuffer() {
     this.uInt16.be = this.container === 'RIFX';
@@ -3516,7 +3518,7 @@ class WaveFileCreator extends WaveFileParser {
     return super.toBuffer();
   }
 
-    /**
+  /**
    * Return the sample at a given index.
    * @param {number} index The sample index.
    * @return {number} The sample.
