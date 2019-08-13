@@ -2916,6 +2916,13 @@ function validateSampleRate(channels, bits, sampleRate) {
  */
 class WaveFileParser extends WaveFileReader {
 
+  /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
   constructor(wavBuffer=null) {
     super(wavBuffer);
     /**
@@ -2923,11 +2930,6 @@ class WaveFileParser extends WaveFileReader {
      * @type {string}
      */
     this.bitDepth = '0';
-    /**
-     * @type {!Object}
-     * @protected
-     */
-    this.dataType = {};
     /**
      * Audio formats.
      * Formats not listed here should be set to 65534,
@@ -2948,7 +2950,6 @@ class WaveFileParser extends WaveFileReader {
     };
     if (wavBuffer) {
       this.bitDepthFromFmt_();
-      this.updateDataType();
     }
   }
 
@@ -2964,7 +2965,6 @@ class WaveFileParser extends WaveFileReader {
   fromBuffer(wavBuffer, samples=true) {
     super.fromBuffer(wavBuffer, samples);
     this.bitDepthFromFmt_();
-    this.updateDataType();
   }
 
   /**
@@ -2978,36 +2978,6 @@ class WaveFileParser extends WaveFileReader {
   toBuffer() {
     this.validateWavHeader();
     return this.writeWavBuffer_();
-  }
-
-  /**
-   * Return the sample at a given index.
-   * @param {number} index The sample index.
-   * @return {number} The sample.
-   * @throws {Error} If the sample index is off range.
-   */
-  getSample(index) {
-    index = index * (this.dataType.bits / 8);
-    if (index + this.dataType.bits / 8 > this.data.samples.length) {
-      throw new Error('Range error');
-    }
-    return unpack$1(
-      this.data.samples.slice(index, index + this.dataType.bits / 8),
-      this.dataType);
-  }
-
-  /**
-   * Set the sample at a given index.
-   * @param {number} index The sample index.
-   * @param {number} sample The sample.
-   * @throws {Error} If the sample index is off range.
-   */
-  setSample(index, sample) {
-    index = index * (this.dataType.bits / 8);
-    if (index + this.dataType.bits / 8 > this.data.samples.length) {
-      throw new Error('Range error');
-    }
-    packTo(sample, this.dataType, this.data.samples, index);
   }
 
   /**
@@ -3026,23 +2996,6 @@ class WaveFileParser extends WaveFileReader {
     if (!validateSampleRate(
         this.fmt.numChannels, this.fmt.bitsPerSample, this.fmt.sampleRate)) {
       throw new Error('Invalid sample rate.');
-    }
-  }
-
-  /**
-   * Update the type definition used to read and write the samples.
-   * @protected
-   */
-  updateDataType() {
-    this.dataType = {
-      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      fp: this.bitDepth == '32f' || this.bitDepth == '64',
-      signed: this.bitDepth != '8',
-      be: this.container == 'RIFX'
-    };
-    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
-      this.dataType.bits = 8;
-      this.dataType.signed = false;
     }
   }
 
@@ -3597,6 +3550,25 @@ function dwChannelMask(numChannels) {
 class WaveFileCreator extends WaveFileParser {
 
   /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(wavBuffer=null) {
+    super(wavBuffer);
+    /**
+     * @type {!Object}
+     * @protected
+     */
+    this.dataType = {};
+    if (wavBuffer) {
+      this.updateDataType();
+    }
+  }
+
+  /**
    * Set up the WaveFileCreator object based on the arguments passed.
    * @param {number} numChannels The number of channels
    *    (Integer numbers: 1 for mono, 2 stereo and so on).
@@ -3630,6 +3602,67 @@ class WaveFileCreator extends WaveFileParser {
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
     this.validateWavHeader();
+  }
+
+  /**
+   * Set up the WaveFileParser object from a byte buffer.
+   * @param {!Uint8Array} wavBuffer The buffer.
+   * @param {boolean=} samples True if the samples should be loaded.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  fromBuffer(wavBuffer, samples=true) {
+    super.fromBuffer(wavBuffer, samples);
+    this.updateDataType();
+  }
+
+    /**
+   * Return the sample at a given index.
+   * @param {number} index The sample index.
+   * @return {number} The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  getSample(index) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    return unpack$1(
+      this.data.samples.slice(index, index + this.dataType.bits / 8),
+      this.dataType);
+  }
+
+  /**
+   * Set the sample at a given index.
+   * @param {number} index The sample index.
+   * @param {number} sample The sample.
+   * @throws {Error} If the sample index is off range.
+   */
+  setSample(index, sample) {
+    index = index * (this.dataType.bits / 8);
+    if (index + this.dataType.bits / 8 > this.data.samples.length) {
+      throw new Error('Range error');
+    }
+    packTo(sample, this.dataType, this.data.samples, index);
+  }
+
+  /**
+   * Update the type definition used to read and write the samples.
+   * @protected
+   */
+  updateDataType() {
+    this.dataType = {
+      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+      fp: this.bitDepth == '32f' || this.bitDepth == '64',
+      signed: this.bitDepth != '8',
+      be: this.container == 'RIFX'
+    };
+    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
+      this.dataType.bits = 8;
+      this.dataType.signed = false;
+    }
   }
 
   /**
