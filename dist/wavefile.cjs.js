@@ -2169,14 +2169,7 @@ class RIFFFile {
  */
 class WaveFileReader extends RIFFFile {
 
-  /**
-   * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  constructor(wavBuffer=null) {
+  constructor() {
     super();
     // Include 'RF64' as a supported container format
     this.supported_containers.push('RF64');
@@ -2382,11 +2375,6 @@ class WaveFileReader extends RIFFFile {
      * @protected
      */
     this.uInt16 = {bits: 16, be: false};
-    // Load a file from the buffer if one was passed
-    // when creating the object
-    if (wavBuffer) {
-      this.fromBuffer(wavBuffer);
-    }
   }
 
   /**
@@ -2918,15 +2906,8 @@ function validateSampleRate(channels, bits, sampleRate) {
  */
 class WaveFileParser extends WaveFileReader {
 
-  /**
-   * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  constructor(wavBuffer=null) {
-    super(wavBuffer);
+  constructor() {
+    super();
     /**
      * The bit depth code according to the samples.
      * @type {string}
@@ -2950,9 +2931,6 @@ class WaveFileParser extends WaveFileReader {
       '32f': 3,
       '64': 3
     };
-    if (wavBuffer) {
-      this.bitDepthFromFmt_();
-    }
   }
 
   /**
@@ -3551,23 +3529,13 @@ function dwChannelMask(numChannels) {
  */
 class WaveFileCreator extends WaveFileParser {
 
-  /**
-   * @param {?Uint8Array=} wavBuffer A wave file buffer.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  constructor(wavBuffer=null) {
-    super(wavBuffer);
+  constructor() {
+    super();
     /**
      * @type {!Object}
      * @protected
      */
     this.dataType = {};
-    if (wavBuffer) {
-      this.updateDataType();
-    }
   }
 
   /**
@@ -4167,6 +4135,20 @@ function fixRIFFTag(tag) {
  * @extends WaveFileConverter
  */
 class WaveFile extends WaveFileConverter {
+
+  /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(wavBuffer=null) {
+    super();
+    if (wavBuffer) {
+      this.fromBuffer(wavBuffer);
+    }
+  }
 
   /**
    * Use a .wav file encoded as a base64 string to load the WaveFile object.

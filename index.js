@@ -40,6 +40,20 @@ import fixRIFFTag from './lib/fix-riff-tag';
 export default class WaveFile extends WaveFileConverter {
 
   /**
+   * @param {?Uint8Array=} wavBuffer A wave file buffer.
+   * @throws {Error} If container is not RIFF, RIFX or RF64.
+   * @throws {Error} If format is not WAVE.
+   * @throws {Error} If no 'fmt ' chunk is found.
+   * @throws {Error} If no 'data' chunk is found.
+   */
+  constructor(wavBuffer=null) {
+    super();
+    if (wavBuffer) {
+      this.fromBuffer(wavBuffer);
+    }
+  }
+
+  /**
    * Use a .wav file encoded as a base64 string to load the WaveFile object.
    * @param {string} base64String A .wav file as a base64 string.
    * @throws {Error} If any property of the object appears invalid.
