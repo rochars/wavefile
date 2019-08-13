@@ -2427,12 +2427,12 @@ class WaveFileReader extends RIFFFile {
       this.head = chunk.chunkData.start;
       this.fmt.chunkId = chunk.chunkId;
       this.fmt.chunkSize = chunk.chunkSize;
-      this.fmt.audioFormat = this.readUInt16(buffer);
-      this.fmt.numChannels = this.readUInt16(buffer);
+      this.fmt.audioFormat = this.readUInt16_(buffer);
+      this.fmt.numChannels = this.readUInt16_(buffer);
       this.fmt.sampleRate = this.readUInt32(buffer);
       this.fmt.byteRate = this.readUInt32(buffer);
-      this.fmt.blockAlign = this.readUInt16(buffer);
-      this.fmt.bitsPerSample = this.readUInt16(buffer);
+      this.fmt.blockAlign = this.readUInt16_(buffer);
+      this.fmt.bitsPerSample = this.readUInt16_(buffer);
       this.readFmtExtension_(buffer);
     } else {
       throw Error('Could not find the "fmt " chunk');
@@ -2446,9 +2446,9 @@ class WaveFileReader extends RIFFFile {
    */
   readFmtExtension_(buffer) {
     if (this.fmt.chunkSize > 16) {
-      this.fmt.cbSize = this.readUInt16(buffer);
+      this.fmt.cbSize = this.readUInt16_(buffer);
       if (this.fmt.chunkSize > 18) {
-        this.fmt.validBitsPerSample = this.readUInt16(buffer);
+        this.fmt.validBitsPerSample = this.readUInt16_(buffer);
         if (this.fmt.chunkSize > 20) {
           this.fmt.dwChannelMask = this.readUInt32(buffer);
           this.fmt.subformat = [
@@ -2580,13 +2580,13 @@ class WaveFileReader extends RIFFFile {
       this.bext.timeReference = [
         this.readUInt32(buffer),
         this.readUInt32(buffer)];
-      this.bext.version = this.readUInt16(buffer);
+      this.bext.version = this.readUInt16_(buffer);
       this.bext.UMID = this.readString(buffer, 64);
-      this.bext.loudnessValue = this.readUInt16(buffer);
-      this.bext.loudnessRange = this.readUInt16(buffer);
-      this.bext.maxTruePeakLevel = this.readUInt16(buffer);
-      this.bext.maxMomentaryLoudness = this.readUInt16(buffer);
-      this.bext.maxShortTermLoudness = this.readUInt16(buffer);
+      this.bext.loudnessValue = this.readUInt16_(buffer);
+      this.bext.loudnessRange = this.readUInt16_(buffer);
+      this.bext.maxTruePeakLevel = this.readUInt16_(buffer);
+      this.bext.maxMomentaryLoudness = this.readUInt16_(buffer);
+      this.bext.maxShortTermLoudness = this.readUInt16_(buffer);
       this.bext.reserved = this.readString(buffer, 180);
       this.bext.codingHistory = this.readString(
         buffer, this.bext.chunkSize - 602);
@@ -2671,12 +2671,12 @@ class WaveFileReader extends RIFFFile {
         if (subChunk.chunkId == 'ltxt') {
           item.dwSampleLength = this.readUInt32(buffer);
           item.dwPurposeID = this.readUInt32(buffer);
-          item.dwCountry = this.readUInt16(buffer);
-          item.dwLanguage = this.readUInt16(buffer);
-          item.dwDialect = this.readUInt16(buffer);
-          item.dwCodePage = this.readUInt16(buffer);
+          item.dwCountry = this.readUInt16_(buffer);
+          item.dwLanguage = this.readUInt16_(buffer);
+          item.dwDialect = this.readUInt16_(buffer);
+          item.dwCodePage = this.readUInt16_(buffer);
         }
-        item.value = this.readZSTR(buffer, this.head);
+        item.value = this.readZSTR_(buffer, this.head);
         this.LIST[this.LIST.length - 1].subChunks.push(item);
       }
     // RIFF INFO tags like ICRD, ISFT, ICMT
@@ -2685,7 +2685,7 @@ class WaveFileReader extends RIFFFile {
       this.LIST[this.LIST.length - 1].subChunks.push({
         chunkId: subChunk.chunkId,
         chunkSize: subChunk.chunkSize,
-        value: this.readZSTR(buffer, this.head)
+        value: this.readZSTR_(buffer, this.head)
       });
     }
   }
@@ -2714,9 +2714,9 @@ class WaveFileReader extends RIFFFile {
    * @param {!Uint8Array} bytes The bytes.
    * @param {number} index the index to start reading.
    * @return {string} The string.
-   * @protected
+   * @private
    */
-  readZSTR(bytes, index=0) {
+  readZSTR_(bytes, index=0) {
     for (let i = index; i < bytes.length; i++) {
       this.head++;
       if (bytes[i] === 0) {
@@ -2730,9 +2730,9 @@ class WaveFileReader extends RIFFFile {
    * Read a number from a chunk.
    * @param {!Uint8Array} bytes The chunk bytes.
    * @return {number} The number.
-   * @protected
+   * @private
    */
-  readUInt16(bytes) {
+  readUInt16_(bytes) {
     /** @type {number} */
     let value = unpack$1(bytes, this.uInt16, this.head);
     this.head += 2;
