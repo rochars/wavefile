@@ -2808,198 +2808,17 @@ function writeString(str, maxSize, fixedSize=true) {
  */
 
 /**
- * @fileoverview The validateNumChannels function.
- * @see https://github.com/rochars/wavefile
- */
-
-/**
- * Validate the number of channels in a wav file according to the
- * bit depth of the audio.
- * @param {number} channels The number of channels in the file.
- * @param {number} bits The number of bits per sample.
- * @return {boolean} True is the number of channels is valid.
- */
-function validateNumChannels(channels, bits) {
-  /** @type {number} */
-  let blockAlign = channels * bits / 8;
-  if (channels < 1 || blockAlign > 65535) {
-    return false;
-  }
-  return true;
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
- * @fileoverview The validateSampleRate function.
- * @see https://github.com/rochars/wavefile
- */
-
-/**
- * Validate the sample rate value of a wav file according to the number of
- * channels and the bit depth of the audio.
- * @param {number} channels The number of channels in the file.
- * @param {number} bits The number of bits per sample.
- * @param {number} sampleRate The sample rate to be validated.
- * @return {boolean} True is the sample rate is valid, false otherwise.
- */
-function validateSampleRate(channels, bits, sampleRate) {
-  /** @type {number} */
-  let byteRate = channels * (bits / 8) * sampleRate;
-  if (sampleRate < 1 || byteRate > 4294967295) {
-    return false;
-  }
-  return true;
-}
-
-/*
- * Copyright (c) 2017-2019 Rafael da Silva Rocha.
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/**
  * A class to read and write wav files.
  * @extends WaveFileReader
  */
 class WaveFileParser extends WaveFileReader {
 
-  constructor() {
-    super();
-    /**
-     * The bit depth code according to the samples.
-     * @type {string}
-     */
-    this.bitDepth = '0';
-    /**
-     * Audio formats.
-     * Formats not listed here should be set to 65534,
-     * the code for WAVE_FORMAT_EXTENSIBLE
-     * @enum {number}
-     * @protected
-     */
-    this.WAV_AUDIO_FORMATS = {
-      '4': 17,
-      '8': 1,
-      '8a': 6,
-      '8m': 7,
-      '16': 1,
-      '24': 1,
-      '32': 1,
-      '32f': 3,
-      '64': 3
-    };
-  }
-
-  /**
-   * Set up the WaveFileParser object from a byte buffer.
-   * @param {!Uint8Array} wavBuffer The buffer.
-   * @param {boolean=} samples True if the samples should be loaded.
-   * @throws {Error} If container is not RIFF, RIFX or RF64.
-   * @throws {Error} If format is not WAVE.
-   * @throws {Error} If no 'fmt ' chunk is found.
-   * @throws {Error} If no 'data' chunk is found.
-   */
-  fromBuffer(wavBuffer, samples=true) {
-    super.fromBuffer(wavBuffer, samples);
-    this.bitDepthFromFmt_();
-  }
-
   /**
    * Return a byte buffer representig the WaveFileParser object as a .wav file.
    * The return value of this method can be written straight to disk.
    * @return {!Uint8Array} A wav file.
-   * @throws {Error} If bit depth is invalid.
-   * @throws {Error} If the number of channels is invalid.
-   * @throws {Error} If the sample rate is invalid.
    */
   toBuffer() {
-    this.validateWavHeader();
-    return this.writeWavBuffer_();
-  }
-
-  /**
-   * Validate the header of the file.
-   * @throws {Error} If bit depth is invalid.
-   * @throws {Error} If the number of channels is invalid.
-   * @throws {Error} If the sample rate is invalid.
-   * @ignore
-   * @protected
-   */
-  validateWavHeader() {
-    this.validateBitDepth_();
-    if (!validateNumChannels(this.fmt.numChannels, this.fmt.bitsPerSample)) {
-      throw new Error('Invalid number of channels.');
-    }
-    if (!validateSampleRate(
-        this.fmt.numChannels, this.fmt.bitsPerSample, this.fmt.sampleRate)) {
-      throw new Error('Invalid sample rate.');
-    }
-  }
-
-  /**
-   * Set the string code of the bit depth based on the 'fmt ' chunk.
-   * @private
-   */
-  bitDepthFromFmt_() {
-    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
-      this.bitDepth = '32f';
-    } else if (this.fmt.audioFormat === 6) {
-      this.bitDepth = '8a';
-    } else if (this.fmt.audioFormat === 7) {
-      this.bitDepth = '8m';
-    } else {
-      this.bitDepth = this.fmt.bitsPerSample.toString();
-    }
-  }
-
-  /**
-   * Return a .wav file byte buffer with the data from the WaveFileParser object.
-   * The return value of this method can be written straight to disk.
-   * @return {!Uint8Array} The wav file bytes.
-   * @private
-   */
-  writeWavBuffer_() {
     this.uInt16.be = this.container === 'RIFX';
     this.uInt32.be = this.uInt16.be;
     /** @type {!Array<!Array<number>>} */
@@ -3371,23 +3190,6 @@ class WaveFileParser extends WaveFileReader {
     }
     return bytes;
   }
-
-  /**
-   * Validate the bit depth.
-   * @return {boolean} True is the bit depth is valid.
-   * @throws {Error} If bit depth is invalid.
-   * @private
-   */
-  validateBitDepth_() {
-    if (!this.WAV_AUDIO_FORMATS[this.bitDepth]) {
-      if (parseInt(this.bitDepth, 10) > 8 &&
-          parseInt(this.bitDepth, 10) < 54) {
-        return true;
-      }
-      throw new Error('Invalid bit depth.');
-    }
-    return true;
-  }
 }
 
 /*
@@ -3522,6 +3324,97 @@ function dwChannelMask(numChannels) {
  */
 
 /**
+ * @fileoverview The validateNumChannels function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Validate the number of channels in a wav file according to the
+ * bit depth of the audio.
+ * @param {number} channels The number of channels in the file.
+ * @param {number} bits The number of bits per sample.
+ * @return {boolean} True is the number of channels is valid.
+ */
+function validateNumChannels(channels, bits) {
+  /** @type {number} */
+  let blockAlign = channels * bits / 8;
+  if (channels < 1 || blockAlign > 65535) {
+    return false;
+  }
+  return true;
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * @fileoverview The validateSampleRate function.
+ * @see https://github.com/rochars/wavefile
+ */
+
+/**
+ * Validate the sample rate value of a wav file according to the number of
+ * channels and the bit depth of the audio.
+ * @param {number} channels The number of channels in the file.
+ * @param {number} bits The number of bits per sample.
+ * @param {number} sampleRate The sample rate to be validated.
+ * @return {boolean} True is the sample rate is valid, false otherwise.
+ */
+function validateSampleRate(channels, bits, sampleRate) {
+  /** @type {number} */
+  let byteRate = channels * (bits / 8) * sampleRate;
+  if (sampleRate < 1 || byteRate > 4294967295) {
+    return false;
+  }
+  return true;
+}
+
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
  * A class to read, write and create wav files.
  * @extends WaveFileParser
  */
@@ -3530,10 +3423,33 @@ class WaveFileCreator extends WaveFileParser {
   constructor() {
     super();
     /**
+     * The bit depth code according to the samples.
+     * @type {string}
+     */
+    this.bitDepth = '0';
+    /**
      * @type {!Object}
      * @protected
      */
     this.dataType = {};
+    /**
+     * Audio formats.
+     * Formats not listed here should be set to 65534,
+     * the code for WAVE_FORMAT_EXTENSIBLE
+     * @enum {number}
+     * @protected
+     */
+    this.WAV_AUDIO_FORMATS = {
+      '4': 17,
+      '8': 1,
+      '8a': 6,
+      '8m': 7,
+      '16': 1,
+      '24': 1,
+      '32': 1,
+      '32f': 3,
+      '64': 3
+    };
   }
 
   /**
@@ -3558,7 +3474,7 @@ class WaveFileCreator extends WaveFileParser {
     this.container = options.container;
     this.bitDepth = bitDepthCode;
     samples = interleave(samples);
-    this.updateDataType();
+    this.updateDataType_();
     /** @type {number} */
     let numBytes = this.dataType.bits / 8;
     this.data.samples = new Uint8Array(samples.length * numBytes);
@@ -3569,7 +3485,7 @@ class WaveFileCreator extends WaveFileParser {
       numBytes, this.data.samples.length, options);
     this.data.chunkId = 'data';
     this.data.chunkSize = this.data.samples.length;
-    this.validateWavHeader();
+    this.validateWavHeader_();
   }
 
   /**
@@ -3583,7 +3499,21 @@ class WaveFileCreator extends WaveFileParser {
    */
   fromBuffer(wavBuffer, samples=true) {
     super.fromBuffer(wavBuffer, samples);
-    this.updateDataType();
+    this.bitDepthFromFmt_();
+    this.updateDataType_();
+  }
+
+  /**
+   * Return a byte buffer representig the WaveFileParser object as a .wav file.
+   * The return value of this method can be written straight to disk.
+   * @return {!Uint8Array} A wav file.
+   * @throws {Error} If bit depth is invalid.
+   * @throws {Error} If the number of channels is invalid.
+   * @throws {Error} If the sample rate is invalid.
+   */
+  toBuffer() {
+    this.validateWavHeader_();
+    return super.toBuffer();
   }
 
     /**
@@ -3614,23 +3544,6 @@ class WaveFileCreator extends WaveFileParser {
       throw new Error('Range error');
     }
     packTo(sample, this.dataType, this.data.samples, index);
-  }
-
-  /**
-   * Update the type definition used to read and write the samples.
-   * @protected
-   */
-  updateDataType() {
-    this.dataType = {
-      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
-      fp: this.bitDepth == '32f' || this.bitDepth == '64',
-      signed: this.bitDepth != '8',
-      be: this.container == 'RIFX'
-    };
-    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
-      this.dataType.bits = 8;
-      this.dataType.signed = false;
-    }
   }
 
   /**
@@ -3772,6 +3685,75 @@ class WaveFileCreator extends WaveFileParser {
       chunkSize: 4,
       dwSampleLength: samplesLength
     };
+  }
+
+  /**
+   * Set the string code of the bit depth based on the 'fmt ' chunk.
+   * @private
+   */
+  bitDepthFromFmt_() {
+    if (this.fmt.audioFormat === 3 && this.fmt.bitsPerSample === 32) {
+      this.bitDepth = '32f';
+    } else if (this.fmt.audioFormat === 6) {
+      this.bitDepth = '8a';
+    } else if (this.fmt.audioFormat === 7) {
+      this.bitDepth = '8m';
+    } else {
+      this.bitDepth = this.fmt.bitsPerSample.toString();
+    }
+  }
+
+  /**
+   * Validate the bit depth.
+   * @return {boolean} True is the bit depth is valid.
+   * @throws {Error} If bit depth is invalid.
+   * @private
+   */
+  validateBitDepth_() {
+    if (!this.WAV_AUDIO_FORMATS[this.bitDepth]) {
+      if (parseInt(this.bitDepth, 10) > 8 &&
+          parseInt(this.bitDepth, 10) < 54) {
+        return true;
+      }
+      throw new Error('Invalid bit depth.');
+    }
+    return true;
+  }
+
+  /**
+   * Update the type definition used to read and write the samples.
+   * @private
+   */
+  updateDataType_() {
+    this.dataType = {
+      bits: ((parseInt(this.bitDepth, 10) - 1) | 7) + 1,
+      fp: this.bitDepth == '32f' || this.bitDepth == '64',
+      signed: this.bitDepth != '8',
+      be: this.container == 'RIFX'
+    };
+    if (['4', '8a', '8m'].indexOf(this.bitDepth) > -1 ) {
+      this.dataType.bits = 8;
+      this.dataType.signed = false;
+    }
+  }
+
+  /**
+   * Validate the header of the file.
+   * @throws {Error} If bit depth is invalid.
+   * @throws {Error} If the number of channels is invalid.
+   * @throws {Error} If the sample rate is invalid.
+   * @ignore
+   * @private
+   */
+  validateWavHeader_() {
+    this.validateBitDepth_();
+    if (!validateNumChannels(this.fmt.numChannels, this.fmt.bitsPerSample)) {
+      throw new Error('Invalid number of channels.');
+    }
+    if (!validateSampleRate(
+        this.fmt.numChannels, this.fmt.bitsPerSample, this.fmt.sampleRate)) {
+      throw new Error('Invalid sample rate.');
+    }
   }
 }
 
