@@ -2388,7 +2388,8 @@ class WaveFileReader extends RIFFFile {
    * @ignore
    */
   fromBuffer(wavBuffer, samples=true) {
-    this.clearHeader();
+    // Always should reset the chunks when reading from a buffer
+    this.clearHeaders();
     this.setSignature(wavBuffer);
     this.uInt16.be = this.uInt32.be;
     if (this.format != 'WAVE') {
@@ -2406,17 +2407,23 @@ class WaveFileReader extends RIFFFile {
   }
 
   /**
-   * Reset some attributes of the object.
+   * Reset the chunks of the WaveFileReader instance.
    * @protected
    * @ignore
    */
-  clearHeader() {
-    this.fmt.cbSize = 0;
-    this.fmt.validBitsPerSample = 0;
-    this.fact.chunkId = '';
-    this.ds64.chunkId = '';
+  clearHeaders() {
+    let tmpWav = new WaveFileReader();
+    Object.assign(this.fmt, tmpWav.fmt);
+    Object.assign(this.fact, tmpWav.fact);
+    Object.assign(this.cue, tmpWav.cue);
+    Object.assign(this.smpl, tmpWav.smpl);
+    Object.assign(this.bext, tmpWav.bext);
+    Object.assign(this.ds64, tmpWav.ds64);
+    Object.assign(this.data, tmpWav.data);
+    this.LIST = [];
+    Object.assign(this.junk, tmpWav.junk);
   }
-
+  
   /**
    * Read the 'fmt ' chunk of a wave file.
    * @param {!Uint8Array} buffer The wav file buffer.
@@ -3458,6 +3465,7 @@ class WaveFileCreator extends WaveFileParser {
 
   /**
    * Set up the WaveFileCreator object based on the arguments passed.
+   * Existing chunks are reset.
    * @param {number} numChannels The number of channels
    *    (Integer numbers: 1 for mono, 2 stereo and so on).
    * @param {number} sampleRate The sample rate.
@@ -3472,6 +3480,67 @@ class WaveFileCreator extends WaveFileParser {
    * @throws {Error} If any argument does not meet the criteria.
    */
   fromScratch(numChannels, sampleRate, bitDepthCode, samples, options={}) {
+    // reset all chunks
+    this.clearHeaders();
+    this.newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options);
+  }
+
+  /**
+   * Set up the WaveFileCreator object based on the arguments passed.
+   * This method preserves existing bext and junk chunks.
+   * @param {number} numChannels The number of channels
+   *    (Integer numbers: 1 for mono, 2 stereo and so on).
+   * @param {number} sampleRate The sample rate.
+   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
+   * @param {string} bitDepthCode The audio bit depth code.
+   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+   *    or any value between '8' and '32' (like '12').
+   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+   *    The samples. Must be in the correct range according to the bit depth.
+   * @param {?Object} options Optional. Used to force the container
+   *    as RIFX with {'container': 'RIFX'}
+   * @throws {Error} If any argument does not meet the criteria.
+   * @private
+   */
+  fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options={}) {
+    /*
+    let tmpWav = new WaveFileCreator();
+    Object.assign(this.fmt, tmpWav.fmt);
+    Object.assign(this.fact, tmpWav.fact);
+    // -- Object.assign(this.cue, tmpWav.cue);
+    //Object.assign(this.smpl, tmpWav.smpl);
+    Object.assign(this.ds64, tmpWav.ds64);
+    Object.assign(this.data, tmpWav.data);
+    //this.LIST = [];
+    */
+    let tmpWav = new WaveFileCreator();
+    if (!options.keepCue) {
+      Object.assign(this.cue, tmpWav.cue);
+    }
+    this.fmt.cbSize = 0;
+    this.fmt.validBitsPerSample = 0;
+    this.fact.chunkId = '';
+    this.ds64.chunkId = '';
+    this.newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options);
+  }
+
+  /**
+   * Set up the WaveFileCreator object based on the arguments passed.
+   * @param {number} numChannels The number of channels
+   *    (Integer numbers: 1 for mono, 2 stereo and so on).
+   * @param {number} sampleRate The sample rate.
+   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
+   * @param {string} bitDepthCode The audio bit depth code.
+   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+   *    or any value between '8' and '32' (like '12').
+   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+   *    The samples. Must be in the correct range according to the bit depth.
+   * @param {?Object} options Optional. Used to force the container
+   *    as RIFX with {'container': 'RIFX'}
+   * @throws {Error} If any argument does not meet the criteria.
+   * @private
+   */
+  newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options={}) {
     if (!options.container) {
       options.container = 'RIFF';
     }
@@ -3483,7 +3552,6 @@ class WaveFileCreator extends WaveFileParser {
     let numBytes = this.dataType.bits / 8;
     this.data.samples = new Uint8Array(samples.length * numBytes);
     packArrayTo(samples, this.dataType, this.data.samples);
-    this.clearHeader();
     this.makeWavHeader_(
       bitDepthCode, numChannels, sampleRate,
       numBytes, this.data.samples.length, options);
@@ -4263,7 +4331,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
    * Force a file as RIFF.
    */
   toRIFF() {
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       this.bitDepth,
@@ -4274,7 +4342,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
    * Force a file as RIFX.
    */
   toRIFX() {
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       this.bitDepth,
@@ -4299,7 +4367,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
       /** @type {!Int16Array} */
       let output = new Int16Array(this.data.samples.length / 2);
       unpackArrayTo(this.data.samples, this.dataType, output);
-      this.fromScratch(
+      this.fromExisting_(
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
@@ -4315,7 +4383,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
    *    Optional. Default is 16.
    */
   fromIMAADPCM(bitDepthCode='16') {
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
@@ -4334,7 +4402,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
     /** @type {!Int16Array} */
     let output = new Int16Array(this.data.samples.length / 2);
     unpackArrayTo(this.data.samples, this.dataType, output);
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
@@ -4349,7 +4417,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
    *    Optional. Default is 16.
    */
   fromALaw(bitDepthCode='16') {
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
@@ -4368,7 +4436,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
     /** @type {!Int16Array} */
     let output = new Int16Array(this.data.samples.length / 2);
     unpackArrayTo(this.data.samples, this.dataType, output);
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
@@ -4383,7 +4451,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
    *    Optional. Default is 16.
    */
   fromMuLaw(bitDepthCode='16') {
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
@@ -4426,12 +4494,15 @@ class WaveFileConverter extends WaveFileMetaEditor {
     }
     bitDepth(
       typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
-    this.fromScratch(
+    this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       newBitDepth,
       typedSamplesOutput,
-      {container: this.correctContainer_()});
+      {
+        container: this.correctContainer_(),
+        keepCue: true,
+      });
   }
 
   /**
