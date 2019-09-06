@@ -348,8 +348,8 @@ describe('smpl chunk should be preserved when changing the bit depth', function(
 
 // --------------------------------------------------------------
 
-// Test changing the compression; in this cases LIST, cue, smpl and bext
-// chunks should be reset
+// Test changing the compression; in this cases LIST, cue and smpl
+// chunks should reset
 
 describe('cue points should be reset when compressing to ADPCM', function() {
     it("cue.ChunkId should be 'cue '", function() {
@@ -365,103 +365,25 @@ describe('cue points should be reset when compressing to ADPCM', function() {
         wav = new WaveFile();
         wav.fromBuffer(fs.readFileSync(path + "/out/4bitADPCM-8kHz-markers-1c-encoded-clear-headers.wav"));
         assert.equal(wav.cue.chunkId, '');
-
-        // Load the original file
-        //let originalWav = new WaveFile();
-        //originalWav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
-
-        // Compare the cue points in the original file
-        // with the ones in the new file
-        //assert.deepEqual(originalWav.cue, wav.cue);
-    });
-});
-/*
-describe('RIFF tags should be reset when compressing to ADPCM', function() {
-    it("cue.ChunkId should be 'cue '", function() {
-        let wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
-        assert.equal(wav.LIST.length, 1);
-        wav.toBitDepth('32');
-        assert.equal(wav.LIST.length, 1);
-        fs.writeFileSync(
-            path + "/out/32bit-from-M1F1-int12WE-clear-headers.wav",
-            wav.toBuffer());
-
-        wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "/out/32bit-from-M1F1-int12WE-clear-headers.wav"));
-        assert.equal(wav.LIST.length, 1);
-
-        // Load the original file
-        let originalWav = new WaveFile();
-        originalWav.fromBuffer(fs.readFileSync(path + "M1F1-int12WE-AFsp-NEW-TAGS.wav"));
-
-        // Compare the LIST chunk in the original file
-        // with the LIST chunk in the new file
-        assert.deepEqual(originalWav.LIST, wav.LIST);
     });
 });
 
-describe('bext should be reset when compressing to ADPCM', function() {
-    it("cue.ChunkId should be 'cue '", function() {
-        
-        // Load a fle with bext
+describe('bext should be kept when compressing to ADPCM', function() {
+    it("should keep the bext chunk", function() {
+        // Load a file with bext
         let wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "24bit-16kHz-bext-mono.wav"));
+        wav.fromBuffer(fs.readFileSync(path + "16bit-8khz-bext-mono.wav"));
         assert.equal(wav.bext.chunkId, 'bext');
-
-        // Change the bith depth and assert bext remains
-        wav.toBitDepth('32');
-        assert.equal(wav.bext.chunkId, 'bext');
-        
-        // Write the new file to disk        
-        fs.writeFileSync(
-            path + "/out/32bit-from-24bit-bext-clear-headers.wav",
-            wav.toBuffer());
-
-        // Load the new file and assert bext remains
-        wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "/out/32bit-from-24bit-bext-clear-headers.wav"));
-        assert.equal(wav.bext.chunkId, 'bext');
-
-        // Load the original file
-        let originalWav = new WaveFile();
-        originalWav.fromBuffer(fs.readFileSync(path + "24bit-16kHz-bext-mono.wav"));
-
-        // Compare the bext chunk in the original file
-        // with the bext chunk in the new file
-        assert.deepEqual(originalWav.bext, wav.bext);
-    });
-});
-
-describe('smpl chunk should be reset when compressing to ADPCM', function() {
-    it("smpl.ChunkId should be 'smpl'", function() {
-        
-        // Load a fle with smpl
-        let wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-region.wav"));
-        assert.equal(wav.smpl.chunkId, 'smpl');
-
-        // Change the bith depth and assert smpl remains
+        // bext should reset
         wav.toIMAADPCM();
-        assert.equal(wav.smpl.chunkId, '');
-        
-        // Write the new file to disk        
+        assert.equal(wav.bext.chunkId, 'bext');
+
         fs.writeFileSync(
-            path + "/out/4bitADPCM-from-16bit-smpl-clear-headers.wav",
+            path + "/out/ADPCM-from-16bit-8khz-bext-mono-clear-headers.wav",
             wav.toBuffer());
 
-        // Load the new file and assert smpl remains
         wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "/out/4bitADPCM-from-16bit-smpl-clear-headers.wav"));
-        assert.equal(wav.smpl.chunkId, '');
-
-        // Load the original file
-        //let originalWav = new WaveFile();
-        //originalWav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-region.wav"));
-
-        // Compare the smpl chunk in the original file
-        // with the smpl chunk in the new file
-        //assert.deepEqual(originalWav.smpl, wav.smpl);
+        wav.fromBuffer(fs.readFileSync(path + "/out/ADPCM-from-16bit-8khz-bext-mono-clear-headers.wav"));
+        assert.equal(wav.bext.chunkId, 'bext');
     });
 });
-*/

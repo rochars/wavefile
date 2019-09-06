@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## version 8.4.6 (unreleased)
+- Fix: clicks and time changes in ADPCM compression/decompression
+- Fix: Range error bug when converting some files to ADPCM
 - Fix: reset chunks in WaveFile objects when using the same object to read multiple files or performing conversions.
 
 ## version 8.4.5 (2019-07-25)
