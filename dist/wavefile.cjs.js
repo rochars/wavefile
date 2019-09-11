@@ -4328,7 +4328,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
     } else {
       this.assure16Bit_();
       /** @type {!Int16Array} */
-      let output = new Int16Array(this.data.samples.length / 2);
+      let output = new Int16Array(this.outputSize_());
       unpackArrayTo(this.data.samples, this.dataType, output);
       this.fromExisting_(
         this.fmt.numChannels,
@@ -4363,7 +4363,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
   toALaw() {
     this.assure16Bit_();
     /** @type {!Int16Array} */
-    let output = new Int16Array(this.data.samples.length / 2);
+    let output = new Int16Array(this.outputSize_());
     unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromExisting_(
       this.fmt.numChannels,
@@ -4397,7 +4397,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
   toMuLaw() {
     this.assure16Bit_();
     /** @type {!Int16Array} */
-    let output = new Int16Array(this.data.samples.length / 2);
+    let output = new Int16Array(this.outputSize_());
     unpackArrayTo(this.data.samples, this.dataType, output);
     this.fromExisting_(
       this.fmt.numChannels,
@@ -4524,6 +4524,21 @@ class WaveFileConverter extends WaveFileMetaEditor {
     Object.assign(this.ds64, tmpWav.ds64);
     Object.assign(this.data, tmpWav.data);
     this.newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options);
+  }
+
+  /**
+   * Return the size in bytes of the output sample array when applying
+   * compression to 16-bit samples.
+   * @return {number}
+   * @private
+   */
+  outputSize_() {
+    /** @type {number} */
+    let outputSize = this.data.samples.length / 2;
+    if (outputSize % 2) {
+      outputSize++;
+    }
+    return outputSize;
   }
 }
 

@@ -3,7 +3,8 @@
 ## version 8.4.6 (unreleased)
 - Fix: clicks and time changes in ADPCM compression/decompression
 - Fix: Range error bug when converting some files to ADPCM
-- Fix: reset chunks in WaveFile objects when using the same object to read multiple files or performing conversions.
+- Fix: properly reset chunks in WaveFile objects when using the same object to read multiple files or performing conversions.
+- Fix: keep metadata when performing bit depth conversions or applying compression
 
 ## version 8.4.5 (2019-07-25)
 - Fix: read UTF8 chars in cue points (https://github.com/rochars/wavefile/issues/13)

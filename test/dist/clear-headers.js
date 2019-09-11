@@ -427,3 +427,161 @@ describe('bext should be kept when compressing to ADPCM', function() {
         assert.equal(wav.bext.chunkId, 'bext');
     });
 });
+
+// A-Law
+describe('cue points should be kept when compressing to A-Law', function() {
+    it("cue should be the same after ADPCM compression", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.equal(wav.cue.chunkId, 'cue ');
+        wav.toALaw();
+        assert.equal(wav.cue.chunkId, 'cue ');
+        wavOriginal.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.deepEqual(wav.cue, wavOriginal.cue);
+    });
+    it("cue should be equal in both files", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(
+            fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        wav.toALaw();
+        fs.writeFileSync(
+            path + "/out/A-Law-8kHz-markers-1c-encoded-clear-headers.wav",
+            wav.toBuffer());
+        wav.fromBuffer(fs.readFileSync(
+            path + "/out/A-Law-8kHz-markers-1c-encoded-clear-headers.wav"));
+        wav.fromALaw();
+        wavOriginal.fromBuffer(
+            fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.deepEqual(wav.cue, wavOriginal.cue);
+    });
+});
+
+describe('smpl should be kept when compressing to A-Law', function() {
+    it("smpl should be the same after A-Law compression", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.equal(wav.smpl.chunkId, 'smpl');
+        wav.toALaw();
+        assert.equal(wav.smpl.chunkId, 'smpl');
+        wavOriginal.fromBuffer(fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.deepEqual(wav.smpl, wavOriginal.smpl);
+    });
+    it("smpl should be equal in both files", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(
+            fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        wav.toALaw();
+        fs.writeFileSync(
+            path + "/out/A-Law-8kHz-1c-1region-reaper-encoded-clear-headers.wav",
+            wav.toBuffer());
+        wav.fromBuffer(fs.readFileSync(
+            path + "/out/A-Law-8kHz-1c-1region-reaper-encoded-clear-headers.wav"));
+        wav.fromALaw();
+        wavOriginal.fromBuffer(
+            fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.deepEqual(wav.smpl, wavOriginal.smpl);
+    });
+});
+
+describe('bext should be kept when compressing to A-Law', function() {
+    it("should keep the bext chunk", function() {
+        // Load a file with bext
+        let wav = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-8khz-bext-mono.wav"));
+        assert.equal(wav.bext.chunkId, 'bext');
+        // bext should reset
+        wav.toALaw();
+        assert.equal(wav.bext.chunkId, 'bext');
+
+        fs.writeFileSync(
+            path + "/out/A-Law-from-16bit-8khz-bext-mono-clear-headers.wav",
+            wav.toBuffer());
+
+        wav = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "/out/A-Law-from-16bit-8khz-bext-mono-clear-headers.wav"));
+        assert.equal(wav.bext.chunkId, 'bext');
+    });
+});
+
+// mu-Law
+describe('cue points should be kept when compressing to mu-Law', function() {
+    it("cue should be the same after mu compression", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.equal(wav.cue.chunkId, 'cue ');
+        wav.toMuLaw();
+        assert.equal(wav.cue.chunkId, 'cue ');
+        wavOriginal.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.deepEqual(wav.cue, wavOriginal.cue);
+    });
+    it("cue should be equal in both files", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(
+            fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        wav.toMuLaw();
+        fs.writeFileSync(
+            path + "/out/mu-Law-8kHz-markers-1c-encoded-clear-headers.wav",
+            wav.toBuffer());
+        wav.fromBuffer(fs.readFileSync(
+            path + "/out/mu-Law-8kHz-markers-1c-encoded-clear-headers.wav"));
+        wav.fromMuLaw();
+        wavOriginal.fromBuffer(
+            fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.deepEqual(wav.cue, wavOriginal.cue);
+    });
+});
+
+describe('smpl should be kept when compressing to mu-Law', function() {
+    it("smpl should be the same after mu-Law compression", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.equal(wav.smpl.chunkId, 'smpl');
+        wav.toMuLaw();
+        assert.equal(wav.smpl.chunkId, 'smpl');
+        wavOriginal.fromBuffer(fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.deepEqual(wav.smpl, wavOriginal.smpl);
+    });
+    it("smpl should be equal in both files", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(
+            fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        wav.toMuLaw();
+        fs.writeFileSync(
+            path + "/out/mu-Law-8kHz-1c-1region-reaper-encoded-clear-headers.wav",
+            wav.toBuffer());
+        wav.fromBuffer(fs.readFileSync(
+            path + "/out/mu-Law-8kHz-1c-1region-reaper-encoded-clear-headers.wav"));
+        wav.fromMuLaw();
+        wavOriginal.fromBuffer(
+            fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.deepEqual(wav.smpl, wavOriginal.smpl);
+    });
+});
+
+describe('bext should be kept when compressing to mu-Law', function() {
+    it("should keep the bext chunk", function() {
+        // Load a file with bext
+        let wav = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-8khz-bext-mono.wav"));
+        assert.equal(wav.bext.chunkId, 'bext');
+        // bext should reset
+        wav.toMuLaw();
+        assert.equal(wav.bext.chunkId, 'bext');
+
+        fs.writeFileSync(
+            path + "/out/mu-Law-from-16bit-8khz-bext-mono-clear-headers.wav",
+            wav.toBuffer());
+
+        wav = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "/out/mu-Law-from-16bit-8khz-bext-mono-clear-headers.wav"));
+        assert.equal(wav.bext.chunkId, 'bext');
+    });
+});
