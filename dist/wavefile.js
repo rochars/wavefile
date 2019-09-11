@@ -340,7 +340,11 @@ function encode$1(samples) {
     }
     block.push(samples[i]);
   }
-  return adpcmSamples.slice(0, (samples.length/2) + 512);
+  let samplesLength = (samples.length / 2);
+  if (samplesLength % 2) {
+    samplesLength--;
+  }
+  return adpcmSamples.slice(0, samplesLength + 512);
 }
 
 /**
@@ -3483,45 +3487,6 @@ class WaveFileCreator extends WaveFileParser {
 
   /**
    * Set up the WaveFileCreator object based on the arguments passed.
-   * This method preserves existing bext and junk chunks.
-   * @param {number} numChannels The number of channels
-   *    (Integer numbers: 1 for mono, 2 stereo and so on).
-   * @param {number} sampleRate The sample rate.
-   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
-   * @param {string} bitDepthCode The audio bit depth code.
-   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
-   *    or any value between '8' and '32' (like '12').
-   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
-   *    The samples. Must be in the correct range according to the bit depth.
-   * @param {?Object} options Optional. Used to force the container
-   *    as RIFX with {'container': 'RIFX'}
-   * @throws {Error} If any argument does not meet the criteria.
-   * @private
-   */
-  fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options={}) {
-    /*
-    let tmpWav = new WaveFileCreator();
-    Object.assign(this.fmt, tmpWav.fmt);
-    Object.assign(this.fact, tmpWav.fact);
-    // -- Object.assign(this.cue, tmpWav.cue);
-    //Object.assign(this.smpl, tmpWav.smpl);
-    Object.assign(this.ds64, tmpWav.ds64);
-    Object.assign(this.data, tmpWav.data);
-    //this.LIST = [];
-    */
-    let tmpWav = new WaveFileCreator();
-    if (!options.keepCue) {
-      Object.assign(this.cue, tmpWav.cue);
-    }
-    this.fmt.cbSize = 0;
-    this.fmt.validBitsPerSample = 0;
-    this.fact.chunkId = '';
-    this.ds64.chunkId = '';
-    this.newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options);
-  }
-
-  /**
-   * Set up the WaveFileCreator object based on the arguments passed.
    * @param {number} numChannels The number of channels
    *    (Integer numbers: 1 for mono, 2 stereo and so on).
    * @param {number} sampleRate The sample rate.
@@ -4495,10 +4460,7 @@ class WaveFileConverter extends WaveFileMetaEditor {
       this.fmt.sampleRate,
       newBitDepth,
       typedSamplesOutput,
-      {
-        container: this.correctContainer_(),
-        keepCue: true,
-      });
+      {container: this.correctContainer_()});
   }
 
   /**
@@ -4534,6 +4496,32 @@ class WaveFileConverter extends WaveFileMetaEditor {
    */
   correctContainer_() {
     return this.container == 'RF64' ? 'RIFF' : this.container;
+  }
+
+  /**
+   * Set up the WaveFileCreator object based on the arguments passed.
+   * This method only reset the fmt , fact, ds64 and data chunks.
+   * @param {number} numChannels The number of channels
+   *    (Integer numbers: 1 for mono, 2 stereo and so on).
+   * @param {number} sampleRate The sample rate.
+   *    Integer numbers like 8000, 44100, 48000, 96000, 192000.
+   * @param {string} bitDepthCode The audio bit depth code.
+   *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+   *    or any value between '8' and '32' (like '12').
+   * @param {!Array<number>|!Array<!Array<number>>|!TypedArray} samples
+   *    The samples. Must be in the correct range according to the bit depth.
+   * @param {?Object} options Optional. Used to force the container
+   *    as RIFX with {'container': 'RIFX'}
+   * @throws {Error} If any argument does not meet the criteria.
+   * @private
+   */
+  fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options={}) {
+    let tmpWav = new WaveFileMetaEditor();
+    Object.assign(this.fmt, tmpWav.fmt);
+    Object.assign(this.fact, tmpWav.fact);
+    Object.assign(this.ds64, tmpWav.ds64);
+    Object.assign(this.data, tmpWav.data);
+    this.newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options);
   }
 }
 

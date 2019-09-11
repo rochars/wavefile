@@ -104,6 +104,6 @@
     "base64-arraybuffer-es6": "^0.3.1",
     "bitdepth": "^7.0.2",
     "byte-data": "^16.0.3",
-    "imaadpcm": "^4.1.0"
+    "imaadpcm": "^4.1.1"
   }
 }

@@ -345,26 +345,66 @@ describe('smpl chunk should be preserved when changing the bit depth', function(
 });
 
 
-
 // --------------------------------------------------------------
 
-// Test changing the compression; in this cases LIST, cue and smpl
+// Test changing the compression; in this cases only fmt , fact, ds64 and data
 // chunks should reset
 
-describe('cue points should be reset when compressing to ADPCM', function() {
-    it("cue.ChunkId should be 'cue '", function() {
+describe('cue points should be kept when compressing to ADPCM', function() {
+    it("cue should be the same after ADPCM compression", function() {
         let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
         wav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
         assert.equal(wav.cue.chunkId, 'cue ');
         wav.toIMAADPCM();
-        assert.equal(wav.cue.chunkId, '');
+        assert.equal(wav.cue.chunkId, 'cue ');
+        wavOriginal.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.deepEqual(wav.cue, wavOriginal.cue);
+    });
+    it("cue should be equal in both files", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(
+            fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        wav.toIMAADPCM();
         fs.writeFileSync(
             path + "/out/4bitADPCM-8kHz-markers-1c-encoded-clear-headers.wav",
             wav.toBuffer());
+        wav.fromBuffer(fs.readFileSync(
+            path + "/out/4bitADPCM-8kHz-markers-1c-encoded-clear-headers.wav"));
+        wav.fromIMAADPCM();
+        wavOriginal.fromBuffer(
+            fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+        assert.deepEqual(wav.cue, wavOriginal.cue);
+    });
+});
 
-        wav = new WaveFile();
-        wav.fromBuffer(fs.readFileSync(path + "/out/4bitADPCM-8kHz-markers-1c-encoded-clear-headers.wav"));
-        assert.equal(wav.cue.chunkId, '');
+describe('smpl should be kept when compressing to ADPCM', function() {
+    it("smpl should be the same after ADPCM compression", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.equal(wav.smpl.chunkId, 'smpl');
+        wav.toIMAADPCM();
+        assert.equal(wav.smpl.chunkId, 'smpl');
+        wavOriginal.fromBuffer(fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.deepEqual(wav.smpl, wavOriginal.smpl);
+    });
+    it("smpl should be equal in both files", function() {
+        let wav = new WaveFile();
+        let wavOriginal = new WaveFile();
+        wav.fromBuffer(
+            fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        wav.toIMAADPCM();
+        fs.writeFileSync(
+            path + "/out/4bitADPCM-8kHz-1c-1region-reaper-encoded-clear-headers.wav",
+            wav.toBuffer());
+        wav.fromBuffer(fs.readFileSync(
+            path + "/out/4bitADPCM-8kHz-1c-1region-reaper-encoded-clear-headers.wav"));
+        wav.fromIMAADPCM();
+        wavOriginal.fromBuffer(
+            fs.readFileSync(path + "16bit-9khz-1c-1region-reaper.wav"));
+        assert.deepEqual(wav.smpl, wavOriginal.smpl);
     });
 });
 
