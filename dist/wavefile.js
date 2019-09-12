@@ -332,19 +332,22 @@ function encode$1(samples) {
   let block = [];
   /** @type {number} */
   let fileIndex = 0;
+  /** @type {number} */
+  let blockCount = 0;
   for (let i=0; i<samples.length; i++) {
     if ((i % 505 == 0 && i != 0)) {
       adpcmSamples.set(encodeBlock(block), fileIndex);
       fileIndex += 256;
       block = [];
+      blockCount++;
     }
     block.push(samples[i]);
   }
-  let samplesLength = (samples.length / 2);
+  let samplesLength = samples.length / 2;
   if (samplesLength % 2) {
-    samplesLength--;
+    samplesLength++;
   }
-  return adpcmSamples.slice(0, samplesLength + 512);
+  return adpcmSamples.slice(0, samplesLength + 512 + blockCount * 4);
 }
 
 /**
