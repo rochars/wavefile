@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  */
 
 /**
@@ -7,46 +7,31 @@
  * @see https://github.com/rochars/wavefile
  */
 
-import {terser} from 'rollup-plugin-terser';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
-import closure from 'rollup-plugin-closure-compiler-js';
-
-// Read externs definitions
-const fs = require('fs');
-const polyfills = fs.readFileSync('./scripts/polyfills.js', 'utf8');
-const externs = fs.readFileSync('./externs/wavefile.js', 'utf8');
-
-// GCC wrapper
-const outputWrapper =
-  ";exports.default=exports;var WaveFile={};" +
-  "typeof module!=='undefined'?module.exports=exports :" +
-  "typeof define==='function'&&define.amd?define(['exports'],exports.default) :" +
-  "typeof global!=='undefined'?global.WaveFile=exports:WaveFile=exports;";
+import compiler from '@ampproject/rollup-plugin-closure-compiler';
 
 export default [
-  // ES6 bundle
+  // ES6 and CJS bundles
   {
     input: 'index.js',
     output: [
       {
         file: 'dist/wavefile.js',
-        format: 'es'
+        format: 'esm'
       },
-      // kept for compatibility with version 8.x dist
       {
         file: 'dist/wavefile.cjs.js',
         format: 'cjs'
       },
-      
     ],
     plugins: [
       resolve(),
       commonjs()
     ]
   },
-  // kept for compatibility with version 8.x dist
+
+  // browser dist
   {
     input: 'index.js',
     output: [
@@ -60,15 +45,15 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
-      closure({
-        languageIn: 'ECMASCRIPT6',
-        languageOut: 'ECMASCRIPT5',
-        compilationLevel: 'ADVANCED',
-        warningLevel: 'VERBOSE',
-        externs: [{src: externs}]
+      compiler({
+        language_in: 'ECMASCRIPT6',
+        language_out: 'ECMASCRIPT5',
+        compilation_level: 'ADVANCED',
+        externs: ['externs/wavefile.js']
       }),
     ]
   },
+  
   // Main UMD dist
   {
     input: 'index.js',
@@ -77,14 +62,18 @@ export default [
         file: 'dist/wavefile.umd.js',
         name: 'WaveFile',
         format: 'umd',
-        banner: polyfills
       },
     ],
     plugins: [
       resolve(),
       commonjs(),
-      babel(),
-      terser({mangle: false})
+      compiler({
+        language_in: 'ECMASCRIPT6',
+        language_out: 'ECMASCRIPT5',
+        compilation_level: 'SIMPLE',
+        warning_level: 'VERBOSE',
+        externs: ['externs/wavefile.js']
+      }),
     ]
   },
 ];
