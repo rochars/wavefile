@@ -73,7 +73,7 @@
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli && npm run test-cjs && npm run test-min",
     "rollup-bundle": "rollup -c && npm run test-dist",
-    "doc": "./node_modules/.bin/jsdoc index.js ./lib/wavefile-converter.js ./lib/wavefile-creator.js ./lib/wavefile-parser.js ./lib/wavefile-reader.js -d docs -r README.md -t node_modules/docdash",
+    "doc": "./node_modules/.bin/jsdoc -c .jsdocrc index.js ./lib/wavefile-converter.js ./lib/wavefile-creator.js ./lib/wavefile-parser.js ./lib/wavefile-reader.js -d docs -r README.md -t node_modules/docdash",
     "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
