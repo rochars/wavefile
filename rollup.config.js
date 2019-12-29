@@ -7,8 +7,8 @@
  * @see https://github.com/rochars/wavefile
  */
 
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 
 export default [
