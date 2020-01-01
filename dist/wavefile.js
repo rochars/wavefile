@@ -69,9 +69,6 @@ var decode = function decode(base64) {
 };
 
 /*
- * bitdepth: Change the resolution of samples to and from any bit depth.
- * https://github.com/rochars/bitdepth
- *
  * Copyright (c) 2017-2018 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -96,7 +93,8 @@ var decode = function decode(base64) {
  */
 
 /**
- * @fileoverview The bitdepth() function and private helper functions.
+ * @fileoverview The changeBitdepth() function.
+ * @see https://github.com/rochars/bitdepth
  */
 
 /** @module bitdepth */
@@ -105,7 +103,7 @@ var decode = function decode(base64) {
 const f64f32_ = new Float32Array(1);
 
 /**
- * Change the bit depth of samples. The input array.
+ * Change the bit depth of samples.
  * @param {!TypedArray} input The samples.
  * @param {string} original The original bit depth of the data.
  *      One of "8" ... "53", "32f", "64"
@@ -113,7 +111,7 @@ const f64f32_ = new Float32Array(1);
  *      One of "8" ... "53", "32f", "64"
  * @param {!TypedArray} output The output array.
  */
-function bitDepth(input, original, target, output) {
+function changeBitDepth(input, original, target, output) {
   validateBitDepth_(original);
   validateBitDepth_(target);
   /** @type {!Function} */
@@ -132,6 +130,9 @@ function bitDepth(input, original, target, output) {
     for (let i=0; i<len; i++) {
       output[i] = input[i] -= 128;
     }
+  }
+  if (original == "32f" || original == "64") {
+    truncateSamples(input);
   }
   // change the resolution of the samples
   for (let i=0; i<len; i++) {        
@@ -239,11 +240,26 @@ function validateBitDepth_(bitDepth) {
   }
 }
 
+/**
+ * Truncate float samples on overflow.
+ * @private
+ */
+function truncateSamples(samples) {
+  /** @type {number} */   
+  let len = samples.length;
+  for (let i=0; i<len; i++) {
+    if (samples[i] > 1) {
+      samples[i] = 1;
+    } else if (samples[i] < -1) {
+      samples[i] = -1;
+    }
+  }
+}
+
 /*
  * imaadpcm: IMA ADPCM codec in JavaScript.
- * Derived from https://github.com/acida/pyima  
- * Copyright (c) 2016 acida. MIT License.  
  * Copyright (c) 2018-2019 Rafael da Silva Rocha.
+ * Copyright (c) 2016 acida. MIT License.  
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -949,7 +965,7 @@ function swap(bytes, offset, index) {
  */
 function unpack(buffer, start=0, end=buffer.length) {
   /** @type {string} */
-  let str = "";
+  let str = '';
   for(let index = start; index < end;) {
     /** @type {number} */
     let lowerBoundary = 0x80;
@@ -1122,7 +1138,7 @@ function validateIntType(bits) {
 }
 
 /*
- * Copyright (c) 2018 Rafael da Silva Rocha.
+ * Copyright (c) 2018-2019 Rafael da Silva Rocha.
  * Copyright (c) 2013 DeNA Co., Ltd.
  * Copyright (c) 2010, Linden Research, Inc
  *
@@ -1155,8 +1171,7 @@ function validateIntType(bits) {
  */
 
 /** 
- * @module IEEE754Buffer
- * @ignore
+ * @module ieee754-buffer
  */
 
 /**
@@ -1170,12 +1185,40 @@ class IEEE754Buffer {
    * @param {number} fbits The fraction bits.
    */
   constructor(ebits, fbits) {
+    /**
+     * @type {number}
+     * @private
+     */
     this.ebits = ebits;
+    /**
+     * @type {number}
+     * @private
+     */
     this.fbits = fbits;
+    /**
+     * @type {number}
+     * @private
+     */
     this.bias = (1 << (ebits - 1)) - 1;
+    /**
+     * @type {number}
+     * @private
+     */
     this.numBytes = Math.ceil((ebits + fbits) / 8);
+    /**
+     * @type {number}
+     * @private
+     */
     this.biasP2 = Math.pow(2, this.bias + 1);
+    /**
+     * @type {number}
+     * @private
+     */
     this.ebitsFbits = (ebits + fbits);
+    /**
+     * @type {number}
+     * @private
+     */
     this.fbias = Math.pow(2, -(8 * this.numBytes - 1 - ebits));
   }
 
@@ -1201,7 +1244,7 @@ class IEEE754Buffer {
     /** @type {number} */
     let exp = Math.min(Math.floor(Math.log(num) / Math.LN2), 1023);
     /** @type {number} */
-    let fraction = this.roundToEven(num / Math.pow(2, exp) * Math.pow(2, this.fbits));
+    let fraction = roundToEven(num / Math.pow(2, exp) * Math.pow(2, this.fbits));
     // NaN
     if (num !== num) {
       fraction = Math.pow(2, this.fbits - 1);
@@ -1219,10 +1262,10 @@ class IEEE754Buffer {
           fraction = 0;
         } else {
           exp = exp + this.bias;
-          fraction = this.roundToEven(fraction) - Math.pow(2, this.fbits);
+          fraction = roundToEven(fraction) - Math.pow(2, this.fbits);
         }
       } else {
-        fraction = this.roundToEven(num / Math.pow(2, 1 - this.bias - this.fbits));
+        fraction = roundToEven(num / Math.pow(2, 1 - this.bias - this.fbits));
         exp = 0;
       } 
     }
@@ -1311,21 +1354,29 @@ class IEEE754Buffer {
     }
     return k;
   }
+}
 
-  roundToEven(n) {
-    var w = Math.floor(n), f = n - w;
-    if (f < 0.5) {
-      return w;
-    }
-    if (f > 0.5) {
-      return w + 1;
-    }
-    return w % 2 ? w + 1 : w;
+/**
+ * Round a number to its nearest even value.
+ * @param {number} n The number.
+ * @return {number}
+ * @private
+ */
+function roundToEven(n) {
+  /** @type {number} */
+  let w = Math.floor(n);
+  let f = n - w;
+  if (f < 0.5) {
+    return w;
   }
+  if (f > 0.5) {
+    return w + 1;
+  }
+  return w % 2 ? w + 1 : w;
 }
 
 /*
- * Copyright (c) 2018 Rafael da Silva Rocha.
+ * Copyright (c) 2018-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -1349,14 +1400,11 @@ class IEEE754Buffer {
  */
 
 /**
- * @fileoverview Pack and unpack unsigned ints.
+ * @fileoverview Encode and decode unsigned integers to and from byte buffers.
  * @see https://github.com/rochars/uint-buffer
  */
 
-/**
- * @module UintBuffer
- * @ignore
- */
+/** @module uint-buffer */
 
 /**
  * A class to write and read unsigned ints to and from byte buffers.
@@ -1402,14 +1450,84 @@ class UintBuffer {
    * @param {number} num The number.
    * @param {number=} index The index being written in the byte buffer.
    * @return {number} The next index to write on the byte buffer.
-   * @throws {Error} If num is NaN.
-   * @throws {Error} On overflow.
+   * @throws {TypeError} If num is not a number.
+   * @throws {RangeError} On overflow.
    */
   pack(buffer, num, index=0) {
-    if (num !== num) {
-      throw new Error('NaN');
+    if (num !== num || typeof num != 'number') {
+      throw new TypeError();
     }
     this.overflow(num);
+    return this.pack_(buffer, num, index);
+  }
+
+  /**
+   * Write one unsigned integer to a byte buffer.
+   * This method assumes the input has already been validated
+   * and should be used only if you know what you are doing.
+   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
+   * @param {number} num The number.
+   * @param {number=} index The index being written in the byte buffer.
+   * @return {number} The next index to write on the byte buffer.
+   */
+  packUnsafe(buffer, num, index=0) {
+    return this.pack_(buffer, num, index);
+  }
+  
+  /**
+   * Read one unsigned integer from a byte buffer.
+   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
+   * @param {number=} index The index to read.
+   * @return {number} The number.
+   * @throws {RangeError} On overflow.
+   */
+  unpack(buffer, index=0) {
+    /** @type {number} */
+    let num = this.unpackUnsafe(buffer, index);
+    this.overflow(num);
+    return num; 
+  }
+
+  /**
+   * Read one unsigned integer from a byte buffer.
+   * Does not check for overflows.
+   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
+   * @param {number=} index The index to read.
+   * @return {number}
+   */
+  unpackUnsafe(buffer, index=0) {
+    /** @type {number} */
+    let num = 0;
+    for(let x = 0; x < this.bytes; x++) {
+      num += buffer[index + x] * Math.pow(256, x);
+    }
+    return num;
+  }
+
+  /**
+   * Throws range error in case of overflow.
+   * @param {number} num The number.
+   * @throws {RangeError} On overflow.
+   * @protected
+   * @ignore
+   */
+  overflow(num) {
+    if (num > this.max || num < this.min) {
+      throw new RangeError();
+    }
+  }
+
+  /**
+   * Write one unsigned integer to a byte buffer.
+   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
+   * @param {number} num The number.
+   * @param {number=} index The index being written in the byte buffer.
+   * @return {number} The next index to write on the byte buffer.
+   * @throws {TypeError} If num is not a number.
+   * @throws {RangeError} On overflow.
+   * @private
+   */
+  pack_(buffer, num, index=0) {
     buffer[index] = (num < 0 ? num + Math.pow(2, this.bits) : num) & 255;
     index++;
     /** @type {number} */
@@ -1425,53 +1543,10 @@ class UintBuffer {
     }
     return index;
   }
-  
-  /**
-   * Read one unsigned integer from a byte buffer.
-   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
-   * @param {number=} index The index to read.
-   * @return {number} The number.
-   * @throws {Error} On overflow.
-   */
-  unpack(buffer, index=0) {
-    /** @type {number} */
-    let num = this.unpackUnsafe(buffer, index);
-    this.overflow(num);
-    return num; 
-  }
-
-  /**
-   * Read one unsigned integer from a byte buffer.
-   * Does not check for overflows.
-   * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
-   * @param {number} index The index to read.
-   * @return {number}
-   * @protected
-   */
-  unpackUnsafe(buffer, index) {
-    /** @type {number} */
-    let num = 0;
-    for(let x = 0; x < this.bytes; x++) {
-      num += buffer[index + x] * Math.pow(256, x);
-    }
-    return num;
-  }
-
-  /**
-   * Throws error in case of overflow.
-   * @param {number} num The number.
-   * @throws {Error} on overflow.
-   * @protected
-   */
-  overflow(num) {
-    if (num > this.max || num < this.min) {
-      throw new Error('Overflow');
-    }
-  }
 }
 
 /*
- * Copyright (c) 2018 Rafael da Silva Rocha.
+ * Copyright (c) 2018-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -1495,7 +1570,7 @@ class UintBuffer {
  */
 
 /**
- * A class to write and read two's complement signed integers
+ * A class to parse two's complement signed integers
  * to and from byte buffers.
  * @extends UintBuffer
  */
@@ -1524,8 +1599,8 @@ class TwosComplementBuffer extends UintBuffer {
    * @param {number} num The number.
    * @param {number=} index The index being written in the byte buffer.
    * @return {number} The next index to write on the byte buffer.
-   * @throws {Error} If num is NaN.
-   * @throws {Error} On overflow.
+   * @throws {TypeError} If num is NaN.
+   * @throws {RangeError} On overflow.
    */
   pack(buffer, num, index=0) {
     return super.pack(buffer, num, index);
@@ -1536,7 +1611,7 @@ class TwosComplementBuffer extends UintBuffer {
    * @param {!Uint8Array|!Array<number>} buffer An array of bytes.
    * @param {number=} index The index to read.
    * @return {number}
-   * @throws {Error} On overflow.
+   * @throws {RangeError} On overflow.
    */
   unpack(buffer, index=0) {
     /** @type {number} */
@@ -1656,7 +1731,7 @@ class NumberBuffer {
 }
 
 /*
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -1678,38 +1753,6 @@ class NumberBuffer {
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
-/**
- * Throw a value error.
- * @throws {Error} A Error with a message based on the input params.
- */
-function throwValueError_(e, value, i, fp) {
-  if (!fp && (
-      value === Infinity || value === -Infinity || value !== value)) {
-    throw new Error('Argument is not a integer at input index ' + i);
-  } else {
-    throw new Error(e.message + ' at input index ' + i + ': ' + value);
-  }
-}
-
-/**
- * Unpack a array of numbers to a typed array.
- * All other unpacking functions are interfaces to this function.
- * @param {!Uint8Array|!Array<number>} buffer The byte buffer.
- * @param {number=} start The buffer index to start reading.
- * @param {number=} end The buffer index to stop reading.
- * @param {number=} offset The number of bytes used by the type.
- * @param {boolean=} safe True for size-safe buffer reading.
- * @throws {Error} On bad buffer length, if safe.
- */
-function getUnpackLen_(buffer, start, end, offset, safe) {
-  /** @type {number} */
-  let extra = (end - start) % offset;
-  if (safe && (extra || buffer.length < offset)) {
-    throw new Error('Bad buffer length');
-  }
-  return end - extra;
-}
 
 /**
  * Read a string of UTF-8 characters from a byte buffer.
@@ -1894,6 +1937,46 @@ function unpackArray(
 function unpack$1(buffer, theType, index=0) {
   return unpackArray(
     buffer, theType, index, index + Math.ceil(theType.bits / 8), true)[0];
+}
+
+/**
+ * Throw a value error.
+ * @throws {Error} A Error with a message based on the input params.
+ * @private
+ */
+function throwValueError_(e, value, i, fp) {
+  if (!fp && (
+      value === Infinity || value === -Infinity || value !== value)) {
+    throw new Error('Argument is not a integer at input index ' + i);
+  } else {
+    if (e instanceof RangeError) {
+      throw new Error('Overflow at input index ' + i + ': ' + value);
+    } else if (e instanceof TypeError) {
+      throw new Error('Argument is not a valid number at input index ' + i + ': ' + value);
+    } else {
+      throw new Error(e.message + ' at input index ' + i + ': ' + value);
+    }
+  }
+}
+
+/**
+ * Unpack a array of numbers to a typed array.
+ * All other unpacking functions are interfaces to this function.
+ * @param {!Uint8Array|!Array<number>} buffer The byte buffer.
+ * @param {number=} start The buffer index to start reading.
+ * @param {number=} end The buffer index to stop reading.
+ * @param {number=} offset The number of bytes used by the type.
+ * @param {boolean=} safe True for size-safe buffer reading.
+ * @throws {Error} On bad buffer length, if safe.
+ * @private
+ */
+function getUnpackLen_(buffer, start, end, offset, safe) {
+  /** @type {number} */
+  let extra = (end - start) % offset;
+  if (safe && (extra || buffer.length < offset)) {
+    throw new Error('Bad buffer length');
+  }
+  return end - extra;
 }
 
 /*
@@ -4226,7 +4309,7 @@ class WaveFileMetaEditor extends WaveFileCreator {
  * Truncate float samples on overflow.
  * @param {Float64Array} samples the samples.
  */
-function truncateSamples(samples) {
+function truncateSamples$1(samples) {
   for (let i = 0, len = samples.length; i < len; i++) {
     if (samples[i] > 1) {
       samples[i] = 1;
@@ -4429,9 +4512,9 @@ class WaveFileConverter extends WaveFileMetaEditor {
     let typedSamplesOutput = new Float64Array(sampleCount);
     unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
     if (thisBitDepth == "32f" || thisBitDepth == "64") {
-      truncateSamples(typedSamplesInput);
+      truncateSamples$1(typedSamplesInput);
     }
-    bitDepth(
+    changeBitDepth(
       typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
     this.fromExisting_(
       this.fmt.numChannels,

@@ -95,8 +95,8 @@
   "dependencies": {
     "alawmulaw": "^5.0.2",
     "base64-arraybuffer-es6": "^0.5.0",
-    "bitdepth": "^7.0.2",
-    "byte-data": "^16.0.3",
-    "imaadpcm": "^4.1.2"
+    "bitdepth": "^8.0.0",
+    "byte-data": "^17.0.0",
+    "imaadpcm": "^5.0.0"
   }
 }

@@ -47,7 +47,7 @@ export default [
       commonjs(),
       compiler({
         language_in: 'ECMASCRIPT6',
-        language_out: 'ECMASCRIPT5',
+        language_out: 'ECMASCRIPT3',
         compilation_level: 'ADVANCED',
         externs: ['externs/wavefile.js']
       }),
@@ -69,7 +69,7 @@ export default [
       commonjs(),
       compiler({
         language_in: 'ECMASCRIPT6',
-        language_out: 'ECMASCRIPT5',
+        language_out: 'ECMASCRIPT3',
         compilation_level: 'SIMPLE',
         warning_level: 'VERBOSE',
         externs: ['externs/wavefile.js']
