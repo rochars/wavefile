@@ -44,7 +44,6 @@ npm install wavefile -g
 ## Use
 
 ### Node
-Or **require**:
 ```javascript
 const wavefile = require('wavefile');
 let wav = new wavefile.WaveFile();
