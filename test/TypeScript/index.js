@@ -8,7 +8,7 @@ exports.__esModule = true;
  * @see https://github.com/rochars/wavefile
  */
 var index_js_1 = require("../../index.js");
-var wav = new index_js_1["default"]();
+var wav = new index_js_1.WaveFile();
 wav.fromScratch(1, 8000, "32", new Uint32Array([0]));
 wav.fromScratch(1, 8000, "32", new Float64Array([0]));
 wav.fromScratch(1, 8000, "32", [0]);

@@ -1,11 +1,22 @@
 # CHANGELOG
 
-## version 8.4.6 (2019-09-12)
-- Fix: clicks and time changes in ADPCM compression/decompression
-- Fix: Range error bug when converting some files to ADPCM
-- Fix: The length of the output array when converting to ADPCM
-- Fix: properly reset chunks in WaveFile objects when using the same object to read multiple files or performing conversions.
-- Fix: keep metadata when performing bit depth conversions or applying compression
+## version 9.0.0 - 2019-12-31
+- New package structure:
+	* dist file is "./dist/wavefile.js", a UMD served as "main"
+	* ES6 source is "./index.js", served as "module"
+- WaveFile class is no longer a default export. You should use like this:
+	- Node.js:
+```javascript
+const WaveFile = require('uint-buffer').WaveFile;
+```
+	- Browser:
+```html
+<script src="wavefile.js"></script>
+<script>
+	var WaveFile = wavefile.WaveFile;
+	var wav = new WaveFile();
+</script>
+```
 
 ## version 8.4.5 (2019-07-25)
 - Fix: read UTF8 chars in cue points (https://github.com/rochars/wavefile/issues/13)

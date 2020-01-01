@@ -18,37 +18,17 @@ let wavefile;
 // UMD
 if (process.argv[4] == '--umd') {
 	console.log('umd tests');
-	wavefile = require('../dist/wavefile.umd.js');
+	wavefile = require('../dist/wavefile.js').WaveFile;
 	if (wavefile.toString().slice(0, 5) === "class") {
 		throw new Error('WaveFile in UMD dist should not be a ES6 class.');
 	}
-
-// ESM
-} else if (process.argv[4] == '--esm') {
-	console.log('esm tests');
-	require = require("esm")(module);
-	global.module = module;
-	wavefile = require('../dist/wavefile.js').default;
-
-// Min
-} else if (process.argv[4] == '--min') {
-	console.log('min tests');
-	global.window = {};
-	require('../dist/wavefile.min.js');
-	wavefile = window.WaveFile;
-// CJS
-} else if (process.argv[4] == '--cjs') {
-	console.log('cjs tests');
-	require = require("esm")(module);
-	global.module = module;
-	wavefile = require('../dist/wavefile.cjs.js');
 
 // Source
 } else {
 	console.log('Source tests');
 	require = require("esm")(module);
 	global.module = module;
-	wavefile = require('../index.js').default;
+	wavefile = require('../index.js').WaveFile;
 }
 
 module.exports = wavefile;

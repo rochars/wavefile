@@ -14,26 +14,28 @@
 		<p>Copyright (c) 2017-2018 Rafael da Silva Rocha.<br>
 			<a href="https://github.com/rochars/wavefile">https://github.com/rochars/wavefile</a></p>
 
-		<p>The tests in the browser run against <strong>./dist/wavefile.umd.js</strong>.</p>
+		<p>The tests in the browser run against <strong>./dist/wavefile.js</strong>.</p>
 		<p>Some WaveFile tests need to read and write files to disk; those tests are not loaded here.<br>
 			To run all the tests <strong>git clone https://github.com/rochars/wavefile</strong>, <strong>npm install</strong> it and <strong>npm test</strong> it.
 	</div>
 
-	<!-- Load Mocha -->
+	
+
+	<!-- Load Chai and Mocha -->
 	<div class="container">
 		<div id="mocha"></div>
 	</div>
+	<script src="https://www.chaijs.com/chai.js"></script>
+	<script src="https://unpkg.com/mocha@6.2.2/mocha.js"></script>
+
+	<!-- Load UMD -->
+	<script src="../dist/wavefile.js"></script>
 	
-	<script src="https://cdn.jsdelivr.net/npm/chai@4.1.2/chai.js"></script>
 	<script>
 		var assert = chai.assert;
+		var WaveFile = wavefile.WaveFile;
+		mocha.setup('bdd')
 	</script>
-	
-	<script src="https://unpkg.com/mocha@4.0.1/mocha.js"></script>
-	<script>mocha.setup('bdd')</script>
-
-	<!-- Load browser dist -->
-	<script src="../dist/wavefile.umd.js"></script>
 
 	<!-- Load the tests -->
 	<script src="src/interface.js"></script>

@@ -1,4 +1,12 @@
 {
+  "source": {
+        "include": [
+        	"index.js",
+          "lib/wavefile-converter.js",
+          "lib/wavefile-meta-editor.js",
+          "lib/wavefile-creator.js"
+        ]
+  },
   "templates": {
     "default": {
       "includeDate": false

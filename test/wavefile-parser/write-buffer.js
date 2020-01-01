@@ -8,7 +8,7 @@
 
 const assert = require('assert');
 const fs = require("fs");
-const WaveFileParser = require("../../lib/wavefile-parser.js").default;
+const WaveFileParser = require("../../lib/wavefile-parser.js").WaveFileParser;
 const path = "./test/files/";
 
 describe('read 16bit file from disk and write to new file', function() {

@@ -29,14 +29,14 @@
 
 /** @module wavefile */
 
-import {encode, decode} from 'base64-arraybuffer-es6';
-import WaveFileConverter from './lib/wavefile-converter';
+import { encode, decode } from 'base64-arraybuffer-es6';
+import { WaveFileConverter } from './lib/wavefile-converter';
 
 /**
  * A class to manipulate wav files.
  * @extends WaveFileConverter
  */
-export default class WaveFile extends WaveFileConverter {
+export class WaveFile extends WaveFileConverter {
 
   /**
    * @param {?Uint8Array=} wavBuffer A wave file buffer.

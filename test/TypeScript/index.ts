@@ -7,7 +7,7 @@
  * @see https://github.com/rochars/wavefile
  */
 
-import WaveFile from '../../index.js'
+import { WaveFile } from '../../index.js'
 
 let wav = new WaveFile();
 wav.fromScratch(1, 8000, "32", new Uint32Array([0]));

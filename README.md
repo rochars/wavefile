@@ -7,7 +7,7 @@ https://github.com/rochars/wavefile
 
 
 ## Notice
-My country, Brazil, is under a fascist government that is hunting and killing its opponents. I've been threatened too. #EleNão
+My country, Brazil, is under a fascist government that is hunting and killing its opponents. I've been threatened too.
 
 
 Create, read and write wav files according to the specs.
@@ -44,24 +44,28 @@ npm install wavefile -g
 ## Use
 
 ### Node
-**import WaveFile from wavefile**:
-```javascript
-import WaveFile from 'wavefile';
-let wav = new WaveFile();
-```
-
 Or **require**:
 ```javascript
-const WaveFile = require('wavefile');
+const wavefile = require('wavefile');
+let wav = new wavefile.WaveFile();
+```
+or 
+```javascript
+const WaveFile = require('wavefile').WaveFile;
+let wav = new WaveFile();
+```
+or
+```javascript
+import { WaveFile } from 'wavefile';
 let wav = new WaveFile();
 ```
 
 ### Browser
-Load **wavefile.umd.js** with ```<script>``` tags:
+Use the **wavefile.js** file in the *dist* folder:
 ```html
-<script src="./dist/wavefile.umd.js"></script>
+<script src="wavefile.js"></script>
 <script>
-  var WaveFile = new WaveFile();
+  var wav = new wavefile.WaveFile();
 </script>
 ```
 
@@ -76,7 +80,7 @@ Or load it from [unpkg](https://unpkg.com/wavefile):
 ```
 
 #### Browser compatibility
-IE10+. Should work in all modern browsers that support ES5/ES6+.
+IE10+. Should work in all modern browsers.
 
 Cross-browser tests powered by  
 <a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a>
@@ -121,7 +125,7 @@ The available options:
 
 ## Node.js Example
 ```javascript
-const WaveFile = require('wavefile');
+const WaveFile = require('wavefile').WaveFile;
 
 // Load a wav file buffer as a WaveFile object
 let wav = new WaveFile(buffer);

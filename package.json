@@ -1,13 +1,13 @@
 {
   "name": "wavefile",
-  "version": "8.5.0",
+  "version": "9.0.0",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
+  "main": "./dist/wavefile.js",
   "module": "./index.js",
-  "main": "./dist/wavefile.cjs.js",
-  "browser": "./dist/wavefile.min.js",
+  "types": "./index.d.ts",
   "bin": "./bin/wavefile.js",
   "engines": {
     "node": ">=8"
@@ -65,20 +65,17 @@
   "scripts": {
     "lint": "jshint index.js bin externs lib test/src",
     "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src test/wavefile-parser --recursive -R dot --timeout=1600000",
-    "test-esm": "node ./node_modules/mocha/bin/_mocha test/dist test/src --esm --recursive -R dot --timeout=240000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
-    "test-cjs": "node ./node_modules/mocha/bin/_mocha test/dist test/src --cjs --recursive -R dot --timeout=240000",
-    "test-min": "node ./node_modules/mocha/bin/_mocha test/dist test/src --min --recursive -R dot --timeout=240000",
     "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
-    "test-dist": "npm run test-umd && npm run test-esm && npm run test-tsc && npm run test-cli && npm run test-cjs && npm run test-min",
-    "rollup-bundle": "rollup -c && npm run test-dist",
-    "doc": "./node_modules/.bin/jsdoc -c .jsdocrc index.js ./lib/wavefile-converter.js ./lib/wavefile-creator.js ./lib/wavefile-parser.js ./lib/wavefile-reader.js -d docs -r README.md -t node_modules/docdash",
-    "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
+    "test-dist": "npm run test-umd && npm run test-tsc && npm run test-cli",
+    "rollup-bundle": "npm test && rollup -c && npm run test-dist",
+    "doc": "./node_modules/.bin/jsdoc -c .jsdocrc -d docs -r README.md -t node_modules/docdash",
+    "build": "npm run lint && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
-    "@ampproject/rollup-plugin-closure-compiler": "^0.10.0",
+    "@ampproject/rollup-plugin-closure-compiler": "^0.13.0",
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^6.0.0",
     "codecov": "^3.6.1",

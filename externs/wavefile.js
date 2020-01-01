@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018 Rafael da Silva Rocha.
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -23,10 +23,13 @@
  */
 
 /**
- * @fileoverview Externs for wavefile 8.4
+ * @fileoverview Externs for wavefile 9.0
  * @see https://github.com/rochars/wavefile
  * @externs
  */
+
+// wavefile module
+var wavefile = {};
 
 // WaveFile class
 var WaveFile = {};

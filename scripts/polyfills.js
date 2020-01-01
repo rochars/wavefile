@@ -1,0 +1,14 @@
+;
+// for IE10 compatibility
+try {
+  if (!Uint8Array.prototype.slice) {
+  Object.defineProperty(Uint8Array.prototype, 'slice', {
+    value: function (begin, end)
+     {
+        return new Uint8Array(Array.prototype.slice.call(this, begin, end));
+     }
+  });
+  }
+} catch(err) {
+  //
+}
