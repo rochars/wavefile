@@ -213,7 +213,7 @@ let wavDataURI = wav.toDataURI();
 <pre class="prettyprint source lang-javascript"><code>let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
-wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+wav.fromScratch(1, 44100, '32', [0, -2147483, 2147483, 4]);
 fs.writeFileSync(path, wav.toBuffer());
 </code></pre>
 <h4>Stereo:</h4>
@@ -221,8 +221,8 @@ fs.writeFileSync(path, wav.toBuffer());
 <pre class="prettyprint source lang-javascript"><code>// Stereo, 48 kHz, 8-bit, de-interleaved samples
 // WaveFile interleave the samples automatically
 wav.fromScratch(2, 48000, '8', [
-    [0, -2, 4, 3],
-    [0, -1, 4, 3]
+    [0, 2, 4, 3],
+    [0, 1, 4, 3]
 ]);
 fs.writeFileSync(path, wav.toBuffer());
 </code></pre>
@@ -261,7 +261,7 @@ wav.setTag(&quot;ICMT&quot;, &quot;some comments&quot;);
 <p>Mind that creating or deleting cue points will change the index of other points if they exist.</p>
 <h3>RIFX</h3>
 <p><strong>wavefile</strong> can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {&quot;container&quot;: &quot;RIFX&quot;});
+<pre class="prettyprint source lang-javascript"><code>wav.fromScratch(1, 48000, '16', [0, 1, -3278, 327], {&quot;container&quot;: &quot;RIFX&quot;});
 </code></pre>
 <p>RIFX to RIFF and RIFF to RIFX:</p>
 <pre class="prettyprint source lang-javascript"><code>// Turn a RIFF file to a RIFX file

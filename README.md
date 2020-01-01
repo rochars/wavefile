@@ -177,7 +177,7 @@ Use the ```fromScratch(numChannels, sampleRate, bitDepth, samples)``` method.
 let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
-wav.fromScratch(1, 44100, '32', [0, -2147483648, 2147483647, 4]);
+wav.fromScratch(1, 44100, '32', [0, -2147483, 2147483, 4]);
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
@@ -187,8 +187,8 @@ Samples can be informed interleaved or de-interleaved. If they are de-interleave
 // Stereo, 48 kHz, 8-bit, de-interleaved samples
 // WaveFile interleave the samples automatically
 wav.fromScratch(2, 48000, '8', [
-    [0, -2, 4, 3],
-    [0, -1, 4, 3]
+    [0, 2, 4, 3],
+    [0, 1, 4, 3]
 ]);
 fs.writeFileSync(path, wav.toBuffer());
 ```
@@ -242,7 +242,7 @@ Mind that creating or deleting cue points will change the index of other points 
 ### RIFX
 **wavefile** can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:
 ```javascript
-wav.fromScratch(1, 48000, '16', [0, 1, -32768, 32767], {"container": "RIFX"});
+wav.fromScratch(1, 48000, '16', [0, 1, -3278, 327], {"container": "RIFX"});
 ```
 
 RIFX to RIFF and RIFF to RIFX:
