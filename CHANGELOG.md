@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 9.0.1 - 2020-01-02
+- Update byte-data@18 for performance improvement
+
 ## version 9.0.0 - 2019-12-31
 - New package structure:
 	* dist file is "./dist/wavefile.js", a UMD served as "main"
