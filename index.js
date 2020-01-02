@@ -29,7 +29,7 @@
 
 /** @module wavefile */
 
-import { encode, decode } from 'base64-arraybuffer-es6';
+import { encode, decode } from './lib/base64-arraybuffer.js';
 import { WaveFileConverter } from './lib/wavefile-converter';
 
 /**
