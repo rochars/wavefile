@@ -27,11 +27,17 @@ describe("Read files with iXML chunk", function() {
 
 
 describe("Change the value of iXML chunk", function() {
-	let wav = new WaveFile(
+	/*
+    let wav = new WaveFile(
         fs.readFileSync(path + "24bit-48kHz-1c-mixpre6-hiser_interview.WAV"));
     wav.iXML.value = '<pmx/>';
     let wav2 = new WaveFile(wav.toBuffer());
-    wav2.toBuffer();
+    */
+    let wav = new WaveFile();
+    wav.fromScratch(1, 48000, '24', [0, 1, -8388608, 8388607])
+    wav.iXML.chunkId = 'iXML';
+    wav.iXML.value = '<pmx/>';
+    let wav2 = new WaveFile(wav.toBuffer());
 
     it("should find the 'iXML' chunk", function() {
         assert.equal(wav2.iXML.chunkId, "iXML");
