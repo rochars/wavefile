@@ -341,10 +341,17 @@ fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());
 <p><strong>wavefile</strong> have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
 <h3>XML Chunks</h3>
 <p><strong>wavefile</strong> support reading and writing <strong>iXML</strong> and <strong>_PMX</strong> chunks.</p>
-<p>To change the value of iXML or _PMX chunks:</p>
-<pre class="prettyprint source lang-javascript"><code>wav.iXML.value = newiXMLValue;
-wav._PMX.value = new_PMXValue;
+<p>To get the value of iXML or _PMX chunks:</p>
+<pre class="prettyprint source lang-javascript"><code>/** @type {string} */
+let iXMLValue = wav.getiXML();
+/** @type {string} */
+let _PMXValue = wav.get_PMX();
 </code></pre>
+<p>To Set the value of iXML or _PMX chunks:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.setiXML(iXMLValue);
+wav.set_PMX(_PMXValue);
+</code></pre>
+<p>The value for XML chunks must always be a string.</p>
 <p>the <em>chunkSize</em> of the chunks will be adjusted according to their new values when <em>toBuffer()</em> is called.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
@@ -557,6 +564,34 @@ WaveFile.getSample(index) {};
  * @throws {Error} If the sample index is off range.
  */
 WaveFile.setSample(index, sample) {};
+
+
+/**
+ * Return the value of the iXML chunk.
+ * @return {string} The contents of the iXML chunk.
+ */
+WaveFile.getiXML() {};
+
+/**
+ * Set the value of the iXML chunk.
+ * @param {string} iXMLValue The value for the iXML chunk.
+ * @throws {TypeError} If the value is not a string.
+ */
+WaveFile.setiXML(iXMLValue) {};
+
+/**
+ * Get the value of the _PMX chunk.
+ * @return {string} The contents of the _PMX chunk.
+ */
+WaveFile.get_PMX() {};
+
+/**
+ * Set the value of the _PMX chunk.
+ * @param {string} _PMXValue The value for the _PMX chunk.
+ * @throws {TypeError} If the value is not a string.
+ */
+WaveFile.set_PMX(_PMXValue) {};
+
 </code></pre>
 <h4>WaveFile.listCuePoints()</h4>
 <p>This method returns a list like this:</p>

@@ -351,11 +351,21 @@ By default **wavefile** will not insert a "bext" chunk in new files or in files 
 ### XML Chunks
 **wavefile** support reading and writing **iXML** and **\_PMX** chunks.
 
-To change the value of iXML or \_PMX chunks:
+To get the value of iXML or \_PMX chunks:
 ```javascript
-wav.iXML.value = newiXMLValue;
-wav._PMX.value = new_PMXValue;
+/** @type {string} */
+let iXMLValue = wav.getiXML();
+/** @type {string} */
+let _PMXValue = wav.get_PMX();
 ```
+
+To Set the value of iXML or \_PMX chunks:
+```javascript
+wav.setiXML(iXMLValue);
+wav.set_PMX(_PMXValue);
+```
+
+The value for XML chunks must always be a string.
 
 the *chunkSize* of the chunks will be adjusted according to their new values when *toBuffer()* is called.
 
@@ -573,6 +583,34 @@ WaveFile.getSample(index) {};
  * @throws {Error} If the sample index is off range.
  */
 WaveFile.setSample(index, sample) {};
+
+
+/**
+ * Return the value of the iXML chunk.
+ * @return {string} The contents of the iXML chunk.
+ */
+WaveFile.getiXML() {};
+
+/**
+ * Set the value of the iXML chunk.
+ * @param {string} iXMLValue The value for the iXML chunk.
+ * @throws {TypeError} If the value is not a string.
+ */
+WaveFile.setiXML(iXMLValue) {};
+
+/**
+ * Get the value of the _PMX chunk.
+ * @return {string} The contents of the _PMX chunk.
+ */
+WaveFile.get_PMX() {};
+
+/**
+ * Set the value of the _PMX chunk.
+ * @param {string} _PMXValue The value for the _PMX chunk.
+ * @throws {TypeError} If the value is not a string.
+ */
+WaveFile.set_PMX(_PMXValue) {};
+
 ```
 
 #### WaveFile.listCuePoints()

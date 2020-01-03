@@ -234,6 +234,48 @@ export class WaveFileCreator extends WaveFileParser {
   }
 
   /**
+   * Return the value of the iXML chunk.
+   * @return {string} The contents of the iXML chunk.
+   */
+  getiXML() {
+    return this.iXML.value;
+  }
+
+  /**
+   * Set the value of the iXML chunk.
+   * @param {string} iXMLValue The value for the iXML chunk.
+   * @throws {TypeError} If the value is not a string.
+   */
+  setiXML(iXMLValue) {
+    if (typeof iXMLValue !== 'string') {
+      throw new TypeError('iXML value must be a string.');
+    }
+    this.iXML.value = iXMLValue;
+    this.iXML.chunkId = 'iXML';
+  }
+
+  /**
+   * Get the value of the _PMX chunk.
+   * @return {string} The contents of the _PMX chunk.
+   */
+  get_PMX() {
+    return this._PMX.value;
+  }
+
+  /**
+   * Set the value of the _PMX chunk.
+   * @param {string} _PMXValue The value for the _PMX chunk.
+   * @throws {TypeError} If the value is not a string.
+   */
+  set_PMX(_PMXValue) {
+    if (typeof _PMXValue !== 'string') {
+      throw new TypeError('_PMX value must be a string.');
+    }
+    this._PMX.value = _PMXValue;
+    this._PMX.chunkId = '_PMX';
+  }
+
+  /**
    * Define the header of a wav file.
    * @param {string} bitDepthCode The audio bit depth
    * @param {number} numChannels The number of channels

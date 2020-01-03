@@ -200,6 +200,18 @@ WaveFile.prototype.bext = {
   codingHistory: ''
 };
 /**
+ * The data of the iXML chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.prototype.iXML = {
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  value: 0
+};
+/**
  * The data of the ds64 chunk.
  * Used only with RF64 files.
  * @type {!Object<string, *>}
@@ -285,6 +297,18 @@ WaveFile.prototype.junk = {
   chunkSize: 0,
   /** @type {!Array<number>} */
   chunkData: []
+};
+/**
+ * The data of the _PMX chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.prototype._PMX = {
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  value: 0
 };
 /**
  * The bit depth code according to the samples.
@@ -496,3 +520,29 @@ WaveFile.prototype.listTags = function() {};
  * @private
  */
 WaveFile.prototype.listCuePoints = function() {};
+
+/**
+ * Return the value of the iXML chunk.
+ * @return {string} The contents of the iXML chunk.
+ */
+WaveFile.prototype.getiXML = function() {};
+
+/**
+ * Set the value of the iXML chunk.
+ * @param {string} iXMLValue The value for the iXML chunk.
+ * @throws {TypeError} If the value is not a string.
+ */
+WaveFile.prototype.setiXML = function(iXMLValue) {};
+
+/**
+ * Get the value of the _PMX chunk.
+ * @return {string} The contents of the _PMX chunk.
+ */
+WaveFile.prototype.get_PMX = function() {};
+
+/**
+ * Set the value of the _PMX chunk.
+ * @param {string} _PMXValue The value for the _PMX chunk.
+ * @throws {TypeError} If the value is not a string.
+ */
+WaveFile.prototype.set_PMX = function(_PMXValue) {};

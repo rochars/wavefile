@@ -64,6 +64,11 @@ declare module wavefile {
      */
     bext: object;
     /**
+     * The data of the 'iXML' chunk.
+     * @type {!Object<string, *>}
+     */
+    iXML: object;
+    /**
      * The data of the 'ds64' chunk.
      * Used only with RF64 files.
      * @type {!Object<string, *>}
@@ -91,6 +96,11 @@ declare module wavefile {
      * @type {!Object<string, *>}
      */
     junk: object;
+    /**
+     * The data of the '_PMX' chunk.
+     * @type {!Object<string, *>}
+     */
+    _PMX: object;
 
     /**
      * Return the sample at a given index.
@@ -297,5 +307,31 @@ declare module wavefile {
      * @param {string} label The new text for the label.
      */
     updateLabel(pointIndex: number, label: string): void;
+
+    /**
+     * Set the value of the iXML chunk.
+     * @param {string} iXMLValue The value for the iXML chunk.
+     * @throws {TypeError} If the value is not a string.
+     */
+    setiXML(iXMLValue: string): void;
+
+    /**
+     * Return the value of the iXML chunk.
+     * @return {string} The contents of the iXML chunk.
+     */
+    getiXML(): string;
+
+    /**
+     * Set the value of the _PMX chunk.
+     * @param {string} _PMXValue The value for the _PMX chunk.
+     * @throws {TypeError} If the value is not a string.
+     */
+    set_PMX(_PMXValue: string): void;
+
+    /**
+     * Get the value of the _PMX chunk.
+     * @return {string} The contents of the _PMX chunk.
+     */
+    get_PMX(): string;
   }
 }

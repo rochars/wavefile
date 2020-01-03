@@ -5,8 +5,8 @@
 - Read and write \_PMX chunks
 To change the value of iXML of \_PMX chunks:
 ```javascript
-wav.iXML.value = newiXMLValue;
-wav._PMX.value = new_PMXValue;
+wav.setiXML(iXMLValue);
+wav.set_PMX(_PMXValue);
 ```
 Fix: chunkSize of LIST subChunks that have string values
 
