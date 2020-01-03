@@ -61,6 +61,17 @@ describe("Read regions created in Adobe Audition", function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
     });
+
+    // _PMX chunk
+    it("should find the '_PMX' chunk", function() {
+        assert.equal(wav._PMX.chunkId, "_PMX");
+    });
+    it("'_PMX' chunkSize should be 10087", function() {
+        assert.equal(wav._PMX.chunkSize, 10087);
+    });
+    it("'_PMX' value should be a string with length = 10085", function() {
+        assert.equal(wav._PMX.value.length, 10085);
+    });
 });
 
 describe("Read regions created in Adobe Audition, write to file, read again", function() {
@@ -128,5 +139,19 @@ describe("Read regions created in Adobe Audition, write to file, read again", fu
     });
     it("'iXML' value in new file should be equal to the one in the original file", function() {
         assert.equal(wav2.iXML.value, wav.iXML.value);
+    });
+
+    // new file should still have the _PMX chunk
+    it("should find the '_PMX' chunk", function() {
+        assert.equal(wav2._PMX.chunkId, "_PMX");
+    });
+    it("'_PMX' chunkSize should be 10087", function() {
+        assert.equal(wav2._PMX.chunkSize, 10087);
+    });
+    it("'_PMX' value should be a string with length 10085", function() {
+        assert.equal(wav2._PMX.value.length, 10085);
+    });
+    it("'_PMX' value in new file should be equal to the one in the original file", function() {
+        assert.equal(wav2._PMX.value, wav._PMX.value);
     });
 });
