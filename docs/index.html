@@ -347,12 +347,12 @@ let iXMLValue = wav.getiXML();
 /** @type {string} */
 let _PMXValue = wav.get_PMX();
 </code></pre>
-<p>To Set the value of iXML or _PMX chunks:</p>
+<p>To set the value of iXML or _PMX chunks:</p>
 <pre class="prettyprint source lang-javascript"><code>wav.setiXML(iXMLValue);
 wav.set_PMX(_PMXValue);
 </code></pre>
 <p>The value for XML chunks must always be a string.</p>
-<p>the <em>chunkSize</em> of the chunks will be adjusted according to their new values when <em>toBuffer()</em> is called.</p>
+<p>the <em>chunkSize</em> of the XML chunks will be adjusted when <em>toBuffer()</em> is called.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>/**

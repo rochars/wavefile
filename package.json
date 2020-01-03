@@ -33,7 +33,9 @@
     "encode",
     "decode",
     "A-Law",
-    "mu-Law"
+    "mu-Law",
+    "_PMX",
+    "iXML"
   ],
   "repository": {
     "type": "git",
