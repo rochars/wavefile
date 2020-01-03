@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 9.0.3 - 2020-01-03
+- Fix: remove extra field from ltxt chunks to fix wav regions labels
+
 ## version 9.0.2 - 2020-01-03
 - Fix: add padding byte on bext when byte number is odd to avoid writing currupted files
 

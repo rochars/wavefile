@@ -28,6 +28,14 @@ describe("read smpl_cue.wav and write to a new file", function() {
     
     let wav = new WaveFile(
         fs.readFileSync(path + "smpl_cue.wav"));
+
+    //ltxt
+    it("ltxt chunks should have empty 'value' field", function() {
+        wavLtxt = getLtxt_(wav);
+        wav2Ltxt = getLtxt_(wav2);
+        assert.equal(wav2Ltxt.value, '');
+    });
+
     let wavB = new WaveFile(
         fs.readFileSync(path + "smpl_cue.wav"));
 
