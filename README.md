@@ -347,6 +347,17 @@ By default **wavefile** will not insert a "bext" chunk in new files or in files 
 ### RF64
 **wavefile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
 
+### XML Chunks
+**wavefile** support reading and writing **iXML** and **\_PMX** chunks.
+
+To change the value of iXML or \_PMX chunks:
+```javascript
+wav.iXML.value = newiXMLValue;
+wav._PMX.value = new_PMXValue;
+```
+
+the *chunkSize* of the chunks will be adjusted according to their new values when *toBuffer()* is called.
+
 ## API
 To create a WaveFile object:
 ```javascript

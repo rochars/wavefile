@@ -338,6 +338,13 @@ fs.writeFileSync(&quot;32bit-file-with-bext.wav&quot;, wav.toBuffer());
 <p>By default <strong>wavefile</strong> will not insert a &quot;bext&quot; chunk in new files or in files that do not already have a &quot;bext&quot; chunk unless a property of <strong>WaveFile.bext</strong> is changed from it's default value. See below the full list of properties in <strong>WaveFile.bext</strong>.</p>
 <h3>RF64</h3>
 <p><strong>wavefile</strong> have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.</p>
+<h3>XML Chunks</h3>
+<p><strong>wavefile</strong> support reading and writing <strong>iXML</strong> and <strong>_PMX</strong> chunks.</p>
+<p>To change the value of iXML or _PMX chunks:</p>
+<pre class="prettyprint source lang-javascript"><code>wav.iXML.value = newiXMLValue;
+wav._PMX.value = new_PMXValue;
+</code></pre>
+<p>the <em>chunkSize</em> of the chunks will be adjusted according to their new values when <em>toBuffer()</em> is called.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>/**
