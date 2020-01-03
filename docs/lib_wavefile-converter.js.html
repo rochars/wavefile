@@ -237,7 +237,7 @@ export class WaveFileConverter extends WaveFileMetaEditor {
       if (newBitDepth != '32f') {
         toBitDepth = this.dataType.bits.toString();
       }
-      thisBitDepth = this.dataType.bits;
+      thisBitDepth = '' + this.dataType.bits;
     }
     this.assureUncompressed_();
     /** @type {number} */

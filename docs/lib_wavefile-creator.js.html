@@ -93,10 +93,10 @@ export class WaveFileCreator extends WaveFileParser {
      */
     this.bitDepth = '0';
     /**
-     * @type {!Object}
+     * @type {{be: boolean, bits: number, fp: boolean, signed: boolean}}
      * @protected
      */
-    this.dataType = {};
+    this.dataType = {bits: 0, be: false, signed: false, fp: false};
     /**
      * Audio formats.
      * Formats not listed here should be set to 65534,

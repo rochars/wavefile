@@ -15,7 +15,6 @@ const fs = require("fs");
 const WaveFile = require("../loader.js");
 const path = "./test/files/";
 describe("32-bit IEEE from file to 8-bit", function() {
-    
     let wav = new WaveFile(
         fs.readFileSync(path + "64bit-48kHz-noBext-mono-overflow.wav"));
     wav.data.samples[0] = 0;
