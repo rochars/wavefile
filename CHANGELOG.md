@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 9.0.2 - 2020-01-03
+- Fix: add padding byte on bext when byte number is odd to avoid writing currupted files
+
 ## version 9.0.1 - 2020-01-02
 - Update byte-data@18 for performance improvement
 
