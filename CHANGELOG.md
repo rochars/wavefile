@@ -8,6 +8,7 @@ To change the value of iXML of \_PMX chunks:
 wav.iXML.value = newiXMLValue;
 wav._PMX.value = new_PMXValue;
 ```
+Fix: chunkSize of LIST subChunks that had UTF8 string values
 
 ## version 9.0.3 - 2020-01-03
 - Fix: remove extra field from ltxt chunks to fix wav regions labels

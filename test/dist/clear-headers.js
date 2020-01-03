@@ -234,6 +234,11 @@ describe('cue points should be preserved when changing the bit depth', function(
     it("cue.ChunkId should be 'cue '", function() {
         let wav = new WaveFile();
         wav.fromBuffer(fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
+
+        // label is Ω, wich uses 2 bytes;
+        // chunkSize in original file is 7
+        assert.equal(wav.LIST[0].subChunks[0].chunkSize, 7);
+
         assert.equal(wav.cue.chunkId, 'cue ');
         wav.toBitDepth('32');
         assert.equal(wav.cue.chunkId, 'cue ');
@@ -244,6 +249,10 @@ describe('cue points should be preserved when changing the bit depth', function(
         wav = new WaveFile();
         wav.fromBuffer(fs.readFileSync(path + "/out/32bit-8kHz-markers-1c-encoded-clear-headers.wav"));
         assert.equal(wav.cue.chunkId, 'cue ');
+
+        // label is Ω, wich uses 2 bytes;
+        // chunkSize in new file must be 7 too
+        assert.equal(wav.LIST[0].subChunks[0].chunkSize, 7);
 
         // Load the original file
         let originalWav = new WaveFile();
