@@ -156,6 +156,7 @@ let wavDataURI = wav.toDataURI();
   * [Change the bit depth](#change-the-bit-depth)
   * [Add BWF metadata](#add-bwf-metadata)
   * [RF64](#rf64)
+  * [XML Chunks](#xml-chunks)
 - [API](#api)
   * [The WaveFile methods:](#the-wavefile-methods-)
   * [The WaveFile properties](#the-wavefile-properties)
