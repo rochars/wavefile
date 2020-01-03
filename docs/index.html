@@ -711,6 +711,18 @@ WaveFile.bext = {
     codingHistory: '' // string, unlimited
 };
 /**
+ * The data of the 'iXML' chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile.iXML = {
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {string} */
+  value: ''
+};
+/**
  * The data of the &quot;ds64&quot; chunk.
  * Used only with RF64 files.
  * @type {!Object&lt;string, *>}
@@ -774,6 +786,18 @@ WaveFile.junk = {
     chunkSize: 0,
     /** @type {!Array&lt;number>} */
     chunkData: []
+};
+/**
+ * The data of the '_PMX' chunk.
+ * @type {!Object&lt;string, *>}
+ */
+WaveFile._PMX = {
+  /** @type {string} */
+  chunkId: '',
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {string} */
+  value: ''
 };
 /**
  * The bit depth code according to the samples.
