@@ -3,6 +3,11 @@
 ## version 9.1.0 - 2020-01-03
 - Read and write iXML chunks
 - Read and write \_PMX chunks
+To change the value of iXML of \_PMX chunks:
+```javascript
+wav.iXML.value = newiXMLValue;
+wav._PMX.value = new_PMXValue;
+```
 
 ## version 9.0.3 - 2020-01-03
 - Fix: remove extra field from ltxt chunks to fix wav regions labels
