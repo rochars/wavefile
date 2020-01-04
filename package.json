@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "9.1.0",
+  "version": "9.1.1",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -66,7 +66,7 @@
   ],
   "scripts": {
     "lint": "jshint index.js bin externs lib test/src",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src test/wavefile-parser --recursive -R dot --timeout=1600000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src test/wavefile-parser test/lib --recursive -R dot --timeout=1600000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
     "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",

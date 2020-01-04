@@ -67,9 +67,7 @@ export class WaveFile extends WaveFileConverter {
    * @throws {Error} If any property of the object appears invalid.
    */
   toBase64() {
-    /** @type {!Uint8Array} */
-    let buffer = this.toBuffer();
-    return encode(buffer, 0, buffer.length);
+    return encode(this.toBuffer());
   }
 
   /**
