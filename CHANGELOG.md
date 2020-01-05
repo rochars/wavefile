@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 9.1.1 - 2020-01-04
+- Smaller dist file
+
 ## version 9.1.0 - 2020-01-03
 - Read and write iXML chunks
 - Read and write \_PMX chunks
