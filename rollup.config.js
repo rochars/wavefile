@@ -54,7 +54,7 @@ export default [
         compilation_level: 'ADVANCED',
         warning_level: 'VERBOSE',
         outputWrapper: polyfills + '%output%',
-        externs: ['externs/wavefile.js']
+        externs: ['externs/wavefile.js','externs/amd.js',]
       }),
       compiler({
         language_in: 'ECMASCRIPT3',
