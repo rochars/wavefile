@@ -42,8 +42,7 @@ export default [
       {
         file: 'dist/wavefile.js',
         name: 'wavefile',
-        format: 'umd',
-        strict: false
+        format: 'umd'
       },
     ],
     plugins: [
@@ -52,7 +51,7 @@ export default [
       compiler({
         language_in: 'ECMASCRIPT6',
         language_out: 'ECMASCRIPT3',
-        compilation_level: 'SIMPLE',
+        compilation_level: 'ADVANCED',
         warning_level: 'VERBOSE',
         outputWrapper: polyfills + '%output%',
         externs: ['externs/wavefile.js']
