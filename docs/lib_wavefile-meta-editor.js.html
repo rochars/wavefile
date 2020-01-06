@@ -174,7 +174,7 @@ export class WaveFileMetaEditor extends WaveFileCreator {
     let points = this.getCuePoints_();
     for (let i = 0, len = points.length; i &lt; len; i++) {
       points[i].milliseconds =
-        (points[i].dwPosition / this.fmt.sampleRate) * 1000;
+        (points[i].dwSampleOffset / this.fmt.sampleRate) * 1000;
     }
     return points;
   }
@@ -186,35 +186,79 @@ export class WaveFileMetaEditor extends WaveFileCreator {
    */
   setCuePoint(position, labl='') {
     this.cue.chunkId = 'cue ';
-    position = (position * this.fmt.sampleRate) / 1000;
-    /** @type {!Array&lt;!Object>} */
+
+    /**
+     * Load the existing points before erasing
+     * the LIST 'adtl' chunk and the cue attr
+     * @type {!Array&lt;!Object>}
+     */
     let existingPoints = this.getCuePoints_();
+
+    // Clear any LIST labeled 'adtl'
+    // The LIST chunk should be re-written
+    // after the new cue point is created
     this.clearLISTadtl_();
-    /** @type {number} */
+
+    /**
+     * Get the current len of the cue points
+     * in the file before erasing the cue attr
+     * @type {number}
+     */
     let len = this.cue.points.length;
+
+    // Erase this.cue so it can be re-written
+    // after the point is added
     this.cue.points = [];
-    /** @type {boolean} */
-    let hasSet = false;
+
+    /**
+     * Cue position param is informed in milliseconds,
+     * here its value is converted to the sample offset
+     * @type {number}
+     */
+    let sampleOffset = (position * this.fmt.sampleRate) / 1000;
+
+    // If there were no cue points in the file,
+    // insert the new cue point as the first
     if (len === 0) {
-      this.setCuePoint_(position, 1, labl);
+      this.setCuePoint_(sampleOffset, 1, labl);
+
+    // If the file already had cue points, This new one
+    // must be added in the list according to its position.
     } else {
+
+      /** @type {boolean} */
+      let hasSet = false;
+
+      // Iterate over the cue points that existed
+      // before this one was added
       for (let i = 0; i &lt; len; i++) {
-        if (existingPoints[i].dwPosition > position &amp;&amp; !hasSet) {
-          this.setCuePoint_(position, i + 1, labl);
+
+        // If the new point is located before this original point
+        // and the new point have not been created, create the
+        // new point and then the original point
+        if (existingPoints[i].dwSampleOffset > sampleOffset &amp;&amp; !hasSet) {
+          // create the new point
+          this.setCuePoint_(sampleOffset, i + 1, labl);
+
+          // create the original point
           this.setCuePoint_(
-            existingPoints[i].dwPosition,
+            existingPoints[i].dwSampleOffset,
             i + 2,
             existingPoints[i].label);
           hasSet = true;
+
+        // Otherwise, re-create the original point
         } else {
           this.setCuePoint_(
-            existingPoints[i].dwPosition,
-            i + 1,
+            existingPoints[i].dwSampleOffset,
+            hasSet ? i + 2 : i + 1,
             existingPoints[i].label);
         }
       }
+      // If no point was created in the above loop,
+      // create the new point as the last one
       if (!hasSet) {
-        this.setCuePoint_(position, this.cue.points.length + 1, labl);
+        this.setCuePoint_(sampleOffset, this.cue.points.length + 1, labl);
       }
     }
     this.cue.dwCuePoints = this.cue.points.length;
@@ -236,7 +280,7 @@ export class WaveFileMetaEditor extends WaveFileCreator {
     for (let i = 0; i &lt; len; i++) {
       if (i + 1 !== index) {
         this.setCuePoint_(
-          existingPoints[i].dwPosition,
+          existingPoints[i].dwSampleOffset,
           i + 1,
           existingPoints[i].label);
       }
@@ -277,11 +321,12 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   getCuePoints_() {
     /** @type {!Array&lt;!Object>} */
     let points = [];
-    for (let i = 0, len = this.cue.points.length; i &lt; len; i++) {
-      points.push({
-        dwPosition: this.cue.points[i].dwPosition,
-        label: this.getLabelForCuePoint_(
-          this.cue.points[i].dwName)});
+    for (let i = 0; i &lt; this.cue.points.length; i++) {
+      // Raw cue point data
+      let cuePointData = this.getDataForCuePoint_(this.cue.points[i].dwName);
+      cuePointData.label = cuePointData.value ? cuePointData.value : '';
+      Object.assign(cuePointData, this.cue.points[i]);
+      points.push(cuePointData);
     }
     return points;
   }
@@ -289,21 +334,24 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   /**
    * Return the label of a cue point.
    * @param {number} pointDwName The ID of the cue point.
-   * @return {string}
+   * @return {!Object}
    * @private
    */
-  getLabelForCuePoint_(pointDwName) {
+  getDataForCuePoint_(pointDwName) {
     /** @type {?number} */
     let cIndex = this.getAdtlChunk_();
+    let pointData = {};
     if (cIndex !== null) {
+      // got through all chunks in the adtl LIST checking
+      // for references to this cue point
       for (let i = 0, len = this.LIST[cIndex].subChunks.length; i &lt; len; i++) {
         if (this.LIST[cIndex].subChunks[i].dwName ==
-            pointDwName) {
-          return this.LIST[cIndex].subChunks[i].value;
+            pointDwName &amp;&amp; this.LIST[cIndex].subChunks[i].chunkId) {
+          Object.assign(pointData, this.LIST[cIndex].subChunks[i]);
         }
       }
     }
-    return '';
+    return pointData;
   }
 
   /**
@@ -372,10 +420,10 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   setCuePoint_(position, dwName, label) {
     this.cue.points.push({
       dwName: dwName,
-      dwPosition: position,
-      fccChunk: 'data',
-      dwChunkStart: 0,
-      dwBlockStart: 0,
+      dwPosition: 0, // should not be hardcoded
+      fccChunk: 'data', // should not be hardcoded
+      dwChunkStart: 0, // should not be hardcoded
+      dwBlockStart: 0, // should not be hardcoded
       dwSampleOffset: position,
     });
     this.setLabl_(dwName, label);
@@ -395,22 +443,31 @@ export class WaveFileMetaEditor extends WaveFileCreator {
 
   /**
    * Create a new 'labl' subchunk in a 'LIST' chunk of type 'adtl'.
+   * This method creates a LIST adtl chunk in the file if one
+   * is not present.
    * @param {number} dwName The ID of the cue point.
    * @param {string} label The label for the cue point.
    * @private
    */
   setLabl_(dwName, label) {
-    /** @type {?number} */
+    /**
+     * Get the index of the LIST chunk labeled as adtl.
+     * A file can have many LIST chunks with unique labels.
+     * @type {?number}
+     */
     let adtlIndex = this.getAdtlChunk_();
+    // If there is no adtl LIST, create one
     if (adtlIndex === null) {
+      // Include a new item LIST chunk
       this.LIST.push({
         chunkId: 'LIST',
         chunkSize: 4,
         format: 'adtl',
         subChunks: []});
+      // Get the index of the new LIST chunk
       adtlIndex = this.LIST.length - 1;
     }
-    this.setLabelText_(adtlIndex === null ? 0 : adtlIndex, dwName, label);
+    this.setLabelText_(adtlIndex, dwName, label);
   }
 
   /**

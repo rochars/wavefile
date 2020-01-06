@@ -128,7 +128,27 @@ describe("16-bit cue reading (file with 2 markers)", function() {
     it("samples.length should be > 0", function() {
         assert.ok(wav.data.samples.length > 0);
     });
-
+    // the cue points [0]
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].dwSampleOffset, 24000);
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].label, "wave1");
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].milliseconds, 1500);
+    });
+    // the cue points [1]
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[1].dwSampleOffset, 72000);
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[1].label, "wave2");
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[1].milliseconds, 4500);
+    });
+    /*
     it("reads the markers in the file", function() {
         assert.deepEqual(wav.listCuePoints(), [
             {
@@ -143,13 +163,23 @@ describe("16-bit cue reading (file with 2 markers)", function() {
             }
         ]);
     });
-
+    */
 });
 
 describe("16-bit cue reading (file with 1 UTF8 marker)", function() {
     let wav = new WaveFile(
         fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue.wav"));
     wav.LISTChunks = [];
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].dwSampleOffset, 4000);
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].label, "\u03A9");
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].milliseconds, 500);
+    });
+    /*
     it("read UTF8 in cue point markers", function() {
         assert.deepEqual(wav.listCuePoints(), [
             {
@@ -160,12 +190,23 @@ describe("16-bit cue reading (file with 1 UTF8 marker)", function() {
             }
         ]);
     });
+    */
 });
 
 describe("16-bit cue reading (https://github.com/rochars/wavefile/issues/13)", function() {
     let wav = new WaveFile(
         fs.readFileSync(path + "16bit-8kHz-1c-reaper-utf8cue-issue13.wav"));
     wav.LISTChunks = [];
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].dwSampleOffset, 4000);
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].label, "Marker 01 abcäöüß");
+    });
+    it("read UTF8 in cue point markers", function() {
+        assert.equal(wav.listCuePoints()[0].milliseconds, 500);
+    });
+    /*
     it("read UTF8 in cue point markers", function() {
         assert.deepEqual(wav.listCuePoints(), [
             {
@@ -175,4 +216,5 @@ describe("16-bit cue reading (https://github.com/rochars/wavefile/issues/13)", f
             }
         ]);
     });
+    */
 });

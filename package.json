@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "9.1.1",
+  "version": "10.0.0",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -35,7 +35,8 @@
     "A-Law",
     "mu-Law",
     "_PMX",
-    "iXML"
+    "iXML",
+    "cue"
   ],
   "repository": {
     "type": "git",

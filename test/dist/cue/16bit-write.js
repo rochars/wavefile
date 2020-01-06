@@ -222,8 +222,23 @@ describe('delete a point', function() {
 
 describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
         function() {
-    
-    let wav = new WaveFile();
+
+    // create a file from scratch
+    let wavThis = new WaveFile();
+
+    // cue points in the original file should = 0
+    it("fromScratch-CUE7, original, before fromScratch", function() {
+        assert.deepEqual(wavThis.listCuePoints(), []);
+    });
+
+});
+
+describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
+        function() {
+
+    // create a file from scratch
+    let wavThis = new WaveFile();
+
     let samples = [];
     for (let i=0; i<128000; i++)  {
         samples.push(0);
@@ -232,38 +247,246 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
         samples,
         samples
     ];
-    wav.fromScratch(2, 44100, '24', deInterleaved);
-    wav.setCuePoint(1500, "cue marker 1");
-    wav.setCuePoint(1000, "cue marker 2"); //
-    wav.setCuePoint(1250, "cue marker 3"); //
-    wav.setCuePoint(500, "cue marker 4"); //
-    wav.setCuePoint(750, "cue marker 5"); //
-    wav.setCuePoint(1750, "cue marker 6"); //
-    wav.setCuePoint(1550, "cue marker 7"); //
+    wavThis.fromScratch(2, 44100, '24', deInterleaved);
+
+    // cue points in the original file should = 0
+    it("fromScratch-CUE7, original, no cue points added yet", function() {
+        assert.deepEqual(wavThis.listCuePoints(), []);
+    });
+});
+
+
+describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
+        function() {
+
+    // create a file from scratch
+    let wavThis = new WaveFile();
+    let samples = [];
+    for (let i=0; i<128000; i++)  {
+        samples.push(0);
+    }
+    let deInterleaved = [
+        samples,
+        samples
+    ];
+    wavThis.fromScratch(2, 44100, '24', deInterleaved);
+
+    // set some cue points in the file
+    // cue points are added out of order
+    wavThis.setCuePoint(1500, "cue marker 1");
+    wavThis.setCuePoint(1000, "cue marker 2"); //
+    wavThis.setCuePoint(1250, "cue marker 3"); //
+    wavThis.setCuePoint(500, "cue marker 4"); //
+    wavThis.setCuePoint(750, "cue marker 5"); //
+    wavThis.setCuePoint(1750, "cue marker 6"); //
+    wavThis.setCuePoint(1550, "cue marker 7"); //
+
+    // cue points in the original file
+    originalCuePoints = wavThis.listCuePoints();
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[0].label, 'cue marker 4');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[1].label, 'cue marker 5');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[2].label, 'cue marker 2');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[3].label, 'cue marker 3');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[4].label, 'cue marker 1');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[5].label, 'cue marker 7');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[6].label, 'cue marker 6');
+    });
+});
+
+
+describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
+        function() {
+
+    // create a file from scratch
+    let wavThis = new WaveFile();
+    let samples = [];
+    for (let i=0; i<128000; i++)  {
+        samples.push(0);
+    }
+    let deInterleaved = [
+        samples,
+        samples
+    ];
+    wavThis.fromScratch(2, 44100, '24', deInterleaved);
+
+    // set some cue points in the file
+    // cue points are added in order
+    wavThis.setCuePoint(500, "cue marker 4"); //
+    wavThis.setCuePoint(750, "cue marker 5"); //
+    wavThis.setCuePoint(1000, "cue marker 2"); //
+    wavThis.setCuePoint(1250, "cue marker 3"); //
+    wavThis.setCuePoint(1500, "cue marker 1");
+    wavThis.setCuePoint(1550, "cue marker 7"); //
+    wavThis.setCuePoint(1750, "cue marker 6"); //
+
+    // cue points in the original file
+    originalCuePoints = wavThis.listCuePoints();
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[0].label, 'cue marker 4');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[1].label, 'cue marker 5');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[2].label, 'cue marker 2');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[3].label, 'cue marker 3');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[4].label, 'cue marker 1');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[5].label, 'cue marker 7');
+    });
+    it("fromScratch-CUE7, original, cue point 1 name", function() {
+        assert.equal(originalCuePoints[6].label, 'cue marker 6');
+    });
+});
+
+
+describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
+        function() {
+
+    // create a file from scratch
+    let wavThis = new WaveFile();
+    let samples = [];
+    for (let i=0; i<128000; i++)  {
+        samples.push(0);
+    }
+    let deInterleaved = [
+        samples,
+        samples
+    ];
+    wavThis.fromScratch(2, 44100, '24', deInterleaved);
+
+    wavThis.setCuePoint(1500, "cue marker 1");
+    wavThis.setCuePoint(1000, "cue marker 2"); //
+    wavThis.setCuePoint(1250, "cue marker 3"); //
+    wavThis.setCuePoint(500, "cue marker 4"); //
+    wavThis.setCuePoint(750, "cue marker 5"); //
+    wavThis.setCuePoint(1750, "cue marker 6"); //
+    wavThis.setCuePoint(1550, "cue marker 7"); //
+
+    wavThis.toBuffer()
+
+    // cue points in the original file after toBuffer
+    toBufferCuePoints = wavThis.listCuePoints();
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[0].label, 'cue marker 4');
+    });
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[1].label, 'cue marker 5');
+    });
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[2].label, 'cue marker 2');
+    });
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[3].label, 'cue marker 3');
+    });
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[4].label, 'cue marker 1');
+    });
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[5].label, 'cue marker 7');
+    });
+    it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
+        assert.equal(toBufferCuePoints[6].label, 'cue marker 6');
+    });
+});
+
+describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
+        function() {
+
+    // create a file from scratch
+    let wavThis = new WaveFile();
+    let samples = [];
+    for (let i=0; i<128000; i++)  {
+        samples.push(0);
+    }
+    let deInterleaved = [
+        samples,
+        samples
+    ];
+    wavThis.fromScratch(2, 44100, '24', deInterleaved);
+
+    // Set cue points in the file
+    wavThis.setCuePoint(1500, "cue marker 1");
+    wavThis.setCuePoint(1000, "cue marker 2"); //
+    wavThis.setCuePoint(1250, "cue marker 3"); //
+    wavThis.setCuePoint(500, "cue marker 4"); //
+    wavThis.setCuePoint(750, "cue marker 5"); //
+    wavThis.setCuePoint(1750, "cue marker 6"); //
+    wavThis.setCuePoint(1550, "cue marker 7"); //
+
+    // write the file
     fs.writeFileSync(
-        "././test/files/out/fromScratch-CUE7.wav", wav.toBuffer());
+        "././test/files/out/fromScratch-CUE7.wav", wavThis.toBuffer());
+
+    // Get the size of the file
     var stats = fs.statSync("././test/files/out/fromScratch-CUE7.wav");
     var fileSizeInBytes1 = stats["size"];
-    let wavCue = new WaveFile(
-        fs.readFileSync("././test/files/test-cue-reaper.wav"));
+
+    // Open the written file
     let wavCue2 = new WaveFile(
         fs.readFileSync("././test/files/out/fromScratch-CUE7.wav"));
 
     it("wav.chunkSize should be == fileSizeInBytes1", function() {
         assert.equal(wavCue2.chunkSize + 8, fileSizeInBytes1);
     });
-    //cue
+
+    // cue chunk in the written file
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
     it("wav.cue.points.length should be 7", function() {
         assert.equal(wavCue2.cue.points.length, 7);
     });
+    it("wav.cue.points.length should be 7", function() {
+        assert.equal(wavCue2.cue.points.length, 7);
+    });
+
+    // cue points in the written file
+    cuePoints = wavCue2.listCuePoints();
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[0].label, 'cue marker 4');
+    });
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[1].label, 'cue marker 5');
+    });
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[2].label, 'cue marker 2');
+    });
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[3].label, 'cue marker 3');
+    });
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[4].label, 'cue marker 1');
+    });
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[5].label, 'cue marker 7');
+    });
+    it("fromScratch-CUE7, written, cue point 1 name", function() {
+        assert.equal(cuePoints[6].label, 'cue marker 6');
+    });
 });
 
 describe('create 44100 kHz 24-bit stereo wave file with two cue points',
     function() {
-    
+
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -298,7 +521,7 @@ describe('create 44100 kHz 24-bit stereo wave file with two cue points',
 
 describe('create 44100 kHz 24-bit stereo wave file with one cue point',
     function() {
-    
+
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<128000; i++)  {
@@ -331,7 +554,7 @@ describe('create 44100 kHz 24-bit stereo wave file with one cue point',
 });
 
 describe('create 16000 kHz stereo wave file with one cue point', function() {
-    
+
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<32000; i++)  {
@@ -364,7 +587,7 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
 });
 
 describe('create 16000 kHz stereo wave file with one cue point', function() {
-    
+
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<32000; i++)  {
@@ -437,7 +660,7 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
 });
 
 describe('create 16000 kHz wave file with one cue point', function() {
-    
+
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<32000; i++)  {
@@ -509,7 +732,7 @@ describe('create 16000 kHz wave file with one cue point', function() {
 });
 
 describe('create 8000 kHz wave file with one cue point in 1s', function() {
-    
+
     let wav = new WaveFile();
     let samples = [];
     for (let i=0; i<16000; i++)  {

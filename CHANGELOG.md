@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## version 10.0.0 - (unreleased)
+Better handling of cue points and regions.
+
+Changes:
+- listCuePoints() now returns more information about each cue point
+
+Fixes:
+- setCuePoint() bug that caused some labels to display the wrong text
+
+
 ## version 9.1.1 - 2020-01-04
 - Smaller dist file
 

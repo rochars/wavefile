@@ -25,28 +25,27 @@ describe('listCuePoints() of a 16-bit wave files from scratch', function() {
         wav.setCuePoint(1000, "cue marker 2"); //
         wav.setCuePoint(1250, "cue marker 3"); //
         wav.setCuePoint(2000, "cue marker 4"); //
-        assert.deepEqual(wav.listCuePoints(), [
-            {
-                milliseconds: 1000,
-                dwPosition: 8000,
-                label: "cue marker 2"
-            },
-            {
-                milliseconds: 1250,
-                dwPosition: 10000,
-                label: "cue marker 3"
-            },
-            {
-                milliseconds: 1500,
-                dwPosition: 12000,
-                label: "cue marker 1"
-            },
-            {
-                milliseconds: 2000,
-                dwPosition: 16000,
-                label: "cue marker 4"
-            },
-        ]);
+
+
+        assert.deepEqual(wav.listCuePoints()[0].dwPosition, 0);
+        assert.deepEqual(wav.listCuePoints()[0].milliseconds, 1000);
+        assert.deepEqual(wav.listCuePoints()[0].dwSampleOffset, 8000);
+        assert.deepEqual(wav.listCuePoints()[0].label, "cue marker 2");
+
+        assert.deepEqual(wav.listCuePoints()[1].dwPosition, 0);
+        assert.deepEqual(wav.listCuePoints()[1].milliseconds, 1250);
+        assert.deepEqual(wav.listCuePoints()[1].dwSampleOffset, 10000);
+        assert.deepEqual(wav.listCuePoints()[1].label, "cue marker 3");
+        
+        assert.deepEqual(wav.listCuePoints()[1].dwPosition, 0);
+        assert.deepEqual(wav.listCuePoints()[2].milliseconds, 1500);
+        assert.deepEqual(wav.listCuePoints()[2].dwSampleOffset, 12000);
+        assert.deepEqual(wav.listCuePoints()[2].label, "cue marker 1");
+        
+        assert.deepEqual(wav.listCuePoints()[3].dwPosition, 0);
+        assert.deepEqual(wav.listCuePoints()[3].milliseconds, 2000);
+        assert.deepEqual(wav.listCuePoints()[3].dwSampleOffset, 16000);
+        assert.deepEqual(wav.listCuePoints()[3].label, "cue marker 4");        
     });
     it('should return a empty array if the file have no cue points',
         function() {
