@@ -212,8 +212,6 @@ export class WaveFileMetaEditor extends WaveFileCreator {
       }
 
       // Remove attrs that should not go in the results
-      delete points[i].chunkId;
-      delete points[i].chunkSize;
       delete points[i].value;
     }
     return points;
@@ -399,11 +397,17 @@ export class WaveFileMetaEditor extends WaveFileCreator {
     /** @type {!Array&lt;!Object>} */
     let points = [];
     for (let i = 0; i &lt; this.cue.points.length; i++) {
-      // Raw cue point data
-      let cuePointData = this.getDataForCuePoint_(this.cue.points[i].dwName);
-      cuePointData.label = cuePointData.value ? cuePointData.value : '';
-      Object.assign(cuePointData, this.cue.points[i]);
-      points.push(cuePointData);
+      /** @type {!Object} */
+      let chunk = this.cue.points[i];
+      /** @type {!Object} */
+      let pointData = this.getDataForCuePoint_(chunk.dwName);
+      pointData.label = pointData.value ? pointData.value : '';
+      pointData.dwPosition = chunk.dwPosition;
+      pointData.fccChunk = chunk.fccChunk;
+      pointData.dwChunkStart = chunk.dwChunkStart;
+      pointData.dwBlockStart = chunk.dwBlockStart;
+      pointData.dwSampleOffset = chunk.dwSampleOffset;
+      points.push(pointData);
     }
     return points;
   }
@@ -417,6 +421,7 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   getDataForCuePoint_(pointDwName) {
     /** @type {?number} */
     let cIndex = this.getAdtlChunk_();
+    /** @type {!Object} */
     let pointData = {};
     if (cIndex !== null) {
       // got through all chunks in the adtl LIST checking
@@ -424,6 +429,8 @@ export class WaveFileMetaEditor extends WaveFileCreator {
       for (let i = 0, len = this.LIST[cIndex].subChunks.length; i &lt; len; i++) {
         if (this.LIST[cIndex].subChunks[i].dwName ==
             pointDwName &amp;&amp; this.LIST[cIndex].subChunks[i].chunkId) {
+          /** @type {!Object} */
+          let chunk = this.LIST[cIndex].subChunks[i];
           // Some chunks may reference the point but
           // have a empty text; this is to ensure that if
           // one chunk that reference the point has a text,
@@ -431,17 +438,15 @@ export class WaveFileMetaEditor extends WaveFileCreator {
           // for the cue point.
           // If different values are present, the last value found
           // will be considered the label for the cue point.
-          let realValue = '';
-          if (pointData.value) {
-            realValue = pointData.value;
-          }
-          // Merge the cue point data with the associated data
-          Object.assign(pointData, this.LIST[cIndex].subChunks[i]);
-          // If the associated data had no value field, keep any
-          // existing value field that may have been found
-          if (!pointData.value) {
-            pointData.value = realValue;
-          }
+          pointData.value = chunk.value ? chunk.value : pointData.value;
+          pointData.dwName = chunk.dwName ? chunk.dwName : 0;
+          pointData.dwSampleLength =
+            chunk.dwSampleLength ? chunk.dwSampleLength : 0;
+          pointData.dwPurposeID = chunk.dwPurposeID ? chunk.dwPurposeID : 0;
+          pointData.dwCountry = chunk.dwCountry ? chunk.dwCountry : 0;
+          pointData.dwLanguage = chunk.dwLanguage ? chunk.dwLanguage : 0;
+          pointData.dwDialect = chunk.dwDialect ? chunk.dwDialect : 0;
+          pointData.dwCodePage = chunk.dwCodePage ? chunk.dwCodePage : 0;
         }
       }
     }
