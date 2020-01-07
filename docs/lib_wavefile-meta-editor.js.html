@@ -182,9 +182,11 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   /**
    * Create a cue point in the wave file.
    * @param {number} position The cue point position in milliseconds.
-   * @param {string} labl The LIST adtl labl text of the marker. Optional.
+   * @param {string=} labl The LIST adtl labl text of the marker. Optional.
+   * @param {number=} end The end of the point in milliseconds. Optional.
+   *   Need to be informed only if the cue point is part of a region.
    */
-  setCuePoint(position, labl='') {
+  setCuePoint(position, labl='', end=0) {
     this.cue.chunkId = 'cue ';
 
     /**
@@ -216,11 +218,22 @@ export class WaveFileMetaEditor extends WaveFileCreator {
      * @type {number}
      */
     let sampleOffset = (position * this.fmt.sampleRate) / 1000;
+    /**
+     * end param is informed in milliseconds, counting
+     * from the start of the file.
+     * here its value is converted to the sample length
+     * of the region.
+     * @type {number}
+     */
+    let dwSampleLength = 0;
+    if (end) {
+      dwSampleLength = ((end * this.fmt.sampleRate) / 1000) - sampleOffset;
+    }
 
     // If there were no cue points in the file,
     // insert the new cue point as the first
     if (len === 0) {
-      this.setCuePoint_(sampleOffset, 1, labl);
+      this.setCuePoint_(sampleOffset, 1, labl, dwSampleLength);
 
     // If the file already had cue points, This new one
     // must be added in the list according to its position.
@@ -238,13 +251,14 @@ export class WaveFileMetaEditor extends WaveFileCreator {
         // new point and then the original point
         if (existingPoints[i].dwSampleOffset > sampleOffset &amp;&amp; !hasSet) {
           // create the new point
-          this.setCuePoint_(sampleOffset, i + 1, labl);
+          this.setCuePoint_(sampleOffset, i + 1, labl, dwSampleLength);
 
           // create the original point
           this.setCuePoint_(
             existingPoints[i].dwSampleOffset,
             i + 2,
-            existingPoints[i].label);
+            existingPoints[i].label,
+            dwSampleLength);
           hasSet = true;
 
         // Otherwise, re-create the original point
@@ -252,13 +266,15 @@ export class WaveFileMetaEditor extends WaveFileCreator {
           this.setCuePoint_(
             existingPoints[i].dwSampleOffset,
             hasSet ? i + 2 : i + 1,
-            existingPoints[i].label);
+            existingPoints[i].label,
+            dwSampleLength);
         }
       }
       // If no point was created in the above loop,
       // create the new point as the last one
       if (!hasSet) {
-        this.setCuePoint_(sampleOffset, this.cue.points.length + 1, labl);
+        this.setCuePoint_(
+          sampleOffset, this.cue.points.length + 1, labl, dwSampleLength);
       }
     }
     this.cue.dwCuePoints = this.cue.points.length;
@@ -282,7 +298,8 @@ export class WaveFileMetaEditor extends WaveFileCreator {
         this.setCuePoint_(
           existingPoints[i].dwSampleOffset,
           i + 1,
-          existingPoints[i].label);
+          existingPoints[i].label,
+          existingPoints[i].dwSampleLength ? existingPoints[i].dwSampleLength : 0);
       }
     }
     this.cue.dwCuePoints = this.cue.points.length;
@@ -332,7 +349,7 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   }
 
   /**
-   * Return the label of a cue point.
+   * Return the associated data of a cue point.
    * @param {number} pointDwName The ID of the cue point.
    * @return {!Object}
    * @private
@@ -347,7 +364,24 @@ export class WaveFileMetaEditor extends WaveFileCreator {
       for (let i = 0, len = this.LIST[cIndex].subChunks.length; i &lt; len; i++) {
         if (this.LIST[cIndex].subChunks[i].dwName ==
             pointDwName &amp;&amp; this.LIST[cIndex].subChunks[i].chunkId) {
+          // Some chunks may reference the point but
+          // have a empty text; this is to ensure that if
+          // one chunk that reference the point has a text,
+          // this value will be kept as the associated data label
+          // for the cue point.
+          // If different values are present, the last value found
+          // will be considered the label for the cue point.
+          let realValue = '';
+          if (pointData.value) {
+            realValue = pointData.value;
+          }
+          // Merge the cue point data with the associated data
           Object.assign(pointData, this.LIST[cIndex].subChunks[i]);
+          // If the associated data had no value field, keep any
+          // existing value field that may have been found
+          if (!pointData.value) {
+            pointData.value = realValue;
+          }
         }
       }
     }
@@ -413,11 +447,13 @@ export class WaveFileMetaEditor extends WaveFileCreator {
 
   /**
    * Push a new cue point in this.cue.points.
-   * @param {number} position The position in milliseconds.
+   * @param {number} position The position as a sample offset.
    * @param {number} dwName the dwName of the cue point
+   * @param {number} dwSampleLength The sample length of the region.
+   *   A zero value indicated that this point is not a region.
    * @private
    */
-  setCuePoint_(position, dwName, label) {
+  setCuePoint_(position, dwName, label, dwSampleLength) {
     this.cue.points.push({
       dwName: dwName,
       dwPosition: 0, // should not be hardcoded
@@ -426,7 +462,7 @@ export class WaveFileMetaEditor extends WaveFileCreator {
       dwBlockStart: 0, // should not be hardcoded
       dwSampleOffset: position,
     });
-    this.setLabl_(dwName, label);
+    this.setLabl_(dwName, label, dwSampleLength);
   }
 
   /**
@@ -447,9 +483,12 @@ export class WaveFileMetaEditor extends WaveFileCreator {
    * is not present.
    * @param {number} dwName The ID of the cue point.
    * @param {string} label The label for the cue point.
+   * @param {number} dwSampleLength The sample length of the region.
+   *   A zero value indicated that this point is not a region
+   *   and no ltxt chunk should be created.
    * @private
    */
-  setLabl_(dwName, label) {
+  setLabl_(dwName, label, dwSampleLength) {
     /**
      * Get the index of the LIST chunk labeled as adtl.
      * A file can have many LIST chunks with unique labels.
@@ -468,6 +507,9 @@ export class WaveFileMetaEditor extends WaveFileCreator {
       adtlIndex = this.LIST.length - 1;
     }
     this.setLabelText_(adtlIndex, dwName, label);
+    if (dwSampleLength) {
+      this.setLtxtChunk_(adtlIndex, dwName, label, dwSampleLength);
+    }
   }
 
   /**
@@ -480,11 +522,34 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   setLabelText_(adtlIndex, dwName, label) {
     this.LIST[adtlIndex].subChunks.push({
       chunkId: 'labl',
-      chunkSize: label.length,
+      chunkSize: 4, // should be 4 + label length in bytes
       dwName: dwName,
       value: label
     });
-    this.LIST[adtlIndex].chunkSize += label.length + 4 + 4 + 4 + 1;
+    this.LIST[adtlIndex].chunkSize += 12; // should be 4 + label length in bytes
+  }
+  /**
+   * Create a new 'ltxt' subchunk in a 'LIST' chunk of type 'adtl'.
+   * @param {number} adtlIndex The index of the 'adtl' LIST in this.LIST.
+   * @param {number} dwName The ID of the cue point.
+   * @param {string} label The label for the cue point.
+   * @param {number} dwSampleLength The sample length of the region.
+   * @private
+   */
+  setLtxtChunk_(adtlIndex, dwName, label, dwSampleLength) {
+    this.LIST[adtlIndex].subChunks.push({
+      chunkId: 'ltxt',
+      chunkSize: 20,  // should be 12 + label length in bytes
+      dwName: dwName,
+      dwSampleLength: dwSampleLength,
+      dwPurposeID: 0, // should not be hardcoded
+      dwCountry: 0, // should not be hardcoded
+      dwLanguage: 0, // should not be hardcoded
+      dwDialect: 0, // should not be hardcoded
+      dwCodePage: 0, // should not be hardcoded
+      value: label // kept for compatibility
+    });
+    this.LIST[adtlIndex].chunkSize += 28;
   }
 }
 </code></pre>

@@ -373,7 +373,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line228">line 228</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line244">line 244</a>
     </li></ul></dd>
     
 
@@ -1829,7 +1829,7 @@
 
     
 
-    <h4 class="name" id="setCuePoint"><span class="type-signature"></span>setCuePoint<span class="signature">(position, labl)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setCuePoint"><span class="type-signature"></span>setCuePoint<span class="signature">(position, labl<span class="signature-attributes">opt</span>, end<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -1841,7 +1841,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line143">line 143</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line145">line 145</a>
     </li></ul></dd>
     
 
@@ -1912,7 +1912,11 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1937,7 +1941,19 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">The cue point position in milliseconds.</td>
@@ -1960,10 +1976,63 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">The LIST adtl labl text of the marker. Optional.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>end</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>0</code>
+                
+                </td>
+            
+
+            <td class="description last">The end of the point in milliseconds. Optional.  Need to be informed only if the cue point is part of a region.</td>
         </tr>
 
     
@@ -3195,7 +3264,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line258">line 258</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line275">line 275</a>
     </li></ul></dd>
     
 

@@ -5,6 +5,7 @@ Better handling of cue points and regions.
 
 Changes:
 - listCuePoints() now returns more information about each cue point
+- setCuePoint() now can create both cue points and regions
 
 Fixes:
 - setCuePoint() bug that caused some labels to display the wrong text
