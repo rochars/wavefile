@@ -114,7 +114,7 @@ WaveFile.prototype.cue = {
     dwChunkStart: 0,
     dwBlockStart: 0,
     dwSampleOffset: 0,
-    milliseconds: 0
+    position: 0
   }],
 };
 /**
@@ -521,20 +521,9 @@ WaveFile.prototype.listTags = function() {};
 /**
  * Return an array with all cue points in the file, in the order they appear
  * in the file.
- *  Objects representing standard cue points look like this:
+ * Objects representing cue points/regions look like this:
  *   {
- *     milliseconds: 500 // the position in milliseconds
- *     label: 'cue marker 1',
- *     dwName: 1,
- *     dwPosition: 0,
- *     fccChunk: 'data',
- *     dwChunkStart: 0,
- *     dwBlockStart: 0,
- *     dwSampleOffset: 22050 // the position as a sample offset
- *   }
- * Objects representing regions look like this:
- *   {
- *     milliseconds: 500 // the position in milliseconds
+ *     position: 500, // the position in milliseconds
  *     label: 'cue marker 1',
  *     end: 1500, // the end position in milliseconds
  *     dwName: 1,

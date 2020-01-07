@@ -79,6 +79,7 @@ https://github.com/rochars/wavefile</p>
 <li>Change the bit depth of the audio</li>
 <li>Read and write RIFF tags</li>
 <li>Set and delete cue points and their labels</li>
+<li>Create regions in wav files</li>
 <li>Encode/decode files as ADPCM, A-Law and μ-Law</li>
 <li>Turn RIFF files to RIFX and RIFX to RIFF</li>
 <li>Create or edit BWF metadata (&quot;bext&quot; chunk)</li>
@@ -254,25 +255,57 @@ wav.setTag(&quot;ICMT&quot;, &quot;some comments&quot;);
 <pre class="prettyprint source lang-javascript"><code>wav.deleteTag(&quot;ICMT&quot;);
 </code></pre>
 <h3>Add cue points to files</h3>
-<p>You can create cue points using the <strong>WaveFile.setCuePoint()</strong> method. The method takes a object with the cue point data and creates a cue point in the corresponding position of the file. The only required attribute of the object is 'position', a number representing the position of the point in milliseconds:</p>
-<pre class="prettyprint source lang-javascript"><code>// to create a cue point the position in milliseconds
-// is the only required attribute in the cue point data object
+<p>You can create cue points using the <strong>WaveFile.setCuePoint()</strong> method. The method takes a object with the cue point data and creates a cue point in the corresponding position of the file. The only required attribute of the object is <em>position</em>, a number representing the position of the point in milliseconds:</p>
+<pre class="prettyprint source lang-javascript"><code>// to create a cue point
 wav.setCuePoint({position: 1500});
 </code></pre>
-<p>You can also create cue points with labels by defining a 'label' attribute:</p>
+<p>You can also create cue points with labels by defining a <em>label</em> attribute:</p>
 <pre class="prettyprint source lang-javascript"><code>// to create a cue point with a label
 wav.setCuePoint({position: 1500, label: 'some label'});
 </code></pre>
-<p>To delete a cue point use <strong>WaveFile.deleteCuePoint()</strong> informing the index of the point. Points are ordered according to their position. The first point is indexed as 1.</p>
+<p>To delete a cue point use <strong>WaveFile.deleteCuePoint()</strong> informing the index of the point. Points are ordered according to their position. <strong>The first point is indexed as 1.</strong></p>
 <pre class="prettyprint source lang-javascript"><code>wav.deleteCuePoint(1);
 </code></pre>
 <p>Mind that creating or deleting cue points will change the index of other points if they exist.</p>
+<p>To list all the cue points in a file, in the order they appear:</p>
+<pre class="prettyprint source lang-javascript"><code>let cuePoints = wav.listCuePoints();
+</code></pre>
+<p>This method will return a list with cue points ordered as they appear in the file.</p>
+<pre class="prettyprint source lang-javascript"><code>[
+  {
+    position: 500, // the position in milliseconds
+    label: 'cue marker 1',
+    end: 1500, // the end position in milliseconds
+    dwName: 1,
+    dwPosition: 0,
+    fccChunk: 'data',
+    dwChunkStart: 0,
+    dwBlockStart: 0,
+    dwSampleOffset: 22050, // the position as a sample offset
+    dwSampleLength: 3646827, // the region length as a sample count
+    dwPurposeID: 544106354,
+    dwCountry: 0,
+    dwLanguage: 0,
+    dwDialect: 0,
+    dwCodePage: 0,
+  },
+  //...
+];
+</code></pre>
 <h3>Create regions in files</h3>
 <p>You can create regions using the <strong>WaveFile.setCuePoint()</strong> method. Regions are cue points with extra data.</p>
-<p>If you specify a 'end' attribute in the object describing the cue point, the point will be created as a region. The 'end' attribute is the end of the region, in milliseconds, counting from the start of the file:</p>
+<p>If you define a not null <em>end</em> attribute in the object describing the cue point, the point will be created as a region. The <em>end</em> attribute should be the end of the region, in milliseconds, counting from the start of the file, and always greater than the <em>position</em> of the point:</p>
 <pre class="prettyprint source lang-javascript"><code>// to create a region with a label:
 wav.setCuePoint({position: 1500, end: 2500, label: 'some label'});
 </code></pre>
+<p>You can also define the following optional properties when creating a region:</p>
+<ul>
+<li>dwPurposeID</li>
+<li>dwCountry</li>
+<li>dwLanguage</li>
+<li>dwDialect</li>
+<li>dwCodePage</li>
+</ul>
 <h3>RIFX</h3>
 <p><strong>wavefile</strong> can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:</p>
 <pre class="prettyprint source lang-javascript"><code>wav.fromScratch(1, 48000, '16', [0, 1, -3278, 327], {&quot;container&quot;: &quot;RIFX&quot;});
@@ -573,20 +606,9 @@ WaveFile.deleteCuePoint(index) {}
 /**
  * Return an array with all cue points in the file, in the order they appear
  * in the file.
- *  Objects representing standard cue points look like this:
+ * Objects representing cue points/regions look like this:
  *   {
- *     milliseconds: 500 // the position in milliseconds
- *     label: 'cue marker 1',
- *     dwName: 1,
- *     dwPosition: 0,
- *     fccChunk: 'data',
- *     dwChunkStart: 0,
- *     dwBlockStart: 0,
- *     dwSampleOffset: 22050 // the position as a sample offset
- *   }
- * Objects representing regions look like this:
- *   {
- *     milliseconds: 500 // the position in milliseconds
+ *     position: 500, // the position in milliseconds
  *     label: 'cue marker 1',
  *     end: 1500, // the end position in milliseconds
  *     dwName: 1,
@@ -604,7 +626,7 @@ WaveFile.deleteCuePoint(index) {}
  *   }
  * @return {!Array&lt;Object>}
  */
-listCuePoints() {}
+WaveFile.listCuePoints() {}
 
 /**
  * Update the label of a cue point.
@@ -658,18 +680,24 @@ WaveFile.set_PMX(_PMXValue) {};
 
 </code></pre>
 <h4>WaveFile.listCuePoints()</h4>
-<p>This method returns a list of objects, each object representing a cue point.
-The list looks like this:</p>
+<p>This method returns a list of objects, each object representing a cue point or region. The list looks like this:</p>
 <pre class="prettyprint source lang-javascript"><code>[
   {
-    milliseconds: 500
+    position: 500, // the position in milliseconds
     label: 'cue marker 1',
+    end: 1500, // the end position in milliseconds
     dwName: 1,
     dwPosition: 0,
     fccChunk: 'data',
     dwChunkStart: 0,
     dwBlockStart: 0,
-    dwSampleOffset: 22050
+    dwSampleOffset: 22050, // the position as a sample offset
+    dwSampleLength: 3646827, // the region length as a sample count
+    dwPurposeID: 544106354,
+    dwCountry: 0,
+    dwLanguage: 0,
+    dwDialect: 0,
+    dwCodePage: 0
   },
   // ...
 ]

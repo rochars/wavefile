@@ -373,7 +373,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line306">line 306</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line299">line 299</a>
     </li></ul></dd>
     
 
@@ -1617,7 +1617,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line154">line 154</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line143">line 143</a>
     </li></ul></dd>
     
 
@@ -1662,7 +1662,7 @@
 
 
 <div class="description">
-    Return an array with all cue points in the file, in the order they appearin the file. Objects representing standard cue points look like this:  {    milliseconds: 500 // the position in milliseconds    label: 'cue marker 1',    dwName: 1,    dwPosition: 0,    fccChunk: 'data',    dwChunkStart: 0,    dwBlockStart: 0,    dwSampleOffset: 22050 // the position as a sample offset  }Objects representing regions look like this:  {    milliseconds: 500 // the position in milliseconds    label: 'cue marker 1',    end: 1500, // the end position in milliseconds    dwName: 1,    dwPosition: 0,    fccChunk: 'data',    dwChunkStart: 0,    dwBlockStart: 0,    dwSampleOffset: 22050, // the position as a sample offset    dwSampleLength: 3646827, // the region length as a sample count    dwPurposeID: 544106354,    dwCountry: 0,    dwLanguage: 0,    dwDialect: 0,    dwCodePage: 0,  }
+    Return an array with all cue points in the file, in the order they appearin the file.Objects representing cue points/regions look like this:  {    position: 500, // the position in milliseconds    label: 'cue marker 1',    end: 1500, // the end position in milliseconds    dwName: 1,    dwPosition: 0,    fccChunk: 'data',    dwChunkStart: 0,    dwBlockStart: 0,    dwSampleOffset: 22050, // the position as a sample offset    dwSampleLength: 3646827, // length as a sample count, 0 if not a region    dwPurposeID: 544106354,    dwCountry: 0,    dwLanguage: 0,    dwDialect: 0,    dwCodePage: 0,  }
 </div>
 
 
@@ -1841,7 +1841,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line207">line 207</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line200">line 200</a>
     </li></ul></dd>
     
 
@@ -3172,7 +3172,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line333">line 333</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line326">line 326</a>
     </li></ul></dd>
     
 

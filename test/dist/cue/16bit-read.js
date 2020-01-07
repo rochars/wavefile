@@ -136,7 +136,7 @@ describe("16-bit cue reading (file with 2 markers)", function() {
         assert.equal(wav.listCuePoints()[0].label, "wave1");
     });
     it("read UTF8 in cue point markers", function() {
-        assert.equal(wav.listCuePoints()[0].milliseconds, 1500);
+        assert.equal(wav.listCuePoints()[0].position, 1500);
     });
     // the cue points [1]
     it("read UTF8 in cue point markers", function() {
@@ -146,24 +146,8 @@ describe("16-bit cue reading (file with 2 markers)", function() {
         assert.equal(wav.listCuePoints()[1].label, "wave2");
     });
     it("read UTF8 in cue point markers", function() {
-        assert.equal(wav.listCuePoints()[1].milliseconds, 4500);
+        assert.equal(wav.listCuePoints()[1].position, 4500);
     });
-    /*
-    it("reads the markers in the file", function() {
-        assert.deepEqual(wav.listCuePoints(), [
-            {
-                dwPosition: 24000,
-                label: "wave1",
-                milliseconds: 1500
-            },
-            {
-                dwPosition: 72000,
-                label: "wave2",
-                milliseconds: 4500
-            }
-        ]);
-    });
-    */
 });
 
 describe("16-bit cue reading (file with 1 UTF8 marker)", function() {
@@ -177,20 +161,8 @@ describe("16-bit cue reading (file with 1 UTF8 marker)", function() {
         assert.equal(wav.listCuePoints()[0].label, "\u03A9");
     });
     it("read UTF8 in cue point markers", function() {
-        assert.equal(wav.listCuePoints()[0].milliseconds, 500);
+        assert.equal(wav.listCuePoints()[0].position, 500);
     });
-    /*
-    it("read UTF8 in cue point markers", function() {
-        assert.deepEqual(wav.listCuePoints(), [
-            {
-                dwPosition: 4000,
-                label: "\u03A9",
-                
-                milliseconds: 500
-            }
-        ]);
-    });
-    */
 });
 
 describe("16-bit cue reading (https://github.com/rochars/wavefile/issues/13)", function() {
@@ -204,17 +176,6 @@ describe("16-bit cue reading (https://github.com/rochars/wavefile/issues/13)", f
         assert.equal(wav.listCuePoints()[0].label, "Marker 01 abcäöüß");
     });
     it("read UTF8 in cue point markers", function() {
-        assert.equal(wav.listCuePoints()[0].milliseconds, 500);
+        assert.equal(wav.listCuePoints()[0].position, 500);
     });
-    /*
-    it("read UTF8 in cue point markers", function() {
-        assert.deepEqual(wav.listCuePoints(), [
-            {
-                dwPosition: 4000,
-                label: "Marker 01 abcäöüß",
-                milliseconds: 500
-            }
-        ]);
-    });
-    */
 });

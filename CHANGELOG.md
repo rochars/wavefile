@@ -1,14 +1,33 @@
 # CHANGELOG
 
-## version 10.0.0 - (unreleased)
+## version 10.0.0 - 2020-01-07
 Better handling of cue points and regions.
 
-Features:
-- setCuePoint() now can create both cue points and regions
-
-API Changes:
-- listCuePoints() now returns a object with more information about each cue point
-- setCuePoint() param is now a object with the cue point data
+### API Changes:
+- *listCuePoints()* now returns a list of objects with more information about each cue point:
+```javascript
+[
+	{
+		position: 500, // the position in milliseconds
+		label: 'cue marker 1',
+		end: 1500, // the end position in milliseconds
+		dwName: 1,
+		dwPosition: 0,
+		fccChunk: 'data',
+		dwChunkStart: 0,
+		dwBlockStart: 0,
+		dwSampleOffset: 22050, // the position as a sample offset
+		dwSampleLength: 3646827, // the region length as a sample count
+		dwPurposeID: 544106354,
+		dwCountry: 0,
+		dwLanguage: 0,
+		dwDialect: 0,
+		dwCodePage: 0,
+	},
+	//...
+];
+```
+- *setCuePoint()* param is now a object with the cue point data:
 ```javascript
 // to create a cue point the position in milliseconds
 // is the only required attribute
@@ -20,8 +39,17 @@ wav.setCuePoint({position: 1500, label: 'some label'});
 // to create a cue region with a label:
 wav.setCuePoint({position: 1500, end: 2500, label: 'some label'});
 ```
+Objects that define regions can also define the following optional properties:
+- dwPurposeID
+- dwCountry
+- dwLanguage
+- dwDialect
+- dwCodePage
 
-Fixes:
+### New Features:
+- setCuePoint() now can create both cue points and regions.
+
+### Fixes:
 - Fix setCuePoint() bug that caused some labels to display the wrong text
 
 
