@@ -76,6 +76,9 @@ describe('delete all points', function() {
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
     wav.deleteCuePoint(1);
+    // set a cue point with no label
+    wav.setCuePoint({position: 500});
+
     fs.writeFileSync(
         "././test/files/out/fromScratch-CUE11.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE11.wav");
@@ -90,8 +93,8 @@ describe('delete all points', function() {
     it("wav.cue.chunkId should be 'cue '", function() {
         assert.equal(wavCue2.cue.chunkId, "cue ");
     });
-    it("wav.cue.points.length should be 10", function() {
-        assert.equal(wavCue2.cue.points.length, 10);
+    it("wav.cue.points.length should be 11", function() {
+        assert.equal(wavCue2.cue.points.length, 11);
     });
 });
 
@@ -107,12 +110,13 @@ describe('delete a point', function() {
         samples
     ];
     wav.fromScratch(2, 44100, '24', deInterleaved);
-    wav.setCuePoint(1500, "cue marker 5");
-    wav.setCuePoint(1000, "cue marker 3"); //
-    wav.setCuePoint(1250, "cue marker 4"); //
-    wav.setCuePoint(500, "cue marker 1"); //
-    wav.setCuePoint(750, "cue marker 2"); //
-    wav.setCuePoint(1750, "cue marker 6"); //
+    wav.setCuePoint({position: 1500, label: "cue marker 5"});
+    wav.setCuePoint({position: 1000, label: "cue marker 3"});
+    wav.setCuePoint({position: 1250, label: "cue marker 4"});
+    wav.setCuePoint({position: 500, label: "cue marker 1"});
+    wav.setCuePoint({position: 750, label: "cue marker 2"});
+    wav.setCuePoint({position: 1750, label: "cue marker 6"});
+
     wav.deleteCuePoint(2); // point in 750
     wav.deleteCuePoint(3); // point 1250
     fs.writeFileSync(
@@ -186,12 +190,13 @@ describe('delete a point', function() {
         samples
     ];
     wav.fromScratch(2, 44100, '24', deInterleaved);
-    wav.setCuePoint(1500, "cue marker 5");
-    wav.setCuePoint(1000, "cue marker 3");
-    wav.setCuePoint(1250, "cue marker 4");
-    wav.setCuePoint(500, "cue marker 1"); 
-    wav.setCuePoint(750, "cue marker 2"); 
-    wav.setCuePoint(1750, "cue marker 6");
+    wav.setCuePoint({position: 1500, label: "cue marker 5"});
+    wav.setCuePoint({position: 1000, label: "cue marker 3"});
+    wav.setCuePoint({position: 1250, label: "cue marker 4"});
+    wav.setCuePoint({position: 500, label: "cue marker 1"});
+    wav.setCuePoint({position: 750, label: "cue marker 2"});
+    wav.setCuePoint({position: 1750, label: "cue marker 6"});
+
     wav.deleteCuePoint(2);
     fs.writeFileSync(
         "././test/files/out/fromScratch-CUE8.wav", wav.toBuffer());
@@ -273,13 +278,13 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
 
     // set some cue points in the file
     // cue points are added out of order
-    wavThis.setCuePoint(1500, "cue marker 1");
-    wavThis.setCuePoint(1000, "cue marker 2"); //
-    wavThis.setCuePoint(1250, "cue marker 3"); //
-    wavThis.setCuePoint(500, "cue marker 4"); //
-    wavThis.setCuePoint(750, "cue marker 5"); //
-    wavThis.setCuePoint(1750, "cue marker 6"); //
-    wavThis.setCuePoint(1550, "cue marker 7"); //
+    wavThis.setCuePoint({position: 1500, label: "cue marker 1"});
+    wavThis.setCuePoint({position: 1000, label: "cue marker 2"});
+    wavThis.setCuePoint({position: 1250, label: "cue marker 3"});
+    wavThis.setCuePoint({position: 500, label: "cue marker 4"});
+    wavThis.setCuePoint({position: 750, label: "cue marker 5"});
+    wavThis.setCuePoint({position: 1750, label: "cue marker 6"});
+    wavThis.setCuePoint({position: 1550, label: "cue marker 7"});
 
     // cue points in the original file
     originalCuePoints = wavThis.listCuePoints();
@@ -324,13 +329,13 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
 
     // set some cue points in the file
     // cue points are added in order
-    wavThis.setCuePoint(500, "cue marker 4"); //
-    wavThis.setCuePoint(750, "cue marker 5"); //
-    wavThis.setCuePoint(1000, "cue marker 2"); //
-    wavThis.setCuePoint(1250, "cue marker 3"); //
-    wavThis.setCuePoint(1500, "cue marker 1");
-    wavThis.setCuePoint(1550, "cue marker 7"); //
-    wavThis.setCuePoint(1750, "cue marker 6"); //
+    wavThis.setCuePoint({position: 500, label: "cue marker 4"});
+    wavThis.setCuePoint({position: 750, label: "cue marker 5"});
+    wavThis.setCuePoint({position: 1000, label: "cue marker 2"});
+    wavThis.setCuePoint({position: 1250, label: "cue marker 3"});
+    wavThis.setCuePoint({position: 1500, label: "cue marker 1"});
+    wavThis.setCuePoint({position: 1550, label: "cue marker 7"});
+    wavThis.setCuePoint({position: 1750, label: "cue marker 6"});
 
     // cue points in the original file
     originalCuePoints = wavThis.listCuePoints();
@@ -372,15 +377,13 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
         samples
     ];
     wavThis.fromScratch(2, 44100, '24', deInterleaved);
-
-    wavThis.setCuePoint(1500, "cue marker 1");
-    wavThis.setCuePoint(1000, "cue marker 2"); //
-    wavThis.setCuePoint(1250, "cue marker 3"); //
-    wavThis.setCuePoint(500, "cue marker 4"); //
-    wavThis.setCuePoint(750, "cue marker 5"); //
-    wavThis.setCuePoint(1750, "cue marker 6"); //
-    wavThis.setCuePoint(1550, "cue marker 7"); //
-
+    wavThis.setCuePoint({position: 1500, label: "cue marker 1"});
+    wavThis.setCuePoint({position: 1000, label: "cue marker 2"});
+    wavThis.setCuePoint({position: 1250, label: "cue marker 3"});
+    wavThis.setCuePoint({position: 500, label: "cue marker 4"});
+    wavThis.setCuePoint({position: 750, label: "cue marker 5"});
+    wavThis.setCuePoint({position: 1750, label: "cue marker 6"});
+    wavThis.setCuePoint({position: 1550, label: "cue marker 7"});
     wavThis.toBuffer()
 
     // cue points in the original file after toBuffer
@@ -424,13 +427,13 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
     wavThis.fromScratch(2, 44100, '24', deInterleaved);
 
     // Set cue points in the file
-    wavThis.setCuePoint(1500, "cue marker 1");
-    wavThis.setCuePoint(1000, "cue marker 2"); //
-    wavThis.setCuePoint(1250, "cue marker 3"); //
-    wavThis.setCuePoint(500, "cue marker 4"); //
-    wavThis.setCuePoint(750, "cue marker 5"); //
-    wavThis.setCuePoint(1750, "cue marker 6"); //
-    wavThis.setCuePoint(1550, "cue marker 7"); //
+    wavThis.setCuePoint({position: 1500, label: "cue marker 1"});
+    wavThis.setCuePoint({position: 1000, label: "cue marker 2"});
+    wavThis.setCuePoint({position: 1250, label: "cue marker 3"});
+    wavThis.setCuePoint({position: 500, label: "cue marker 4"});
+    wavThis.setCuePoint({position: 750, label: "cue marker 5"});
+    wavThis.setCuePoint({position: 1750, label: "cue marker 6"});
+    wavThis.setCuePoint({position: 1550, label: "cue marker 7"});
 
     // write the file
     fs.writeFileSync(
@@ -497,8 +500,9 @@ describe('create 44100 kHz 24-bit stereo wave file with two cue points',
         samples
     ];
     wav.fromScratch(2, 44100, '24', deInterleaved);
-    wav.setCuePoint(1500, "cue marker");
-    wav.setCuePoint(1000, "cue marker 2");
+    wav.setCuePoint({position: 1500, label: "cue marker"});
+    wav.setCuePoint({position: 1000, label: "cue marker 2"});
+
     fs.writeFileSync("././test/files/out/fromScratch-CUE6.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE6.wav");
     var fileSizeInBytes1 = stats["size"];
@@ -532,7 +536,7 @@ describe('create 44100 kHz 24-bit stereo wave file with one cue point',
         samples
     ];
     wav.fromScratch(2, 44100, '24', deInterleaved);
-    wav.setCuePoint(1500, "cue marker");
+    wav.setCuePoint({position: 1500, label: "cue marker"});
     fs.writeFileSync("././test/files/out/fromScratch-CUE5.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE5.wav");
     var fileSizeInBytes1 = stats["size"];
@@ -565,7 +569,7 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
         samples
     ];
     wav.fromScratch(2, 8000, '16', deInterleaved);
-    wav.setCuePoint(1500, "cue marker");
+    wav.setCuePoint({position: 1500, label: "cue marker"});
     fs.writeFileSync("././test/files/out/fromScratch-CUE4.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE4.wav");
     var fileSizeInBytes1 = stats["size"];
@@ -598,7 +602,7 @@ describe('create 16000 kHz stereo wave file with one cue point', function() {
         samples
     ];
     wav.fromScratch(2, 16000, '16', deInterleaved);
-    wav.setCuePoint(1000, "cue marker");
+    wav.setCuePoint({position: 1000, label: "cue marker"});
     fs.writeFileSync("././test/files/out/fromScratch-CUE3.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE3.wav");
     var fileSizeInBytes1 = stats["size"];
@@ -667,7 +671,7 @@ describe('create 16000 kHz wave file with one cue point', function() {
         samples.push(0);
     }
     wav.fromScratch(1, 16000, '16', samples);
-    wav.setCuePoint(1000, "cue marker");
+    wav.setCuePoint({position: 1000, label: "cue marker"});
     fs.writeFileSync("././test/files/out/fromScratch-CUE2.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE2.wav");
     var fileSizeInBytes1 = stats["size"];
@@ -739,7 +743,7 @@ describe('create 8000 kHz wave file with one cue point in 1s', function() {
         samples.push(0);
     }
     wav.fromScratch(1, 8000, '16', samples);
-    wav.setCuePoint(1000, "cue marker");
+    wav.setCuePoint({position: 1000, label: "cue marker"});
     fs.writeFileSync("././test/files/out/fromScratch-CUE.wav", wav.toBuffer());
     var stats = fs.statSync("././test/files/out/fromScratch-CUE.wav");
     var fileSizeInBytes1 = stats["size"];

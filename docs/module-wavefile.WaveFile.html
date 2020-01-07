@@ -373,7 +373,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line244">line 244</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line308">line 308</a>
     </li></ul></dd>
     
 
@@ -1605,7 +1605,7 @@
 
     
 
-    <h4 class="name" id="listCuePoints"><span class="type-signature"></span>listCuePoints<span class="signature">()</span><span class="type-signature"> &rarr; (non-null) {Array.&lt;!Object>}</span></h4>
+    <h4 class="name" id="listCuePoints"><span class="type-signature"></span>listCuePoints<span class="signature">()</span><span class="type-signature"> &rarr; (non-null) {Array.&lt;Object>}</span></h4>
 
     
 
@@ -1617,7 +1617,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line128">line 128</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -1662,7 +1662,7 @@
 
 
 <div class="description">
-    Return an array with all cue points in the file, in the order they appearin the file.The difference between this method and using the list in WaveFile.cueis that the return value of this method includes the position inmilliseconds of each cue point (WaveFile.cue only have the sample offset)
+    Return an array with all cue points in the file, in the order they appearin the file. Objects representing standard cue points look like this:  {    milliseconds: 500 // the position in milliseconds    label: 'cue marker 1',    dwName: 1,    dwPosition: 0,    fccChunk: 'data',    dwChunkStart: 0,    dwBlockStart: 0,    dwSampleOffset: 22050 // the position as a sample offset  }Objects representing regions look like this:  {    milliseconds: 500 // the position in milliseconds    label: 'cue marker 1',    end: 1500, // the end position in milliseconds    dwName: 1,    dwPosition: 0,    fccChunk: 'data',    dwChunkStart: 0,    dwBlockStart: 0,    dwSampleOffset: 22050, // the position as a sample offset    dwSampleLength: 3646827, // the region length as a sample count    dwPurposeID: 544106354,    dwCountry: 0,    dwLanguage: 0,    dwDialect: 0,    dwCodePage: 0,  }
 </div>
 
 
@@ -1700,7 +1700,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Array.&lt;!Object></span>
+<span class="param-type">Array.&lt;Object></span>
 
 
     </dd>
@@ -1829,7 +1829,7 @@
 
     
 
-    <h4 class="name" id="setCuePoint"><span class="type-signature"></span>setCuePoint<span class="signature">(position, labl<span class="signature-attributes">opt</span>, end<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setCuePoint"><span class="type-signature"></span>setCuePoint<span class="signature">(pointData<span class="signature-attributes">non-null</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -1841,7 +1841,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line145">line 145</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line209">line 209</a>
     </li></ul></dd>
     
 
@@ -1912,11 +1912,7 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1928,111 +1924,23 @@
 
         <tr>
             
-                <td class="name"><code>position</code></td>
+                <td class="name"><code>pointData</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Object</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last">The cue point position in milliseconds.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>labl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">The LIST adtl labl text of the marker. Optional.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>end</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <code>0</code>
-                
-                </td>
-            
-
-            <td class="description last">The end of the point in milliseconds. Optional.  Need to be informed only if the cue point is part of a region.</td>
+            <td class="description last">A object with the data of the cue point.# Only required attribute to create a cue point:pointData.position: The position of the point in milliseconds# Optional attribute for cue points:pointData.label: A string label for the cue point# Extra data used for regionspointData.end: A number representing the end of the region,  in milliseconds, counting from the start of the file. If  no end attr is specified then no region is created.# You may also specify the following attrs for regions, all optional:pointData.dwPurposeIDpointData.dwCountrypointData.dwLanguagepointData.dwDialectpointData.dwCodePage</td>
         </tr>
 
     
@@ -3264,7 +3172,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line275">line 275</a>
+        <a href="lib_wavefile-meta-editor.js.html">lib/wavefile-meta-editor.js</a>, <a href="lib_wavefile-meta-editor.js.html#line335">line 335</a>
     </li></ul></dd>
     
 

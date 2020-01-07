@@ -21,11 +21,10 @@ describe('listCuePoints() of a 16-bit wave files from scratch', function() {
         }
         var deInterleaved = [samples, samples];
         wav.fromScratch(2, 8000, '24', deInterleaved);
-        wav.setCuePoint(1500, "cue marker 1");
-        wav.setCuePoint(1000, "cue marker 2"); //
-        wav.setCuePoint(1250, "cue marker 3"); //
-        wav.setCuePoint(2000, "cue marker 4"); //
-
+        wav.setCuePoint({position: 1500, label: "cue marker 1"});
+        wav.setCuePoint({position: 1000, label: "cue marker 2"}); //
+        wav.setCuePoint({position: 1250, label: "cue marker 3"}); //
+        wav.setCuePoint({position: 2000, label: "cue marker 4"}); //
 
         assert.deepEqual(wav.listCuePoints()[0].dwPosition, 0);
         assert.deepEqual(wav.listCuePoints()[0].milliseconds, 1000);

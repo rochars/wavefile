@@ -23,7 +23,7 @@
  */
 
 /**
- * @fileoverview Externs for wavefile 9.0
+ * @fileoverview Externs for wavefile 10.0
  * @see https://github.com/rochars/wavefile
  * @externs
  */
@@ -485,10 +485,18 @@ WaveFile.prototype.deleteTag = function(tag) {};
 
 /**
  * Create a cue point in the wave file.
- * @param {number} position The cue point position in milliseconds.
- * @param {string} labl The LIST adtl labl text of the marker. Optional.
+ * @param {!{
+ *   position: number,
+ *   label: ?string,
+ *   end: ?number,
+ *   dwPurposeID: ?number,
+ *   dwCountry: ?number,
+ *   dwLanguage: ?number,
+ *   dwDialect: ?number,
+ *   dwCodePage: ?number
+ * }} pointData A object with the data of the cue point.
  */
-WaveFile.prototype.setCuePoint = function(position, labl='') {};
+WaveFile.prototype.setCuePoint = function(pointData) {};
 
 /**
  * Remove a cue point from a wave file.
@@ -513,11 +521,36 @@ WaveFile.prototype.listTags = function() {};
 /**
  * Return an array with all cue points in the file, in the order they appear
  * in the file.
- * The difference between this method and using the list in WaveFile.cue
- * is that the return value of this method includes the position in
- * milliseconds of each cue point (WaveFile.cue only have the sample offset)
- * @return {!Array<!Object>}
- * @private
+ *  Objects representing standard cue points look like this:
+ *   {
+ *     milliseconds: 500 // the position in milliseconds
+ *     label: 'cue marker 1',
+ *     dwName: 1,
+ *     dwPosition: 0,
+ *     fccChunk: 'data',
+ *     dwChunkStart: 0,
+ *     dwBlockStart: 0,
+ *     dwSampleOffset: 22050 // the position as a sample offset
+ *   }
+ * Objects representing regions look like this:
+ *   {
+ *     milliseconds: 500 // the position in milliseconds
+ *     label: 'cue marker 1',
+ *     end: 1500, // the end position in milliseconds
+ *     dwName: 1,
+ *     dwPosition: 0,
+ *     fccChunk: 'data',
+ *     dwChunkStart: 0,
+ *     dwBlockStart: 0,
+ *     dwSampleOffset: 22050, // the position as a sample offset
+ *     dwSampleLength: 3646827, // the region length as a sample count
+ *     dwPurposeID: 544106354,
+ *     dwCountry: 0,
+ *     dwLanguage: 0,
+ *     dwDialect: 0,
+ *     dwCodePage: 0,
+ *   }
+ * @return {!Array<Object>}
  */
 WaveFile.prototype.listCuePoints = function() {};
 

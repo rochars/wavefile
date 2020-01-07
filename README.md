@@ -149,6 +149,7 @@ let wavDataURI = wav.toDataURI();
   * [Create wave files from scratch](#create-wave-files-from-scratch)
   * [Add RIFF tags to files](#add-riff-tags-to-files)
   * [Add cue points to files](#add-cue-points-to-files)
+  * [Create regions in files](#create-regions-in-files)
   * [RIFX](#rifx)
   * [IMA-ADPCM](#ima-adpcm)
   * [A-Law](#a-law)
@@ -228,9 +229,17 @@ wav.deleteTag("ICMT");
 ```
 
 ### Add cue points to files
-You can create cue points using the **WaveFile.setCuePoint()** method. The method takes time in milliseconds, a text label and creates a cue point in the corresponding position of the file:
+You can create cue points using the **WaveFile.setCuePoint()** method. The method takes a object with the cue point data and creates a cue point in the corresponding position of the file. The only required attribute of the object is 'position', a number representing the position of the point in milliseconds:
 ```javascript
-wav.setCuePoint(1750, "some label for the cue point");
+// to create a cue point the position in milliseconds
+// is the only required attribute in the cue point data object
+wav.setCuePoint({position: 1500});
+```
+
+You can also create cue points with labels by defining a 'label' attribute:
+```javascript
+// to create a cue point with a label
+wav.setCuePoint({position: 1500, label: 'some label'});
 ```
 
 To delete a cue point use **WaveFile.deleteCuePoint()** informing the index of the point. Points are ordered according to their position. The first point is indexed as 1.
@@ -239,6 +248,15 @@ wav.deleteCuePoint(1);
 ```
 
 Mind that creating or deleting cue points will change the index of other points if they exist.
+
+### Create regions in files
+You can create regions using the **WaveFile.setCuePoint()** method. Regions are cue points with extra data.
+
+If you specify a 'end' attribute in the object describing the cue point, the point will be created as a region. The 'end' attribute is the end of the region, in milliseconds, counting from the start of the file:
+```javascript
+// to create a region with a label:
+wav.setCuePoint({position: 1500, end: 2500, label: 'some label'});
+```
 
 ### RIFX
 **wavefile** can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:
@@ -538,10 +556,36 @@ WaveFile.listTags() {}
 
 /**
  * Create a cue point in the wave file.
- * @param {number} position The cue point position in milliseconds.
- * @param {string} labl The LIST adtl labl text of the marker. Optional.
+ * @param {!{
+ *   position: number,
+ *   label: ?string,
+ *   end: ?number,
+ *   dwPurposeID: ?number,
+ *   dwCountry: ?number,
+ *   dwLanguage: ?number,
+ *   dwDialect: ?number,
+ *   dwCodePage: ?number
+ * }} pointData A object with the data of the cue point.
+ *
+ * # Only required attribute to create a cue point:
+ * pointData.position: The position of the point in milliseconds
+ *
+ * # Optional attribute for cue points:
+ * pointData.label: A string label for the cue point
+ *
+ * # Extra data used for regions
+ * pointData.end: A number representing the end of the region,
+ *   in milliseconds, counting from the start of the file. If
+ *   no end attr is specified then no region is created.
+ *
+ * # You may also specify the following attrs for regions, all optional:
+ * pointData.dwPurposeID
+ * pointData.dwCountry
+ * pointData.dwLanguage
+ * pointData.dwDialect
+ * pointData.dwCodePage
  */
-WaveFile.setCuePoint(position, labl='') {}
+WaveFile.setCuePoint(pointData) {}
 
 /**
  * Remove a cue point from a wave file.
@@ -553,11 +597,36 @@ WaveFile.deleteCuePoint(index) {}
 /**
  * Return an array with all cue points in the file, in the order they appear
  * in the file.
- * The difference between this method and using the list in WaveFile.cue
- * is that the return value of this method includes the position in
- * milliseconds of each cue point (WaveFile.cue only have the sample offset)
- * @return {!Array<!Object>}
- * @private
+ *  Objects representing standard cue points look like this:
+ *   {
+ *     milliseconds: 500 // the position in milliseconds
+ *     label: 'cue marker 1',
+ *     dwName: 1,
+ *     dwPosition: 0,
+ *     fccChunk: 'data',
+ *     dwChunkStart: 0,
+ *     dwBlockStart: 0,
+ *     dwSampleOffset: 22050 // the position as a sample offset
+ *   }
+ * Objects representing regions look like this:
+ *   {
+ *     milliseconds: 500 // the position in milliseconds
+ *     label: 'cue marker 1',
+ *     end: 1500, // the end position in milliseconds
+ *     dwName: 1,
+ *     dwPosition: 0,
+ *     fccChunk: 'data',
+ *     dwChunkStart: 0,
+ *     dwBlockStart: 0,
+ *     dwSampleOffset: 22050, // the position as a sample offset
+ *     dwSampleLength: 3646827, // the region length as a sample count
+ *     dwPurposeID: 544106354,
+ *     dwCountry: 0,
+ *     dwLanguage: 0,
+ *     dwDialect: 0,
+ *     dwCodePage: 0,
+ *   }
+ * @return {!Array<Object>}
  */
 listCuePoints() {}
 
@@ -614,14 +683,21 @@ WaveFile.set_PMX(_PMXValue) {};
 ```
 
 #### WaveFile.listCuePoints()
-This method returns a list like this:
+This method returns a list of objects, each object representing a cue point.
+The list looks like this:
 ```javascript
 [
   {
-    milliseconds: 1000, // the position in milliseconds
-    dwPosition: 8000, // the sample offset of the point
-    label: "some cue marker" // the label of the point
+    milliseconds: 500
+    label: 'cue marker 1',
+    dwName: 1,
+    dwPosition: 0,
+    fccChunk: 'data',
+    dwChunkStart: 0,
+    dwBlockStart: 0,
+    dwSampleOffset: 22050
   },
+  // ...
 ]
 ```
 The list order reflects the order of the points in the file.

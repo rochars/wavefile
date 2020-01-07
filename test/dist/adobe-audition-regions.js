@@ -18,7 +18,7 @@ describe("Read regions created in Adobe Audition", function() {
 
     //fs.writeFileSync(
     //    path + "/out/24bit-48kHz-1c-mixpre6-hiser_interview.WAV", wav.toBuffer());
-
+    
     it("chunkId should be 'RIFF'", function() {
         assert.equal(wav.container, "RIFF");
     });

@@ -10,7 +10,7 @@ var assert = assert || require('assert');
 var WaveFile = WaveFile || require('../loader.js');
 
 describe('Create and delete cue points', function() {
-    
+
     var wav = new WaveFile();
     var samples = [];
     for (var i=0; i<128000; i++)  {
@@ -21,12 +21,14 @@ describe('Create and delete cue points', function() {
         samples
     ];
     wav.fromScratch(2, 44100, '24', deInterleaved);
-    wav.setCuePoint(1500, "cue marker 5");
-    wav.setCuePoint(1000, "cue marker 3"); //
-    wav.setCuePoint(1250, "cue marker 4"); //
-    wav.setCuePoint(500, "cue marker 1"); //
-    wav.setCuePoint(750, "cue marker 2"); //
-    wav.setCuePoint(1750, "cue marker 6"); //
+
+    wav.setCuePoint({position: 1500, label: "cue marker 5"});
+    wav.setCuePoint({position: 1000, label: "cue marker 3"});
+    wav.setCuePoint({position: 1250, label: "cue marker 4"});
+    wav.setCuePoint({position: 500, label: "cue marker 1"});
+    wav.setCuePoint({position: 750, label: "cue marker 2"});
+    wav.setCuePoint({position: 1750, label: "cue marker 6"});
+
     wav.deleteCuePoint(2); // point in 750
     wav.deleteCuePoint(3); // point 1250
 

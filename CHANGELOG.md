@@ -3,12 +3,26 @@
 ## version 10.0.0 - (unreleased)
 Better handling of cue points and regions.
 
-Changes:
-- listCuePoints() now returns more information about each cue point
+Features:
 - setCuePoint() now can create both cue points and regions
 
+API Changes:
+- listCuePoints() now returns a object with more information about each cue point
+- setCuePoint() param is now a object with the cue point data
+```javascript
+// to create a cue point the position in milliseconds
+// is the only required attribute
+wav.setCuePoint({position: 1500});
+
+// to create a cue point with a label
+wav.setCuePoint({position: 1500, label: 'some label'});
+
+// to create a cue region with a label:
+wav.setCuePoint({position: 1500, end: 2500, label: 'some label'});
+```
+
 Fixes:
-- setCuePoint() bug that caused some labels to display the wrong text
+- Fix setCuePoint() bug that caused some labels to display the wrong text
 
 
 ## version 9.1.1 - 2020-01-04

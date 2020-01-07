@@ -28,7 +28,7 @@ describe('create 44100 kHz 24-bit stereo wave file with one region',
     wav.fromScratch(2, 44100, '24', deInterleaved);
 
     // Set cue points in the file
-    wav.setCuePoint(1250, "Region 7", 1900);
+    wav.setCuePoint({position: 1250, label: "Region 7", end: 1900});
 
     // cue point label in the written file
     let cuePoints = wav.listCuePoints();
