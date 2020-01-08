@@ -23,7 +23,7 @@ describe('getSamples() with a mono 16-bit file', function() {
     });
 
     it("getSamples() should return the samples", function() {
-        assert.deepEqual(wav.getSamples(), samples);
+        assert.deepEqual(wav.getSamples(), new Float64Array(samples));
     });
 });
 
@@ -41,7 +41,7 @@ describe('getSamples() with a 11-bit file', function() {
     });
 
     it("getSamples() should return the samples", function() {
-        assert.deepEqual(wav.getSamples(), samples);
+        assert.deepEqual(wav.getSamples(), new Float64Array(samples));
     });
 });
 
@@ -62,7 +62,8 @@ describe('getSamples() with a stereo 16-bit file', function() {
     });
 
     it("getSamples() should return the samples de-interleaved", function() {
-        assert.deepEqual(wav.getSamples(), samples);
+        assert.deepEqual(wav.getSamples()[0], new Float64Array(samples[0]));
+        assert.deepEqual(wav.getSamples()[1], new Float64Array(samples[1]));
     });
 });
 
@@ -84,6 +85,8 @@ describe('getSamples() with a stereo 16-bit file, interleaved', function() {
     });
 
     it("getSamples(true) should return the samples de-interleaved", function() {
-        assert.deepEqual(wav.getSamples(true), interleavedSamples);
+        assert.deepEqual(
+            wav.getSamples(true),
+            new Float64Array(interleavedSamples));
     });
 });
