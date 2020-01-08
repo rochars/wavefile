@@ -448,18 +448,22 @@ WaveFile(bytes=null);
 </code></pre>
 <h3>The WaveFile methods</h3>
 <pre class="prettyprint source lang-javascript"><code>/**
- * Set up the WaveFile object based on the arguments passed.
- * @param {number} numChannels The number of channels
- *      (Integer numbers: 1 for mono, 2 stereo and so on).
+ * Set up the WaveFileCreator object based on the arguments passed.
+ * Existing chunks are reset.
+ * @param {number} numChannels The number of channels.
  * @param {number} sampleRate The sample rate.
- *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
- * @param {string} bitDepth The audio bit depth code.
- *      One of &quot;4&quot;, &quot;8&quot;, &quot;8a&quot;, &quot;8m&quot;, &quot;16&quot;, &quot;24&quot;, &quot;32&quot;, &quot;32f&quot;, &quot;64&quot;
- *      or any value between &quot;8&quot; and &quot;32&quot; (like &quot;12&quot;).
- * @param {!Array&lt;number>|!Array&lt;!Array&lt;number>>|!ArrayBufferView} samples
- *      The samples. Must be in the correct range according to the bit depth.
+ *    Integers like 8000, 44100, 48000, 96000, 192000.
+ * @param {string} bitDepthCode The audio bit depth code.
+ *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+ *    or any value between '8' and '32' (like '12').
+ * @param {
+ *      !Array&lt;number> |
+ *      !Array&lt;Array&lt;number>> |
+ *      !TypedArray |
+ *      !Array&lt;TypedArray>
+ *    } samples The samples.
  * @param {?Object} options Optional. Used to force the container
- *      as RIFX with {&quot;container&quot;: &quot;RIFX&quot;}
+ *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {}

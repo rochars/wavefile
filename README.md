@@ -479,18 +479,22 @@ WaveFile(bytes=null);
 ### The WaveFile methods
 ```javascript
 /**
- * Set up the WaveFile object based on the arguments passed.
- * @param {number} numChannels The number of channels
- *      (Integer numbers: 1 for mono, 2 stereo and so on).
+ * Set up the WaveFileCreator object based on the arguments passed.
+ * Existing chunks are reset.
+ * @param {number} numChannels The number of channels.
  * @param {number} sampleRate The sample rate.
- *      Integer numbers like 8000, 44100, 48000, 96000, 192000.
- * @param {string} bitDepth The audio bit depth code.
- *      One of "4", "8", "8a", "8m", "16", "24", "32", "32f", "64"
- *      or any value between "8" and "32" (like "12").
- * @param {!Array<number>|!Array<!Array<number>>|!ArrayBufferView} samples
- *      The samples. Must be in the correct range according to the bit depth.
+ *    Integers like 8000, 44100, 48000, 96000, 192000.
+ * @param {string} bitDepthCode The audio bit depth code.
+ *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+ *    or any value between '8' and '32' (like '12').
+ * @param {
+ *      !Array<number> |
+ *      !Array<Array<number>> |
+ *      !TypedArray |
+ *      !Array<TypedArray>
+ *    } samples The samples.
  * @param {?Object} options Optional. Used to force the container
- *      as RIFX with {"container": "RIFX"}
+ *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {}
