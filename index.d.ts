@@ -1,4 +1,4 @@
-// Type definitions for wavefile 10.0
+// Type definitions for wavefile 10.1
 // Project: https://github.com/rochars/wavefile
 // Definitions by: Rafael da Silva Rocha <https://github.com/rochars>
 // Definitions: https://github.com/rochars/wavefile
@@ -101,6 +101,14 @@ declare module wavefile {
      * @type {!Object<string, *>}
      */
     _PMX: object;
+
+    /**
+     * Return the samples packed in a Float64Array.
+     * @param {?boolean} interleaved True to return interleaved samples,
+     *   false to return the samples de-interleaved. Defaults to false.
+     * @return {!Float64Array|Array<Float64Array>} the samples.
+     */
+    getSamples(interleaved?:boolean): Float64Array;
 
     /**
      * Return the sample at a given index.

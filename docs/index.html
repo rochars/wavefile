@@ -190,6 +190,7 @@ let wavDataURI = wav.toDataURI();
 <li><a href="#add-bwf-metadata">Add BWF metadata</a></li>
 <li><a href="#rf64">RF64</a></li>
 <li><a href="#xml-chunks">XML Chunks</a></li>
+<li><a href="#the-samples">The samples</a></li>
 </ul>
 </li>
 <li><a href="#api">API</a>
@@ -204,7 +205,6 @@ let wavDataURI = wav.toDataURI();
 </li>
 </ul>
 </li>
-<li><a href="#the-samples">The samples</a></li>
 <li><a href="#contributing-to-wavefile">Contributing to wavefile</a></li>
 <li><a href="#references">References</a></li>
 <li><a href="#legal">Legal</a></li>
@@ -399,6 +399,43 @@ wav.set_PMX(_PMXValue);
 </code></pre>
 <p>The value for XML chunks must always be a string.</p>
 <p>the <em>chunkSize</em> of the XML chunks will be adjusted when <em>toBuffer()</em> is called.</p>
+<h3>The samples</h3>
+<p>Samples are stored in <em>data.samples</em> as a Uint8Array.</p>
+<p>To get the samples as a Float64Array you should use the <em>getSamples()</em> method:</p>
+<pre class="prettyprint source lang-javascript"><code>let samples = wav.getSamples();
+</code></pre>
+<p>If the file is stereo or have more than one channel then the samples will be returned de-interleaved in a <em>Array</em> of <em>Float64Array</em> objects, one Float64Array for each channel. The method takes a optional boolean param <em>interleaved</em>, set to <strong>false</strong> by default. If set to <strong>true</strong>, samples will be returned interleaved. <strong>Default is de-interleaved</strong>.</p>
+<pre class="prettyprint source lang-javascript"><code>// Both will return de-interleaved samples
+samples = wav.getSamples();
+samples = wav.getSamples(false);
+
+// To get interleaved samples
+samples = wav.getSamples(true);
+</code></pre>
+<p>To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-javascript"><code>wav = new WaveFile();
+
+// some samples
+let samples = [561, 1200, 423];
+
+// Create a WaveFile using the samples
+wav.fromScratch(1, 8000, &quot;16&quot;, samples);
+
+// Getting and setting a sample in the WaveFile instance:
+wav.getSample(1); // return 1200, the value of the second sample
+wav.setSample(1, 10); // change the second sample to 10
+wav.getSample(1); // return 10, the new value of the second sample
+</code></pre>
+<p>Range:</p>
+<ul>
+<li>0 to 255 for 8-bit</li>
+<li>-32768 to 32767 for 16-bit</li>
+<li>-8388608 to 8388607 for 24-bit</li>
+<li>-2147483648 to 2147483647 for 32-bit</li>
+<li>-1.0 to 1.0 for 32-bit (float)</li>
+<li>-1.0 to 1.0 for 64-bit (float)</li>
+</ul>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>/**
@@ -634,6 +671,14 @@ WaveFile.listCuePoints() {}
  * @param {string} label The new text for the label.
  */
 WaveFile.updateLabel(pointIndex, label) {}
+
+/**
+ * Return the samples packed in a Float64Array.
+ * @param {?boolean} interleaved True to return interleaved samples,
+ *   false to return the samples de-interleaved. Defaults to false.
+ * @return {!Float64Array|Array&lt;Float64Array>} the samples.
+ */
+WaveFile.getSamples(interleaved=false) {};
 
 /**
  * Return the sample at a given index.
@@ -1014,32 +1059,6 @@ WaveFile.LIST = [];
 </code></pre>
 <p>Where &quot;chunkId&quot; may be any RIFF tag:<br>
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info</p>
-<h2>The samples</h2>
-<p>Samples are stored in WaveFile.data.samples as a Uint8Array representing a byte buffer. Once you inform the samples with fromScratch() they are packed as bytes and stay that way.</p>
-<p>To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.</p>
-<p>Example:</p>
-<pre class="prettyprint source lang-javascript"><code>wav = new WaveFile();
-
-// some samples
-let samples = [561, 1200, 423];
-
-// Create a WaveFile using the samples
-wav.fromScratch(1, 8000, &quot;16&quot;, samples);
-
-// Getting and setting a sample in the WaveFile instance:
-wav.getSample(1); // return 1200, the value of the second sample
-wav.setSample(1, 10); // change the second sample to 10
-wav.getSample(1); // return 10, the new value of the second sample
-</code></pre>
-<p>Range:</p>
-<ul>
-<li>0 to 255 for 8-bit</li>
-<li>-32768 to 32767 for 16-bit</li>
-<li>-8388608 to 8388607 for 24-bit</li>
-<li>-2147483648 to 2147483647 for 32-bit</li>
-<li>-1.0 to 1.0 for 32-bit (float)</li>
-<li>-1.0 to 1.0 for 64-bit (float)</li>
-</ul>
 <h2>Contributing to wavefile</h2>
 <p><strong>wavefile</strong> welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.</p>
 <p>See <a href="https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> for details.</p>

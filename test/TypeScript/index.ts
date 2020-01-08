@@ -15,6 +15,9 @@ wav.fromScratch(1, 8000, "32", new Float64Array([0]));
 wav.fromScratch(1, 8000, "32", [0]);
 wav.fromScratch(1, 8000, "32", [[0],[0]]);
 
+let samples: Float64Array;
+samples = wav.getSamples();
+
 try {
 	wav.fromBuffer(new Uint8Array([0]));
 } catch (e) {

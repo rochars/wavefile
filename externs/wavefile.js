@@ -23,7 +23,7 @@
  */
 
 /**
- * @fileoverview Externs for wavefile 10.0
+ * @fileoverview Externs for wavefile 10.1
  * @see https://github.com/rochars/wavefile
  * @externs
  */
@@ -315,6 +315,14 @@ WaveFile.prototype._PMX = {
  * @type {string}
  */
 WaveFile.prototype.bitDepth = '';
+
+/**
+ * Return the samples packed in a Float64Array.
+ * @param {?boolean} interleaved True to return interleaved samples,
+ *   false to return the samples de-interleaved. Defaults to false.
+ * @return {!Float64Array|Array<Float64Array>} the samples.
+ */
+WaveFile.prototype.getSamples = function(interleaved=false) {};
 
 /**
  * Return the sample at a given index.

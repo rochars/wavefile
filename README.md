@@ -159,13 +159,13 @@ let wavDataURI = wav.toDataURI();
   * [Add BWF metadata](#add-bwf-metadata)
   * [RF64](#rf64)
   * [XML Chunks](#xml-chunks)
+  * [The samples](#the-samples)
 - [API](#api)
   * [The WaveFile methods:](#the-wavefile-methods-)
   * [The WaveFile properties](#the-wavefile-properties)
     + [Cue points](#cue-points)
     + [Sample loops](#sample-loops)
     + [LIST chunk](#list-chunk)
-- [The samples](#the-samples)
 - [Contributing to wavefile](#contributing-to-wavefile)
 - [References](#references)
 - [Legal](#legal)
@@ -421,6 +421,49 @@ The value for XML chunks must always be a string.
 
 the *chunkSize* of the XML chunks will be adjusted when *toBuffer()* is called.
 
+### The samples
+Samples are stored in *data.samples* as a Uint8Array.
+
+To get the samples as a Float64Array you should use the *getSamples()* method:
+```javascript
+let samples = wav.getSamples();
+```
+If the file is stereo or have more than one channel then the samples will be returned de-interleaved in a *Array* of *Float64Array* objects, one Float64Array for each channel. The method takes a optional boolean param *interleaved*, set to **false** by default. If set to **true**, samples will be returned interleaved. **Default is de-interleaved**.
+```javascript
+// Both will return de-interleaved samples
+samples = wav.getSamples();
+samples = wav.getSamples(false);
+
+// To get interleaved samples
+samples = wav.getSamples(true);
+```
+
+To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.
+
+Example:
+```javascript
+wav = new WaveFile();
+
+// some samples
+let samples = [561, 1200, 423];
+
+// Create a WaveFile using the samples
+wav.fromScratch(1, 8000, "16", samples);
+
+// Getting and setting a sample in the WaveFile instance:
+wav.getSample(1); // return 1200, the value of the second sample
+wav.setSample(1, 10); // change the second sample to 10
+wav.getSample(1); // return 10, the new value of the second sample
+```
+
+Range:
+- 0 to 255 for 8-bit
+- -32768 to 32767 for 16-bit
+- -8388608 to 8388607 for 24-bit
+- -2147483648 to 2147483647 for 32-bit
+- -1.0 to 1.0 for 32-bit (float)
+- -1.0 to 1.0 for 64-bit (float)
+
 ## API
 To create a WaveFile object:
 ```javascript
@@ -659,6 +702,14 @@ WaveFile.listCuePoints() {}
  * @param {string} label The new text for the label.
  */
 WaveFile.updateLabel(pointIndex, label) {}
+
+/**
+ * Return the samples packed in a Float64Array.
+ * @param {?boolean} interleaved True to return interleaved samples,
+ *   false to return the samples de-interleaved. Defaults to false.
+ * @return {!Float64Array|Array<Float64Array>} the samples.
+ */
+WaveFile.getSamples(interleaved=false) {};
 
 /**
  * Return the sample at a given index.
@@ -1053,35 +1104,6 @@ For "LIST" chunks with the "INFO" format, "subChunks" will be an array of object
 ```
 Where "chunkId" may be any RIFF tag:  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
-
-## The samples
-Samples are stored in WaveFile.data.samples as a Uint8Array representing a byte buffer. Once you inform the samples with fromScratch() they are packed as bytes and stay that way.
-
-To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.
-
-Example:
-```javascript
-wav = new WaveFile();
-
-// some samples
-let samples = [561, 1200, 423];
-
-// Create a WaveFile using the samples
-wav.fromScratch(1, 8000, "16", samples);
-
-// Getting and setting a sample in the WaveFile instance:
-wav.getSample(1); // return 1200, the value of the second sample
-wav.setSample(1, 10); // change the second sample to 10
-wav.getSample(1); // return 10, the new value of the second sample
-```
-
-Range:
-- 0 to 255 for 8-bit
-- -32768 to 32767 for 16-bit
-- -8388608 to 8388607 for 24-bit
-- -2147483648 to 2147483647 for 32-bit
-- -1.0 to 1.0 for 32-bit (float)
-- -1.0 to 1.0 for 64-bit (float)
 
 ## Contributing to wavefile
 **wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.

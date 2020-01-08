@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## version 10.1.0 - 2020-01-08
+Add *getSamples()* to the API. It returns the samples packed in a Float64Array.
+If the file have more than one channel, samples will be returned de-interleaved
+in a Array of Float64Array objects, one for each channel. The method takes a
+optional boolean param *interleaved*, set to **false** by default. If set to
+**true**, samples will be returned interleaved. **Default is de-interleaved**.
+```javascript
+// Both will return de-interleaved samples
+samples = wav.getSamples();
+samples = wav.getSamples(false);
+
+// To get interleaved samples
+samples = wav.getSamples(true);
+```
+
 ## version 10.0.0 - 2020-01-07
 Better handling of cue points and regions.
 
