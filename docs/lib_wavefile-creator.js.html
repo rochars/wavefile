@@ -73,8 +73,8 @@
 
 import { WaveFileParser } from './wavefile-parser';
 import { interleave, deInterleave } from './parsers/interleave';
-import { validateNumChannels } from './validate-num-channels'; 
-import { validateSampleRate } from './validate-sample-rate';
+import { validateNumChannels } from './validators/validate-num-channels'; 
+import { validateSampleRate } from './validators/validate-sample-rate';
 import { packArrayTo, unpackArrayTo, packTo, unpack } from 'byte-data';
 
 /**
