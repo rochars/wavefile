@@ -71,13 +71,12 @@
  * @see https://github.com/rochars/wavefile
  */
 
-import { changeBitDepth as bitDepthLib } from 'bitdepth';
+import { changeBitDepth } from 'bitdepth';
 import * as imaadpcm from 'imaadpcm';
 import * as alawmulaw from 'alawmulaw';
 import { unpackArray, unpackArrayTo } from 'byte-data';
 import { WaveFileMetaEditor } from './wavefile-meta-editor';
-import { truncateSamples,
-  truncateIntSamples } from './parsers/truncate-samples';
+import { truncateIntSamples } from './parsers/truncate-samples';
 import { validateSampleRate } from './validators/validate-sample-rate';
 import { resample } from './resampler';
 
@@ -242,24 +241,27 @@ export class WaveFileConverter extends WaveFileMetaEditor {
       }
       thisBitDepth = '' + this.dataType.bits;
     }
+    // If the file is compressed, make it
+    // PCM before changing the bit depth
     this.assureUncompressed_();
-    /** @type {number} */
-    let sampleCount = this.data.samples.length / (this.dataType.bits / 8);
-    /** @type {!Float64Array} */
-    let typedSamplesInput = new Float64Array(sampleCount);
-    /** @type {!Float64Array} */
-    let typedSamplesOutput = new Float64Array(sampleCount);
-    unpackArrayTo(this.data.samples, this.dataType, typedSamplesInput);
-    if (thisBitDepth == "32f" || thisBitDepth == "64") {
-      truncateSamples(typedSamplesInput);
-    }
-    bitDepthLib(
-      typedSamplesInput, thisBitDepth, toBitDepth, typedSamplesOutput);
+    /**
+     * The original samples, interleaved.
+     * @type {!Array|!TypedArray}
+     */
+    let samples = this.getSamples(true);
+    /**
+     * The container for the new samples.
+     * @type {!Float64Array}
+     */
+    let newSamples = new Float64Array(samples.length);
+    // Change the bit depth
+    changeBitDepth(samples, thisBitDepth, newSamples, toBitDepth);
+    // Re-create the file
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       newBitDepth,
-      typedSamplesOutput,
+      newSamples,
       {container: this.correctContainer_()});
   }
 
@@ -286,8 +288,10 @@ export class WaveFileConverter extends WaveFileMetaEditor {
     }
     // Truncate samples
     if (this.bitDepth !== '64' &amp;&amp; this.bitDepth !== '32f') {
+      // Truncate samples in mono files
       if (newSamples[0].constructor === Number) {
         truncateIntSamples(newSamples, this.dataType.bits);
+      // Truncate samples in multi-channel files
       } else {
         for (let i = 0; i &lt; newSamples.length; i++) {
           truncateIntSamples(newSamples[i], this.dataType.bits);
