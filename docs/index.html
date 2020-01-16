@@ -390,6 +390,16 @@ fs.writeFileSync(&quot;44100Hz-file.wav&quot;, wav.toBuffer());
 <pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
 wav.toSampleRate(44100, {method: &quot;sinc&quot;});
 </code></pre>
+<h4>Changing the sample rate of ADPCM, mu-Law or A-Law</h4>
+<p>You need to convert compressed files to standard PCM before resampling:</p>
+<p>To resample a mu-Law file:</p>
+<pre class="prettyprint source lang-javascript"><code>// convert the file to PCM
+wav.fromMuLaw();
+// resample
+wav.toSampleRate(44100, {method: &quot;sinc&quot;});
+// back to mu-Law
+wav.toMuLaw();
+</code></pre>
 <h3>Add BWF metadata</h3>
 <p>To add BWF data to a file you can use the <strong>bext</strong> property:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with no &quot;bext&quot;

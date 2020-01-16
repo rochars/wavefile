@@ -405,6 +405,19 @@ To use another method:
 wav.toSampleRate(44100, {method: "sinc"});
 ```
 
+#### Changing the sample rate of ADPCM, mu-Law or A-Law
+You need to convert compressed files to standard PCM before resampling:
+
+To resample a mu-Law file:
+```javascript
+// convert the file to PCM
+wav.fromMuLaw();
+// resample
+wav.toSampleRate(44100, {method: "sinc"});
+// back to mu-Law
+wav.toMuLaw();
+```
+
 ### Add BWF metadata
 To add BWF data to a file you can use the **bext** property:
 ```javascript
