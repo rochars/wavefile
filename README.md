@@ -156,6 +156,7 @@ let wavDataURI = wav.toDataURI();
   * [A-Law](#a-law)
   * [mu-Law](#mu-law)
   * [Change the bit depth](#change-the-bit-depth)
+  * [Change the sample rate](#change-the-sample-rate)
   * [Add BWF metadata](#add-bwf-metadata)
   * [RF64](#rf64)
   * [XML Chunks](#xml-chunks)
@@ -382,6 +383,28 @@ wav.toBitDepth("24");
 fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 ```
 
+### Change the sample rate
+You can change the sample rate of the audio with the **toSampleRate()** method. By default, **cubic interpolation** is used to resample the data. You can use **cubic** and **sinc**.
+```javascript
+// Load a wav file with 16kHz audio
+let wav = new WaveFile(fs.readFileSync("16kHz-file.wav"));
+
+// Change the bit depth to 44.1kHz
+// using the default configuration
+wav.toSampleRate(41000);
+// this is the same as:
+// wav.toSampleRate(41000, {method: "cubic"});
+
+// Write the new 44.1kHz file
+fs.writeFileSync("44100Hz-file.wav", wav.toBuffer());
+```
+
+To use another method:
+```javascript
+// Change the bit depth to 44.1kHz using sinc
+wav.toSampleRate(41000, {method: "sinc"});
+```
+
 ### Add BWF metadata
 To add BWF data to a file you can use the **bext** property:
 ```javascript
@@ -564,6 +587,21 @@ WaveFile.toRIFX() {}
  * @throws {Error} If the bit depth is not valid.
  */
 WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
+
+/**
+ * Convert the sample rate of the audio.
+ * @param {number} sampleRate The target sample rate.
+ * @param {?{
+ *   method: ?string,
+ *   clip: ?string,
+ *   tension: ?number,
+ *   sincFilterSize: ?number,
+ *   lanczosFilterSize: ?number,
+ *   sincWindow: ?function
+ * }} details The extra configuration, if needed.
+ *   are available.
+ */
+WaveFile.toSampleRate(sampleRate, details={}) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.

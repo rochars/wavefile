@@ -1,4 +1,4 @@
-// Type definitions for wavefile 10.1
+// Type definitions for wavefile 10.2
 // Project: https://github.com/rochars/wavefile
 // Definitions by: Rafael da Silva Rocha <https://github.com/rochars>
 // Definitions: https://github.com/rochars/wavefile
@@ -134,7 +134,7 @@ declare module wavefile {
      * @param {string} bitDepthCode The audio bit depth code.
      *  One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
      *  or any value between '8' and '32' (like '12').
-     * @param {!Array<number>|!Array<Array<number>>|!TypedArray|!!Array<TypedArray>} samples
+     * @param {!Array|!TypedArray} samples
      * @param {?Object} options Optional. Used to force the container
      *  as RIFX with {'container': 'RIFX'}
      * @throws {Error} If any argument does not meet the criteria.
@@ -212,6 +212,13 @@ declare module wavefile {
      * @throws {Error} If the bit depth is not valid.
      */
     toBitDepth(newBitDepth: string, changeResolution?: boolean): void;
+
+    /**
+     * Convert the sample rate of the audio.
+     * @param {number} sampleRate The target sample rate.
+     * @param {?Object} details The extra configuration, if needed.
+     */
+    toSampleRate(samples: number, details?:object): void;
 
     /**
      * Encode a 16-bit wave file as 4-bit IMA ADPCM.

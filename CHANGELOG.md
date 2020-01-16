@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## version 10.2.0 - unreleased
+Change the sample rate.
+
+### New Features:
+Change the sample rate with ```wav.toSampleRate();```
+
+### Fixes:
+- Bug that prevented creating multi channel files using a array of typed arrays for samples
+- Type declaration for sample arrays now use more generic types to ease integration
+
+
 ## version 10.1.0 - 2020-01-08
 Add *getSamples()* to the API. It returns the samples packed in a Float64Array.
 If the file have more than one channel, samples will be returned de-interleaved

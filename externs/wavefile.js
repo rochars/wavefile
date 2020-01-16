@@ -23,7 +23,7 @@
  */
 
 /**
- * @fileoverview Externs for wavefile 10.1
+ * @fileoverview Externs for wavefile 10.2
  * @see https://github.com/rochars/wavefile
  * @externs
  */
@@ -428,6 +428,21 @@ WaveFile.prototype.toRIFX = function() {};
  * @throws {Error} If the bit depth is not valid.
  */
 WaveFile.prototype.toBitDepth = function(newBitDepth, changeResolution=true) {};
+
+/**
+ * Convert the sample rate of the audio.
+ * @param {number} sampleRate The target sample rate.
+ * @param {?Object} details The extra configuration, if needed.
+ */
+WaveFile.prototype.toSampleRate = function(
+  sampleRate, details= {
+    method: 'cubic',
+    clip: 'mirror',
+    tension: 0,
+    sincFilterSize: 32,
+    lanczosFilterSize: 24,
+    sincWindow: function(x){},
+    LPForder: 1}) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.

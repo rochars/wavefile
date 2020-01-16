@@ -27,7 +27,7 @@
 
 <nav >
     
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toSampleRate">toSampleRate</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
 </nav>
 
 <div id="main">
@@ -187,6 +187,7 @@ let wavDataURI = wav.toDataURI();
 <li><a href="#a-law">A-Law</a></li>
 <li><a href="#mu-law">mu-Law</a></li>
 <li><a href="#change-the-bit-depth">Change the bit depth</a></li>
+<li><a href="#change-the-sample-rate">Change the sample rate</a></li>
 <li><a href="#add-bwf-metadata">Add BWF metadata</a></li>
 <li><a href="#rf64">RF64</a></li>
 <li><a href="#xml-chunks">XML Chunks</a></li>
@@ -371,6 +372,24 @@ wav.toBitDepth(&quot;24&quot;);
 // Write the new 24-bit file
 fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
 </code></pre>
+<h3>Change the sample rate</h3>
+<p>You can change the sample rate of the audio with the <strong>toSampleRate()</strong> method. By default, <strong>cubic interpolation</strong> is used to resample the data. You can use <strong>cubic</strong> and <strong>sinc</strong>.</p>
+<pre class="prettyprint source lang-javascript"><code>// Load a wav file with 16kHz audio
+let wav = new WaveFile(fs.readFileSync(&quot;16kHz-file.wav&quot;));
+
+// Change the bit depth to 44.1kHz
+// using the default configuration
+wav.toSampleRate(41000);
+// this is the same as:
+// wav.toSampleRate(41000, {method: &quot;cubic&quot;});
+
+// Write the new 44.1kHz file
+fs.writeFileSync(&quot;44100Hz-file.wav&quot;, wav.toBuffer());
+</code></pre>
+<p>To use another method:</p>
+<pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
+wav.toSampleRate(41000, {method: &quot;sinc&quot;});
+</code></pre>
 <h3>Add BWF metadata</h3>
 <p>To add BWF data to a file you can use the <strong>bext</strong> property:</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with no &quot;bext&quot;
@@ -533,6 +552,21 @@ WaveFile.toRIFX() {}
  * @throws {Error} If the bit depth is not valid.
  */
 WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
+
+/**
+ * Convert the sample rate of the audio.
+ * @param {number} sampleRate The target sample rate.
+ * @param {?{
+ *   method: ?string,
+ *   clip: ?string,
+ *   tension: ?number,
+ *   sincFilterSize: ?number,
+ *   lanczosFilterSize: ?number,
+ *   sincWindow: ?function
+ * }} details The extra configuration, if needed.
+ *   are available.
+ */
+WaveFile.toSampleRate(sampleRate, details={}) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.

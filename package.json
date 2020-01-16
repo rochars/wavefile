@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -36,7 +36,8 @@
     "mu-Law",
     "_PMX",
     "iXML",
-    "cue"
+    "cue",
+    "resampler"
   ],
   "repository": {
     "type": "git",
@@ -67,14 +68,16 @@
   ],
   "scripts": {
     "lint": "jshint index.js bin externs lib test/src",
-    "test": "nyc ./node_modules/mocha/bin/_mocha test/dist test/src test/wavefile-parser test/lib --recursive -R dot --timeout=1600000",
-    "test-umd": "node ./node_modules/mocha/bin/_mocha test/dist test/src --umd --recursive -R dot --timeout=240000",
+    "test": "nyc ./node_modules/mocha/bin/_mocha test/resampler test/dist test/src test/wavefile-parser test/lib --recursive -R dot --timeout=1600000",
+    "test-sr": "nyc ./node_modules/mocha/bin/_mocha test/resampler-full -R dot --timeout=1600000",
+    "test-sr-sinc": "nyc ./node_modules/mocha/bin/_mocha test/resampler-full/sinc.js -R dot --timeout=1600000",
+    "test-umd": "node ./node_modules/mocha/bin/_mocha test/resampler test/dist test/src --umd --recursive -R dot --timeout=240000",
     "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
     "test-dist": "npm run test-umd && npm run test-tsc && npm run test-cli",
-    "rollup-bundle": "npm test && rollup -c && npm run test-dist",
+    "rollup-bundle": "rollup -c && npm run test-dist",
     "doc": "./node_modules/.bin/jsdoc -c .jsdocrc -d docs -r README.md -t node_modules/docdash",
-    "build": "npm run lint && npm run rollup-bundle && npm run doc",
+    "build": "npm run lint && npm test && npm run rollup-bundle && npm run doc",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
