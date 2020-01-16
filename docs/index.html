@@ -379,16 +379,16 @@ let wav = new WaveFile(fs.readFileSync(&quot;16kHz-file.wav&quot;));
 
 // Change the bit depth to 44.1kHz
 // using the default configuration
-wav.toSampleRate(41000);
+wav.toSampleRate(44100);
 // this is the same as:
-// wav.toSampleRate(41000, {method: &quot;cubic&quot;});
+// wav.toSampleRate(44100, {method: &quot;cubic&quot;});
 
 // Write the new 44.1kHz file
 fs.writeFileSync(&quot;44100Hz-file.wav&quot;, wav.toBuffer());
 </code></pre>
 <p>To use another method:</p>
 <pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
-wav.toSampleRate(41000, {method: &quot;sinc&quot;});
+wav.toSampleRate(44100, {method: &quot;sinc&quot;});
 </code></pre>
 <h3>Add BWF metadata</h3>
 <p>To add BWF data to a file you can use the <strong>bext</strong> property:</p>
@@ -475,12 +475,7 @@ WaveFile(bytes=null);
  * @param {string} bitDepthCode The audio bit depth code.
  *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
  *    or any value between '8' and '32' (like '12').
- * @param {
- *      !Array&lt;number> |
- *      !Array&lt;Array&lt;number>> |
- *      !TypedArray |
- *      !Array&lt;TypedArray>
- *    } samples The samples.
+ * @param {!Array|!TypedArray} samples The samples.
  * @param {?Object} options Optional. Used to force the container
  *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
@@ -556,15 +551,7 @@ WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
 /**
  * Convert the sample rate of the audio.
  * @param {number} sampleRate The target sample rate.
- * @param {?{
- *   method: ?string,
- *   clip: ?string,
- *   tension: ?number,
- *   sincFilterSize: ?number,
- *   lanczosFilterSize: ?number,
- *   sincWindow: ?function
- * }} details The extra configuration, if needed.
- *   are available.
+ * @param {?Object} details The extra configuration, if needed.
  */
 WaveFile.toSampleRate(sampleRate, details={}) {};
 

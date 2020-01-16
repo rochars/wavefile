@@ -391,9 +391,9 @@ let wav = new WaveFile(fs.readFileSync("16kHz-file.wav"));
 
 // Change the bit depth to 44.1kHz
 // using the default configuration
-wav.toSampleRate(41000);
+wav.toSampleRate(44100);
 // this is the same as:
-// wav.toSampleRate(41000, {method: "cubic"});
+// wav.toSampleRate(44100, {method: "cubic"});
 
 // Write the new 44.1kHz file
 fs.writeFileSync("44100Hz-file.wav", wav.toBuffer());
@@ -402,7 +402,7 @@ fs.writeFileSync("44100Hz-file.wav", wav.toBuffer());
 To use another method:
 ```javascript
 // Change the bit depth to 44.1kHz using sinc
-wav.toSampleRate(41000, {method: "sinc"});
+wav.toSampleRate(44100, {method: "sinc"});
 ```
 
 ### Add BWF metadata
@@ -510,12 +510,7 @@ WaveFile(bytes=null);
  * @param {string} bitDepthCode The audio bit depth code.
  *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
  *    or any value between '8' and '32' (like '12').
- * @param {
- *      !Array<number> |
- *      !Array<Array<number>> |
- *      !TypedArray |
- *      !Array<TypedArray>
- *    } samples The samples.
+ * @param {!Array|!TypedArray} samples The samples.
  * @param {?Object} options Optional. Used to force the container
  *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
@@ -591,15 +586,7 @@ WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
 /**
  * Convert the sample rate of the audio.
  * @param {number} sampleRate The target sample rate.
- * @param {?{
- *   method: ?string,
- *   clip: ?string,
- *   tension: ?number,
- *   sincFilterSize: ?number,
- *   lanczosFilterSize: ?number,
- *   sincWindow: ?function
- * }} details The extra configuration, if needed.
- *   are available.
+ * @param {?Object} details The extra configuration, if needed.
  */
 WaveFile.toSampleRate(sampleRate, details={}) {};
 

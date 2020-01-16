@@ -348,12 +348,7 @@ WaveFile.prototype.setSample = function(index, sample) {};
  * @param {string} bitDepthCode The audio bit depth code.
  *      One of 4, 8, 8a, 8m, 16, 24, 32, 32f, 64
  *      or any value between 8 and 32 (like 12).
- * @param {
- *      !Array<number> |
- *      !Array<Array<number>> |
- *      !TypedArray |
- *      !Array<TypedArray>
- *    } samples The samples.
+ * @param {!Array|!TypedArray} samples The samples.
  * @param {?Object} options Optional. Used to force the container
  *      as RIFX with {container: RIFX}
  * @throws {Error} If any argument does not meet the criteria.
