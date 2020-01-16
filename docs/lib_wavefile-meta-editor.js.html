@@ -72,7 +72,6 @@
  */
 
 import { WaveFileCreator } from './wavefile-creator';
-import fixRIFFTag from './fix-riff-tag';
 
 /**
  * A class to edit meta information in wav files.
@@ -103,7 +102,7 @@ export class WaveFileMetaEditor extends WaveFileCreator {
    * @throws {Error} If the tag name is not valid.
    */
   setTag(tag, value) {
-    tag = fixRIFFTag(tag);
+    tag = fixRIFFTag_(tag);
     /** @type {!Object} */
     let index = this.getTagIndex_(tag);
     if (index.TAG !== null) {
@@ -603,6 +602,23 @@ export class WaveFileMetaEditor extends WaveFileCreator {
     });
     this.LIST[adtlIndex].chunkSize += 28;
   }
+}
+
+/**
+ * Fix a RIFF tag format if possible, throw an error otherwise.
+ * @param {string} tag The tag name.
+ * @return {string} The tag name in proper fourCC format.
+ * @private
+ */
+function fixRIFFTag_(tag) {
+  if (tag.constructor !== String) {
+    throw new Error('Invalid tag name.');
+  } else if (tag.length &lt; 4) {
+    for (let i = 0, len = 4 - tag.length; i &lt; len; i++) {
+      tag += ' ';
+    }
+  }
+  return tag;
 }
 </code></pre>
         </article>
