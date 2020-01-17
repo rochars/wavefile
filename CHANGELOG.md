@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## version 10.2.0 - unreleased
+## version 10.2.0 - 2020-01-16
 Change the sample rate.
 
 ### New Features:
