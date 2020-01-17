@@ -23,6 +23,7 @@ With **wavefile** you can:
 - Create wav files
 - Read wav files
 - Change the bit depth of the audio
+- Change the sample rate of the audio
 - Read and write RIFF tags
 - Set and delete cue points and their labels
 - Create regions in wav files
@@ -371,7 +372,7 @@ wav.fromMuLaw("24");
 ```
 
 ### Change the bit depth
-You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method.
+You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method. WaveFile only change the bit depth of the samples; no dithering is done.
 ```javascript
 // Load a wav file with 32-bit audio
 let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
@@ -675,16 +676,7 @@ WaveFile.listTags() {}
 
 /**
  * Create a cue point in the wave file.
- * @param {!{
- *   position: number,
- *   label: ?string,
- *   end: ?number,
- *   dwPurposeID: ?number,
- *   dwCountry: ?number,
- *   dwLanguage: ?number,
- *   dwDialect: ?number,
- *   dwCodePage: ?number
- * }} pointData A object with the data of the cue point.
+ * @param {!Object} pointData A object with the data of the cue point.
  *
  * # Only required attribute to create a cue point:
  * pointData.position: The position of the point in milliseconds
@@ -703,6 +695,18 @@ WaveFile.listTags() {}
  * pointData.dwLanguage
  * pointData.dwDialect
  * pointData.dwCodePage
+ * 
+ * # This is what a complete pointData object look like:
+ * {
+ *   position: number,
+ *   label: ?string,
+ *   end: ?number,
+ *   dwPurposeID: ?number,
+ *   dwCountry: ?number,
+ *   dwLanguage: ?number,
+ *   dwDialect: ?number,
+ *   dwCodePage: ?number
+ * }
  */
 WaveFile.setCuePoint(pointData) {}
 

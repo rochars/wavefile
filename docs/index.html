@@ -77,6 +77,7 @@ https://github.com/rochars/wavefile</p>
 <li>Create wav files</li>
 <li>Read wav files</li>
 <li>Change the bit depth of the audio</li>
+<li>Change the sample rate of the audio</li>
 <li>Read and write RIFF tags</li>
 <li>Set and delete cue points and their labels</li>
 <li>Create regions in wav files</li>
@@ -362,7 +363,7 @@ wav.fromMuLaw();
 wav.fromMuLaw(&quot;24&quot;);
 </code></pre>
 <h3>Change the bit depth</h3>
-<p>You can change the bit depth of the audio with the <strong>toBitDepth(bitDepth)</strong> method.</p>
+<p>You can change the bit depth of the audio with the <strong>toBitDepth(bitDepth)</strong> method. WaveFile only change the bit depth of the samples; no dithering is done.</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with 32-bit audio
 let wav = new WaveFile(fs.readFileSync(&quot;32bit-file.wav&quot;));
 
@@ -637,16 +638,7 @@ WaveFile.listTags() {}
 
 /**
  * Create a cue point in the wave file.
- * @param {!{
- *   position: number,
- *   label: ?string,
- *   end: ?number,
- *   dwPurposeID: ?number,
- *   dwCountry: ?number,
- *   dwLanguage: ?number,
- *   dwDialect: ?number,
- *   dwCodePage: ?number
- * }} pointData A object with the data of the cue point.
+ * @param {!Object} pointData A object with the data of the cue point.
  *
  * # Only required attribute to create a cue point:
  * pointData.position: The position of the point in milliseconds
@@ -665,6 +657,18 @@ WaveFile.listTags() {}
  * pointData.dwLanguage
  * pointData.dwDialect
  * pointData.dwCodePage
+ * 
+ * # This is what a complete pointData object look like:
+ * {
+ *   position: number,
+ *   label: ?string,
+ *   end: ?number,
+ *   dwPurposeID: ?number,
+ *   dwCountry: ?number,
+ *   dwLanguage: ?number,
+ *   dwDialect: ?number,
+ *   dwCodePage: ?number
+ * }
  */
 WaveFile.setCuePoint(pointData) {}
 
