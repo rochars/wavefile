@@ -13,6 +13,8 @@ const path = "./test/files/";
 
 console.log('linear');
 
+let hrstart = process.hrtime();
+
 // Chirps, FP
 
 describe('Downsample a 32-bit 44.1kHz log sine sweep', function() {
@@ -158,3 +160,6 @@ describe('Upsample a 16bit 44.1kHz file', function() {
     path + "/out/to-sample-rate/linear-song1-96kHz.wav",
     wav.toBuffer());
 });
+
+hrend = process.hrtime(hrstart);
+console.info('%ds %dms', hrend[0], hrend[1] / 1000000);
