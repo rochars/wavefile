@@ -74,4 +74,11 @@ describe('Resampling interface tests', function() {
         wav.toSampleRate(16000);
      }, Error);
   });
+
+  // Configuration 
+  it("Use no LPF during resample", function() {
+    let wav = new WaveFile();
+    wav.fromScratch(1, 16000, '16', [1,2])
+    wav.toSampleRate(32000, {LPF: false});
+  });
 });

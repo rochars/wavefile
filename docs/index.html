@@ -391,6 +391,10 @@ fs.writeFileSync(&quot;44100Hz-file.wav&quot;, wav.toBuffer());
 <pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
 wav.toSampleRate(44100, {method: &quot;sinc&quot;});
 </code></pre>
+<p>By default a low-pass filter is used when resampling. You can turn this off:</p>
+<pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
+wav.toSampleRate(44100, {method: &quot;sinc&quot;, LPF: false});
+</code></pre>
 <h4>Changing the sample rate of ADPCM, mu-Law or A-Law</h4>
 <p>You need to convert compressed files to standard PCM before resampling:</p>
 <p>To resample a mu-Law file:</p>

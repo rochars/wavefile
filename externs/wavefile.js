@@ -437,7 +437,8 @@ WaveFile.prototype.toSampleRate = function(
     sincFilterSize: 32,
     lanczosFilterSize: 24,
     sincWindow: function(x){},
-    LPForder: 1}) {};
+    LPForder: 1,
+    LPF: true}) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.

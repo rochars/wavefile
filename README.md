@@ -406,6 +406,12 @@ To use another method:
 wav.toSampleRate(44100, {method: "sinc"});
 ```
 
+By default a low-pass filter is used when resampling. You can turn this off:
+```javascript
+// Change the bit depth to 44.1kHz using sinc
+wav.toSampleRate(44100, {method: "sinc", LPF: false});
+```
+
 #### Changing the sample rate of ADPCM, mu-Law or A-Law
 You need to convert compressed files to standard PCM before resampling:
 
