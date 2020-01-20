@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "10.3.0",
+  "version": "10.3.1",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",

@@ -252,7 +252,7 @@ export class WaveFileCueEditor extends WaveFileTagEditor {
    */
   updateLabel(pointIndex, label) {
     /** @type {?number} */
-    let cIndex = this.getAdtlChunk_();
+    let cIndex = this.getLISTIndex('adtl');
     if (cIndex !== null) {
       for (let i = 0, len = this.LIST[cIndex].subChunks.length; i &lt; len; i++) {
         if (this.LIST[cIndex].subChunks[i].dwName ==
@@ -296,7 +296,7 @@ export class WaveFileCueEditor extends WaveFileTagEditor {
    */
   getDataForCuePoint_(pointDwName) {
     /** @type {?number} */
-    let LISTindex = this.getAdtlChunk_();
+    let LISTindex = this.getLISTIndex('adtl');
     /** @type {!Object} */
     let pointData = {};
     // If there is a adtl LIST in the file, look for
@@ -338,20 +338,6 @@ export class WaveFileCueEditor extends WaveFileTagEditor {
         pointData.dwCodePage = chunk.dwCodePage || 0;
       }
     }
-  }
-
-  /**
-   * Return the index of the 'adtl' LIST in this.LIST.
-   * @return {?number}
-   * @private
-   */
-  getAdtlChunk_() {
-    for (let i = 0, len = this.LIST.length; i &lt; len; i++) {
-      if (this.LIST[i].format == 'adtl') {
-        return i;
-      }
-    }
-    return null;
   }
 
   /**
@@ -436,7 +422,7 @@ export class WaveFileCueEditor extends WaveFileTagEditor {
      * A file can have many LIST chunks with unique labels.
      * @type {?number}
      */
-    let adtlIndex = this.getAdtlChunk_();
+    let adtlIndex = this.getLISTIndex('adtl');
     // If there is no adtl LIST, create one
     if (adtlIndex === null) {
       // Include a new item LIST chunk
