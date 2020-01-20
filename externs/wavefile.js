@@ -320,13 +320,13 @@ WaveFile.prototype.bitDepth = '';
  * Return the samples packed in a Float64Array.
  * @param {?boolean} interleaved True to return interleaved samples,
  *   false to return the samples de-interleaved. Defaults to false.
- * @param {?Function=} outputObject The Typed Array object to write the
+ * @param {?Function=} OutputObject The Typed Array object to write the
    *   samples. Assumes Float64Array by default.
  * @return {!Float64Array|Array<Float64Array>} the samples.
  */
 WaveFile.prototype.getSamples = function(
   interleaved=false,
-  outputObject=Float64Array) {};
+  OutputObject=Float64Array) {};
 
 /**
  * Return the sample at a given index.

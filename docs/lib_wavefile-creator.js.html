@@ -168,22 +168,22 @@ export class WaveFileCreator extends WaveFileParser {
    * Return the samples packed in a Float64Array.
    * @param {?boolean} interleaved True to return interleaved samples,
    *   false to return the samples de-interleaved. Defaults to false.
-   * @param {?Function=} outputObject The Typed Array object to write the
+   * @param {?Function=} OutputObject The Typed Array object to write the
    *   samples. Assumes Float64Array by default.
    * @return {!Array|!TypedArray} the samples.
    */
-  getSamples(interleaved=false, outputObject=Float64Array) {
+  getSamples(interleaved=false, OutputObject=Float64Array) {
     /**
      * A Float64Array created with a size to match the
      * the length of the samples.
      * @type {!Array|!TypedArray}
      */
-    let samples = new outputObject(
+    let samples = new OutputObject(
       this.data.samples.length / (this.dataType.bits / 8));
     // Unpack all the samples
     unpackArrayTo(this.data.samples, this.dataType, samples);
     if (!interleaved &amp;&amp; this.fmt.numChannels > 1) {
-      return deInterleave(samples, this.fmt.numChannels, outputObject);
+      return deInterleave(samples, this.fmt.numChannels, OutputObject);
     }
     return samples;
   }

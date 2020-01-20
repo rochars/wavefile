@@ -483,10 +483,14 @@ samples = wav.getSamples(true);
 
 You can use any typed array as the output of *getSamples()*:
 ```javascript
-// Will return the samples in a Int32Array
+// Will return the samples de-interleaved,
+// packed in a array of Int32Array objects, one for each channel
 samples = wav.getSamples(false, Int32Array);
-// Will return the samples in a Uint8Array
-samples = wav.getSamples(false, Uint8Array);
+// will return the samples de-interleaved,
+// packed in a array of Int16Array objects, one for each channel
+let samples = getSamples(false, Int16Array);
+// will return the samples interleaved, packed in a Int16Array
+let samples = getSamples(true, Int16Array);
 ```
 
 
@@ -768,11 +772,11 @@ WaveFile.updateLabel(pointIndex, label) {}
  * Return the samples packed in a Float64Array.
  * @param {?boolean} interleaved True to return interleaved samples,
  *   false to return the samples de-interleaved. Defaults to false.
- * @param {?Function=} outputObject The Typed Array object to write the
+ * @param {?Function=} OutputObject The Typed Array object to write the
    *   samples. Assumes Float64Array by default.
  * @return {!Float64Array|Array<Float64Array>} the samples.
  */
-WaveFile.getSamples(interleaved=false, outputObject=Float64Array) {};
+WaveFile.getSamples(interleaved=false, OutputObject=Float64Array) {};
 
 /**
  * Return the sample at a given index.

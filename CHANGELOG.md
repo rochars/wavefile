@@ -13,8 +13,14 @@ wav.toSampleRate(44100, {method: 'cubic'}); // will use LPF
 
 - You can now use any Typed Array as the output for ```getSamples()```:
 ```javascript
-// will return the samples packed in a Int16Array
-getSamples(interleaved=false, outputObject=Int16Array) {
+// Will return the samples de-interleaved,
+// packed in a array of Int32Array objects, one for each channel
+samples = wav.getSamples(false, Int32Array);
+// will return the samples de-interleaved,
+// packed in a array of Int16Array objects, one for each channel
+let samples = getSamples(false, Int16Array);
+// will return the samples interleaved, packed in a Int16Array
+let samples = getSamples(true, Int16Array);
 ```
 
 ## version 10.2.0 - 2020-01-16
