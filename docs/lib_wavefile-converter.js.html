@@ -27,7 +27,7 @@
 
 <nav >
     
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toSampleRate">toSampleRate</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toSampleRate">toSampleRate</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
 </nav>
 
 <div id="main">
@@ -75,17 +75,17 @@ import { changeBitDepth } from 'bitdepth';
 import * as imaadpcm from 'imaadpcm';
 import * as alawmulaw from 'alawmulaw';
 import { unpackArray, unpackArrayTo } from 'byte-data';
-import { WaveFileMetaEditor } from './wavefile-meta-editor';
+import { WaveFileCueEditor } from './wavefile-cue-editor';
 import { truncateIntSamples } from './parsers/truncate-samples';
 import { validateSampleRate } from './validators/validate-sample-rate';
 import { resample } from './resampler';
 
 /**
  * A class to convert wav files to other types of wav files.
- * @extends WaveFileMetaEditor
+ * @extends WaveFileCueEditor
  * @ignore
  */
-export class WaveFileConverter extends WaveFileMetaEditor {
+export class WaveFileConverter extends WaveFileCueEditor {
 
   /**
    * Force a file as RIFF.
@@ -373,7 +373,7 @@ export class WaveFileConverter extends WaveFileMetaEditor {
    * @private
    */
   fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options={}) {
-    let tmpWav = new WaveFileMetaEditor();
+    let tmpWav = new WaveFileCueEditor();
     Object.assign(this.fmt, tmpWav.fmt);
     Object.assign(this.fact, tmpWav.fact);
     Object.assign(this.ds64, tmpWav.ds64);

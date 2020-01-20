@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>lib/wavefile-meta-editor.js - Documentation</title>
+    <title>lib/wavefile-cue-editor.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -27,12 +27,12 @@
 
 <nav >
     
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteTag">deleteTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#getTag">getTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listTags">listTags</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setTag">setTag</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toSampleRate">toSampleRate</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-wavefile.WaveFile.html">WaveFile</a><ul class='methods'><li data-type='method'><a href="module-wavefile.WaveFile.html#deleteCuePoint">deleteCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromALaw">fromALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromBase64">fromBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromDataURI">fromDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromIMAADPCM">fromIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#fromMuLaw">fromMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#listCuePoints">listCuePoints</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#setCuePoint">setCuePoint</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toALaw">toALaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBase64">toBase64</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toBitDepth">toBitDepth</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toDataURI">toDataURI</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toIMAADPCM">toIMAADPCM</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toMuLaw">toMuLaw</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFF">toRIFF</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toRIFX">toRIFX</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#toSampleRate">toSampleRate</a></li><li data-type='method'><a href="module-wavefile.WaveFile.html#updateLabel">updateLabel</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-wavefile.html">wavefile</a></li></ul>
 </nav>
 
 <div id="main">
     
-    <h1 class="page-title">lib/wavefile-meta-editor.js</h1>
+    <h1 class="page-title">lib/wavefile-cue-editor.js</h1>
     
 
     
@@ -67,98 +67,18 @@
  */
 
 /**
- * @fileoverview The WaveFileMetaEditor class.
+ * @fileoverview The WaveFileCueEditor class.
  * @see https://github.com/rochars/wavefile
  */
 
-import { WaveFileCreator } from './wavefile-creator';
+import { WaveFileTagEditor } from './wavefile-tag-editor';
 
 /**
  * A class to edit meta information in wav files.
- * @extends WaveFileCreator
+ * @extends WaveFileTagEditor
  * @ignore
  */
-export class WaveFileMetaEditor extends WaveFileCreator {
-
-  /**
-   * Return the value of a RIFF tag in the INFO chunk.
-   * @param {string} tag The tag name.
-   * @return {?string} The value if the tag is found, null otherwise.
-   */
-  getTag(tag) {
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      return this.LIST[index.LIST].subChunks[index.TAG].value;
-    }
-    return null;
-  }
-
-  /**
-   * Write a RIFF tag in the INFO chunk. If the tag do not exist,
-   * then it is created. It if exists, it is overwritten.
-   * @param {string} tag The tag name.
-   * @param {string} value The tag value.
-   * @throws {Error} If the tag name is not valid.
-   */
-  setTag(tag, value) {
-    tag = fixRIFFTag_(tag);
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      this.LIST[index.LIST].subChunks[index.TAG].chunkSize =
-        value.length + 1;
-      this.LIST[index.LIST].subChunks[index.TAG].value = value;
-    } else if (index.LIST !== null) {
-      this.LIST[index.LIST].subChunks.push({
-        chunkId: tag,
-        chunkSize: value.length + 1,
-        value: value});
-    } else {
-      this.LIST.push({
-        chunkId: 'LIST',
-        chunkSize: 8 + value.length + 1,
-        format: 'INFO',
-        subChunks: []});
-      this.LIST[this.LIST.length - 1].subChunks.push({
-        chunkId: tag,
-        chunkSize: value.length + 1,
-        value: value});
-    }
-  }
-
-  /**
-   * Remove a RIFF tag from the INFO chunk.
-   * @param {string} tag The tag name.
-   * @return {boolean} True if a tag was deleted.
-   */
-  deleteTag(tag) {
-    /** @type {!Object} */
-    let index = this.getTagIndex_(tag);
-    if (index.TAG !== null) {
-      this.LIST[index.LIST].subChunks.splice(index.TAG, 1);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Return a Object&lt;tag, value> with the RIFF tags in the file.
-   * @return {!Object&lt;string, string>} The file tags.
-   */
-  listTags() {
-    /** @type {?number} */
-    let index = this.getLISTINFOIndex_();
-    /** @type {!Object} */
-    let tags = {};
-    if (index !== null) {
-      for (let i = 0, len = this.LIST[index].subChunks.length; i &lt; len; i++) {
-        tags[this.LIST[index].subChunks[i].chunkId] =
-          this.LIST[index].subChunks[i].value;
-      }
-    }
-    return tags;
-  }
+export class WaveFileCueEditor extends WaveFileTagEditor {
 
   /**
    * Return an array with all cue points in the file, in the order they appear
@@ -421,23 +341,6 @@ export class WaveFileMetaEditor extends WaveFileCreator {
   }
 
   /**
-   * Return the index of the INFO chunk in the LIST chunk.
-   * @return {?number} the index of the INFO chunk.
-   * @private
-   */
-  getLISTINFOIndex_() {
-    /** @type {?number} */
-    let index = null;
-    for (let i = 0, len = this.LIST.length; i &lt; len; i++) {
-      if (this.LIST[i].format === 'INFO') {
-        index = i;
-        break;
-      }
-    }
-    return index;
-  }
-
-  /**
    * Return the index of the 'adtl' LIST in this.LIST.
    * @return {?number}
    * @private
@@ -449,32 +352,6 @@ export class WaveFileMetaEditor extends WaveFileCreator {
       }
     }
     return null;
-  }
-
-  /**
-   * Return the index of a tag in a FILE chunk.
-   * @param {string} tag The tag name.
-   * @return {!Object&lt;string, ?number>}
-   *    Object.LIST is the INFO index in LIST
-   *    Object.TAG is the tag index in the INFO
-   * @private
-   */
-  getTagIndex_(tag) {
-    /** @type {!Object&lt;string, ?number>} */
-    let index = {LIST: null, TAG: null};
-    for (let i = 0, len = this.LIST.length; i &lt; len; i++) {
-      if (this.LIST[i].format == 'INFO') {
-        index.LIST = i;
-        for (let j=0, subLen = this.LIST[i].subChunks.length; j &lt; subLen; j++) {
-          if (this.LIST[i].subChunks[j].chunkId == tag) {
-            index.TAG = j;
-            break;
-          }
-        }
-        break;
-      }
-    }
-    return index;
   }
 
   /**
@@ -615,23 +492,6 @@ export class WaveFileMetaEditor extends WaveFileCreator {
     });
     this.LIST[adtlIndex].chunkSize += 28;
   }
-}
-
-/**
- * Fix a RIFF tag format if possible, throw an error otherwise.
- * @param {string} tag The tag name.
- * @return {string} The tag name in proper fourCC format.
- * @private
- */
-function fixRIFFTag_(tag) {
-  if (tag.constructor !== String) {
-    throw new Error('Invalid tag name.');
-  } else if (tag.length &lt; 4) {
-    for (let i = 0, len = 4 - tag.length; i &lt; len; i++) {
-      tag += ' ';
-    }
-  }
-  return tag;
 }
 </code></pre>
         </article>

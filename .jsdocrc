@@ -3,7 +3,8 @@
         "include": [
         	"index.js",
           "lib/wavefile-converter.js",
-          "lib/wavefile-meta-editor.js",
+          "lib/wavefile-cue-editor.js",
+          "lib/wavefile-tag-editor.js",
           "lib/wavefile-creator.js"
         ]
   },
