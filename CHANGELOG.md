@@ -1,13 +1,17 @@
 # CHANGELOG
 
 ## version 10.3.0 - 2020-01-20
-- Resample with or without LPF:
+
+### Features
+- New resample methods: *linear* for linear interpolation and *point* for nearest point interpolation. Both methods use no LPF by default; others methods use LPF by default.
+
+- Resample with or without LPF using any interpolation method:
 ```javascript
 // Resample using cubic without LPF
 wav.toSampleRate(44100, {method: 'cubic', LPF: false});
 // Resample using cubic with LPF:
 wav.toSampleRate(44100, {method: 'cubic', LPF: true});
-// LPF is used by default
+// cubic and sinc use LPF by default
 wav.toSampleRate(44100, {method: 'cubic'}); // will use LPF
 ```
 

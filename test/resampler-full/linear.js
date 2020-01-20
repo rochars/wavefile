@@ -21,7 +21,7 @@ describe('Downsample a 32-bit 44.1kHz log sine sweep', function() {
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'linear'});
+  wav.toSampleRate(16000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -35,7 +35,7 @@ describe('Upsample a 32-bit 44.1kHz log sine sweep', function() {
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'linear'});
+  wav.toSampleRate(96000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -49,7 +49,7 @@ describe('Downsample a 32-bit 44.1kHz linear sine sweep', function() {
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'linear'});
+  wav.toSampleRate(16000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -63,7 +63,7 @@ describe('Upsample a 32-bit 44.1kHz linear sine sweep', function() {
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'linear'});
+  wav.toSampleRate(96000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -79,7 +79,7 @@ describe('Downsample a 16-bit 44.1kHz log sine sweep', function() {
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'linear'});
+  wav.toSampleRate(16000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -93,7 +93,7 @@ describe('Upsample a 16-bit 44.1kHz log sine sweep', function() {
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'linear'});
+  wav.toSampleRate(96000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -107,7 +107,7 @@ describe('Downsample a 16-bit 44.1kHz linear sine sweep', function() {
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'linear'});
+  wav.toSampleRate(16000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -121,7 +121,7 @@ describe('Upsample a 16-bit 44.1kHz linear sine sweep', function() {
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'linear'});
+  wav.toSampleRate(96000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -137,7 +137,7 @@ describe('Downsample a 16bit 44.1kHz file', function() {
     fs.readFileSync(path + "song1.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'linear'});
+  wav.toSampleRate(16000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(
@@ -151,7 +151,7 @@ describe('Upsample a 16bit 44.1kHz file', function() {
     fs.readFileSync(path + "song1.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'linear'});
+  wav.toSampleRate(96000, {method: 'linear', LPF: true});
 
   // Write the file
   fs.writeFileSync(

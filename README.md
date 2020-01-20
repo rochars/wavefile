@@ -385,7 +385,7 @@ fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 ```
 
 ### Change the sample rate
-You can change the sample rate of the audio with the **toSampleRate()** method. By default, **cubic interpolation** is used to resample the data. You can use **cubic** and **sinc**.
+You can change the sample rate of the audio with the **toSampleRate()** method. By default, **cubic interpolation** is used to resample the data. You can choose between **cubic**, **sinc**, **point** and **linear**.
 ```javascript
 // Load a wav file with 16kHz audio
 let wav = new WaveFile(fs.readFileSync("16kHz-file.wav"));
@@ -406,10 +406,19 @@ To use another method:
 wav.toSampleRate(44100, {method: "sinc"});
 ```
 
-By default a low-pass filter is used when resampling. You can turn this off:
+#### Resampling methods
+- **point**: Nearest point interpolation, lowest quality, no LPF by default, fastest
+- **linear**: Linear interpolation, low quality, no LPF by default, fast
+- **cubic**: Cubic interpolation, regular quality, use LPF by default **(default method)**
+- **sinc**: Windowed sinc interpolation, best quality, use LPF by default, slowest
+
+You can turn the LPF on and off for any resampling method:
 ```javascript
-// Change the bit depth to 44.1kHz using sinc
+// Will use 'sinc' method with no LPF
 wav.toSampleRate(44100, {method: "sinc", LPF: false});
+
+// Will use 'linear' method with LPF
+wav.toSampleRate(44100, {method: "linear", LPF: true});
 ```
 
 #### Changing the sample rate of ADPCM, mu-Law or A-Law

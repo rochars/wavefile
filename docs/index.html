@@ -374,7 +374,7 @@ wav.toBitDepth(&quot;24&quot;);
 fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
 </code></pre>
 <h3>Change the sample rate</h3>
-<p>You can change the sample rate of the audio with the <strong>toSampleRate()</strong> method. By default, <strong>cubic interpolation</strong> is used to resample the data. You can use <strong>cubic</strong> and <strong>sinc</strong>.</p>
+<p>You can change the sample rate of the audio with the <strong>toSampleRate()</strong> method. By default, <strong>cubic interpolation</strong> is used to resample the data. You can choose between <strong>cubic</strong>, <strong>sinc</strong>, <strong>point</strong> and <strong>linear</strong>.</p>
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with 16kHz audio
 let wav = new WaveFile(fs.readFileSync(&quot;16kHz-file.wav&quot;));
 
@@ -391,9 +391,19 @@ fs.writeFileSync(&quot;44100Hz-file.wav&quot;, wav.toBuffer());
 <pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
 wav.toSampleRate(44100, {method: &quot;sinc&quot;});
 </code></pre>
-<p>By default a low-pass filter is used when resampling. You can turn this off:</p>
-<pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
+<h4>Resampling methods</h4>
+<ul>
+<li><strong>point</strong>: Nearest point interpolation, lowest quality, no LPF by default, fastest</li>
+<li><strong>linear</strong>: Linear interpolation, low quality, no LPF by default, fast</li>
+<li><strong>cubic</strong>: Cubic interpolation, regular quality, use LPF by default <strong>(default method)</strong></li>
+<li><strong>sinc</strong>: Windowed sinc interpolation, best quality, use LPF by default, slowest</li>
+</ul>
+<p>You can turn the LPF on and off for any resampling method:</p>
+<pre class="prettyprint source lang-javascript"><code>// Will use 'sinc' method with no LPF
 wav.toSampleRate(44100, {method: &quot;sinc&quot;, LPF: false});
+
+// Will use 'linear' method with LPF
+wav.toSampleRate(44100, {method: &quot;linear&quot;, LPF: true});
 </code></pre>
 <h4>Changing the sample rate of ADPCM, mu-Law or A-Law</h4>
 <p>You need to convert compressed files to standard PCM before resampling:</p>

@@ -11,7 +11,7 @@ const fs = require("fs");
 const WaveFile = require("../../test/loader.js");
 const path = "./test/files/";
 
-console.log('point');
+console.log('point, no LPF');
 
 // Chirps, FP
 
