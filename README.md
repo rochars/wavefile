@@ -390,7 +390,7 @@ You can change the sample rate of the audio with the **toSampleRate()** method. 
 // Load a wav file with 16kHz audio
 let wav = new WaveFile(fs.readFileSync("16kHz-file.wav"));
 
-// Change the bit depth to 44.1kHz
+// Change the sample rate to 44.1kHz
 // using the default configuration
 wav.toSampleRate(44100);
 // this is the same as:
@@ -402,7 +402,7 @@ fs.writeFileSync("44100Hz-file.wav", wav.toBuffer());
 
 To use another method:
 ```javascript
-// Change the bit depth to 44.1kHz using sinc
+// Change the sample rate to 44.1kHz using sinc
 wav.toSampleRate(44100, {method: "sinc"});
 ```
 

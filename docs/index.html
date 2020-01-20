@@ -378,7 +378,7 @@ fs.writeFileSync(&quot;24bit-file.wav&quot;, wav.toBuffer());
 <pre class="prettyprint source lang-javascript"><code>// Load a wav file with 16kHz audio
 let wav = new WaveFile(fs.readFileSync(&quot;16kHz-file.wav&quot;));
 
-// Change the bit depth to 44.1kHz
+// Change the sample rate to 44.1kHz
 // using the default configuration
 wav.toSampleRate(44100);
 // this is the same as:
@@ -388,7 +388,7 @@ wav.toSampleRate(44100);
 fs.writeFileSync(&quot;44100Hz-file.wav&quot;, wav.toBuffer());
 </code></pre>
 <p>To use another method:</p>
-<pre class="prettyprint source lang-javascript"><code>// Change the bit depth to 44.1kHz using sinc
+<pre class="prettyprint source lang-javascript"><code>// Change the sample rate to 44.1kHz using sinc
 wav.toSampleRate(44100, {method: &quot;sinc&quot;});
 </code></pre>
 <h4>Resampling methods</h4>
