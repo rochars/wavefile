@@ -20,16 +20,16 @@ Create, read and write wav files according to the specs.
 
 With **wavefile** you can:
 
-- Create wav files
-- Read wav files
-- Change the bit depth of the audio
-- Change the sample rate of the audio
-- Read and write RIFF tags
-- Set and delete cue points and their labels
-- Create regions in wav files
-- Encode/decode files as ADPCM, A-Law and μ-Law
-- Turn RIFF files to RIFX and RIFX to RIFF
-- Create or edit BWF metadata ("bext" chunk)
+- [Create wav files](#create-wave-files-from-scratch)
+- [Read wav files](#use)
+- [Change the bit depth of the audio](#change-the-bit-depth)
+- [Change the sample rate of the audio](#change-the-sample-rate)
+- [Read and write RIFF tags](#add-riff-tags-to-files)
+- [Set and delete cue points and their labels](#add-cue-points-to-files)
+- [Create regions in wav files](#create-regions-in-files)
+- [Encode/decode files as ADPCM, A-Law and μ-Law](#ima-adpcm)
+- [Turn RIFF files to RIFX and RIFX to RIFF](#rifx)
+- [Create or edit BWF metadata ("bext" chunk)](#add-bwf-metadata)
 
 And more.
 
