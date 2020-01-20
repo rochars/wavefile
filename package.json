@@ -73,7 +73,7 @@
     "test-sr-point": "node ./node_modules/mocha/bin/_mocha test/resampler-full/point.js -R dot --timeout=1600000",
     "test-sr-linear": "node ./node_modules/mocha/bin/_mocha test/resampler-full/linear.js -R dot --timeout=1600000",
     "test-sr-cubic": "node ./node_modules/mocha/bin/_mocha test/resampler-full/cubic.js -R dot --timeout=1600000",
-    "test-sr-sinc": "node ./node_modules/mocha/bin/_mocha test/resampler-full/sinc.js -R dot --timeout=1600000",
+    "test-sr-sinc": "node ./node_modules/mocha/bin/_mocha test/resampler-full/sinc.js test/resampler-full/sinc-no-LPF.js -R dot --timeout=1600000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/resampler test/dist test/src --umd --recursive -R dot --timeout=240000",
     "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
     "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT",
