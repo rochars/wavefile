@@ -395,8 +395,8 @@ wav.toSampleRate(44100, {method: &quot;sinc&quot;});
 <ul>
 <li><strong>point</strong>: Nearest point interpolation, lowest quality, no LPF by default, fastest</li>
 <li><strong>linear</strong>: Linear interpolation, low quality, no LPF by default, fast</li>
-<li><strong>cubic</strong>: Cubic interpolation, regular quality, use LPF by default <strong>(default method)</strong></li>
-<li><strong>sinc</strong>: Windowed sinc interpolation, best quality, use LPF by default, slowest</li>
+<li><strong>cubic</strong>: Cubic interpolation, use LPF by default <strong>(default method)</strong></li>
+<li><strong>sinc</strong>: Windowed sinc interpolation, use LPF by default, slowest</li>
 </ul>
 <p>You can turn the LPF on and off for any resampling method:</p>
 <pre class="prettyprint source lang-javascript"><code>// Will use 'sinc' method with no LPF

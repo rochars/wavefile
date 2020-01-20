@@ -409,8 +409,8 @@ wav.toSampleRate(44100, {method: "sinc"});
 #### Resampling methods
 - **point**: Nearest point interpolation, lowest quality, no LPF by default, fastest
 - **linear**: Linear interpolation, low quality, no LPF by default, fast
-- **cubic**: Cubic interpolation, regular quality, use LPF by default **(default method)**
-- **sinc**: Windowed sinc interpolation, best quality, use LPF by default, slowest
+- **cubic**: Cubic interpolation, use LPF by default **(default method)**
+- **sinc**: Windowed sinc interpolation, use LPF by default, slowest
 
 You can turn the LPF on and off for any resampling method:
 ```javascript
