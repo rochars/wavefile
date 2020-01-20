@@ -15,6 +15,7 @@ wav.fromScratch(1, 8000, "32", [0]);
 wav.fromScratch(1, 8000, "32", [[0], [0]]);
 var samples;
 samples = wav.getSamples();
+samples = wav.getSamples(true, Int32Array);
 try {
     wav.fromBuffer(new Uint8Array([0]));
 }

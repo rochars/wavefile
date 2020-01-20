@@ -481,6 +481,15 @@ samples = wav.getSamples(false);
 samples = wav.getSamples(true);
 ```
 
+You can use any typed array as the output of *getSamples()*:
+```javascript
+// Will return the samples in a Int32Array
+samples = wav.getSamples(false, Int32Array);
+// Will return the samples in a Uint8Array
+samples = wav.getSamples(false, Uint8Array);
+```
+
+
 To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.
 
 Example:
@@ -759,9 +768,11 @@ WaveFile.updateLabel(pointIndex, label) {}
  * Return the samples packed in a Float64Array.
  * @param {?boolean} interleaved True to return interleaved samples,
  *   false to return the samples de-interleaved. Defaults to false.
+ * @param {?Function=} outputObject The Typed Array object to write the
+   *   samples. Assumes Float64Array by default.
  * @return {!Float64Array|Array<Float64Array>} the samples.
  */
-WaveFile.getSamples(interleaved=false) {};
+WaveFile.getSamples(interleaved=false, outputObject=Float64Array) {};
 
 /**
  * Return the sample at a given index.

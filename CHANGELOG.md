@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## version 10.3.0 - 2020-01-20
+- Resample with or without LPF:
+```javascript
+// Resample using cubic without LPF
+wav.toSampleRate(44100, {method: 'cubic', LPF: false});
+// Resample using cubic with LPF:
+wav.toSampleRate(44100, {method: 'cubic', LPF: true});
+// LPF is used by default
+wav.toSampleRate(44100, {method: 'cubic'}); // will use LPF
+```
+
+- You can now use any Typed Array as the output for ```getSamples()```:
+```javascript
+// will return the samples packed in a Int16Array
+getSamples(interleaved=false, outputObject=Int16Array) {
+```
+
 ## version 10.2.0 - 2020-01-16
 Change the sample rate.
 
