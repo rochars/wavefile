@@ -23,7 +23,7 @@
  */
 
 /**
- * @fileoverview Externs for wavefile 10.2
+ * @fileoverview Externs for wavefile 10.4
  * @see https://github.com/rochars/wavefile
  * @externs
  */

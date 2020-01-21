@@ -1,4 +1,4 @@
-// Type definitions for wavefile 10.2
+// Type definitions for wavefile 10.4
 // Project: https://github.com/rochars/wavefile
 // Definitions by: Rafael da Silva Rocha <https://github.com/rochars>
 // Definitions: https://github.com/rochars/wavefile
