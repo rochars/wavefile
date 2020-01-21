@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 10.4.1 - 2020-01-21
+Faster sinc resampling.
+
 ## version 10.4.0 - 2020-01-20
 - Default LPF for resample is IIR 
 - Use FIR or IIR LPFs to resample:
