@@ -1,11 +1,11 @@
 {
   "source": {
         "include": [
-        	"index.js",
-          "lib/wavefile-converter.js",
-          "lib/wavefile-cue-editor.js",
+        	"lib/wavefile-creator.js",
           "lib/wavefile-tag-editor.js",
-          "lib/wavefile-creator.js"
+          "lib/wavefile-cue-editor.js",
+          "lib/wavefile-converter.js",
+          "index.js"
         ]
   },
   "templates": {
