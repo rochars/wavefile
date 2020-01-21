@@ -23,7 +23,7 @@ describe('Upsample a 16bit 8kHz file', function() {
 
   // Convert to another sample rate
   wav.toSampleRate(16000,
-    {method: 'point', clip: 'periodic', LPForder: 2, LPF: true});
+    {method: 'point', clip: 'periodic', LPForder: 2, LPF: true, LPFType: 'FIR'});
 
   // Write the file
   fs.writeFileSync(
@@ -86,7 +86,7 @@ describe('Downsample a stereo file', function() {
 
   // Convert to another sample rate
   wav.toSampleRate(16000,
-    {method: 'point', clip: 'mirror', LPForder: 2, LPF: true});
+    {method: 'point', clip: 'mirror', LPForder: 2, LPF: true, LPFType: 'FIR'});
 
   // Write the file
   fs.writeFileSync(

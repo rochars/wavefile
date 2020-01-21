@@ -2,7 +2,7 @@
  * WaveFile: https://github.com/rochars/wavefile
  * Copyright (c) 2017-2018 Rafael da Silva Rocha. MIT License.
  *
- * Tests for sample rate conversion, linear method.
+ * Tests for sample rate conversion, cubic method.
  * 
  */
 
@@ -11,28 +11,28 @@ const fs = require("fs");
 const WaveFile = require("../../test/loader.js");
 const path = "./test/files/";
 
-console.log('linear');
+console.log('cubic + IIR');
 
 // Test file integrity
 
-describe('Upsample a 16bit 8kHz file', function() {
-  
+describe('Upsample a 4bit 8kHz file', function() {
+    
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'linear', clip: 'mirror', LPF: true, LPFType: 'FIR'});
+  wav.toSampleRate(4000, {method: 'cubic', LPFType: 'IIR'});
 
   // Write the file
   fs.writeFileSync(
-    path + "/out/to-sample-rate/linear-16-bit-16001kHz-noBext-mono.wav",
+    path + "/out/to-sample-rate/cubic-IIR-16-bit-16001kHz-noBext-mono.wav",
     wav.toBuffer());
 
   // Read the written 16kHz file 
   let wav2 = new WaveFile(
     fs.readFileSync(
-      path +"/out/to-sample-rate/linear-16-bit-16001kHz-noBext-mono.wav"));
+      path +"/out/to-sample-rate/cubic-IIR-16-bit-16001kHz-noBext-mono.wav"));
 
   // Check the attributes of the resampled file
   it("chunkId should be 'RIFF'", function() {
@@ -54,10 +54,10 @@ describe('Upsample a 16bit 8kHz file', function() {
     assert.equal(wav2.fmt.numChannels, 1);
   });
   it("sampleRate should be 16000", function() {
-    assert.equal(wav2.fmt.sampleRate, 16000);
+    assert.equal(wav2.fmt.sampleRate, 4000);
   });
-  it("byteRate should be 32000", function() {
-    assert.equal(wav2.fmt.byteRate, 32000);
+  it("byteRate should be 8000", function() {
+    assert.equal(wav2.fmt.byteRate, 8000);
   });
   it("blockAlign should be 2", function() {
     assert.equal(wav2.fmt.blockAlign, 2);

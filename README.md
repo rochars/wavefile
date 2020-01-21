@@ -421,6 +421,15 @@ wav.toSampleRate(44100, {method: "sinc", LPF: false});
 wav.toSampleRate(44100, {method: "linear", LPF: true});
 ```
 
+The default LPF is a IIR LPF. You may define what type of LPF will be used by changing the LPFType attribute on the *toSampleRate()* param. You can use **IIR** or **FIR**:
+```javascript
+// Will use 'linear' method with a FIR LPF
+wav.toSampleRate(44100, {method: "linear", LPF: true, LPFType: 'FIR'});
+
+// Will use 'linear' method with a IIR LPF, the default
+wav.toSampleRate(44100, {method: "linear", LPF: true});
+```
+
 #### Changing the sample rate of ADPCM, mu-Law or A-Law
 You need to convert compressed files to standard PCM before resampling:
 

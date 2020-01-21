@@ -22,7 +22,7 @@ describe('Upsample a 4bit 8kHz file', function() {
     fs.readFileSync(path + "16-bit-8kHz-noBext-mono.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(4000, {method: 'cubic'});
+  wav.toSampleRate(4000, {method: 'cubic', LPFType: 'FIR'});
 
   // Write the file
   fs.writeFileSync(

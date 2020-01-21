@@ -405,6 +405,13 @@ wav.toSampleRate(44100, {method: &quot;sinc&quot;, LPF: false});
 // Will use 'linear' method with LPF
 wav.toSampleRate(44100, {method: &quot;linear&quot;, LPF: true});
 </code></pre>
+<p>The default LPF is a IIR LPF. You may define what type of LPF will be used by changing the LPFType attribute on the <em>toSampleRate()</em> param. You can use <strong>IIR</strong> or <strong>FIR</strong>:</p>
+<pre class="prettyprint source lang-javascript"><code>// Will use 'linear' method with a FIR LPF
+wav.toSampleRate(44100, {method: &quot;linear&quot;, LPF: true, LPFType: 'FIR'});
+
+// Will use 'linear' method with a IIR LPF, the default
+wav.toSampleRate(44100, {method: &quot;linear&quot;, LPF: true});
+</code></pre>
 <h4>Changing the sample rate of ADPCM, mu-Law or A-Law</h4>
 <p>You need to convert compressed files to standard PCM before resampling:</p>
 <p>To resample a mu-Law file:</p>

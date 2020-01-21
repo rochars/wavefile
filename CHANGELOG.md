@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## version 10.4.0 - 2020-01-20
+- Default LPF for resample is IIR 
+- Use FIR or IIR LPFs to resample:
+```javascript
+// Will use 'linear' method with a FIR LPF
+wav.toSampleRate(44100, {method: "linear", LPF: true, LPFType: 'FIR'});
+
+// Will use 'linear' method with a IIR LPF, the default
+wav.toSampleRate(44100, {method: "linear", LPF: true});
+```
+
 ## version 10.3.0 - 2020-01-20
 
 ### Features
