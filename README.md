@@ -21,7 +21,7 @@ Create, read and write wav files according to the specs.
 With **wavefile** you can:
 
 - [Create wav files](#create-wave-files-from-scratch)
-- [Read wav files](#use)
+- [Read wav files](#read-wave-files)
 - [Change the bit depth of the audio](#change-the-bit-depth)
 - [Change the sample rate of the audio](#change-the-sample-rate)
 - [Read and write RIFF tags](#add-riff-tags-to-files)
@@ -149,6 +149,7 @@ let wavDataURI = wav.toDataURI();
 - [Use](#use)
 - [Operation Manual](#operation-manual)
   * [Create wave files from scratch](#create-wave-files-from-scratch)
+  * [Read wave files](#read-wave-files)
   * [Add RIFF tags to files](#add-riff-tags-to-files)
   * [Add cue points to files](#add-cue-points-to-files)
   * [Create regions in files](#create-regions-in-files)
@@ -212,6 +213,18 @@ You can also use any bit depth between "8" and "53", like **"11", "12", "17", "2
 
 #### A word on bit depth
 Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.
+
+### Read wave files
+```javascript
+const WaveFile = require('wavefile').WaveFile;
+wav = new WaveFile();
+// Read a wav file from a buffer
+wav.fromBuffer(buffer);
+// Read a wav file from a base64 string
+wav.fromBase64(base64);
+// Read a wav file from a data URI
+wav.fromDataURI(dataURI);
+```
 
 ### Add RIFF tags to files
 You can create (or overwrite) tags on files with the **WaveFile.setTag()** method.

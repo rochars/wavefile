@@ -75,7 +75,7 @@ https://github.com/rochars/wavefile</p>
 <p>With <strong>wavefile</strong> you can:</p>
 <ul>
 <li><a href="#create-wave-files-from-scratch">Create wav files</a></li>
-<li><a href="#use">Read wav files</a></li>
+<li><a href="#read-wave-files">Read wav files</a></li>
 <li><a href="#change-the-bit-depth">Change the bit depth of the audio</a></li>
 <li><a href="#change-the-sample-rate">Change the sample rate of the audio</a></li>
 <li><a href="#add-riff-tags-to-files">Read and write RIFF tags</a></li>
@@ -180,6 +180,7 @@ let wavDataURI = wav.toDataURI();
 <li><a href="#operation-manual">Operation Manual</a>
 <ul>
 <li><a href="#create-wave-files-from-scratch">Create wave files from scratch</a></li>
+<li><a href="#read-wave-files">Read wave files</a></li>
 <li><a href="#add-riff-tags-to-files">Add RIFF tags to files</a></li>
 <li><a href="#add-cue-points-to-files">Add cue points to files</a></li>
 <li><a href="#create-regions-in-files">Create regions in files</a></li>
@@ -244,6 +245,16 @@ fs.writeFileSync(path, wav.toBuffer());
 <p>You can also use any bit depth between &quot;8&quot; and &quot;53&quot;, like <strong>&quot;11&quot;, &quot;12&quot;, &quot;17&quot;, &quot;20&quot; and so on</strong>.</p>
 <h4>A word on bit depth</h4>
 <p>Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.</p>
+<h3>Read wave files</h3>
+<pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile').WaveFile;
+wav = new WaveFile();
+// Read a wav file from a buffer
+wav.fromBuffer(buffer);
+// Read a wav file from a base64 string
+wav.fromBase64(base64);
+// Read a wav file from a data URI
+wav.fromDataURI(dataURI);
+</code></pre>
 <h3>Add RIFF tags to files</h3>
 <p>You can create (or overwrite) tags on files with the <strong>WaveFile.setTag()</strong> method.</p>
 <pre class="prettyprint source lang-javascript"><code>// Write the ICMT tag with some comments to the file
