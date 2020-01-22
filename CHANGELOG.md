@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 10.4.2 - 2020-01-22
+Better sinc resampling.
+
 ## version 10.4.1 - 2020-01-21
 Faster sinc resampling.
 
