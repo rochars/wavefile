@@ -76,7 +76,6 @@ import * as imaadpcm from 'imaadpcm';
 import * as alawmulaw from 'alawmulaw';
 import { unpackArrayTo } from 'byte-data';
 import { WaveFileCueEditor } from './wavefile-cue-editor';
-import { truncateIntSamples } from './parsers/truncate-samples';
 import { validateSampleRate } from './validators/validate-sample-rate';
 import { resample } from './resampler';
 
@@ -306,11 +305,11 @@ export class WaveFileConverter extends WaveFileCueEditor {
     if (this.bitDepth !== '64' &amp;&amp; this.bitDepth !== '32f') {
       // Truncate samples in mono files
       if (newSamples[0].constructor === Number) {
-        truncateIntSamples(newSamples, this.dataType.bits);
+        roundIntSamples(newSamples);
       // Truncate samples in multi-channel files
       } else {
         for (let i = 0; i &lt; newSamples.length; i++) {
-          truncateIntSamples(newSamples[i], this.dataType.bits);
+          roundIntSamples(newSamples[i]);
         }
       }
     }
@@ -411,7 +410,19 @@ function outputSize_(byteLen, byteOffset) {
     outputSize++;
   }
   return outputSize;
-}</code></pre>
+}
+
+/**
+ * Round integer samples.
+ * @param {!(Array&lt;number>|TypedArray)} samples The samples to round.
+ * @private
+ */
+function roundIntSamples(samples) {
+  for (let i = 0, len = samples.length; i &lt; len; i++) {
+    samples[i] = Math.round(samples[i]);
+  }
+}
+</code></pre>
         </article>
     </section>
 
