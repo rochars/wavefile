@@ -414,3 +414,259 @@ describe('create 16-bit wave files from scratch with tags', function() {
         assert.equal(wav.bitDepth, "16");
     });
 });
+
+// UTF8 tests
+// Should handle UTF8 tags in files
+
+describe("Write and read a file with UTF8 chars in tags", function() {
+
+    let wav = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
+    
+    wav.setTag("IENE", "a𒈓笠߹~");
+
+    // Create the file
+    let wavBuffer = wav.toBuffer();
+
+    // Write the file
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-UTF8.wav",
+        wavBuffer);
+    
+    // Read the file
+    let wav2 = new WaveFile(
+        fs.readFileSync(
+            path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-UTF8.wav"));
+
+    // 'INFO'
+    it("LISTChunks[0].chunkId should be 'LIST'", function() {
+        assert.equal(wav.LIST[0]["chunkId"], "LIST");
+    });
+    it("LISTChunks[0].format should be 'INFO'", function() {
+        assert.equal(wav.LIST[0]["format"], "INFO");
+    });
+    // tags
+    // IENE
+    it("LISTChunks[0].subChunks[0].chunkId should be 'ICRD'", function() {
+        assert.equal(wav.getTag('IENE'), "a𒈓笠߹~");
+    });
+    it("'IENE' value", function() {
+        assert.equal(wav2.getTag('IENE'), "a𒈓笠߹~");
+    });
+    // Other tags should remain the same
+    // ICRD
+    it("LISTChunks[0].subChunks[0].chunkId should be 'ICRD'", function() {
+        assert.equal(wav.LIST[0].subChunks[0].chunkId, "ICRD");
+    });
+    it("'ICRD' size", function() {
+        assert.equal(wav.LIST[0].subChunks[0].chunkSize, "24");
+    });
+    it("'ICRD' value", function() {
+        assert.equal(
+            wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+    });
+    // ISFT
+    it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
+        assert.equal(wav.LIST[0].subChunks[1].chunkId, "ISFT");
+    });
+    it("'ISFT' size", function() {
+        assert.equal(wav.LIST[0].subChunks[1].chunkSize, "10");
+    });
+    it("'ISFT' value", function() {
+        assert.equal(wav.LIST[0].subChunks[1].value, "CopyAudio");
+    });
+    // ICMT
+    it("LISTChunks[0].subChunks[2].chunkId should be 'ICMT'", function() {
+        assert.equal(wav.LIST[0].subChunks[2].chunkId, "ICMT");
+    });it("'ICMT' size", function() {
+        assert.equal(wav.LIST[0].subChunks[2].chunkSize, "14");
+    });
+    it("'ICMT' value", function() {
+        assert.equal(wav.LIST[0].subChunks[2].value, "kabal@CAPELLA");
+    });
+    // 'INFO'
+    it("LISTChunks[0].chunkId should be 'LIST'", function() {
+        assert.equal(wav2.LIST[0]["chunkId"], "LIST");
+    });
+    it("LISTChunks[0].format should be 'INFO'", function() {
+        assert.equal(wav2.LIST[0]["format"], "INFO");
+    });
+    // tags
+    // ICRD
+    it("LISTChunks[0].subChunks[0].chunkId should be 'ICRD'", function() {
+        assert.equal(wav2.LIST[0].subChunks[0].chunkId, "ICRD");
+    });
+    it("'ICRD' size", function() {
+        assert.equal(wav2.LIST[0].subChunks[0].chunkSize, "24");
+    });
+    it("'ICRD' value", function() {
+        assert.equal(
+            wav2.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+    });
+    // ISFT
+    it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
+        assert.equal(wav2.LIST[0].subChunks[1].chunkId, "ISFT");
+    });
+    it("'ISFT' size", function() {
+        assert.equal(wav2.LIST[0].subChunks[1].chunkSize, "10");
+    });
+    it("'ISFT' value", function() {
+        assert.equal(wav2.LIST[0].subChunks[1].value, "CopyAudio");
+    });
+    // ICMT
+    it("LISTChunks[0].subChunks[2].chunkId should be 'ICMT'", function() {
+        assert.equal(wav2.LIST[0].subChunks[2].chunkId, "ICMT");
+    });it("'ICMT' size", function() {
+        assert.equal(wav2.LIST[0].subChunks[2].chunkSize, "14");
+    });
+    it("'ICMT' value", function() {
+        assert.equal(wav2.LIST[0].subChunks[2].value, "kabal@CAPELLA");
+    });
+});
+
+describe("Read a file with invalid UTF8 chars on tags", function() {
+
+    let wav = new WaveFile(
+        fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
+    
+    wav.setTag("IENX", "a輸𒈓𒈓𒈓笠笠笠߹~");
+
+    // Create the file
+    let wavBuffer = wav.toBuffer();
+
+    // Change the 𒈓chars to invalid UTF8 chars
+    // (should result in 1 replacement char each)
+    replaceBytes(wavBuffer, [0xF0,0x92,0x88,0x93], [0xf0,0x28,0x8c,0xbc]);
+    replaceBytes(wavBuffer, [0xF0,0x92,0x88,0x93], [0xf0,0x90,0x28,0xbc]);
+    replaceBytes(wavBuffer, [0xF0,0x92,0x88,0x93], [0xf0,0xF4,0x8c,0x28]);
+    // Change the 輸 char to invalid UTF8 chars
+    // (should result in 1 replacement char)
+    replaceBytes(wavBuffer, [240,175,167,159], [0xf0,0xf0,0x8c,0x28]);
+    // Change the 笠 chars to invalid UTF8 chars
+    // (should result in 1 replacement char each)
+    replaceBytes(wavBuffer, [239,167,184], [0xe2,0x28,0xa1]);
+    replaceBytes(wavBuffer, [239,167,184], [0xe2,0xED,0x28]);
+    replaceBytes(wavBuffer, [239,167,184], [0xe2,0xE0,0x28]);
+    // Change the ߹ char to invalid UTF8 chars 0xa0, 0xa1
+    // (should result in 2 replacement chars)
+    replaceBytes(wavBuffer, [223,185], [0xa0,0xa1]);
+
+    // Write the file
+    fs.writeFileSync(
+        path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-UTF8-invalid.wav",
+        wavBuffer);
+    
+    // Read the file
+    let wav2 = new WaveFile(
+        fs.readFileSync(
+            path + "/out/M1F1-int12WE-AFsp-out-set-get-tag-UTF8-invalid.wav"));
+
+    // WAV1
+    // 'INFO'
+    it("LISTChunks[0].chunkId should be 'LIST'", function() {
+        assert.equal(wav.LIST[0]["chunkId"], "LIST");
+    });
+    it("LISTChunks[0].format should be 'INFO'", function() {
+        assert.equal(wav.LIST[0]["format"], "INFO");
+    });
+    // tags
+    // IENX
+    it("'IENX' should have 9 replacement chars between 'a' - '~'", function() {
+        assert.equal(wav2.getTag('IENX'),
+        "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD~");
+    });
+    // Other tags should remain the same
+    // ICRD
+    it("LISTChunks[0].subChunks[0].chunkId should be 'ICRD'", function() {
+        assert.equal(wav.LIST[0].subChunks[0].chunkId, "ICRD");
+    });
+    it("'ICRD' size", function() {
+        assert.equal(wav.LIST[0].subChunks[0].chunkSize, "24");
+    });
+    it("'ICRD' value", function() {
+        assert.equal(
+            wav.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+    });
+    // ISFT
+    it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
+        assert.equal(wav.LIST[0].subChunks[1].chunkId, "ISFT");
+    });
+    it("'ISFT' size", function() {
+        assert.equal(wav.LIST[0].subChunks[1].chunkSize, "10");
+    });
+    it("'ISFT' value", function() {
+        assert.equal(wav.LIST[0].subChunks[1].value, "CopyAudio");
+    });
+    // ICMT
+    it("LISTChunks[0].subChunks[2].chunkId should be 'ICMT'", function() {
+        assert.equal(wav.LIST[0].subChunks[2].chunkId, "ICMT");
+    });it("'ICMT' size", function() {
+        assert.equal(wav.LIST[0].subChunks[2].chunkSize, "14");
+    });
+    it("'ICMT' value", function() {
+        assert.equal(wav.LIST[0].subChunks[2].value, "kabal@CAPELLA");
+    });
+    // 'INFO'
+    it("LISTChunks[0].chunkId should be 'LIST'", function() {
+        assert.equal(wav2.LIST[0]["chunkId"], "LIST");
+    });
+    it("LISTChunks[0].format should be 'INFO'", function() {
+        assert.equal(wav2.LIST[0]["format"], "INFO");
+    });
+    // tags
+    // ICRD
+    it("LISTChunks[0].subChunks[0].chunkId should be 'ICRD'", function() {
+        assert.equal(wav2.LIST[0].subChunks[0].chunkId, "ICRD");
+    });
+    it("'ICRD' size", function() {
+        assert.equal(wav2.LIST[0].subChunks[0].chunkSize, "24");
+    });
+    it("'ICRD' value", function() {
+        assert.equal(
+            wav2.LIST[0].subChunks[0].value, "2003-01-30 03:28:46 UTC");
+    });
+    // ISFT
+    it("LISTChunks[0].subChunks[1].chunkId should be 'ISFT'", function() {
+        assert.equal(wav2.LIST[0].subChunks[1].chunkId, "ISFT");
+    });
+    it("'ISFT' size", function() {
+        assert.equal(wav2.LIST[0].subChunks[1].chunkSize, "10");
+    });
+    it("'ISFT' value", function() {
+        assert.equal(wav2.LIST[0].subChunks[1].value, "CopyAudio");
+    });
+    // ICMT
+    it("LISTChunks[0].subChunks[2].chunkId should be 'ICMT'", function() {
+        assert.equal(wav2.LIST[0].subChunks[2].chunkId, "ICMT");
+    });it("'ICMT' size", function() {
+        assert.equal(wav2.LIST[0].subChunks[2].chunkSize, "14");
+    });
+    it("'ICMT' value", function() {
+        assert.equal(wav2.LIST[0].subChunks[2].value, "kabal@CAPELLA");
+    });
+});
+
+/**
+ * Replace bytes in a byte array. Match and replace must be of same size.
+ * @param {!Array|!TypedArray} buffer The original buffer
+ * @param {!Array} match The element sequence to match
+ * @param {!Array} replace The replacement sequence
+ */
+function replaceBytes(buffer, match, replace) {
+  for(let loc = 0, sz = buffer.length, checksComplete = 0,
+      totalChecks = match.length;
+      loc < sz && checksComplete < totalChecks; loc++) {
+    if(match[checksComplete] === buffer[loc]) {
+      checksComplete++;
+    }
+    else {
+      checksComplete = 0;
+    }
+    if(checksComplete === totalChecks) {
+      for (let i = 0; i < totalChecks; i++) {
+        buffer[loc - i] = replace[replace.length - 1 - i];
+      }
+      break;
+    }
+  }
+}
