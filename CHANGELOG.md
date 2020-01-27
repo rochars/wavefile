@@ -1,8 +1,13 @@
 # CHANGELOG
 
-## version 10.4.3 - 2020-01-27
-- Fix: clamp int samples on overflow instead of throwing RangeError
-- Fix: large files RIFF/RIFX conversion
+## version 11.0.0 - unreleased
+
+### API changes
+- clamp int samples on overflow instead of throwing RangeError
+
+### Fixes
+- large files RIFF/RIFX conversion
+
 
 ## version 10.4.2 - 2020-01-22
 Better sinc resampling.

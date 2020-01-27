@@ -499,7 +499,7 @@ wav.getSample(1); // return 1200, the value of the second sample
 wav.setSample(1, 10); // change the second sample to 10
 wav.getSample(1); // return 10, the new value of the second sample
 </code></pre>
-<p>Range:</p>
+<h3>Range:</h3>
 <ul>
 <li>0 to 255 for 8-bit</li>
 <li>-32768 to 32767 for 16-bit</li>
@@ -508,6 +508,7 @@ wav.getSample(1); // return 10, the new value of the second sample
 <li>-1.0 to 1.0 for 32-bit (float)</li>
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
+<p>Floating point samples may be defined out of range. Integer samples will be clamped on overflow.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>/**

@@ -543,13 +543,15 @@ wav.setSample(1, 10); // change the second sample to 10
 wav.getSample(1); // return 10, the new value of the second sample
 ```
 
-Range:
+### Range:
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit
 - -8388608 to 8388607 for 24-bit
 - -2147483648 to 2147483647 for 32-bit
 - -1.0 to 1.0 for 32-bit (float)
 - -1.0 to 1.0 for 64-bit (float)
+
+Floating point samples may be defined out of range. Integer samples will be clamped on overflow.
 
 ## API
 To create a WaveFile object:
