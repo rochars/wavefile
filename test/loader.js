@@ -16,7 +16,7 @@
 let wavefile;
 
 // UMD
-if (process.argv[4] == '--umd') {
+if (findArg('--umd')) {
 	console.log('umd tests');
 	wavefile = require('../dist/wavefile.js').WaveFile;
 	if (wavefile.toString().slice(0, 5) === "class") {
@@ -29,6 +29,20 @@ if (process.argv[4] == '--umd') {
 	require = require("esm")(module);
 	global.module = module;
 	wavefile = require('../index.js').WaveFile;
+}
+
+/**
+ * Return true if arg is in process.argv.
+ * @param {string} arg The argument you are looking for.
+ * @return {boolean}
+ */
+function findArg(arg) {
+	for (let i = 0, len = process.argv.length; i < len; i++) {
+		if (process.argv[i] == arg) {
+			return true;
+		}
+	}
+	return false;
 }
 
 module.exports = wavefile;
