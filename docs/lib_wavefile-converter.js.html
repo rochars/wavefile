@@ -94,7 +94,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
     let output = new Float64Array(
       outputSize_(this.data.samples.length, this.dataType.bits / 8));
     unpackArrayTo(this.data.samples, this.dataType, output,
-      0, this.data.samples.length, false, true);
+      0, this.data.samples.length, false, false);
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -110,7 +110,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
     let output = new Float64Array(
       outputSize_(this.data.samples.length, this.dataType.bits / 8));
     unpackArrayTo(this.data.samples, this.dataType, output,
-      0, this.data.samples.length, false, true);
+      0, this.data.samples.length, false, false);
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -137,7 +137,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       let output = new Int16Array(
         outputSize_(this.data.samples.length, 2));
       unpackArrayTo(this.data.samples, this.dataType, output,
-        0, this.data.samples.length, false, true);
+        0, this.data.samples.length, false, false);
       this.fromExisting_(
         this.fmt.numChannels,
         this.fmt.sampleRate,
@@ -174,7 +174,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
     let output = new Int16Array(
       outputSize_(this.data.samples.length, 2));
     unpackArrayTo(this.data.samples, this.dataType, output,
-        0, this.data.samples.length, false, true);
+        0, this.data.samples.length, false, false);
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -210,7 +210,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
     let output = new Int16Array(
       outputSize_(this.data.samples.length, 2));
     unpackArrayTo(this.data.samples, this.dataType, output,
-        0, this.data.samples.length, false, true);
+        0, this.data.samples.length, false, false);
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
@@ -305,11 +305,11 @@ export class WaveFileConverter extends WaveFileCueEditor {
     if (this.bitDepth !== '64' &amp;&amp; this.bitDepth !== '32f') {
       // Truncate samples in mono files
       if (newSamples[0].constructor === Number) {
-        roundIntSamples(newSamples);
+        truncateIntSamples(newSamples, this.dataType.bits);
       // Truncate samples in multi-channel files
       } else {
         for (let i = 0; i &lt; newSamples.length; i++) {
-          roundIntSamples(newSamples[i]);
+          truncateIntSamples(newSamples[i], this.dataType.bits);
         }
       }
     }
@@ -413,13 +413,21 @@ function outputSize_(byteLen, byteOffset) {
 }
 
 /**
- * Round integer samples.
+ * Clamp integer samples.
  * @param {!(Array&lt;number>|TypedArray)} samples The samples to round.
+ * @param {number} bits The number of bits.
  * @private
  */
-function roundIntSamples(samples) {
+function truncateIntSamples(samples, bits) {
+  let max = bits === 8 ? 255 : Math.pow(2, bits) / 2 - 1;
+  let min = bits === 8 ? 0 : -max - 1;
   for (let i = 0, len = samples.length; i &lt; len; i++) {
     samples[i] = Math.round(samples[i]);
+    if (samples[i] > max) {
+      samples[i] = max;
+    } else if (samples[i] &lt; min) {
+      samples[i] = min;
+    }
   }
 }
 </code></pre>
