@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## version 10.4.3 - unreleased
+Fix: clamp int samples on overflow instead of throwing RangeError
+
 ## version 10.4.2 - 2020-01-22
 Better sinc resampling.
 

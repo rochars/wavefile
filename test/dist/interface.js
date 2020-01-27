@@ -84,3 +84,12 @@ describe('Write and read some edge cases to 64 bit file', function() {
             0.0000000000000000000000000000000000000000001);
     });
 });
+
+// Int samples
+describe('Should clamp int samples on overflow', function() {
+    wav = new WaveFile();
+    it('should limit the sample', function() {
+        wav.fromScratch(1, 8000, '16', [32768, -32769], {container: 'RIFX'});
+        assert.deepEqual(wav.getSamples(), new Float64Array([32767, -32768]));
+    });
+});

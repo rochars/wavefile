@@ -1,6 +1,6 @@
 {
   "name": "wavefile",
-  "version": "10.4.2",
+  "version": "10.4.3",
   "description": "Create, read and write wav files according to the specs.",
   "homepage": "https://github.com/rochars/wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
@@ -101,7 +101,7 @@
   "dependencies": {
     "alawmulaw": "^5.0.2",
     "bitdepth": "^9.0.0",
-    "byte-data": "^18.0.4",
+    "byte-data": "^18.1.1",
     "imaadpcm": "^5.0.0"
   }
 }
