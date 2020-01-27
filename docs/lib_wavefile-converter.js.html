@@ -91,24 +91,32 @@ export class WaveFileConverter extends WaveFileCueEditor {
    * Force a file as RIFF.
    */
   toRIFF() {
+    /** @type {!Float64Array} */
+    let output = new Float64Array(
+      outputSize_(this.data.samples.length, this.dataType.bits / 8));
+    unpackArrayTo(this.data.samples, this.dataType, output,
+      0, this.data.samples.length, false, true);
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       this.bitDepth,
-      unpackArray(this.data.samples, this.dataType,
-        0, this.data.samples.length, false, true));
+      output);
   }
 
   /**
    * Force a file as RIFX.
    */
   toRIFX() {
+    /** @type {!Float64Array} */
+    let output = new Float64Array(
+      outputSize_(this.data.samples.length, this.dataType.bits / 8));
+    unpackArrayTo(this.data.samples, this.dataType, output,
+      0, this.data.samples.length, false, true);
     this.fromExisting_(
       this.fmt.numChannels,
       this.fmt.sampleRate,
       this.bitDepth,
-      unpackArray(this.data.samples, this.dataType,
-        0, this.data.samples.length, false, true),
+      output,
       {container: 'RIFX'});
   }
 
@@ -127,7 +135,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
     } else {
       this.assure16Bit_();
       /** @type {!Int16Array} */
-      let output = new Int16Array(this.outputSize_());
+      let output = new Int16Array(
+        outputSize_(this.data.samples.length, 2));
       unpackArrayTo(this.data.samples, this.dataType, output,
         0, this.data.samples.length, false, true);
       this.fromExisting_(
@@ -163,7 +172,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
   toALaw() {
     this.assure16Bit_();
     /** @type {!Int16Array} */
-    let output = new Int16Array(this.outputSize_());
+    let output = new Int16Array(
+      outputSize_(this.data.samples.length, 2));
     unpackArrayTo(this.data.samples, this.dataType, output,
         0, this.data.samples.length, false, true);
     this.fromExisting_(
@@ -198,7 +208,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
   toMuLaw() {
     this.assure16Bit_();
     /** @type {!Int16Array} */
-    let output = new Int16Array(this.outputSize_());
+    let output = new Int16Array(
+      outputSize_(this.data.samples.length, 2));
     unpackArrayTo(this.data.samples, this.dataType, output,
         0, this.data.samples.length, false, true);
     this.fromExisting_(
@@ -385,23 +396,22 @@ export class WaveFileConverter extends WaveFileCueEditor {
     Object.assign(this.data, tmpWav.data);
     this.newWavFile_(numChannels, sampleRate, bitDepthCode, samples, options);
   }
-
-  /**
-   * Return the size in bytes of the output sample array when applying
-   * compression to 16-bit samples.
-   * @return {number}
-   * @private
-   */
-  outputSize_() {
-    /** @type {number} */
-    let outputSize = this.data.samples.length / 2;
-    if (outputSize % 2) {
-      outputSize++;
-    }
-    return outputSize;
-  }
 }
-</code></pre>
+
+/**
+ * Return the size in bytes of the output sample array when applying
+ * compression to 16-bit samples.
+ * @return {number}
+ * @private
+ */
+function outputSize_(byteLen, byteOffset) {
+  /** @type {number} */
+  let outputSize = byteLen / byteOffset;
+  if (outputSize % 2) {
+    outputSize++;
+  }
+  return outputSize;
+}</code></pre>
         </article>
     </section>
 
