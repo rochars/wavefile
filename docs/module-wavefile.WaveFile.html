@@ -65,7 +65,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="WaveFile"><span class="type-signature"></span>new WaveFile<span class="signature">(wavBuffer<span class="signature-attributes">opt, nullable</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="WaveFile"><span class="type-signature"></span>new WaveFile<span class="signature">(wavBuffer<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -173,8 +173,6 @@
                     &lt;optional><br>
                 
 
-                
-                    &lt;nullable><br>
                 
 
                 
@@ -1135,7 +1133,7 @@
 
     
 
-    <h4 class="name" id="fromALaw"><span class="type-signature"></span>fromALaw<span class="signature">(bitDepthCode)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="fromALaw"><span class="type-signature"></span>fromALaw<span class="signature">(bitDepthCode<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -1147,7 +1145,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line148">line 148</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line147">line 147</a>
     </li></ul></dd>
     
 
@@ -1218,6 +1216,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
         <th>Default</th>
@@ -1245,16 +1245,26 @@
             </td>
 
             
-
-            
-                <td class="default">
+                <td class="attributes">
                 
-                    <code>16</code>
+                    &lt;optional><br>
+                
+
+                
+
                 
                 </td>
             
 
-            <td class="description last">The new bit depth of the samples.   One of '8' ... '32' (integers), '32f' or '64' (floats).   Optional. Default is 16.</td>
+            
+                <td class="default">
+                
+                    <code>'16'</code>
+                
+                </td>
+            
+
+            <td class="description last">The new bit depth of the samples.   One of '8' ... '32' (integers), '32f' or '64' (floats).</td>
         </tr>
 
     
@@ -1461,7 +1471,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-creator.js.html">lib/wavefile-creator.js</a>, <a href="lib_wavefile-creator.js.html#line104">line 104</a>
+        <a href="lib_wavefile-creator.js.html">lib/wavefile-creator.js</a>, <a href="lib_wavefile-creator.js.html#line105">line 105</a>
     </li></ul></dd>
     
 
@@ -1920,7 +1930,7 @@
 
     
 
-    <h4 class="name" id="fromIMAADPCM"><span class="type-signature"></span>fromIMAADPCM<span class="signature">(bitDepthCode)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="fromIMAADPCM"><span class="type-signature"></span>fromIMAADPCM<span class="signature">(bitDepthCode<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -2003,6 +2013,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
         <th>Default</th>
@@ -2030,16 +2042,26 @@
             </td>
 
             
-
-            
-                <td class="default">
+                <td class="attributes">
                 
-                    <code>16</code>
+                    &lt;optional><br>
+                
+
+                
+
                 
                 </td>
             
 
-            <td class="description last">The new bit depth of the samples.   One of '8' ... '32' (integers), '32f' or '64' (floats).   Optional. Default is 16.</td>
+            
+                <td class="default">
+                
+                    <code>'16'</code>
+                
+                </td>
+            
+
+            <td class="description last">The new bit depth of the samples.   One of '8' ... '32' (integers), '32f' or '64' (floats).</td>
         </tr>
 
     
@@ -2069,7 +2091,7 @@
 
     
 
-    <h4 class="name" id="fromMuLaw"><span class="type-signature"></span>fromMuLaw<span class="signature">(bitDepthCode)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="fromMuLaw"><span class="type-signature"></span>fromMuLaw<span class="signature">(bitDepthCode<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -2081,7 +2103,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line184">line 184</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line182">line 182</a>
     </li></ul></dd>
     
 
@@ -2152,6 +2174,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
         <th>Default</th>
@@ -2179,16 +2203,26 @@
             </td>
 
             
-
-            
-                <td class="default">
+                <td class="attributes">
                 
-                    <code>16</code>
+                    &lt;optional><br>
+                
+
+                
+
                 
                 </td>
             
 
-            <td class="description last">The new bit depth of the samples.   One of '8' ... '32' (integers), '32f' or '64' (floats).   Optional. Default is 16.</td>
+            
+                <td class="default">
+                
+                    <code>'16'</code>
+                
+                </td>
+            
+
+            <td class="description last">The new bit depth of the samples.   One of '8' ... '32' (integers), '32f' or '64' (floats).</td>
         </tr>
 
     
@@ -2218,7 +2252,7 @@
 
     
 
-    <h4 class="name" id="fromScratch"><span class="type-signature"></span>fromScratch<span class="signature">(numChannels, sampleRate, bitDepthCode, samples, options<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="fromScratch"><span class="type-signature"></span>fromScratch<span class="signature">(numChannels, sampleRate, bitDepthCode, samples, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -2305,6 +2339,8 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2338,6 +2374,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">The number of channels.</td>
         </tr>
@@ -2369,6 +2409,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">The sample rate.   Integers like 8000, 44100, 48000, 96000, 192000.</td>
         </tr>
@@ -2399,6 +2443,10 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">The audio bit depth code.   One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'   or any value between '8' and '32' (like '12').</td>
@@ -2434,6 +2482,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">The samples.</td>
         </tr>
@@ -2457,15 +2509,21 @@
             
                 <td class="attributes">
                 
-
+                    &lt;optional><br>
                 
-                    &lt;nullable><br>
+
                 
 
                 
                 </td>
             
 
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
             
 
             <td class="description last">Optional. Used to force the container   as RIFX with {'container': 'RIFX'}</td>
@@ -3106,7 +3164,7 @@
 
     
 
-    <h4 class="name" id="getSamples"><span class="type-signature"></span>getSamples<span class="signature">(interleaved<span class="signature-attributes">nullable</span>, OutputObject<span class="signature-attributes">opt, nullable</span>)</span><span class="type-signature"> &rarr; {Array|TypedArray}</span></h4>
+    <h4 class="name" id="getSamples"><span class="type-signature"></span>getSamples<span class="signature">(interleaved<span class="signature-attributes">opt</span>, OutputObject<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Array|TypedArray}</span></h4>
 
     
 
@@ -3220,9 +3278,9 @@
             
                 <td class="attributes">
                 
-
+                    &lt;optional><br>
                 
-                    &lt;nullable><br>
+
                 
 
                 
@@ -3237,7 +3295,7 @@
                 </td>
             
 
-            <td class="description last">True to return interleaved samples,  false to return the samples de-interleaved. Defaults to false.</td>
+            <td class="description last">True to return interleaved samples,  false to return the samples de-interleaved.</td>
         </tr>
 
     
@@ -3263,8 +3321,6 @@
                 
 
                 
-                    &lt;nullable><br>
-                
 
                 
                 </td>
@@ -3273,10 +3329,12 @@
             
                 <td class="default">
                 
+                    <code>Float64Array</code>
+                
                 </td>
             
 
-            <td class="description last">The Typed Array object to write the  samples. Assumes Float64Array by default.</td>
+            <td class="description last">The sample container.</td>
         </tr>
 
     
@@ -4815,7 +4873,7 @@
 
     
 
-    <h4 class="name" id="toBitDepth"><span class="type-signature"></span>toBitDepth<span class="signature">(newBitDepth, changeResolution)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="toBitDepth"><span class="type-signature"></span>toBitDepth<span class="signature">(newBitDepth, changeResolution<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -4827,7 +4885,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line204">line 204</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line202">line 202</a>
     </li></ul></dd>
     
 
@@ -4898,6 +4956,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
         <th>Default</th>
@@ -4925,6 +4985,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
                 <td class="default">
@@ -4951,6 +5019,16 @@
             
             </td>
 
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -5032,7 +5110,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-creator.js.html">lib/wavefile-creator.js</a>, <a href="lib_wavefile-creator.js.html#line118">line 118</a>
+        <a href="lib_wavefile-creator.js.html">lib/wavefile-creator.js</a>, <a href="lib_wavefile-creator.js.html#line119">line 119</a>
     </li></ul></dd>
     
 
@@ -5367,7 +5445,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line83">line 83</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -5515,7 +5593,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line163">line 163</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line162">line 162</a>
     </li></ul></dd>
     
 
@@ -5699,7 +5777,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line64">line 64</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line65">line 65</a>
     </li></ul></dd>
     
 
@@ -5779,7 +5857,7 @@
 
     
 
-    <h4 class="name" id="toSampleRate"><span class="type-signature"></span>toSampleRate<span class="signature">(sampleRate, details<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="toSampleRate"><span class="type-signature"></span>toSampleRate<span class="signature">(sampleRate, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -5791,7 +5869,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line244">line 244</a>
+        <a href="lib_wavefile-converter.js.html">lib/wavefile-converter.js</a>, <a href="lib_wavefile-converter.js.html#line242">line 242</a>
     </li></ul></dd>
     
 
@@ -5866,6 +5944,8 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -5899,6 +5979,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">The target sample rate.</td>
         </tr>
@@ -5907,7 +5991,7 @@
 
         <tr>
             
-                <td class="name"><code>details</code></td>
+                <td class="name"><code>options</code></td>
             
 
             <td class="type">
@@ -5922,15 +6006,21 @@
             
                 <td class="attributes">
                 
-
+                    &lt;optional><br>
                 
-                    &lt;nullable><br>
+
                 
 
                 
                 </td>
             
 
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
             
 
             <td class="description last">The extra configuration, if needed.</td>

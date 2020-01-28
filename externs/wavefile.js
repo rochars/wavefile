@@ -23,7 +23,7 @@
  */
 
 /**
- * @fileoverview Externs for wavefile 10.4
+ * @fileoverview Externs for wavefile 11.0
  * @see https://github.com/rochars/wavefile
  * @externs
  */
@@ -318,11 +318,10 @@ WaveFile.prototype.bitDepth = '';
 
 /**
  * Return the samples packed in a Float64Array.
- * @param {?boolean} interleaved True to return interleaved samples,
- *   false to return the samples de-interleaved. Defaults to false.
- * @param {?Function=} OutputObject The Typed Array object to write the
-   *   samples. Assumes Float64Array by default.
- * @return {!Float64Array|Array<Float64Array>} the samples.
+ * @param {boolean=} [interleaved=false] True to return interleaved samples,
+ *   false to return the samples de-interleaved.
+ * @param {Function=} [OutputObject=Float64Array] The sample container.
+ * @return {!Array|!TypedArray} the samples.
  */
 WaveFile.prototype.getSamples = function(
   interleaved=false,
@@ -345,16 +344,17 @@ WaveFile.prototype.getSample = function(index) {};
 WaveFile.prototype.setSample = function(index, sample) {};
 
 /**
- * Set up the WaveFile object based on the arguments passed.
+ * Set up the WaveFileCreator object based on the arguments passed.
+ * Existing chunks are reset.
  * @param {number} numChannels The number of channels.
  * @param {number} sampleRate The sample rate.
- *      Integers like 8000, 44100, 48000, 96000, 192000.
+ *    Integers like 8000, 44100, 48000, 96000, 192000.
  * @param {string} bitDepthCode The audio bit depth code.
- *      One of 4, 8, 8a, 8m, 16, 24, 32, 32f, 64
- *      or any value between 8 and 32 (like 12).
+ *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+ *    or any value between '8' and '32' (like '12').
  * @param {!Array|!TypedArray} samples The samples.
- * @param {?Object} options Optional. Used to force the container
- *      as RIFX with {container: RIFX}
+ * @param {Object=} options Optional. Used to force the container
+ *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.prototype.fromScratch = function(
@@ -362,14 +362,15 @@ WaveFile.prototype.fromScratch = function(
     container:'RIFF'}) {};
 
 /**
- * Set up the WaveFile object from a byte buffer.
- * @param {!Uint8Array} bytes The buffer.
- * @param {boolean=} samples True if the samples should be loaded.
+ * Set up the WaveFileParser object from a byte buffer.
+ * @param {!Uint8Array} wavBuffer The buffer.
+ * @param {boolean=} [samples=true] True if the samples should be loaded.
  * @throws {Error} If container is not RIFF, RIFX or RF64.
- * @throws {Error} If no fmt  chunk is found.
- * @throws {Error} If no data chunk is found.
+ * @throws {Error} If format is not WAVE.
+ * @throws {Error} If no 'fmt ' chunk is found.
+ * @throws {Error} If no 'data' chunk is found.
  */
-WaveFile.prototype.fromBuffer = function(bytes, samples=true) {};
+WaveFile.prototype.fromBuffer = function(wavBuffer, samples=true) {};
 
 /**
  * Return a byte buffer representig the WaveFile object as a .wav file.
@@ -421,20 +422,20 @@ WaveFile.prototype.toRIFX = function() {};
 /**
  * Change the bit depth of the samples.
  * @param {string} newBitDepth The new bit depth of the samples.
- *      One of 8 ... 32 (integers), 32f or 64 (floats)
- * @param {boolean} changeResolution A boolean indicating if the
- *      resolution of samples should be actually changed or not.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats)
+ * @param {boolean=} [changeResolution=true] A boolean indicating if the
+ *    resolution of samples should be actually changed or not.
  * @throws {Error} If the bit depth is not valid.
  */
 WaveFile.prototype.toBitDepth = function(newBitDepth, changeResolution=true) {};
 
 /**
- * Convert the sample rate of the audio.
+ * Convert the sample rate of the file.
  * @param {number} sampleRate The target sample rate.
- * @param {?Object} details The extra configuration, if needed.
+ * @param {Object=} options The extra configuration, if needed.
  */
 WaveFile.prototype.toSampleRate = function(
-  sampleRate, details= {
+  sampleRate, options= {
     method: 'cubic',
     clip: 'mirror',
     tension: 0,
@@ -454,9 +455,8 @@ WaveFile.prototype.toIMAADPCM = function() {};
 
 /**
  * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
- * @param {string} bitDepthCode The new bit depth of the samples.
- *      One of 8 ... 32 (integers), 32f or 64 (floats).
- *      Optional. Default is 16.
+ * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
 WaveFile.prototype.fromIMAADPCM = function(bitDepthCode='16') {};
 
@@ -467,9 +467,8 @@ WaveFile.prototype.toALaw = function() {};
 
 /**
  * Decode a 8-bit A-Law wave file into a 16-bit wave file.
- * @param {string} bitDepthCode The new bit depth of the samples.
- *      One of 8 ... 32 (integers), 32f or 64 (floats).
- *      Optional. Default is 16.
+ * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
 WaveFile.prototype.fromALaw = function(bitDepthCode='16') {};
 
@@ -480,9 +479,8 @@ WaveFile.prototype.toMuLaw = function() {};
 
 /**
  * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
- * @param {string} bitDepthCode The new bit depth of the samples.
- *      One of 8 ... 32 (integers), 32f or 64 (floats).
- *      Optional. Default is 16.
+ * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
 WaveFile.prototype.fromMuLaw = function(bitDepthCode='16') {};
 

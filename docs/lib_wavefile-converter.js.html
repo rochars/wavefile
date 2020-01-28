@@ -99,7 +99,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       this.bitDepth,
-      output);
+      output,
+      {container: 'RIFF'});
   }
 
   /**
@@ -149,9 +150,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
 
   /**
    * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
+   * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
    */
   fromIMAADPCM(bitDepthCode='16') {
     this.fromExisting_(
@@ -185,9 +185,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
 
   /**
    * Decode a 8-bit A-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
+   * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
    */
   fromALaw(bitDepthCode='16') {
     this.fromExisting_(
@@ -221,9 +220,8 @@ export class WaveFileConverter extends WaveFileCueEditor {
 
   /**
    * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
-   * @param {string} bitDepthCode The new bit depth of the samples.
+   * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats).
-   *    Optional. Default is 16.
    */
   fromMuLaw(bitDepthCode='16') {
     this.fromExisting_(
@@ -241,7 +239,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
    * Change the bit depth of the samples.
    * @param {string} newBitDepth The new bit depth of the samples.
    *    One of '8' ... '32' (integers), '32f' or '64' (floats)
-   * @param {boolean} changeResolution A boolean indicating if the
+   * @param {boolean=} [changeResolution=true] A boolean indicating if the
    *    resolution of samples should be actually changed or not.
    * @throws {Error} If the bit depth is not valid.
    */
@@ -283,9 +281,9 @@ export class WaveFileConverter extends WaveFileCueEditor {
   /**
    * Convert the sample rate of the file.
    * @param {number} sampleRate The target sample rate.
-   * @param {?Object} details The extra configuration, if needed.
+   * @param {Object=} options The extra configuration, if needed.
    */
-  toSampleRate(sampleRate, details={}) {
+  toSampleRate(sampleRate, options=null) {
     this.validateResample_(sampleRate);
     /** @type {!Array|!TypedArray} */
     let samples = this.getSamples();
@@ -293,12 +291,12 @@ export class WaveFileConverter extends WaveFileCueEditor {
     let newSamples = [];
     // Mono files
     if (samples.constructor === Float64Array) {
-      newSamples = resample(samples, this.fmt.sampleRate, sampleRate, details);
+      newSamples = resample(samples, this.fmt.sampleRate, sampleRate, options);
     // Multi-channel files
     } else {
       for (let i = 0; i &lt; samples.length; i++) {
         newSamples.push(resample(
-          samples[i], this.fmt.sampleRate, sampleRate, details));
+          samples[i], this.fmt.sampleRate, sampleRate, options));
       }
     }
     // Truncate samples
@@ -382,12 +380,11 @@ export class WaveFileConverter extends WaveFileCueEditor {
    *    or any value between '8' and '32' (like '12').
    * @param {!Array|!TypedArray} samples
    *    The samples. Must be in the correct range according to the bit depth.
-   * @param {?Object} options Optional. Used to force the container
-   *    as RIFX with {'container': 'RIFX'}
+   * @param {Object} options Used to define the container. Uses RIFF by default.
    * @throws {Error} If any argument does not meet the criteria.
    * @private
    */
-  fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options={}) {
+  fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options) {
     let tmpWav = new WaveFileCueEditor();
     Object.assign(this.fmt, tmpWav.fmt);
     Object.assign(this.fact, tmpWav.fact);

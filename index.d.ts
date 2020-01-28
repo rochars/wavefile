@@ -1,4 +1,4 @@
-// Type definitions for wavefile 10.4
+// Type definitions for wavefile 11.0
 // Project: https://github.com/rochars/wavefile
 // Definitions by: Rafael da Silva Rocha <https://github.com/rochars>
 // Definitions: https://github.com/rochars/wavefile
@@ -8,14 +8,6 @@ export = wavefile;
 declare module wavefile {
 
   class WaveFile {
-    
-    /**
-     * @param {?Uint8Array=} bytes A wave file buffer.
-     * @throws {Error} If no 'RIFF' chunk is found.
-     * @throws {Error} If no 'fmt ' chunk is found.
-     * @throws {Error} If no 'data' chunk is found.
-     */
-    constructor(bytes?: Uint8Array);
 
     /**
      * The bit depth code according to the samples.
@@ -103,12 +95,19 @@ declare module wavefile {
     _PMX: object;
 
     /**
+     * @param {Uint8Array=} [wavBuffer=null] A wave file buffer.
+     * @throws {Error} If no 'RIFF' chunk is found.
+     * @throws {Error} If no 'fmt ' chunk is found.
+     * @throws {Error} If no 'data' chunk is found.
+     */
+    constructor(wavBuffer?: Uint8Array);
+
+    /**
      * Return the samples packed in a Float64Array.
-     * @param {?boolean} interleaved True to return interleaved samples,
-     *   false to return the samples de-interleaved. Defaults to false.
-     * @param {?Function=} OutputObject The Typed Array object to write the
-     *   samples. Assumes Float64Array by default.
-     * @return {!Float64Array|Array<Float64Array>} the samples.
+     * @param {boolean=} [interleaved=false] True to return interleaved samples,
+     *   false to return the samples de-interleaved.
+     * @param {Function=} [OutputObject=Float64Array] The sample container.
+     * @return {!Array|!TypedArray} the samples.
      */
     getSamples(interleaved?:boolean, OutputObject?: Function): Float64Array;
 
@@ -129,16 +128,17 @@ declare module wavefile {
     setSample(index: number, sample: number): void;
 
     /**
-     * Set up the WaveFile object based on the arguments passed.
+     * Set up the WaveFileCreator object based on the arguments passed.
+     * Existing chunks are reset.
      * @param {number} numChannels The number of channels.
      * @param {number} sampleRate The sample rate.
-     *  Integer numbers like 8000, 44100, 48000, 96000, 192000.
+     *    Integers like 8000, 44100, 48000, 96000, 192000.
      * @param {string} bitDepthCode The audio bit depth code.
-     *  One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
-     *  or any value between '8' and '32' (like '12').
-     * @param {!Array|!TypedArray} samples
-     * @param {?Object} options Optional. Used to force the container
-     *  as RIFX with {'container': 'RIFX'}
+     *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
+     *    or any value between '8' and '32' (like '12').
+     * @param {!Array|!TypedArray} samples The samples.
+     * @param {Object=} options Optional. Used to force the container
+     *    as RIFX with {'container': 'RIFX'}
      * @throws {Error} If any argument does not meet the criteria.
      */
     fromScratch(
@@ -149,10 +149,11 @@ declare module wavefile {
       options?: object): void;
 
     /**
-     * Set up the WaveFile object from a byte buffer.
-     * @param {!Uint8Array} bytes The buffer.
-     * @param {boolean=} samples True if the samples should be loaded.
+     * Set up the WaveFileParser object from a byte buffer.
+     * @param {!Uint8Array} wavBuffer The buffer.
+     * @param {boolean=} [samples=true] True if the samples should be loaded.
      * @throws {Error} If container is not RIFF, RIFX or RF64.
+     * @throws {Error} If format is not WAVE.
      * @throws {Error} If no 'fmt ' chunk is found.
      * @throws {Error} If no 'data' chunk is found.
      */
@@ -208,19 +209,19 @@ declare module wavefile {
     /**
      * Change the bit depth of the samples.
      * @param {string} newBitDepth The new bit depth of the samples.
-     *  One of '8' ... '32' (integers), '32f' or '64' (floats)
-     * @param {boolean} changeResolution A boolean indicating if the
-     *  resolution of samples should be actually changed or not.
+     *    One of '8' ... '32' (integers), '32f' or '64' (floats)
+     * @param {boolean=} [changeResolution=true] A boolean indicating if the
+     *    resolution of samples should be actually changed or not.
      * @throws {Error} If the bit depth is not valid.
      */
     toBitDepth(newBitDepth: string, changeResolution?: boolean): void;
 
     /**
-     * Convert the sample rate of the audio.
+     * Convert the sample rate of the file.
      * @param {number} sampleRate The target sample rate.
-     * @param {?Object} details The extra configuration, if needed.
+     * @param {Object=} options The extra configuration, if needed.
      */
-    toSampleRate(samples: number, details?:object): void;
+    toSampleRate(samples: number, options?:object): void;
 
     /**
      * Encode a 16-bit wave file as 4-bit IMA ADPCM.
@@ -231,9 +232,8 @@ declare module wavefile {
 
     /**
      * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
-     * @param {string} bitDepthCode The new bit depth of the samples.
+     * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
      *  One of '8' ... '32' (integers), '32f' or '64' (floats).
-     *  Optional. Default is 16.
      */
     fromIMAADPCM(bitDepthCode?: string): void;
 
@@ -244,9 +244,8 @@ declare module wavefile {
 
     /**
      * Decode a 8-bit A-Law wave file into a 16-bit wave file.
-     * @param {string} bitDepthCode The new bit depth of the samples.
+     * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
      *  One of '8' ... '32' (integers), '32f' or '64' (floats).
-     *  Optional. Default is 16.
      */
     fromALaw(bitDepthCode?: string): void;
 
@@ -257,9 +256,8 @@ declare module wavefile {
 
     /**
      * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
-     * @param {string} bitDepthCode The new bit depth of the samples.
+     * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
      *  One of '8' ... '32' (integers), '32f' or '64' (floats).
-     *  Optional. Default is 16.
      */
     fromMuLaw(bitDepthCode?: string): void;
 

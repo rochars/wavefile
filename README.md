@@ -577,20 +577,23 @@ WaveFile(bytes=null);
  *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
  *    or any value between '8' and '32' (like '12').
  * @param {!Array|!TypedArray} samples The samples.
- * @param {?Object} options Optional. Used to force the container
+ * @param {Object=} options Optional. Used to force the container
  *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
  */
-WaveFile.fromScratch(numChannels, sampleRate, bitDepth, samples, options={}) {}
+WaveFile.fromScratch(
+  numChannels, sampleRate, bitDepth, samples, options=null) {}
 
 /**
- * Set up the WaveFile object from a byte buffer.
- * @param {!Uint8Array} bytes The buffer.
+ * Set up the WaveFileParser object from a byte buffer.
+ * @param {!Uint8Array} wavBuffer The buffer.
+ * @param {boolean=} [samples=true] True if the samples should be loaded.
  * @throws {Error} If container is not RIFF, RIFX or RF64.
- * @throws {Error} If no "fmt " chunk is found.
- * @throws {Error} If no "data" chunk is found.
+ * @throws {Error} If format is not WAVE.
+ * @throws {Error} If no 'fmt ' chunk is found.
+ * @throws {Error} If no 'data' chunk is found.
  */
-WaveFile.fromBuffer(bytes) {}
+WaveFile.fromBuffer(bytes, samples=true) {}
 
 /**
  * Return a byte buffer representig the WaveFile object as a .wav file.
@@ -641,20 +644,20 @@ WaveFile.toRIFX() {}
 
 /**
  * Change the bit depth of the samples.
- * @param {string} bitDepth The new bit depth of the samples.
- *      One of "8" ... "32" (integers), "32f" or "64" (floats)
- * @param {boolean} changeResolution A boolean indicating if the
- *      resolution of samples should be actually changed or not.
+ * @param {string} newBitDepth The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats)
+ * @param {boolean=} [changeResolution=true] A boolean indicating if the
+ *    resolution of samples should be actually changed or not.
  * @throws {Error} If the bit depth is not valid.
  */
 WaveFile.toBitDepth(bitDepth, changeResolution=true) {}
 
 /**
- * Convert the sample rate of the audio.
+ * Convert the sample rate of the file.
  * @param {number} sampleRate The target sample rate.
- * @param {?Object} details The extra configuration, if needed.
+ * @param {Object=} options The extra configuration, if needed.
  */
-WaveFile.toSampleRate(sampleRate, details={}) {};
+WaveFile.toSampleRate(sampleRate, options=null) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.
@@ -665,9 +668,8 @@ WaveFile.toIMAADPCM() {}
 
 /**
  * Decode a 4-bit IMA ADPCM wave file as a 16-bit wave file.
- * @param {string} bitDepth The new bit depth of the samples.
- *      One of "8" ... "32" (integers), "32f" or "64" (floats).
- *      Optional. Default is 16.
+ * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
 WaveFile.fromIMAADPCM(bitDepth='16') {}
 
@@ -678,9 +680,8 @@ WaveFile.toALaw() {}
 
 /**
  * Decode a 8-bit A-Law wave file into a 16-bit wave file.
- * @param {string} bitDepth The new bit depth of the samples.
- *      One of "8" ... "32" (integers), "32f" or "64" (floats).
- *      Optional. Default is 16.
+ * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
 WaveFile.fromALaw(bitDepth='16') {}
 
@@ -691,9 +692,8 @@ WaveFile.toMuLaw() {}
 
 /**
  * Decode a 8-bit mu-Law wave file into a 16-bit wave file.
- * @param {string} bitDepth The new bit depth of the samples.
- *      One of "8" ... "32" (integers), "32f" or "64" (floats).
- *      Optional. Default is 16.
+ * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
+ *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
 WaveFile.fromMuLaw(bitDepth='16') {}
 
@@ -803,11 +803,10 @@ WaveFile.updateLabel(pointIndex, label) {}
 
 /**
  * Return the samples packed in a Float64Array.
- * @param {?boolean} interleaved True to return interleaved samples,
- *   false to return the samples de-interleaved. Defaults to false.
- * @param {?Function=} OutputObject The Typed Array object to write the
-   *   samples. Assumes Float64Array by default.
- * @return {!Float64Array|Array<Float64Array>} the samples.
+ * @param {boolean=} [interleaved=false] True to return interleaved samples,
+ *   false to return the samples de-interleaved.
+ * @param {Function=} [OutputObject=Float64Array] The sample container.
+ * @return {!Array|!TypedArray} the samples.
  */
 WaveFile.getSamples(interleaved=false, OutputObject=Float64Array) {};
 
