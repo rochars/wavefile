@@ -39,16 +39,16 @@ import { WaveFileConverter } from './lib/wavefile-converter';
 export class WaveFile extends WaveFileConverter {
 
   /**
-   * @param {Uint8Array=} [wavBuffer=null] A wave file buffer.
+   * @param {Uint8Array=} wav A wave file buffer.
    * @throws {Error} If container is not RIFF, RIFX or RF64.
    * @throws {Error} If format is not WAVE.
    * @throws {Error} If no 'fmt ' chunk is found.
    * @throws {Error} If no 'data' chunk is found.
    */
-  constructor(wavBuffer=null) {
+  constructor(wav) {
     super();
-    if (wavBuffer) {
-      this.fromBuffer(wavBuffer);
+    if (wav) {
+      this.fromBuffer(wav);
     }
   }
 
