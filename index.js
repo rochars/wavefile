@@ -58,7 +58,7 @@ export class WaveFile extends WaveFileConverter {
    * @throws {Error} If any property of the object appears invalid.
    */
   fromBase64(base64String) {
-    this.fromBuffer(new Uint8Array(decode(base64String)));
+    this.fromBuffer(decode(base64String));
   }
 
   /**
