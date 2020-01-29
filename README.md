@@ -530,14 +530,16 @@ wavefile --help
 
 The available options:
 ```
+  --resample   Ex: wavefile input.wav --resample=44100 output.wav
+               Change the sample rate. The input file is not affected.
+               Use with --method to change the interpolation method:
+               Ex: wavefile in.wav --resample=8000 --method=sinc out.wav
+               If --method is ommited, cubic interpolation will be used.
+
   --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
                Change the bit depth.
                The input file is not affected.
                Possible values: 8, 16, 24, 32, 32f, 64
-
-  --resample   Ex: wavefile input.wav --resample=44100 output.wav
-               Change the sample rate.
-               The input file is not affected.
 
   --compress   Ex: wavefile input.wav --compress=adpcm output.wav
                Apply compression to the file.
@@ -563,7 +565,11 @@ The available options:
                Show this help page.
 ```
 
-The **--resample** command performs resampling using *cubic interpolation*.
+The **--resample** command performs resampling using *cubic interpolation* by default. Use it with the **--method** option to change the interpolation method:
+```
+$ wavefile input.wav --resample=44100 method=sinc output.wav
+```
+You can use *point*,*linear*,*cubic* and *sinc*.
 
 ## API
 To create a WaveFile object:

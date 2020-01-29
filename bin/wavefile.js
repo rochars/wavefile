@@ -1,4 +1,27 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2017-2019 Rafael da Silva Rocha.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 /**
  * @fileoverview wavefile CLI.
@@ -19,8 +42,10 @@ const help = " Usage:\n" +
   " Available options:\n" +
   "\n" +
   "  --resample   Ex: wavefile input.wav --resample=16000 output.wav\n" +
-  "               Change the sample rate.\n" +
-  "               The input file is not affected.\n" +
+  "               Change the sample rate. The input file is not affected\n" +
+  "               Use with --method to change the interpolation method:\n" +
+  "               Ex: wavefile in.wav --resample=8000 --method=sinc out.wav\n" +
+  "               If --method is ommited, cubic interpolation will be used.\n" +
   "\n" +
   "  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav\n" +
   "               Change the bit depth.\n" +
@@ -52,7 +77,8 @@ const help = " Usage:\n" +
   "\n";
 
 // Help
-if (process.argv[2] == '-h' || process.argv[2] == '--help' || process.argv.length < 4) {
+if (process.argv[2] == '-h' ||
+    process.argv[2] == '--help' || process.argv.length < 4) {
   console.log(presentation);
   console.log(help);
   process.exit();
@@ -61,18 +87,18 @@ if (process.argv[2] == '-h' || process.argv[2] == '--help' || process.argv.lengt
 // Anything that is not a arg will be considered a file reference;
 // the first item in the list will be considered the input, all
 // others will be output
-/** @type {Array<string>} */
+/** @type {!Array<string>} */
 let files = [];
 
 // Anything that is not a file will be considered a command;
 // All commands should be executed against the input file
-/** @type {Array<string>} */
-let commands = [];
+/** @type {!Object} */
+let commands = {};
 
 // parse args
 for (let arg=2; arg<process.argv.length; arg++) {
   if (process.argv[arg].slice(0, 1) == '-') {
-    commands.push(process.argv[arg]);
+    commands[process.argv[arg].split("=")[0]] = process.argv[arg].split("=")[1];
   } else {
     files.push(process.argv[arg]);
   }
@@ -88,60 +114,63 @@ files.splice(0, 1);
 let shouldWrite = false;
 for (let command in commands) {
   // --bitdepth
-  let splitCommand = commands[command].split("=");
-  if (splitCommand[0] == '--bitdepth') {
-    wav.toBitDepth(splitCommand[1]);
+  if (command == '--bitdepth') {
+    wav.toBitDepth(commands[command]);
     shouldWrite = true;
   // --resample
-  } else if (splitCommand[0] == '--resample') {
-    wav.toSampleRate(parseInt(splitCommand[1], 10));
+  } else if (command == '--resample') {
+    let options = {
+      'method' : commands['--method'] ? commands['--method'] : 'cubic'
+    };
+    wav.toSampleRate(parseInt(commands[command], 10), options);
     shouldWrite = true;
   // --compress
-  } else if (splitCommand[0] == '--compress') {
-    if (splitCommand[1] == 'adpcm') {
+  } else if (command == '--compress') {
+    if (commands[command] == 'adpcm') {
       wav.toIMAADPCM();
       shouldWrite = true;
-    } else if (splitCommand[1] == 'alaw') {
+    } else if (commands[command] == 'alaw') {
       wav.toALaw();
       shouldWrite = true;
-    } else if (splitCommand[1] == 'mulaw') {
+    } else if (commands[command] == 'mulaw') {
       wav.toMuLaw();
       shouldWrite = true;
     }
   // --tag
-  } else if (splitCommand[0] == '--tag') {
-    console.log(wav.getTag(splitCommand[1]));
+  } else if (command == '--tag') {
+    console.log(wav.getTag(commands[command]));
   // --list-tag
-  } else if (splitCommand[0] == '--list-tags') {
+  } else if (command == '--list-tags') {
     tags = wav.listTags();
     for (var tag in tags) {
-          if (tags.hasOwnProperty(tag)) {
-             console.log(tag + ': ' + tags[tag]);
-          }
+      if (tags.hasOwnProperty(tag)) {
+         console.log(tag + ': ' + tags[tag]);
       }
+    }
   // --list-cue
-  } else if (splitCommand[0] == '--list-cue') {
+  } else if (command == '--list-cue') {
     console.log(wav.listCuePoints());
   // --bits
-  } else if (splitCommand[0] == '--bits') {
+  } else if (command == '--bits') {
     if (wav.fmt.validBitsPerSample) {
       console.log(wav.fmt.validBitsPerSample);
     } else {
       console.log(wav.fmt.bitPerSample);
     }
   // --rate
-  } else if (splitCommand[0] == '--rate') {
+  } else if (command == '--rate') {
     console.log(wav.fmt.sampleRate);
   // error
   } else {
-    if (splitCommand[0] !== '--method') {
-      console.log('ERROR: Bad option. Run wavefile -h to check the available options.');
+    if (!(command === '--method' && commands['--resample'])) {
+      console.log('ERROR: Bad option. Run wavefile -h to check the available'+
+        ' options.');
       process.exit();
     }
   }
 }
 
-// Write the output
+// Write the output file
 if (shouldWrite) {
   if (files.length) {
     for (let file in files) {

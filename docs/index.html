@@ -486,14 +486,16 @@ wav.getSample(1); // return 10, the new value of the second sample
 <pre class="prettyprint source"><code>wavefile --help
 </code></pre>
 <p>The available options:</p>
-<pre class="prettyprint source"><code>  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
+<pre class="prettyprint source"><code>  --resample   Ex: wavefile input.wav --resample=44100 output.wav
+               Change the sample rate. The input file is not affected.
+               Use with --method to change the interpolation method:
+               Ex: wavefile in.wav --resample=8000 --method=sinc out.wav
+               If --method is ommited, cubic interpolation will be used.
+
+  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
                Change the bit depth.
                The input file is not affected.
                Possible values: 8, 16, 24, 32, 32f, 64
-
-  --resample   Ex: wavefile input.wav --resample=44100 output.wav
-               Change the sample rate.
-               The input file is not affected.
 
   --compress   Ex: wavefile input.wav --compress=adpcm output.wav
                Apply compression to the file.
@@ -518,7 +520,10 @@ wav.getSample(1); // return 10, the new value of the second sample
   --help       Ex: --help
                Show this help page.
 </code></pre>
-<p>The <strong>--resample</strong> command performs resampling using <em>cubic interpolation</em>.</p>
+<p>The <strong>--resample</strong> command performs resampling using <em>cubic interpolation</em> by default. Use it with the <strong>--method</strong> option to change the interpolation method:</p>
+<pre class="prettyprint source"><code>$ wavefile input.wav --resample=44100 method=sinc output.wav
+</code></pre>
+<p>You can use <em>point</em>,<em>linear</em>,<em>cubic</em> and <em>sinc</em>.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>// Create a empty WaveFile object
