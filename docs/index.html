@@ -511,13 +511,19 @@ wav.getSample(1); // return 10, the new value of the second sample
 <p>Floating point samples may be defined out of range. Integer samples will be clamped on overflow.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
-<pre class="prettyprint source lang-javascript"><code>/**
- * @param {?Uint8Array} bytes A wave file buffer.
+<pre class="prettyprint source lang-javascript"><code>// Create a empty WaveFile object
+WaveFile();
+
+// Create a WaveFile object with the contents of a wav file buffer
+WaveFile(wav);
+
+/**
+ * @param {Uint8Array=} wav A wave file buffer.
  * @throws {Error} If no &quot;RIFF&quot; chunk is found.
  * @throws {Error} If no &quot;fmt &quot; chunk is found.
  * @throws {Error} If no &quot;data&quot; chunk is found.
  */
-WaveFile(bytes=null);
+WaveFile(wav);
 </code></pre>
 <h3>The WaveFile methods</h3>
 <pre class="prettyprint source lang-javascript"><code>/**

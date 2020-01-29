@@ -556,13 +556,19 @@ Floating point samples may be defined out of range. Integer samples will be clam
 ## API
 To create a WaveFile object:
 ```javascript
+// Create a empty WaveFile object
+WaveFile();
+
+// Create a WaveFile object with the contents of a wav file buffer
+WaveFile(wav);
+
 /**
- * @param {?Uint8Array} bytes A wave file buffer.
+ * @param {Uint8Array=} wav A wave file buffer.
  * @throws {Error} If no "RIFF" chunk is found.
  * @throws {Error} If no "fmt " chunk is found.
  * @throws {Error} If no "data" chunk is found.
  */
-WaveFile(bytes=null);
+WaveFile(wav);
 ```
 
 ### The WaveFile methods
