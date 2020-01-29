@@ -321,7 +321,7 @@ WaveFile.prototype.bitDepth = '';
  * @param {boolean=} [interleaved=false] True to return interleaved samples,
  *   false to return the samples de-interleaved.
  * @param {Function=} [OutputObject=Float64Array] The sample container.
- * @return {!Array|!TypedArray} the samples.
+ * @return {!(Array|TypedArray)} the samples.
  */
 WaveFile.prototype.getSamples = function(
   interleaved=false,
@@ -352,7 +352,7 @@ WaveFile.prototype.setSample = function(index, sample) {};
  * @param {string} bitDepthCode The audio bit depth code.
  *    One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'
  *    or any value between '8' and '32' (like '12').
- * @param {!Array|!TypedArray} samples The samples.
+ * @param {!(Array|TypedArray)} samples The samples.
  * @param {Object=} options Optional. Used to force the container
  *    as RIFX with {'container': 'RIFX'}
  * @throws {Error} If any argument does not meet the criteria.
@@ -373,10 +373,12 @@ WaveFile.prototype.fromScratch = function(
 WaveFile.prototype.fromBuffer = function(wavBuffer, samples=true) {};
 
 /**
- * Return a byte buffer representig the WaveFile object as a .wav file.
+ * Return a byte buffer representig the WaveFileParser object as a .wav file.
  * The return value of this method can be written straight to disk.
- * @return {!Uint8Array} A .wav file.
- * @throws {Error} If any property of the object appears invalid.
+ * @return {!Uint8Array} A wav file.
+ * @throws {Error} If bit depth is invalid.
+ * @throws {Error} If the number of channels is invalid.
+ * @throws {Error} If the sample rate is invalid.
  */
 WaveFile.prototype.toBuffer = function() {};
 
