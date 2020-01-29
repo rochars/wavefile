@@ -2244,7 +2244,7 @@
 
     
 
-    <h4 class="name" id="fromScratch"><span class="type-signature"></span>fromScratch<span class="signature">(numChannels, sampleRate, bitDepthCode, samples, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="fromScratch"><span class="type-signature"></span>fromScratch<span class="signature">(numChannels, sampleRate, bitDepthCode, samples<span class="signature-attributes">non-null</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -2331,8 +2331,6 @@
         
 
         
-        <th>Default</th>
-        
 
         <th class="last">Description</th>
     </tr>
@@ -2366,10 +2364,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">The number of channels.</td>
         </tr>
@@ -2401,10 +2395,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">The sample rate.   Integers like 8000, 44100, 48000, 96000, 192000.</td>
         </tr>
@@ -2435,10 +2425,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last">The audio bit depth code.   One of '4', '8', '8a', '8m', '16', '24', '32', '32f', '64'   or any value between '8' and '32' (like '12').</td>
@@ -2474,10 +2460,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">The samples.</td>
         </tr>
@@ -2510,12 +2492,6 @@
                 </td>
             
 
-            
-                <td class="default">
-                
-                    <code>null</code>
-                
-                </td>
             
 
             <td class="description last">Optional. Used to force the container   as RIFX with {'container': 'RIFX'}</td>
