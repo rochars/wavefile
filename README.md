@@ -87,41 +87,10 @@ Cross-browser tests powered by
 <a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a>
 
 
-### Command line
+### Command line use
 To see the available options:
 ```
 wavefile --help
-```
-
-The available options:
-```
-  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
-               Change the bit depth.
-               The input file is not affected.
-               Possible values: 8, 16, 24, 32, 32f, 64
-
-  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
-               Apply compression to the file.
-               The input file is not affected.
-               Possible values: adpcm, alaw, mulaw
-
-  --tag        Ex: wavefile input.wav --tag=ICRD
-               Print the value of tag if the tag exists.
-
-  --list-tags  Ex: wavefile input.wav --list-tags
-               Print all tags of the file.
-
-  --list-cue   Ex: wavefile input.wav --list-cue
-               Print all the cue points of the file.
-
-  --bits       Ex: wavefile input.wav --bits
-               Print the bit depth of the file.
-
-  --rate       Ex: wavefile input.wav --rate
-               Print the sample rate of the file.
-
-  --help       Ex: --help
-               Show this help page.
 ```
 
 ## Node.js Example
@@ -163,6 +132,7 @@ let wavDataURI = wav.toDataURI();
   * [RF64](#rf64)
   * [XML Chunks](#xml-chunks)
   * [The samples](#the-samples)
+  * [Command line](#command-line)
 - [API](#api)
   * [The WaveFile methods:](#the-wavefile-methods-)
   * [The WaveFile properties](#the-wavefile-properties)
@@ -524,7 +494,6 @@ let samples = getSamples(false, Int16Array);
 let samples = getSamples(true, Int16Array);
 ```
 
-
 To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.
 
 Example:
@@ -552,6 +521,49 @@ wav.getSample(1); // return 10, the new value of the second sample
 - -1.0 to 1.0 for 64-bit (float)
 
 Floating point samples may be defined out of range. Integer samples will be clamped on overflow.
+
+### Command line
+To see the available options:
+```
+wavefile --help
+```
+
+The available options:
+```
+  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
+               Change the bit depth.
+               The input file is not affected.
+               Possible values: 8, 16, 24, 32, 32f, 64
+
+  --resample   Ex: wavefile input.wav --resample=44100 output.wav
+               Change the sample rate.
+               The input file is not affected.
+
+  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
+               Apply compression to the file.
+               The input file is not affected.
+               Possible values: adpcm, alaw, mulaw
+
+  --tag        Ex: wavefile input.wav --tag=ICRD
+               Print the value of tag if the tag exists.
+
+  --list-tags  Ex: wavefile input.wav --list-tags
+               Print all tags of the file.
+
+  --list-cue   Ex: wavefile input.wav --list-cue
+               Print all the cue points of the file.
+
+  --bits       Ex: wavefile input.wav --bits
+               Print the bit depth of the file.
+
+  --rate       Ex: wavefile input.wav --rate
+               Print the sample rate of the file.
+
+  --help       Ex: --help
+               Show this help page.
+```
+
+The **--resample** command performs resampling using *cubic interpolation*.
 
 ## API
 To create a WaveFile object:

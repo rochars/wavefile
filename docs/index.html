@@ -122,38 +122,9 @@ let wav = new WaveFile();
 <p>IE10+. Should work in all modern browsers.</p>
 <p>Cross-browser tests powered by<br>
 <a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a></p>
-<h3>Command line</h3>
+<h3>Command line use</h3>
 <p>To see the available options:</p>
 <pre class="prettyprint source"><code>wavefile --help
-</code></pre>
-<p>The available options:</p>
-<pre class="prettyprint source"><code>  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
-               Change the bit depth.
-               The input file is not affected.
-               Possible values: 8, 16, 24, 32, 32f, 64
-
-  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
-               Apply compression to the file.
-               The input file is not affected.
-               Possible values: adpcm, alaw, mulaw
-
-  --tag        Ex: wavefile input.wav --tag=ICRD
-               Print the value of tag if the tag exists.
-
-  --list-tags  Ex: wavefile input.wav --list-tags
-               Print all tags of the file.
-
-  --list-cue   Ex: wavefile input.wav --list-cue
-               Print all the cue points of the file.
-
-  --bits       Ex: wavefile input.wav --bits
-               Print the bit depth of the file.
-
-  --rate       Ex: wavefile input.wav --rate
-               Print the sample rate of the file.
-
-  --help       Ex: --help
-               Show this help page.
 </code></pre>
 <h2>Node.js Example</h2>
 <pre class="prettyprint source lang-javascript"><code>const WaveFile = require('wavefile').WaveFile;
@@ -194,6 +165,7 @@ let wavDataURI = wav.toDataURI();
 <li><a href="#rf64">RF64</a></li>
 <li><a href="#xml-chunks">XML Chunks</a></li>
 <li><a href="#the-samples">The samples</a></li>
+<li><a href="#command-line">Command line</a></li>
 </ul>
 </li>
 <li><a href="#api">API</a>
@@ -509,6 +481,44 @@ wav.getSample(1); // return 10, the new value of the second sample
 <li>-1.0 to 1.0 for 64-bit (float)</li>
 </ul>
 <p>Floating point samples may be defined out of range. Integer samples will be clamped on overflow.</p>
+<h3>Command line</h3>
+<p>To see the available options:</p>
+<pre class="prettyprint source"><code>wavefile --help
+</code></pre>
+<p>The available options:</p>
+<pre class="prettyprint source"><code>  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav
+               Change the bit depth.
+               The input file is not affected.
+               Possible values: 8, 16, 24, 32, 32f, 64
+
+  --resample   Ex: wavefile input.wav --resample=44100 output.wav
+               Change the sample rate.
+               The input file is not affected.
+
+  --compress   Ex: wavefile input.wav --compress=adpcm output.wav
+               Apply compression to the file.
+               The input file is not affected.
+               Possible values: adpcm, alaw, mulaw
+
+  --tag        Ex: wavefile input.wav --tag=ICRD
+               Print the value of tag if the tag exists.
+
+  --list-tags  Ex: wavefile input.wav --list-tags
+               Print all tags of the file.
+
+  --list-cue   Ex: wavefile input.wav --list-cue
+               Print all the cue points of the file.
+
+  --bits       Ex: wavefile input.wav --bits
+               Print the bit depth of the file.
+
+  --rate       Ex: wavefile input.wav --rate
+               Print the sample rate of the file.
+
+  --help       Ex: --help
+               Show this help page.
+</code></pre>
+<p>The <strong>--resample</strong> command performs resampling using <em>cubic interpolation</em>.</p>
 <h2>API</h2>
 <p>To create a WaveFile object:</p>
 <pre class="prettyprint source lang-javascript"><code>// Create a empty WaveFile object

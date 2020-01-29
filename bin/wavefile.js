@@ -18,6 +18,10 @@ const help = " Usage:\n" +
   "\n" +
   " Available options:\n" +
   "\n" +
+  "  --resample   Ex: wavefile input.wav --resample=16000 output.wav\n" +
+  "               Change the sample rate.\n" +
+  "               The input file is not affected.\n" +
+  "\n" +
   "  --bitdepth   Ex: wavefile input.wav --bitdepth=32f output.wav\n" +
   "               Change the bit depth.\n" +
   "               The input file is not affected.\n" +
@@ -88,6 +92,10 @@ for (let command in commands) {
   if (splitCommand[0] == '--bitdepth') {
     wav.toBitDepth(splitCommand[1]);
     shouldWrite = true;
+  // --resample
+  } else if (splitCommand[0] == '--resample') {
+    wav.toSampleRate(parseInt(splitCommand[1], 10));
+    shouldWrite = true;
   // --compress
   } else if (splitCommand[0] == '--compress') {
     if (splitCommand[1] == 'adpcm') {
@@ -126,8 +134,10 @@ for (let command in commands) {
     console.log(wav.fmt.sampleRate);
   // error
   } else {
-    console.log('ERROR: Bad option. Run wavefile -h to check the available options.');
-    process.exit();
+    if (splitCommand[0] !== '--method') {
+      console.log('ERROR: Bad option. Run wavefile -h to check the available options.');
+      process.exit();
+    }
   }
 }
 
