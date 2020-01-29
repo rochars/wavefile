@@ -101,7 +101,7 @@
   "dependencies": {
     "alawmulaw": "^5.0.2",
     "bitdepth": "^9.0.0",
-    "byte-data": "^19.0.0",
+    "byte-data": "^19.0.1",
     "imaadpcm": "^5.0.0"
   }
 }
