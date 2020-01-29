@@ -385,6 +385,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
    * @private
    */
   fromExisting_(numChannels, sampleRate, bitDepthCode, samples, options) {
+    /** @type {!Object} */
     let tmpWav = new WaveFileCueEditor();
     Object.assign(this.fmt, tmpWav.fmt);
     Object.assign(this.fact, tmpWav.fact);
