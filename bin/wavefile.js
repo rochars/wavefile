@@ -34,6 +34,7 @@ const fs = require('fs');
 /** @type {string} */
 const presentation = " WaveFile 8.1.0\n" +
 " Copyright (c) 2017-2018 Rafael da Silva Rocha.\n";
+
 /** @type {string} */
 const help = " Usage:\n" +
   "\n" +
@@ -84,15 +85,19 @@ if (process.argv[2] == '-h' ||
   process.exit();
 }
 
-// Anything that is not a arg will be considered a file reference;
-// the first item in the list will be considered the input, all
-// others will be output
-/** @type {!Array<string>} */
+/**
+ * Anything that is not a command will be considered a file reference;
+ * the first item in the list will be considered the input, all
+ * others will be considered output.
+ * @type {!Array<string>}
+ */
 let files = [];
 
-// Anything that is not a file will be considered a command;
-// All commands should be executed against the input file
-/** @type {!Object} */
+/**
+ * Anything that is not a file will be considered a command;
+ * All commands should be executed against the input file.
+ * @type {Object}
+ */
 let commands = {};
 
 // parse args
@@ -119,6 +124,7 @@ for (let command in commands) {
     shouldWrite = true;
   // --resample
   } else if (command == '--resample') {
+    /** @type {!Object} */
     let options = {
       'method' : commands['--method'] ? commands['--method'] : 'cubic'
     };
@@ -141,6 +147,7 @@ for (let command in commands) {
     console.log(wav.getTag(commands[command]));
   // --list-tag
   } else if (command == '--list-tags') {
+    /** @type {!Object} */
     tags = wav.listTags();
     for (var tag in tags) {
       if (tags.hasOwnProperty(tag)) {
