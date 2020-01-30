@@ -1,9 +1,12 @@
 # CHANGELOG
 
-## version 11.0.0 - unreleased
+## version 11.0.0 - 2020-01-30
 
 ### API changes
 - clamp int samples on overflow instead of throwing RangeError
+
+### Other changes
+- Zero dependencies
 
 
 ## version 10.4.3 - 2020-01-27

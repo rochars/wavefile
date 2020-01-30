@@ -17,6 +17,7 @@ Create, read and write wav files according to the specs.
 - **Use it in Node.js**
 - **Use it as a command line tool**
 - **Handle files up to 2GB**
+- **Zero dependencies**
 
 With **wavefile** you can:
 
