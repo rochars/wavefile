@@ -523,9 +523,14 @@ wav.getSample(1); // return 10, the new value of the second sample
 Floating point samples may be defined out of range. Integer samples will be clamped on overflow.
 
 ### Command line
+To use **wavefile** from the command line, install it globally:
+```
+$ npm install wavefile -g
+```
+
 To see the available options:
 ```
-wavefile --help
+$ wavefile --help
 ```
 
 The available options:

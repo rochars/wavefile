@@ -482,8 +482,11 @@ wav.getSample(1); // return 10, the new value of the second sample
 </ul>
 <p>Floating point samples may be defined out of range. Integer samples will be clamped on overflow.</p>
 <h3>Command line</h3>
+<p>To use <strong>wavefile</strong> from the command line, install it globally:</p>
+<pre class="prettyprint source"><code>$ npm install wavefile -g
+</code></pre>
 <p>To see the available options:</p>
-<pre class="prettyprint source"><code>wavefile --help
+<pre class="prettyprint source"><code>$ wavefile --help
 </code></pre>
 <p>The available options:</p>
 <pre class="prettyprint source"><code>  --resample   Ex: wavefile input.wav --resample=44100 output.wav
