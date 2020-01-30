@@ -72,10 +72,9 @@
  */
 
 import { changeBitDepth } from './codecs/bitdepth';
-import { encode as encodeIMAADPCM,
-  decode as decodeIMAADPCM } from './codecs/imaadpcm';
-import { encode as encodeALaw, decode as decodeALaw } from './codecs/alaw';
-import { encode as encodeMuLaw, decode as decodeMuLaw } from './codecs/mulaw';
+import * as imaadpcm from './codecs/imaadpcm';
+import * as alaw from './codecs/alaw';
+import * as mulaw from './codecs/mulaw';
 import { unpackArrayTo } from './parsers/binary';
 import { WaveFileCueEditor } from './wavefile-cue-editor';
 import { validateSampleRate } from './validators/validate-sample-rate';
@@ -145,7 +144,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
-        encodeIMAADPCM(output),
+        imaadpcm.encode(output),
         {container: this.correctContainer_()});
     }
   }
@@ -160,7 +159,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      decodeIMAADPCM(this.data.samples, this.fmt.blockAlign),
+      imaadpcm.decode(this.data.samples, this.fmt.blockAlign),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -181,7 +180,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      encodeALaw(output),
+      alaw.encode(output),
       {container: this.correctContainer_()});
   }
 
@@ -195,7 +194,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      decodeALaw(this.data.samples),
+      alaw.decode(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -216,7 +215,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      encodeMuLaw(output),
+      mulaw.encode(output),
       {container: this.correctContainer_()});
   }
 
@@ -230,7 +229,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      decodeMuLaw(this.data.samples),
+      mulaw.decode(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
