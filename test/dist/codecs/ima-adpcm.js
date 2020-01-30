@@ -345,3 +345,15 @@ describe('8-bit A-Law to 4-bit ADPCM', function() {
         assert.ok(wav2.data.samples.length > 0);
     });
 });
+
+describe('8-bit A-Law to 4-bit ADPCM', function() {
+    let wav = new WaveFile(
+        fs.readFileSync(
+            path + "16bit-44100Hz-mono-chirp-1-22050-linear.wav"));
+    wav.toSampleRate(8000);
+    wav.toIMAADPCM();
+    let wav2 = new WaveFile(wav.toBuffer());
+    fs.writeFileSync(
+        path + "/out/4bit-8000Hz-mono-chirp-1-22050-linear.wav",
+        wav2.toBuffer());
+});
