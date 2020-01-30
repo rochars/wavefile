@@ -71,10 +71,12 @@
  * @see https://github.com/rochars/wavefile
  */
 
-import { changeBitDepth } from 'bitdepth';
-import * as imaadpcm from 'imaadpcm';
-import * as alawmulaw from 'alawmulaw';
-import { unpackArrayTo } from 'byte-data';
+import { changeBitDepth } from './codecs/bitdepth';
+import { encode as encodeIMAADPCM,
+  decode as decodeIMAADPCM} from './codecs/imaadpcm';
+import {encode as encodeALaw, decode as decodeALaw} from './codecs/alaw';
+import {encode as encodeMuLaw, decode as decodeMuLaw} from './codecs/mulaw';
+import { unpackArrayTo } from './parsers/binary';
 import { WaveFileCueEditor } from './wavefile-cue-editor';
 import { validateSampleRate } from './validators/validate-sample-rate';
 import { resample } from './resampler';
@@ -143,7 +145,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
         this.fmt.numChannels,
         this.fmt.sampleRate,
         '4',
-        imaadpcm.encode(output),
+        encodeIMAADPCM(output),
         {container: this.correctContainer_()});
     }
   }
@@ -158,7 +160,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      imaadpcm.decode(this.data.samples, this.fmt.blockAlign),
+      decodeIMAADPCM(this.data.samples, this.fmt.blockAlign),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -179,7 +181,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8a',
-      alawmulaw.alaw.encode(output),
+      encodeALaw(output),
       {container: this.correctContainer_()});
   }
 
@@ -193,7 +195,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      alawmulaw.alaw.decode(this.data.samples),
+      decodeALaw(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -214,7 +216,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '8m',
-      alawmulaw.mulaw.encode(output),
+      encodeMuLaw(output),
       {container: this.correctContainer_()});
   }
 
@@ -228,7 +230,7 @@ export class WaveFileConverter extends WaveFileCueEditor {
       this.fmt.numChannels,
       this.fmt.sampleRate,
       '16',
-      alawmulaw.mulaw.decode(this.data.samples),
+      decodeMuLaw(this.data.samples),
       {container: this.correctContainer_()});
     if (bitDepthCode != '16') {
       this.toBitDepth(bitDepthCode);
@@ -297,18 +299,6 @@ export class WaveFileConverter extends WaveFileCueEditor {
       for (let i = 0; i &lt; samples.length; i++) {
         newSamples.push(resample(
           samples[i], this.fmt.sampleRate, sampleRate, options));
-      }
-    }
-    // Truncate samples
-    if (this.bitDepth !== '64' &amp;&amp; this.bitDepth !== '32f') {
-      // Truncate samples in mono files
-      if (newSamples[0].constructor === Number) {
-        roundIntSamples(newSamples);
-      // Truncate samples in multi-channel files
-      } else {
-        for (let i = 0; i &lt; newSamples.length; i++) {
-          roundIntSamples(newSamples[i]);
-        }
       }
     }
     // Recreate the file
@@ -408,17 +398,6 @@ function outputSize_(byteLen, byteOffset) {
     outputSize++;
   }
   return outputSize;
-}
-
-/**
- * Round integer samples.
- * @param {!(Array&lt;number>|TypedArray)} samples The samples to round.
- * @private
- */
-function roundIntSamples(samples) {
-  for (let i = 0, len = samples.length; i &lt; len; i++) {
-    samples[i] = Math.round(samples[i]);
-  }
 }
 </code></pre>
         </article>

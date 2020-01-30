@@ -87,6 +87,7 @@
     "@ampproject/rollup-plugin-closure-compiler": "^0.13.0",
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^6.0.0",
+    "byte-data": "^19.0.1",
     "codecov": "^3.6.1",
     "docdash": "^1.1.1",
     "esm": "^3.2.25",
@@ -98,10 +99,5 @@
     "rollup": "^1.27.14",
     "typescript": "^3.7.4"
   },
-  "dependencies": {
-    "alawmulaw": "^5.0.2",
-    "bitdepth": "^9.0.0",
-    "byte-data": "^19.0.1",
-    "imaadpcm": "^5.0.0"
-  }
+  "dependencies": {}
 }
