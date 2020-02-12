@@ -7,7 +7,8 @@ https://github.com/rochars/wavefile
 
 
 ## Notice
-**I've been receiving constant death threats for my position against the Bolsonaro regime, both in person and over the phone. I need to get away from my activities for now. Wish me luck.**
+**I've been receiving constant death threats for my position against the Bolsonaro regime, both in person and over the phone.
+**
 
 
 Create, read and write wav files according to the specs.
