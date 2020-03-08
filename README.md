@@ -6,10 +6,20 @@ https://github.com/rochars/wavefile
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
 
-## Notice
-**I've been receiving constant death threats for my position against the Bolsonaro regime, both in person and over the phone.
-**
+## MOVING AWAY FROM GITHUB (2020-03-08)
+Microsoft, owner of GitHub, was one of the main backers of the current fascist regime in Brazil and also of the coup d'etat that led to the present situation of my country.
 
+It paid well: The brazilian government was required to run all its systems on open-source software. After the coup d'etat this changed, the goverment began purchasing Microsoft licenses and migrating all their systems to Windows.
+
+It is not just a case of business malpractice - there is a genocide going on in Brazil and many people, including myself, have lived under constant death threats for the past couple years bacause of our positions against the current fascist regime. Many have been murdered or incarcerated. Poverty and violence skyrocketed.
+
+**This software will keep being released in NPM as always - only the repository will be moved. Projects depending on this software will not be affected.**
+
+For Microsoft owners and collaborators: you have a lot of blood in your hands. I will not share my work with people of your kind.
+
+---
+
+# wavefile
 
 Create, read and write wav files according to the specs.
 
