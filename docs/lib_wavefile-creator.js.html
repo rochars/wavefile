@@ -241,12 +241,13 @@ export class WaveFileCreator extends WaveFileParser {
    * @param {Object=} info Mpeg info such as version, layer, bitRate, etc.
    * @throws {Error} If any argument does not meet the criteria.
    */
+  // prettier-ignore
   mpegHeadMode_(info) {
     return {
-      stereo: 1,
+      "stereo": 1,
       "joint-stereo": 2,
       "dual-mono": 4,
-      mono: 8
+      "mono": 8
     }[info.channelMode];
   }
 
