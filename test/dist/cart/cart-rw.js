@@ -120,8 +120,12 @@ describe("Create an bwf mpeg cart file from info and an mp2 file", function() {
   };
 
   let wav = new WaveFile();
-
   wav.fromMpeg(fs.readFileSync(path + "test.mp2"), info);
+  wav.cart.chunkId = "cart";
+  wav.cart.cutId = "30000";
+  wav.cart.title = "Title";
+  wav.cart.artist = "Artist";
+
   fs.writeFileSync(path + "out/test-mp2-i.wav", wav.toBuffer());
   wav = new WaveFile(fs.readFileSync(path + "out/test-mp2-i.wav"));
 
