@@ -1,12 +1,12 @@
-# wavefile
+# prx-wavefile
+
 Copyright (c) 2017-2019 Rafael da Silva Rocha.  
 https://github.com/rochars/wavefile
 
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/docs) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/test/browser.html)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
-
-# wavefile
+# prx-wavefile
 
 Create, read and write wav files according to the specs.
 
@@ -17,7 +17,14 @@ Create, read and write wav files according to the specs.
 - **Handle files up to 2GB**
 - **Zero dependencies**
 
-With **wavefile** you can:
+`prx-wavefile` is a fork of the excellent [wavefile](https://github.com/rochars/wavefile) project created by @rochars.
+
+This fork also supports these additional features:
+
+- [Broadcast Wave Format](https://en.wikipedia.org/wiki/Broadcast_Wave_Format) for MPEG audio described in [EBU Tech 3285-s1 - Specification of the Broadcast Wave Format (BWF) - Supplement 1, MPEG Audio - first edition (1997)](http://tech.ebu.ch/docs/tech/tech3285s1.pdf).
+- [CartChunk](http://www.cartchunk.org/) metadata for broadcast automation described in [AES46-2002 (s2008): AES standard for network and file transfer of audio Audio-file transfer and exchange Radio traffic audio delivery extension to the broadcast-WAVE-file forma](http://www.aes.org/publications/standards/search.cfm?docID=41)
+
+With **prx-wavefile** you can:
 
 - [Create wav files](#create-wave-files-from-scratch)
 - [Read wav files](#read-wave-files)
@@ -29,15 +36,19 @@ With **wavefile** you can:
 - [Encode/decode files as ADPCM, A-Law and μ-Law](#ima-adpcm)
 - [Turn RIFF files to RIFX and RIFX to RIFF](#rifx)
 - [Create or edit BWF metadata ("bext" chunk)](#add-bwf-metadata)
+- [Create wav files from MPEG audio](#create-from-mpeg)
+- [Create or edit Cart Chunk metadata ("cart" chunk)](#add-cart-chunk)
 
 And more.
 
 ## Install
+
 ```
 npm install wavefile
 ```
 
 To use it from the [command line](#command-line), install it globally:
+
 ```
 npm install wavefile -g
 ```
@@ -45,23 +56,30 @@ npm install wavefile -g
 ## Use
 
 ### Node
+
 ```javascript
-const wavefile = require('wavefile');
+const wavefile = require("prx-wavefile");
 let wav = new wavefile.WaveFile();
 ```
-or 
+
+or
+
 ```javascript
-const WaveFile = require('wavefile').WaveFile;
+const WaveFile = require("prx-wavefile").WaveFile;
 let wav = new WaveFile();
 ```
+
 or
+
 ```javascript
-import { WaveFile } from 'wavefile';
+import { WaveFile } from "prx-wavefile";
 let wav = new WaveFile();
 ```
 
 ### Browser
-Use the **wavefile.js** file in the *dist* folder:
+
+Use the **wavefile.js** file in the _dist_ folder:
+
 ```html
 <script src="wavefile.js"></script>
 <script>
@@ -69,32 +87,37 @@ Use the **wavefile.js** file in the *dist* folder:
 </script>
 ```
 
-Or load it from the [jsDelivr](https://cdn.jsdelivr.net/npm/wavefile) CDN:
+Or load it from the [jsDelivr](https://cdn.jsdelivr.net/npm/prx-wavefile) CDN:
+
 ```html
-<script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
+<script src="https://cdn.jsdelivr.net/npm/prx-wavefile"></script>
 ```
 
-Or load it from [unpkg](https://unpkg.com/wavefile):
+Or load it from [unpkg](https://unpkg.com/prx-wavefile):
+
 ```html
-<script src="https://unpkg.com/wavefile"></script>
+<script src="https://unpkg.com/prx-wavefile"></script>
 ```
 
 #### Browser compatibility
+
 IE10+. Should work in all modern browsers.
 
 Cross-browser tests powered by  
 <a href="https://www.browserstack.com"><img src="https://rochars.github.io/wavefile/docs/Browserstack-logo@2x.png" width="150px"/></a>
 
-
 ### Command line use
+
 To see the available options:
+
 ```
 wavefile --help
 ```
 
 ## Node.js Example
+
 ```javascript
-const WaveFile = require('wavefile').WaveFile;
+const WaveFile = require("prx-wavefile").WaveFile;
 
 // Load a wav file buffer as a WaveFile object
 let wav = new WaveFile(buffer);
@@ -113,31 +136,34 @@ let wavDataURI = wav.toDataURI();
 ```
 
 ## Table of Contents
+
 - [Install](#install)
 - [Use](#use)
 - [Operation Manual](#operation-manual)
-  * [Create wave files from scratch](#create-wave-files-from-scratch)
-  * [Read wave files](#read-wave-files)
-  * [Add RIFF tags to files](#add-riff-tags-to-files)
-  * [Add cue points to files](#add-cue-points-to-files)
-  * [Create regions in files](#create-regions-in-files)
-  * [RIFX](#rifx)
-  * [IMA-ADPCM](#ima-adpcm)
-  * [A-Law](#a-law)
-  * [mu-Law](#mu-law)
-  * [Change the bit depth](#change-the-bit-depth)
-  * [Change the sample rate](#change-the-sample-rate)
-  * [Add BWF metadata](#add-bwf-metadata)
-  * [RF64](#rf64)
-  * [XML Chunks](#xml-chunks)
-  * [The samples](#the-samples)
-  * [Command line](#command-line)
+  - [Create wave files from scratch](#create-wave-files-from-scratch)
+  - [Read wave files](#read-wave-files)
+  - [Add RIFF tags to files](#add-riff-tags-to-files)
+  - [Add cue points to files](#add-cue-points-to-files)
+  - [Create regions in files](#create-regions-in-files)
+  - [RIFX](#rifx)
+  - [IMA-ADPCM](#ima-adpcm)
+  - [A-Law](#a-law)
+  - [mu-Law](#mu-law)
+  - [Change the bit depth](#change-the-bit-depth)
+  - [Change the sample rate](#change-the-sample-rate)
+  - [Add BWF metadata](#add-bwf-metadata)
+  - [Create BWF from MPEG](#create-from-mpeg)
+  - [Cart Chunk](#add-cart-chunk)
+  - [RF64](#rf64)
+  - [XML Chunks](#xml-chunks)
+  - [The samples](#the-samples)
+  - [Command line](#command-line)
 - [API](#api)
-  * [The WaveFile methods:](#the-wavefile-methods-)
-  * [The WaveFile properties](#the-wavefile-properties)
-    + [Cue points](#cue-points)
-    + [Sample loops](#sample-loops)
-    + [LIST chunk](#list-chunk)
+  - [The WaveFile methods:](#the-wavefile-methods-)
+  - [The WaveFile properties](#the-wavefile-properties)
+    - [Cue points](#cue-points)
+    - [Sample loops](#sample-loops)
+    - [LIST chunk](#list-chunk)
 - [Contributing to wavefile](#contributing-to-wavefile)
 - [References](#references)
 - [Legal](#legal)
@@ -145,28 +171,33 @@ let wavDataURI = wav.toDataURI();
 ## Operation Manual
 
 ### Create wave files from scratch
-Use the ```fromScratch(numChannels, sampleRate, bitDepth, samples)``` method.
+
+Use the `fromScratch(numChannels, sampleRate, bitDepth, samples)` method.
 
 #### Mono:
+
 ```javascript
 let wav = new WaveFile();
 
 // Create a mono wave file, 44.1 kHz, 32-bit and 4 samples
-wav.fromScratch(1, 44100, '32', [0, -2147483, 2147483, 4]);
+wav.fromScratch(1, 44100, "32", [0, -2147483, 2147483, 4]);
 fs.writeFileSync(path, wav.toBuffer());
 ```
 
 #### Stereo:
+
 Samples can be informed interleaved or de-interleaved. If they are de-interleaved, WaveFile will interleave them. In this example they are de-interleaved.
+
 ```javascript
 // Stereo, 48 kHz, 8-bit, de-interleaved samples
 // WaveFile interleave the samples automatically
-wav.fromScratch(2, 48000, '8', [
-    [0, 2, 4, 3],
-    [0, 1, 4, 3]
+wav.fromScratch(2, 48000, "8", [
+  [0, 2, 4, 3],
+  [0, 1, 4, 3]
 ]);
 fs.writeFileSync(path, wav.toBuffer());
 ```
+
 Possible values for the bit depth are:  
 "4" - 4-bit IMA-ADPCM  
 "8" - 8-bit  
@@ -181,11 +212,13 @@ Possible values for the bit depth are:
 You can also use any bit depth between "8" and "53", like **"11", "12", "17", "20" and so on**.
 
 #### A word on bit depth
+
 Resolutions other than 4-bit, 8-bit, 16-bit, 24-bit, 32-bit (integer), 32-bit (fp) and 64-bit (fp) are implemented as WAVE_FORMAT_EXTENSIBLE and may not be supported by some players.
 
 ### Read wave files
+
 ```javascript
-const WaveFile = require('wavefile').WaveFile;
+const WaveFile = require("prx-wavefile").WaveFile;
 wav = new WaveFile();
 // Read a wav file from a buffer
 wav.fromBuffer(buffer);
@@ -196,37 +229,45 @@ wav.fromDataURI(dataURI);
 ```
 
 ### Add RIFF tags to files
+
 You can create (or overwrite) tags on files with the **WaveFile.setTag()** method.
+
 ```javascript
 // Write the ICMT tag with some comments to the file
 wav.setTag("ICMT", "some comments");
 ```
 
 To get the value of a tag (if it exists), use **WaveFile.getTag()**:
+
 ```javascript
 console.log(wav.getTag("ICMT"));
 // some comments
 ```
 
 You can delete a tag with **WaveFile.deleteTag()**:
+
 ```javascript
 wav.deleteTag("ICMT");
 ```
 
 ### Add cue points to files
-You can create cue points using the **WaveFile.setCuePoint()** method. The method takes a object with the cue point data and creates a cue point in the corresponding position of the file. The only required attribute of the object is *position*, a number representing the position of the point in milliseconds:
+
+You can create cue points using the **WaveFile.setCuePoint()** method. The method takes a object with the cue point data and creates a cue point in the corresponding position of the file. The only required attribute of the object is _position_, a number representing the position of the point in milliseconds:
+
 ```javascript
 // to create a cue point
-wav.setCuePoint({position: 1500});
+wav.setCuePoint({ position: 1500 });
 ```
 
-You can also create cue points with labels by defining a *label* attribute:
+You can also create cue points with labels by defining a _label_ attribute:
+
 ```javascript
 // to create a cue point with a label
-wav.setCuePoint({position: 1500, label: 'some label'});
+wav.setCuePoint({ position: 1500, label: "some label" });
 ```
 
 To delete a cue point use **WaveFile.deleteCuePoint()** informing the index of the point. Points are ordered according to their position. **The first point is indexed as 1.**
+
 ```javascript
 wav.deleteCuePoint(1);
 ```
@@ -234,19 +275,22 @@ wav.deleteCuePoint(1);
 Mind that creating or deleting cue points will change the index of other points if they exist.
 
 To list all the cue points in a file, in the order they appear:
+
 ```javascript
 let cuePoints = wav.listCuePoints();
 ```
+
 This method will return a list with cue points ordered as they appear in the file.
+
 ```javascript
 [
   {
     position: 500, // the position in milliseconds
-    label: 'cue marker 1',
+    label: "cue marker 1",
     end: 1500, // the end position in milliseconds
     dwName: 1,
     dwPosition: 0,
-    fccChunk: 'data',
+    fccChunk: "data",
     dwChunkStart: 0,
     dwBlockStart: 0,
     dwSampleOffset: 22050, // the position as a sample offset
@@ -255,21 +299,25 @@ This method will return a list with cue points ordered as they appear in the fil
     dwCountry: 0,
     dwLanguage: 0,
     dwDialect: 0,
-    dwCodePage: 0,
-  },
+    dwCodePage: 0
+  }
   //...
 ];
 ```
 
 ### Create regions in files
+
 You can create regions using the **WaveFile.setCuePoint()** method. Regions are cue points with extra data.
 
-If you define a not null *end* attribute in the object describing the cue point, the point will be created as a region. The *end* attribute should be the end of the region, in milliseconds, counting from the start of the file, and always greater than the *position* of the point:
+If you define a not null _end_ attribute in the object describing the cue point, the point will be created as a region. The _end_ attribute should be the end of the region, in milliseconds, counting from the start of the file, and always greater than the _position_ of the point:
+
 ```javascript
 // to create a region with a label:
-wav.setCuePoint({position: 1500, end: 2500, label: 'some label'});
+wav.setCuePoint({ position: 1500, end: 2500, label: "some label" });
 ```
+
 You can also define the following optional properties when creating a region:
+
 - dwPurposeID
 - dwCountry
 - dwLanguage
@@ -277,12 +325,15 @@ You can also define the following optional properties when creating a region:
 - dwCodePage
 
 ### RIFX
-**wavefile** can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:
+
+**WaveFile** can handle existing RIFX files and create RIFX files from scratch. Files created from scratch will default to RIFF; to create a file as RIFX you must define the container:
+
 ```javascript
-wav.fromScratch(1, 48000, '16', [0, 1, -3278, 327], {"container": "RIFX"});
+wav.fromScratch(1, 48000, "16", [0, 1, -3278, 327], { container: "RIFX" });
 ```
 
 RIFX to RIFF and RIFF to RIFX:
+
 ```javascript
 // Turn a RIFF file to a RIFX file
 wav.toRIFX();
@@ -292,69 +343,86 @@ wav.toRIFF();
 ```
 
 ### IMA-ADPCM
+
 16-bit 8000 Hz mono wave files can be compressed as IMA-ADPCM:
+
 ```javascript
 // Encode a 16-bit wave file as 4-bit IMA-ADPCM:
 wav.toIMAADPCM();
 ```
-IMA-ADPCM files compressed with **wavefile** will have a block align of 256 bytes.
+
+IMA-ADPCM files compressed with **WaveFile** will have a block align of 256 bytes.
 
 If the audio is not 16-bit it will be converted to 16-bit before compressing. Compressing audio with sample rate different from 8000 Hz or more than one channel is not supported and will throw errors.
 
 To decode 4-bit IMA-ADPCM as 16-bit linear PCM:
+
 ```javascript
 // Decode 4-bit IMA-ADPCM as 16-bit:
 wav.fromIMAADPCM();
 ```
 
 Decoding always result in 16-bit audio. To decode to another bit depth:
+
 ```javascript
 // Decode 4-bit IMA-ADPCM as 24-bit:
 wav.fromIMAADPCM("24");
 ```
 
 ### A-Law
+
 16-bit wave files (mono or stereo) can be encoded as A-Law:
+
 ```javascript
 // Encode a 16-bit wave file as 8-bit A-law:
 wav.toALaw();
 ```
+
 If the audio is not 16-bit it will be converted to 16-bit before compressing.
 
 To decode 8-bit A-Law as 16-bit linear PCM:
+
 ```javascript
 // Decode 8-bit A-Law as 16-bit:
 wav.fromALaw();
 ```
 
 Decoding always result in 16-bit audio. To decode to another bit depth:
+
 ```javascript
 // Decode 8-bit A-Law as 24-bit:
 wav.fromALaw("24");
 ```
 
 ### mu-Law
+
 16-bit wave files (mono or stereo) can be encoded as mu-Law:
+
 ```javascript
 // Encode a 16-bit wave file as 8-bit mu-law:
 wav.toMuLaw();
 ```
+
 If the audio is not 16-bit it will be converted to 16-bit before compressing.
 
 To decode 8-bit mu-Law as 16-bit linear PCM:
+
 ```javascript
 // Decode 8-bit mu-Law as 16-bit:
 wav.fromMuLaw();
 ```
 
 Decoding always result in 16-bit audio. To decode to another bit depth:
+
 ```javascript
 // Decode 8-bit mu-Law as 24-bit:
 wav.fromMuLaw("24");
 ```
 
 ### Change the bit depth
+
 You can change the bit depth of the audio with the **toBitDepth(bitDepth)** method. WaveFile only change the bit depth of the samples; no dithering is done.
+
 ```javascript
 // Load a wav file with 32-bit audio
 let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
@@ -367,7 +435,9 @@ fs.writeFileSync("24bit-file.wav", wav.toBuffer());
 ```
 
 ### Change the sample rate
+
 You can change the sample rate of the audio with the **toSampleRate()** method. By default, **cubic interpolation** is used to resample the data. You can choose between **cubic**, **sinc**, **point** and **linear**.
+
 ```javascript
 // Load a wav file with 16kHz audio
 let wav = new WaveFile(fs.readFileSync("16kHz-file.wav"));
@@ -383,50 +453,58 @@ fs.writeFileSync("44100Hz-file.wav", wav.toBuffer());
 ```
 
 To use another method:
+
 ```javascript
 // Change the sample rate to 44.1kHz using sinc
-wav.toSampleRate(44100, {method: "sinc"});
+wav.toSampleRate(44100, { method: "sinc" });
 ```
 
 #### Resampling methods
+
 - **point**: Nearest point interpolation, lowest quality, no LPF by default, fastest
 - **linear**: Linear interpolation, low quality, no LPF by default, fast
 - **cubic**: Cubic interpolation, use LPF by default **(default method)**
 - **sinc**: Windowed sinc interpolation, use LPF by default, slowest
 
 You can turn the LPF on and off for any resampling method:
+
 ```javascript
 // Will use 'sinc' method with no LPF
-wav.toSampleRate(44100, {method: "sinc", LPF: false});
+wav.toSampleRate(44100, { method: "sinc", LPF: false });
 
 // Will use 'linear' method with LPF
-wav.toSampleRate(44100, {method: "linear", LPF: true});
+wav.toSampleRate(44100, { method: "linear", LPF: true });
 ```
 
-The default LPF is a IIR LPF. You may define what type of LPF will be used by changing the LPFType attribute on the *toSampleRate()* param. You can use **IIR** or **FIR**:
+The default LPF is a IIR LPF. You may define what type of LPF will be used by changing the LPFType attribute on the _toSampleRate()_ param. You can use **IIR** or **FIR**:
+
 ```javascript
 // Will use 'linear' method with a FIR LPF
-wav.toSampleRate(44100, {method: "linear", LPF: true, LPFType: 'FIR'});
+wav.toSampleRate(44100, { method: "linear", LPF: true, LPFType: "FIR" });
 
 // Will use 'linear' method with a IIR LPF, the default
-wav.toSampleRate(44100, {method: "linear", LPF: true});
+wav.toSampleRate(44100, { method: "linear", LPF: true });
 ```
 
 #### Changing the sample rate of ADPCM, mu-Law or A-Law
+
 You need to convert compressed files to standard PCM before resampling:
 
 To resample a mu-Law file:
+
 ```javascript
 // convert the file to PCM
 wav.fromMuLaw();
 // resample
-wav.toSampleRate(44100, {method: "sinc"});
+wav.toSampleRate(44100, { method: "sinc" });
 // back to mu-Law
 wav.toMuLaw();
 ```
 
 ### Add BWF metadata
+
 To add BWF data to a file you can use the **bext** property:
+
 ```javascript
 // Load a wav file with no "bext"
 let wav = new WaveFile(fs.readFileSync("32bit-file.wav"));
@@ -438,15 +516,72 @@ wav.bext.originator = "wavefile";
 fs.writeFileSync("32bit-file-with-bext.wav", wav.toBuffer());
 ```
 
-By default **wavefile** will not insert a "bext" chunk in new files or in files that do not already have a "bext" chunk unless a property of **WaveFile.bext** is changed from it's default value. See below the full list of properties in **WaveFile.bext**.
+By default **WaveFile** will not insert a "bext" chunk in new files or in files that do not already have a "bext" chunk unless a property of **WaveFile.bext** is changed from it's default value. See below the full list of properties in **WaveFile.bext**.
+
+### Create From MPEG
+
+Make a wav file from an mpeg audio file, with optional metadata, using **WaveFile.fromMpeg()**.
+There is now an [MPEG reader](lib/mpeg-reader.js) in `prx-wavefile` that is used to
+read metadata from the MPEG and automatically set that in "fact", "fmt", "bext", and "mext" chunks.
+
+The MPEG specific "mext" chunk is specified below in **WaveFile.mext**.
+
+The optional info is specified below in **WaveFile.mpegInfo**.
+
+```javascript
+// You can create a wav from just an MPEG audio buffer/stream.
+let wav = new WaveFile();
+wav.fromMpeg(fs.readFileSync("test.mp2"));
+
+// You can also pass in the mpeg metadata info if you prefer
+// This is specified by WaveFile.mpegInfo
+let info = {
+  version: 1,
+  layer: 2,
+  sampleRate: 44100,
+  bitRate: 128,
+  channelMode: "stereo",
+  padding: 1,
+  modeExtension: 0,
+  emphasis: 0,
+  privateBit: 1,
+  copyright: true,
+  original: true,
+  errorProtection: true,
+  numChannels: 2,
+  frameSize: 768,
+  sampleLength: 269568,
+  freeForm: true
+};
+let wav2 = new WaveFile();
+wav2.fromMpeg(fs.readFileSync("test.mp2"), info);
+```
+
+### Add Cart Chunk
+
+By default **WaveFile** will not insert a "cart" chunk in new files or in files that do not already have a "cart" chunk unless a property of **WaveFile.cart** is changed from it's default value. See below the full list of properties in **WaveFile.cart**.
+
+```javascript
+let wav = new WaveFile();
+wav.fromMpeg(fs.readFileSync("test.mp2"));
+
+// Use the wav.cart to set the values
+wav.cart.chunkId = "cart";
+wav.cart.cutId = "30000";
+wav.cart.title = "Title";
+wav.cart.artist = "Artist";
+```
 
 ### RF64
-**wavefile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
+
+**WaveFile** have limited support of RF64 files. It possible to read (at least some) RF64 files, but changing the bit depth or applying compression to the samples will result in a RIFF file.
 
 ### XML Chunks
-**wavefile** support reading and writing **iXML** and **\_PMX** chunks.
+
+**Wavefile** support reading and writing **iXML** and **\_PMX** chunks.
 
 To get the value of iXML or \_PMX chunks:
+
 ```javascript
 /** @type {string} */
 let iXMLValue = wav.getiXML();
@@ -455,6 +590,7 @@ let _PMXValue = wav.get_PMX();
 ```
 
 To set the value of iXML or \_PMX chunks:
+
 ```javascript
 wav.setiXML(iXMLValue);
 wav.set_PMX(_PMXValue);
@@ -462,16 +598,20 @@ wav.set_PMX(_PMXValue);
 
 The value for XML chunks must always be a string.
 
-the *chunkSize* of the XML chunks will be adjusted when *toBuffer()* is called.
+the _chunkSize_ of the XML chunks will be adjusted when _toBuffer()_ is called.
 
 ### The samples
-Samples are stored in *data.samples* as a Uint8Array.
 
-To get the samples as a Float64Array you should use the *getSamples()* method:
+Samples are stored in _data.samples_ as a Uint8Array.
+
+To get the samples as a Float64Array you should use the _getSamples()_ method:
+
 ```javascript
 let samples = wav.getSamples();
 ```
-If the file is stereo or have more than one channel then the samples will be returned de-interleaved in a *Array* of *Float64Array* objects, one Float64Array for each channel. The method takes a optional boolean param *interleaved*, set to **false** by default. If set to **true**, samples will be returned interleaved. **Default is de-interleaved**.
+
+If the file is stereo or have more than one channel then the samples will be returned de-interleaved in a _Array_ of _Float64Array_ objects, one Float64Array for each channel. The method takes a optional boolean param _interleaved_, set to **false** by default. If set to **true**, samples will be returned interleaved. **Default is de-interleaved**.
+
 ```javascript
 // Both will return de-interleaved samples
 samples = wav.getSamples();
@@ -481,7 +621,8 @@ samples = wav.getSamples(false);
 samples = wav.getSamples(true);
 ```
 
-You can use any typed array as the output of *getSamples()*:
+You can use any typed array as the output of _getSamples()_:
+
 ```javascript
 // Will return the samples de-interleaved,
 // packed in a array of Int32Array objects, one for each channel
@@ -496,6 +637,7 @@ let samples = getSamples(true, Int16Array);
 To get and set samples in a WaveFile instance you should use WaveFile.getSample(index) and WaveFile.setSample(index, sample). The 'index' is the index of the sample in the sample array, not the index of the bytes in data.samples.
 
 Example:
+
 ```javascript
 wav = new WaveFile();
 
@@ -512,6 +654,7 @@ wav.getSample(1); // return 10, the new value of the second sample
 ```
 
 ### Range:
+
 - 0 to 255 for 8-bit
 - -32768 to 32767 for 16-bit
 - -8388608 to 8388607 for 24-bit
@@ -522,17 +665,21 @@ wav.getSample(1); // return 10, the new value of the second sample
 Floating point samples may be defined out of range. Integer samples will be clamped on overflow.
 
 ### Command line
+
 To use **wavefile** from the command line, install it globally:
+
 ```
 $ npm install wavefile -g
 ```
 
 To see the available options:
+
 ```
 $ wavefile --help
 ```
 
 The available options:
+
 ```
   --resample   Ex: wavefile input.wav --resample=44100 output.wav
                Change the sample rate. The input file is not affected.
@@ -569,14 +716,18 @@ The available options:
                Show this help page.
 ```
 
-The **--resample** command performs resampling using *cubic interpolation* by default. Use it with the **--method** option to change the interpolation method:
+The **--resample** command performs resampling using _cubic interpolation_ by default. Use it with the **--method** option to change the interpolation method:
+
 ```
 $ wavefile input.wav --resample=44100 method=sinc output.wav
 ```
-You can use *point*,*linear*,*cubic* and *sinc*.
+
+You can use _point_,_linear_,_cubic_ and _sinc_.
 
 ## API
+
 To create a WaveFile object:
+
 ```javascript
 // Create a empty WaveFile object
 WaveFile();
@@ -594,6 +745,7 @@ WaveFile(wav);
 ```
 
 ### The WaveFile methods
+
 ```javascript
 /**
  * Set up the WaveFileCreator object based on the arguments passed.
@@ -610,6 +762,14 @@ WaveFile(wav);
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.fromScratch(numChannels, sampleRate, bitDepth, samples, options) {}
+
+/**
+ * Set up the WaveFileCreator object from an mpeg buffer and metadata info.
+ * @param {!Uint8Array} mpegBuffer The buffer.
+ * @param {Object=} info Mpeg info such as version, layer, bitRate, etc.
+ * @throws {Error} If any argument does not meet the criteria.
+ */
+WaveFile.fromMpeg(mpegBuffer, info=null) {};
 
 /**
  * Set up the WaveFileParser object from a byte buffer.
@@ -774,7 +934,7 @@ WaveFile.listTags() {}
  * pointData.dwLanguage
  * pointData.dwDialect
  * pointData.dwCodePage
- * 
+ *
  * # This is what a complete pointData object look like:
  * {
  *   position: number,
@@ -883,16 +1043,18 @@ WaveFile.set_PMX(_PMXValue) {};
 ```
 
 #### WaveFile.listCuePoints()
+
 This method returns a list of objects, each object representing a cue point or region. The list looks like this:
+
 ```javascript
 [
   {
     position: 500, // the position in milliseconds
-    label: 'cue marker 1',
+    label: "cue marker 1",
     end: 1500, // the end position in milliseconds
     dwName: 1,
     dwPosition: 0,
-    fccChunk: 'data',
+    fccChunk: "data",
     dwChunkStart: 0,
     dwBlockStart: 0,
     dwSampleOffset: 22050, // the position as a sample offset
@@ -902,20 +1064,22 @@ This method returns a list of objects, each object representing a cue point or r
     dwLanguage: 0,
     dwDialect: 0,
     dwCodePage: 0
-  },
+  }
   // ...
-]
+];
 ```
+
 The list order reflects the order of the points in the file.
 
 ### The WaveFile properties
+
 ```javascript
 /**
  * The container identifier.
  * "RIFF", "RIFX" and "RF64" are supported.
  * @type {string}
  */
-WaveFile.container = '';
+WaveFile.container = "";
 /**
  * @type {number}
  */
@@ -925,138 +1089,246 @@ WaveFile.chunkSize = 0;
  * Always 'WAVE'.
  * @type {string}
  */
-WaveFile.format = '';
+WaveFile.format = "";
 /**
  * The data of the "fmt" chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.fmt = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    audioFormat: 0,
-    /** @type {number} */
-    numChannels: 0,
-    /** @type {number} */
-    sampleRate: 0,
-    /** @type {number} */
-    byteRate: 0,
-    /** @type {number} */
-    blockAlign: 0,
-    /** @type {number} */
-    bitsPerSample: 0,
-    /** @type {number} */
-    cbSize: 0,
-    /** @type {number} */
-    validBitsPerSample: 0,
-    /** @type {number} */
-    dwChannelMask: 0,
-    /**
-     * 4 32-bit values representing a 128-bit ID
-     * @type {!Array<number>}
-     */
-    subformat: []
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  audioFormat: 0,
+  /** @type {number} */
+  numChannels: 0,
+  /** @type {number} */
+  sampleRate: 0,
+  /** @type {number} */
+  byteRate: 0,
+  /** @type {number} */
+  blockAlign: 0,
+  /** @type {number} */
+  bitsPerSample: 0,
+  /** @type {number} */
+  cbSize: 0,
+  /** @type {number} */
+  validBitsPerSample: 0,
+  /** @type {number} */
+  dwChannelMask: 0,
+  /**
+   * 4 32-bit values representing a 128-bit ID
+   * @type {!Array<number>}
+   */
+  subformat: []
 };
 /**
  * The data of the "fact" chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.fact = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    dwSampleLength: 0
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  dwSampleLength: 0
 };
 /**
  * The data of the "cue " chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.cue = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    dwCuePoints: 0,
-    /** @type {!Array<!Object>} */
-    points: [],
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  dwCuePoints: 0,
+  /** @type {!Array<!Object>} */
+  points: []
 };
 /**
  * The data of the "smpl" chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.smpl = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    dwManufacturer: 0,
-    /** @type {number} */
-    dwProduct: 0,
-    /** @type {number} */
-    dwSamplePeriod: 0,
-    /** @type {number} */
-    dwMIDIUnityNote: 0,
-    /** @type {number} */
-    dwMIDIPitchFraction: 0,
-    /** @type {number} */
-    dwSMPTEFormat: 0,
-    /** @type {number} */
-    dwSMPTEOffset: 0,
-    /** @type {number} */
-    dwNumSampleLoops: 0,
-    /** @type {number} */
-    dwSamplerData: 0,
-    /** @type {!Array<!Object>} */
-    loops: [],
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  dwManufacturer: 0,
+  /** @type {number} */
+  dwProduct: 0,
+  /** @type {number} */
+  dwSamplePeriod: 0,
+  /** @type {number} */
+  dwMIDIUnityNote: 0,
+  /** @type {number} */
+  dwMIDIPitchFraction: 0,
+  /** @type {number} */
+  dwSMPTEFormat: 0,
+  /** @type {number} */
+  dwSMPTEOffset: 0,
+  /** @type {number} */
+  dwNumSampleLoops: 0,
+  /** @type {number} */
+  dwSamplerData: 0,
+  /** @type {!Array<!Object>} */
+  loops: []
 };
 /**
  * The data of the "bext" chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.bext = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {string} */
-    description: '', //256
-    /** @type {string} */
-    originator: '', //32
-    /** @type {string} */
-    originatorReference: '', //32
-    /** @type {string} */
-    originationDate: '', //10
-    /** @type {string} */
-    originationTime: '', //8
-    /**
-     * 2 32-bit values, timeReference high and low
-     * @type {!Array<number>}
-     */
-    timeReference: [0, 0],
-    /** @type {number} */
-    version: 0, //WORD
-    /** @type {string} */
-    UMID: '', // 64 chars
-    /** @type {number} */
-    loudnessValue: 0, //WORD
-    /** @type {number} */
-    loudnessRange: 0, //WORD
-    /** @type {number} */
-    maxTruePeakLevel: 0, //WORD
-    /** @type {number} */
-    maxMomentaryLoudness: 0, //WORD
-    /** @type {number} */
-    maxShortTermLoudness: 0, //WORD
-    /** @type {string} */
-    reserved: '', //180
-    /** @type {string} */
-    codingHistory: '' // string, unlimited
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {string} */
+  description: "", //256
+  /** @type {string} */
+  originator: "", //32
+  /** @type {string} */
+  originatorReference: "", //32
+  /** @type {string} */
+  originationDate: "", //10
+  /** @type {string} */
+  originationTime: "", //8
+  /**
+   * 2 32-bit values, timeReference high and low
+   * @type {!Array<number>}
+   */
+  timeReference: [0, 0],
+  /** @type {number} */
+  version: 0, //WORD
+  /** @type {string} */
+  UMID: "", // 64 chars
+  /** @type {number} */
+  loudnessValue: 0, //WORD
+  /** @type {number} */
+  loudnessRange: 0, //WORD
+  /** @type {number} */
+  maxTruePeakLevel: 0, //WORD
+  /** @type {number} */
+  maxMomentaryLoudness: 0, //WORD
+  /** @type {number} */
+  maxShortTermLoudness: 0, //WORD
+  /** @type {string} */
+  reserved: "", //180
+  /** @type {string} */
+  codingHistory: "" // string, unlimited
+};
+/**
+ * The data of the 'mext' chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.mext = {
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  soundInformation: 0,
+  /** @type {number} */
+  frameSize: 0,
+  /** @type {number} */
+  ancillaryDataLength: 0,
+  /** @type {number} */
+  ancillaryDataDef: 0, //4
+  /** @type {string} */
+  reserved: ""
+};
+/**
+ * mpegInfo for making a wav from mpeg audio
+ * @type {!Object<string, *>}
+ */
+WaveFile.mpegInfo = {
+  /** @type {number} */
+  version: 0,
+  /** @type {number} */
+  layer: 0,
+  /** @type {number} */
+  sampleRate: 0,
+  /** @type {number} */
+  bitRate: 0,
+  /** @type {string} */
+  channelMode: "",
+  /** @type {number} */
+  padding: 0,
+  /** @type {number} */
+  modeExtension: 0,
+  /** @type {number} */
+  emphasis: 0,
+  /** @type {number} */
+  privateBit: 0,
+  /** @type {boolean} */
+  copyright: false,
+  /** @type {boolean} */
+  original: false,
+  /** @type {boolean} */
+  errorProtection: false,
+  /** @type {number} */
+  numChannels: 0,
+  /** @type {number} */
+  frameSize: 0,
+  /** @type {number} */
+  sampleLength: 0,
+  /** @type {boolean} */
+  freeForm: false
+};
+/**
+ * The data of the cart chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.cart = {
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {string} */
+  version: "",
+  /** @type {string} */
+  title: "",
+  /** @type {string} */
+  artist: "",
+  /** @type {string} */
+  cutId: "",
+  /** @type {string} */
+  clientId: "",
+  /** @type {string} */
+  category: "",
+  /** @type {string} */
+  classification: "",
+  /** @type {string} */
+  outCue: "",
+  /** @type {string} */
+  startDate: "",
+  /** @type {string} */
+  startTime: "",
+  /** @type {string} */
+  endDate: "",
+  /** @type {string} */
+  endTime: "",
+  /** @type {string} */
+  producerAppId: "",
+  /** @type {string} */
+  producerAppVersion: "",
+  /** @type {string} */
+  userDef: "",
+  /** @type {number} */
+  levelReference: 0,
+  /** @type {string} */
+  postTimer: "",
+  /** @type {string} */
+  reserved: "",
+  /** @type {string} */
+  url: "",
+  /** @type {string} */
+  tagText: ""
 };
 /**
  * The data of the 'iXML' chunk.
@@ -1064,11 +1336,11 @@ WaveFile.bext = {
  */
 WaveFile.iXML = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {string} */
-  value: ''
+  value: ""
 };
 /**
  * The data of the "ds64" chunk.
@@ -1076,40 +1348,40 @@ WaveFile.iXML = {
  * @type {!Object<string, *>}
  */
 WaveFile.ds64 = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {number} */
-    riffSizeHigh: 0, // DWORD
-    /** @type {number} */
-    riffSizeLow: 0, // DWORD
-    /** @type {number} */
-    dataSizeHigh: 0, // DWORD
-    /** @type {number} */
-    dataSizeLow: 0, // DWORD
-    /** @type {number} */
-    originationTime: 0, // DWORD
-    /** @type {number} */
-    sampleCountHigh: 0, // DWORD
-    /** @type {number} */
-    sampleCountLow: 0, // DWORD
-    /** @type {number} */
-    //"tableLength": 0, // DWORD
-    /** @type {!Array<number>} */
-    //"table": []
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  riffSizeHigh: 0, // DWORD
+  /** @type {number} */
+  riffSizeLow: 0, // DWORD
+  /** @type {number} */
+  dataSizeHigh: 0, // DWORD
+  /** @type {number} */
+  dataSizeLow: 0, // DWORD
+  /** @type {number} */
+  originationTime: 0, // DWORD
+  /** @type {number} */
+  sampleCountHigh: 0, // DWORD
+  /** @type {number} */
+  sampleCountLow: 0 // DWORD
+  /** @type {number} */
+  //"tableLength": 0, // DWORD
+  /** @type {!Array<number>} */
+  //"table": []
 };
 /**
  * The data of the "data" chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.data = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {!Uint8Array} */
-    samples: new Uint8Array(0)
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {!Uint8Array} */
+  samples: new Uint8Array(0)
 };
 /**
  * The data of the "LIST" chunks.
@@ -1128,12 +1400,12 @@ WaveFile.LIST = [];
  * @type {!Object<string, *>}
  */
 WaveFile.junk = {
-    /** @type {string} */
-    chunkId: '',
-    /** @type {number} */
-    chunkSize: 0,
-    /** @type {!Array<number>} */
-    chunkData: []
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {!Array<number>} */
+  chunkData: []
 };
 /**
  * The data of the '_PMX' chunk.
@@ -1141,21 +1413,23 @@ WaveFile.junk = {
  */
 WaveFile._PMX = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {string} */
-  value: ''
+  value: ""
 };
 /**
  * The bit depth code according to the samples.
  * @type {string}
  */
-WaveFile.bitDepth =  '';
+WaveFile.bitDepth = "";
 ```
 
 #### Cue points
-Items in *cue.points* are objects like this:
+
+Items in _cue.points_ are objects like this:
+
 ```javascript
 {
     /** @type {number} */
@@ -1174,7 +1448,9 @@ Items in *cue.points* are objects like this:
 ```
 
 #### Sample loops
-Items in *smpl.loops* are objects like this:
+
+Items in _smpl.loops_ are objects like this:
+
 ```javascript
 {
     /** @type {string} */
@@ -1193,7 +1469,9 @@ Items in *smpl.loops* are objects like this:
 ```
 
 #### LIST chunk
+
 "LIST" chunk data is stored as follows:
+
 ```javascript
 /**
  * An array of the "LIST" chunks present in the file.
@@ -1202,7 +1480,8 @@ Items in *smpl.loops* are objects like this:
 WaveFile.LIST = [];
 ```
 
-Items in *WaveFile.LIST* are objects like this:
+Items in _WaveFile.LIST_ are objects like this:
+
 ```javascript
 {
     /** @type {string} */
@@ -1215,9 +1494,11 @@ Items in *WaveFile.LIST* are objects like this:
     subChunks: []
 };
 ```
+
 Where "subChunks" are the subChunks of the "LIST" chunk. A single file may have many "LIST" chunks as long as their formats ("INFO", "adtl", etc) are not the same. **wavefile** can read and write "LIST" chunks of format "INFO" and "adtl".
 
 For "LIST" chunks with the "INFO" format, "subChunks" will be an array of objects like this:
+
 ```javascript
 {
     /** @type {string} */
@@ -1228,24 +1509,47 @@ For "LIST" chunks with the "INFO" format, "subChunks" will be an array of object
     value: ''
 }
 ```
+
 Where "chunkId" may be any RIFF tag:  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
 ## Contributing to wavefile
+
 **wavefile** welcomes all contributions from anyone willing to work in good faith with other contributors and the community. No contribution is too small and all contributions are valued.
 
 See [CONTRIBUTING.md](https://github.com/rochars/wavefile/blob/master/CONTRIBUTING.md) for details.
 
 ### Style guide
+
 **wavefile** code should follow the Google JavaScript Style Guide:  
 https://google.github.io/styleguide/jsguide.html
 
 ### Code of conduct
+
 This project is bound by a Code of Conduct: The [Contributor Covenant, version 1.4](https://github.com/rochars/wavefile/blob/master/CODE_OF_CONDUCT.md), also available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
+
+## Creator's note
+
+The creator of **wavefile**, @rochars, added this note to the README on the original project:
+
+### MOVING AWAY FROM GITHUB (2020-03-08)
+
+Microsoft, owner of GitHub, was one of the main backers of the current fascist regime in Brazil and also of the coup d'etat that led to the present situation of my country.
+
+It paid well: The brazilian government was required to run all its systems on open-source software. After the coup d'etat this changed, the goverment began purchasing Microsoft licenses and migrating all their systems to Windows.
+
+It is not just a case of business malpractice - there is a genocide going on in Brazil and many people, including myself, have lived under constant death threats for the past couple years bacause of our positions against the current fascist regime. Many have been murdered or incarcerated. Poverty and violence skyrocketed.
+
+**This software will keep being released in NPM as always - only the repository will be moved. Projects depending on this software will not be affected.**
+
+For Microsoft owners and collaborators: you have a lot of blood in your hands. I will not share my work with people of your kind.
+
+---
 
 ## References
 
 ### Papers
+
 https://tech.ebu.ch/docs/tech/tech3285.pdf  
 https://tech.ebu.ch/docs/tech/tech3306-2009.pdf  
 http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html  
@@ -1254,21 +1558,29 @@ http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf
 https://sites.google.com/site/musicgapi/technical-documents/wav-file-format  
 http://www.neurophys.wisc.edu/auditory/riff-format.txt  
 https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
+http://tech.ebu.ch/docs/tech/tech3285s1.pdf
+http://www.cartchunk.org/
+http://www.aes.org/publications/standards/search.cfm?docID=41
 
 ### Software
+
 https://github.com/erikd/libsndfile  
 https://gist.github.com/hackNightly/3776503  
 https://github.com/chirlu/sox/blob/master/src/wav.c
+https://github.com/kookster/nu_wav
 
 ### Other
+
 https://developercertificate.org/  
 https://www.contributor-covenant.org/version/1/4/code-of-conduct.html  
 https://google.github.io/styleguide/jsguide.html
 
 ## Legal
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Frochars%2Fwavefile.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Frochars%2Fwavefile?ref=badge_large)
 
 ### LICENSE
+
 Copyright (c) 2017-2019 Rafael da Silva Rocha.
 
 Permission is hereby granted, free of charge, to any person obtaining
