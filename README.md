@@ -5,6 +5,16 @@ https://github.com/rochars/wavefile
 [![NPM version](https://img.shields.io/npm/v/wavefile.svg?style=for-the-badge)](https://www.npmjs.com/package/wavefile) [![Docs](https://img.shields.io/badge/API-docs-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/docs) [![Tests](https://img.shields.io/badge/tests-online-blue.svg?style=for-the-badge)](https://rochars.github.io/wavefile/test/browser.html)  
 [![Codecov](https://img.shields.io/codecov/c/github/rochars/wavefile.svg?style=flat-square)](https://codecov.io/gh/rochars/wavefile) [![Unix Build](https://img.shields.io/travis/rochars/wavefile.svg?style=flat-square)](https://travis-ci.org/rochars/wavefile) [![Windows Build](https://img.shields.io/appveyor/ci/rochars/wavefile.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/rochars/wavefile) [![Scrutinizer](https://img.shields.io/scrutinizer/g/rochars/wavefile.svg?style=flat-square&logo=scrutinizer)](https://scrutinizer-ci.com/g/rochars/wavefile/) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1880/badge)](https://bestpractices.coreinfrastructure.org/projects/1880)
 
+## NOTICE (2020-09-02)
+My part in the development of this software has unfortunately ended. There are many **wavefile forks**; I welcome them all and wish them the best.
+
+If this software is / was useful to you and you would like to make a donation:
+
+BTC: bc1qwf9ncpnjwklnrqw3vjsjeeurk5hvshfnaffvwg  
+XMR: 837GxvoURUzTnNUEFyzs1SW33yBnZxGZ1Hwk7qioYfpkGyVS4W51mRNTo9rDn4myNpdH425a5VQyWj4bKHvcuTqcBEe5Aq9  
+LTC: ltc1q8wvyxv4xwwmcu5k9a9ma7q5tjhajhe9dagg2ta
+
+Thank you all very much. Working on **wavefile** was a lot of fun for me. I am happy to see that it was useful for so many people.
 
 ## MOVING AWAY FROM GITHUB (2020-03-08)
 Microsoft, owner of GitHub, was one of the main backers of the current fascist regime in Brazil and also of the coup d'etat that led to the present situation of my country.
