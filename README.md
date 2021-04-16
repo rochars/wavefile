@@ -8,12 +8,6 @@ https://github.com/rochars/wavefile
 ## NOTICE (2020-09-02)
 My part in the development of this software has unfortunately ended. There are many **wavefile forks**; I welcome them all and wish them the best.
 
-If this software is / was useful to you and you would like to make a donation:
-
-BTC: bc1qwf9ncpnjwklnrqw3vjsjeeurk5hvshfnaffvwg  
-XMR: 837GxvoURUzTnNUEFyzs1SW33yBnZxGZ1Hwk7qioYfpkGyVS4W51mRNTo9rDn4myNpdH425a5VQyWj4bKHvcuTqcBEe5Aq9  
-LTC: ltc1q8wvyxv4xwwmcu5k9a9ma7q5tjhajhe9dagg2ta
-
 Thank you all very much. Working on **wavefile** was a lot of fun for me. I am happy to see that it was useful for so many people.
 
 ## MOVING AWAY FROM GITHUB (2020-03-08)
