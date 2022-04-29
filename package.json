@@ -2,7 +2,7 @@
   "name": "prx-wavefile",
   "version": "11.0.0-prx.2",
   "description": "Create, read and write wav files according to the specs.",
-  "homepage": "https://github.com/rochars/wavefile",
+  "homepage": "https://github.com/PRX/prx-wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "main": "./dist/wavefile.js",
@@ -41,10 +41,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/rochars/wavefile.git"
+    "url": "git://github.com/PRX/prx-wavefile.git"
   },
   "bugs": {
-    "url": "https://github.com/rochars/wavefile/issues"
+    "url": "https://github.com/PRX/prx-wavefile/issues"
   },
   "directories": {
     "bin": "bin",
