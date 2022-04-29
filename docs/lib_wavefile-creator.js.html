@@ -226,7 +226,7 @@ export class WaveFileCreator extends WaveFileParser {
     }
     if (
       (info.sampleRate == 44100 || info.sampleRate == 22050) &amp;&amp;
-      info.padding
+      !info.padding
     ) {
       soundInformation += 4;
     }
