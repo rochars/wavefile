@@ -145,31 +145,31 @@ describe("Create an bwf mpeg cart file from info and an mp2 file", function() {
   );
 
   assert.equal(wav.mext.frameSize, 768);
-  assert.equal(wav.mext.soundInformation, 12);
+  assert.equal(wav.mext.soundInformation, 8);
 });
 
 describe("Create a bwf mpeg cart file from an mp2 file", function() {
   let wav = new WaveFile();
 
-  wav.fromMpeg(fs.readFileSync(path + "test.mp2"));
+  wav.fromMpeg(fs.readFileSync(path + "44100_test.mp2"));
   fs.writeFileSync(path + "out/test-mp2.wav", wav.toBuffer());
   wav = new WaveFile(fs.readFileSync(path + "out/test-mp2.wav"));
 
-  assert.equal(wav.fmt.sampleRate, 48000);
+  assert.equal(wav.fmt.sampleRate, 44100);
   assert.equal(wav.fmt.byteRate, 32000);
   assert.equal(wav.fmt.numChannels, 2);
-  assert.equal(wav.fmt.blockAlign, 768);
+  assert.equal(wav.fmt.blockAlign, 835);
   assert.equal(wav.fmt.numChannels, 2);
   assert.equal(wav.fmt.headBitRate, 256000);
   assert.equal(wav.fmt.headLayer, 2);
 
-  assert.equal(wav.fact.dwSampleLength, 269568);
+  assert.equal(wav.fact.dwSampleLength, 1323648);
 
   assert.equal(
     wav.bext.codingHistory,
-    "A=MPEG1L2,F=48000,B=256,M=stereo,T=wavefile\r\n\u0000\u0000"
+    "A=MPEG1L2,F=44100,B=256,M=stereo,T=wavefile\r\n\u0000\u0000"
   );
 
-  assert.equal(wav.mext.frameSize, 768);
-  assert.equal(wav.mext.soundInformation, 3);
+  assert.equal(wav.mext.frameSize, 835);
+  assert.equal(wav.mext.soundInformation, 7);
 });
