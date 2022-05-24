@@ -39,7 +39,7 @@ var WaveFile = {};
  * RIFF, RIFX and RF64 are supported.
  * @type {string}
  */
-WaveFile.prototype.container = '';
+WaveFile.prototype.container = "";
 /**
  * @type {number}
  */
@@ -49,14 +49,14 @@ WaveFile.prototype.chunkSize = 0;
  * Always WAVE.
  * @type {string}
  */
-WaveFile.prototype.format = '';
+WaveFile.prototype.format = "";
 /**
  * The data of the fmt chunk.
  * @type {!Object<string, *>}
  */
 WaveFile.prototype.fmt = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
@@ -81,7 +81,28 @@ WaveFile.prototype.fmt = {
    * 4 32-bit values representing a 128-bit ID
    * @type {!Array<number>}
    */
-  subformat: []
+  subformat: [],
+  /**
+   * MPEG additional format information
+   * when audioFormat == 80
+   * https://tech.ebu.ch/docs/tech/tech3285s1.pdf
+   */
+  /** @type {number} */
+  headLayer: 0,
+  /** @type {number} */
+  headBitRate: 0,
+  /** @type {number} */
+  headMode: 0,
+  /** @type {number} */
+  headModeExt: 0,
+  /** @type {number} */
+  headEmphasis: 0,
+  /** @type {number} */
+  headFlags: 0,
+  /** @type {number} */
+  ptsLow: 0,
+  /** @type {number} */
+  ptsHigh: 0
 };
 /**
  * The data of the fact chunk.
@@ -89,7 +110,7 @@ WaveFile.prototype.fmt = {
  */
 WaveFile.prototype.fact = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
@@ -101,21 +122,23 @@ WaveFile.prototype.fact = {
  */
 WaveFile.prototype.cue = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
   dwCuePoints: 0,
   /** @type {!Array<!Object>} */
-  points: [{
-    dwName: 0, // a cue point ID
-    dwPosition: 0,
-    fccChunk: 0,
-    dwChunkStart: 0,
-    dwBlockStart: 0,
-    dwSampleOffset: 0,
-    position: 0
-  }],
+  points: [
+    {
+      dwName: 0, // a cue point ID
+      dwPosition: 0,
+      fccChunk: 0,
+      dwChunkStart: 0,
+      dwBlockStart: 0,
+      dwSampleOffset: 0,
+      position: 0
+    }
+  ]
 };
 /**
  * The data of the smpl chunk.
@@ -123,7 +146,7 @@ WaveFile.prototype.cue = {
  */
 WaveFile.prototype.smpl = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
@@ -147,14 +170,14 @@ WaveFile.prototype.smpl = {
   /** @type {!Array<!Object>} */
   loops: [
     {
-      dwName: '', // a cue point ID
+      dwName: "", // a cue point ID
       dwType: 0,
       dwStart: 0,
       dwEnd: 0,
       dwFraction: 0,
       dwPlayCount: 0
     }
-  ],
+  ]
 };
 /**
  * The data of the bext chunk.
@@ -162,19 +185,19 @@ WaveFile.prototype.smpl = {
  */
 WaveFile.prototype.bext = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {string} */
-  description: '',
+  description: "",
   /** @type {string} */
-  originator: '',
+  originator: "",
   /** @type {string} */
-  originatorReference: '',
+  originatorReference: "",
   /** @type {string} */
-  originationDate: '',
+  originationDate: "",
   /** @type {string} */
-  originationTime: '',
+  originationTime: "",
   /**
    * 2 32-bit values, timeReference high and low
    * @type {!Array<number>}
@@ -183,7 +206,7 @@ WaveFile.prototype.bext = {
   /** @type {number} */
   version: 0,
   /** @type {string} */
-  UMID: '',
+  UMID: "",
   /** @type {number} */
   loudnessValue: 0,
   /** @type {number} */
@@ -195,9 +218,117 @@ WaveFile.prototype.bext = {
   /** @type {number} */
   maxShortTermLoudness: 0,
   /** @type {string} */
-  reserved: '',
+  reserved: "",
   /** @type {string} */
-  codingHistory: ''
+  codingHistory: ""
+};
+/**
+ * The data of the 'mext' chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.prototype.mext = {
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {number} */
+  soundInformation: 0,
+  /** @type {number} */
+  frameSize: 0,
+  /** @type {number} */
+  ancillaryDataLength: 0,
+  /** @type {number} */
+  ancillaryDataDef: 0, //4
+  /** @type {string} */
+  reserved: ""
+};
+/**
+ * mpegInfo for making a wav from mpeg audio
+ * @type {!Object<string, *>}
+ */
+WaveFile.prototype.mpegInfo = {
+  /** @type {number} */
+  version: 0,
+  /** @type {number} */
+  layer: 0,
+  /** @type {number} */
+  sampleRate: 0,
+  /** @type {number} */
+  bitRate: 0,
+  /** @type {string} */
+  channelMode: "",
+  /** @type {number} */
+  padding: 0,
+  /** @type {number} */
+  modeExtension: 0,
+  /** @type {number} */
+  emphasis: 0,
+  /** @type {number} */
+  privateBit: 0,
+  /** @type {boolean} */
+  copyright: false,
+  /** @type {boolean} */
+  original: false,
+  /** @type {boolean} */
+  errorProtection: false,
+  /** @type {number} */
+  numChannels: 0,
+  /** @type {number} */
+  frameSize: 0,
+  /** @type {number} */
+  sampleLength: 0,
+  /** @type {boolean} */
+  freeForm: false
+};
+/**
+ * The data of the cart chunk.
+ * @type {!Object<string, *>}
+ */
+WaveFile.prototype.cart = {
+  /** @type {string} */
+  chunkId: "",
+  /** @type {number} */
+  chunkSize: 0,
+  /** @type {string} */
+  version: "",
+  /** @type {string} */
+  title: "",
+  /** @type {string} */
+  artist: "",
+  /** @type {string} */
+  cutId: "",
+  /** @type {string} */
+  clientId: "",
+  /** @type {string} */
+  category: "",
+  /** @type {string} */
+  classification: "",
+  /** @type {string} */
+  outCue: "",
+  /** @type {string} */
+  startDate: "",
+  /** @type {string} */
+  startTime: "",
+  /** @type {string} */
+  endDate: "",
+  /** @type {string} */
+  endTime: "",
+  /** @type {string} */
+  producerAppId: "",
+  /** @type {string} */
+  producerAppVersion: "",
+  /** @type {string} */
+  userDef: "",
+  /** @type {number} */
+  levelReference: 0,
+  /** @type {string} */
+  postTimer: "",
+  /** @type {string} */
+  reserved: "",
+  /** @type {string} */
+  url: "",
+  /** @type {string} */
+  tagText: ""
 };
 /**
  * The data of the iXML chunk.
@@ -205,7 +336,7 @@ WaveFile.prototype.bext = {
  */
 WaveFile.prototype.iXML = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
@@ -218,7 +349,7 @@ WaveFile.prototype.iXML = {
  */
 WaveFile.prototype.ds64 = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
@@ -242,7 +373,7 @@ WaveFile.prototype.ds64 = {
  */
 WaveFile.prototype.data = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {!Uint8Array} */
@@ -254,26 +385,26 @@ WaveFile.prototype.data = {
  */
 WaveFile.prototype.LIST = [
   {
-    chunkId: '',
+    chunkId: "",
     chunkSize: 0,
-    format: '',
+    format: "",
     subChunks: [
       // For format 'INFO'
       {
-        chunkId: '',
+        chunkId: "",
         chunkSize: 0,
-        value: ''
+        value: ""
       },
       // For format 'adtl' types 'labl' or 'note'
       {
-        chunkId: '',
+        chunkId: "",
         chunkSize: 0,
         dwName: 0,
-        value: ''
+        value: ""
       },
       // For format 'adtl' type 'ltxt'
       {
-        chunkId: '',
+        chunkId: "",
         value: 0,
         dwName: 0,
         dwSampleLength: 0,
@@ -292,7 +423,7 @@ WaveFile.prototype.LIST = [
  */
 WaveFile.prototype.junk = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {!Array<number>} */
@@ -304,7 +435,7 @@ WaveFile.prototype.junk = {
  */
 WaveFile.prototype._PMX = {
   /** @type {string} */
-  chunkId: '',
+  chunkId: "",
   /** @type {number} */
   chunkSize: 0,
   /** @type {number} */
@@ -314,7 +445,7 @@ WaveFile.prototype._PMX = {
  * The bit depth code according to the samples.
  * @type {string}
  */
-WaveFile.prototype.bitDepth = '';
+WaveFile.prototype.bitDepth = "";
 
 /**
  * Return the samples packed in a Float64Array.
@@ -324,8 +455,9 @@ WaveFile.prototype.bitDepth = '';
  * @return {!(Array|TypedArray)} the samples.
  */
 WaveFile.prototype.getSamples = function(
-  interleaved=false,
-  OutputObject=Float64Array) {};
+  interleaved = false,
+  OutputObject = Float64Array
+) {};
 
 /**
  * Return the sample at a given index.
@@ -358,8 +490,22 @@ WaveFile.prototype.setSample = function(index, sample) {};
  * @throws {Error} If any argument does not meet the criteria.
  */
 WaveFile.prototype.fromScratch = function(
-  numChannels, sampleRate, bitDepthCode, samples, options={
-    container:'RIFF'}) {};
+  numChannels,
+  sampleRate,
+  bitDepthCode,
+  samples,
+  options = {
+    container: "RIFF"
+  }
+) {};
+
+/**
+ * Set up the WaveFileCreator object from an mpeg buffer and metadata info.
+ * @param {!Uint8Array} mpegBuffer The buffer.
+ * @param {Object=} info Mpeg info such as version, layer, bitRate, etc.
+ * @throws {Error} If any argument does not meet the criteria.
+ */
+WaveFile.prototype.fromMpeg = function(mpegBuffer, info) {};
 
 /**
  * Set up the WaveFileParser object from a byte buffer.
@@ -370,7 +516,7 @@ WaveFile.prototype.fromScratch = function(
  * @throws {Error} If no 'fmt ' chunk is found.
  * @throws {Error} If no 'data' chunk is found.
  */
-WaveFile.prototype.fromBuffer = function(wavBuffer, samples=true) {};
+WaveFile.prototype.fromBuffer = function(wavBuffer, samples = true) {};
 
 /**
  * Return a byte buffer representig the WaveFileParser object as a .wav file.
@@ -429,7 +575,10 @@ WaveFile.prototype.toRIFX = function() {};
  *    resolution of samples should be actually changed or not.
  * @throws {Error} If the bit depth is not valid.
  */
-WaveFile.prototype.toBitDepth = function(newBitDepth, changeResolution=true) {};
+WaveFile.prototype.toBitDepth = function(
+  newBitDepth,
+  changeResolution = true
+) {};
 
 /**
  * Convert the sample rate of the file.
@@ -437,16 +586,19 @@ WaveFile.prototype.toBitDepth = function(newBitDepth, changeResolution=true) {};
  * @param {Object=} options The extra configuration, if needed.
  */
 WaveFile.prototype.toSampleRate = function(
-  sampleRate, options= {
-    method: 'cubic',
-    clip: 'mirror',
+  sampleRate,
+  options = {
+    method: "cubic",
+    clip: "mirror",
     tension: 0,
     sincFilterSize: 32,
     lanczosFilterSize: 24,
-    sincWindow: function(x){},
+    sincWindow: function(x) {},
     LPF: true,
-    LPFType: 'IIR',
-    LPForder: 1}) {};
+    LPFType: "IIR",
+    LPForder: 1
+  }
+) {};
 
 /**
  * Encode a 16-bit wave file as 4-bit IMA ADPCM.
@@ -460,7 +612,7 @@ WaveFile.prototype.toIMAADPCM = function() {};
  * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
  *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
-WaveFile.prototype.fromIMAADPCM = function(bitDepthCode='16') {};
+WaveFile.prototype.fromIMAADPCM = function(bitDepthCode = "16") {};
 
 /**
  * Encode 16-bit wave file as 8-bit A-Law.
@@ -472,7 +624,7 @@ WaveFile.prototype.toALaw = function() {};
  * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
  *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
-WaveFile.prototype.fromALaw = function(bitDepthCode='16') {};
+WaveFile.prototype.fromALaw = function(bitDepthCode = "16") {};
 
 /**
  * Encode 16-bit wave file as 8-bit mu-Law.
@@ -484,7 +636,7 @@ WaveFile.prototype.toMuLaw = function() {};
  * @param {string=} [bitDepthCode='16'] The new bit depth of the samples.
  *    One of '8' ... '32' (integers), '32f' or '64' (floats).
  */
-WaveFile.prototype.fromMuLaw = function(bitDepthCode='16') {};
+WaveFile.prototype.fromMuLaw = function(bitDepthCode = "16") {};
 
 /**
  * Write a RIFF tag in the INFO chunk. If the tag do not exist,
