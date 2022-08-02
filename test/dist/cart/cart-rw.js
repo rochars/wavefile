@@ -14,6 +14,36 @@ function cl(str) {
   return str.replace(/\0+$/, "");
 }
 
+describe("Write file without pad bytes", function() {
+  let wav = new WaveFile(fs.readFileSync(path + "cc_0101.wav"));
+  wav.cart.tagText = "1";
+  wav.padBytes = false;
+  fs.writeFileSync(path + "out/cc_0101_nopad.wav", wav.toBuffer());
+  fs.stat(path + "out/cc_0101_nopad.wav", (error, stats) => {
+    if (error) {
+      throw error;
+    }
+    else {
+      assert.equal(stats.size, 806911);
+    }
+  });
+  assert.equal(wav.cart.chunkSize, 2049);
+
+  wav = new WaveFile(fs.readFileSync(path + "cc_0101.wav"));
+  wav.cart.tagText = "1";
+  wav.padBytes = true;
+  fs.writeFileSync(path + "out/cc_0101_yespad.wav", wav.toBuffer());
+  fs.stat(path + "out/cc_0101_yespad.wav", (error, stats) => {
+    if (error) {
+      throw error;
+    }
+    else {
+      assert.equal(stats.size, 806912);
+    }
+  });
+  assert.equal(wav.cart.chunkSize, 2049);
+});
+
 describe("Read and write cart chunk PCM wav file", function() {
   let wav = new WaveFile(fs.readFileSync(path + "cc_0101.wav"));
   fs.writeFileSync(path + "out/cc_0101.wav", wav.toBuffer());
