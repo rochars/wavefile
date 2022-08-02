@@ -101,6 +101,12 @@ declare module wavefile {
      * @type {!Object<string, *>}
      */
     _PMX: object;
+    /**
+     * Whether to apply a pad byte or not
+     * Defaults to 'true'
+     * @type {boolean}
+     */
+     padBytes: boolean;
 
     /**
      * @param {Uint8Array=} [wavBuffer=null] A wave file buffer.

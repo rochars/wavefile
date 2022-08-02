@@ -446,6 +446,12 @@ WaveFile.prototype._PMX = {
  * @type {string}
  */
 WaveFile.prototype.bitDepth = "";
+/**
+ * Whether to apply a pad byte or not
+ * Defaults to 'true'
+ * @type {boolean}
+ */
+WaveFile.prototype.padBytes = true;
 
 /**
  * Return the samples packed in a Float64Array.
