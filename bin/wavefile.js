@@ -67,6 +67,9 @@ const help = " Usage:\n" +
   "  --list-cue   Ex: wavefile input.wav --list-cue\n" +
   "               Print all the cue points of the file.\n" +
   "\n" +
+  "  --list-smpl  Ex: wavefile input.wav --list-smpl\n" +
+  "               Print all the sample chunks from the file.\n" +
+  "\n" +
   "  --bits       Ex: wavefile input.wav --bits\n" +
   "               Print the bit depth of the file.\n" +
   "\n" +
@@ -157,6 +160,9 @@ for (let command in commands) {
   // --list-cue
   } else if (command == '--list-cue') {
     console.log(wav.listCuePoints());
+  // --list-smpl
+} else if (command == '--list-smpl') {
+    console.log(wav.smpl);
   // --bits
   } else if (command == '--bits') {
     if (wav.fmt.validBitsPerSample) {
