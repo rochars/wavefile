@@ -1549,31 +1549,38 @@ For Microsoft owners and collaborators: you have a lot of blood in your hands. I
 ## References
 
 ### Papers
+#### General Wave/RIFF docs
+- http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html  
+- http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf  
+- https://sites.google.com/site/musicgapi/technical-documents/wav-file-format  
+- http://www.neurophys.wisc.edu/auditory/riff-format.txt  
+- https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
 
-https://tech.ebu.ch/docs/tech/tech3285.pdf  
-https://tech.ebu.ch/docs/tech/tech3306-2009.pdf  
-http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html  
-https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml  
-http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/Docs/riffmci.pdf  
-https://sites.google.com/site/musicgapi/technical-documents/wav-file-format  
-http://www.neurophys.wisc.edu/auditory/riff-format.txt  
-https://sno.phy.queensu.ca/~phil/exiftool/TagNames/RIFF.html#Info
-http://tech.ebu.ch/docs/tech/tech3285s1.pdf
-http://www.cartchunk.org/
-http://www.aes.org/publications/standards/search.cfm?docID=41
+#### Broadcast Wave Format
+- Spec: https://tech.ebu.ch/docs/tech/tech3285.pdf  
+- Version 1: https://www.loc.gov/preservation/digital/formats/fdd/fdd000356.shtml  
+- MPEG Supplement: https://tech.ebu.ch/docs/tech/tech3285s1.pdf
+
+#### Broadcast Wave 64Bit (BW64)
+- Current: https://www.itu.int/dms_pubrec/itu-r/rec/bs/R-REC-BS.2088-1-201910-I!!PDF-E.pdf
+- Superseded: https://tech.ebu.ch/publications/tech3306
+
+#### Cart Chunk
+- Site: http://www.cartchunk.org/
+- Spec: http://www.aes.org/publications/standards/search.cfm?docID=41
 
 ### Software
 
-https://github.com/erikd/libsndfile  
-https://gist.github.com/hackNightly/3776503  
-https://github.com/chirlu/sox/blob/master/src/wav.c
-https://github.com/kookster/nu_wav
+- https://github.com/erikd/libsndfile  
+- https://gist.github.com/hackNightly/3776503  
+- https://github.com/chirlu/sox/blob/master/src/wav.c
+- https://github.com/kookster/nu_wav
 
 ### Other
 
-https://developercertificate.org/  
-https://www.contributor-covenant.org/version/1/4/code-of-conduct.html  
-https://google.github.io/styleguide/jsguide.html
+- https://developercertificate.org/  
+- https://www.contributor-covenant.org/version/1/4/code-of-conduct.html  
+- https://google.github.io/styleguide/jsguide.html
 
 ## Legal
 
