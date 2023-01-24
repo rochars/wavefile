@@ -1,8 +1,8 @@
 {
-  "name": "wavefile",
-  "version": "11.0.0",
+  "name": "prx-wavefile",
+  "version": "11.0.0-prx.4",
   "description": "Create, read and write wav files according to the specs.",
-  "homepage": "https://github.com/rochars/wavefile",
+  "homepage": "https://github.com/PRX/prx-wavefile",
   "author": "Rafael da Silva Rocha <rocha.rafaelsilva@gmail.com>",
   "license": "MIT",
   "main": "./dist/wavefile.js",
@@ -41,10 +41,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/rochars/wavefile.git"
+    "url": "git://github.com/PRX/prx-wavefile.git"
   },
   "bugs": {
-    "url": "https://github.com/rochars/wavefile/issues"
+    "url": "https://github.com/PRX/prx-wavefile/issues"
   },
   "directories": {
     "bin": "bin",
@@ -76,7 +76,7 @@
     "test-sr-sinc": "node ./node_modules/mocha/bin/_mocha test/resampler-full/sinc.js test/resampler-full/sinc-IIR.js test/resampler-full/sinc-no-lpf.js -R dot --timeout=1600000",
     "test-umd": "node ./node_modules/mocha/bin/_mocha test/resampler test/dist test/src --umd --recursive -R dot --timeout=240000",
     "test-tsc": "tsc ./test/TypeScript/index.ts && node -r esm ./test/TypeScript/index.js",
-    "test-cli": "wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT && wavefile ./test/files/M1F1-int12WE-AFsp.wav --resample=16000 --method=point ./test/files/out/to-sample-rate/M1F1-int12WE-AFsp-CLI.wav",
+    "test-cli": "prx-wavefile ./test/files/M1F1-int12WE-AFsp.wav --tag=ICMT && prx-wavefile ./test/files/M1F1-int12WE-AFsp.wav --resample=16000 --method=point ./test/files/out/to-sample-rate/M1F1-int12WE-AFsp-CLI.wav",
     "test-dist": "npm run test-umd && npm run test-tsc && npm run test-cli",
     "rollup-bundle": "rollup -c && npm run test-dist",
     "doc": "./node_modules/.bin/jsdoc -c .jsdocrc -d docs -r README.md -t node_modules/docdash",
@@ -84,7 +84,7 @@
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
-    "@ampproject/rollup-plugin-closure-compiler": "^0.13.0",
+    "@ampproject/rollup-plugin-closure-compiler": "^0.27.0",
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^6.0.0",
     "byte-data": "^19.0.1",
