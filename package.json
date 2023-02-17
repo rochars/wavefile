@@ -7,6 +7,10 @@
   "license": "MIT",
   "main": "./dist/wavefile.js",
   "module": "./index.js",
+  "exports": {
+    "import": "./dist/wrapper.mjs",
+    "require": "./dist/wavefile.js"
+  },
   "types": "./index.d.ts",
   "bin": "./bin/wavefile.js",
   "engines": {
