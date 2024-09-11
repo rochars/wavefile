@@ -6,9 +6,10 @@
 * 
 */
 
-const assert = require('assert');
-const fs = require("fs");
-const WaveFile = require("../../test/loader.js");
+import WaveFile from '../loader.js';
+import assert from 'node:assert'
+import fs from 'fs';
+import { after } from 'node:test';
 const path = "./test/files/";
 
 console.log('cubic');
@@ -161,5 +162,7 @@ describe('Upsample a 16bit 44.1kHz file', function() {
     wav.toBuffer());
 });
 
-hrend = process.hrtime(hrstart);
-console.info('%ds %dms', hrend[0], hrend[1] / 1000000);
+after(function () {
+  const hrend = process.hrtime(hrstart);
+  console.info('%ds %dms', hrend[0], hrend[1] / 1000000);
+});

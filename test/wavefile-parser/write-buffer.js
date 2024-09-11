@@ -6,9 +6,10 @@
  * 
  */
 
-const assert = require('assert');
-const fs = require("fs");
-const WaveFileParser = require("../../lib/wavefile-parser.js").WaveFileParser;
+import '../loader.js';
+import assert from 'node:assert'
+import { WaveFileParser } from '../../lib/wavefile-parser.js';
+import fs from 'fs';
 const path = "./test/files/";
 
 describe('read 16bit file from disk and write to new file', function() {

@@ -7,8 +7,8 @@
  * @see https://github.com/rochars/wavefile
  */
 
-var assert = assert || require('assert');
-var WaveFile = WaveFile || require('../loader.js');
+import WaveFile from '../loader.js';
+import assert from 'node:assert';
 
 describe('listCuePoints() of a 16-bit wave files from scratch', function() {
     

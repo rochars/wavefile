@@ -6,10 +6,10 @@
  * 
  */
 
-const assert = require('assert');
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
 
 describe('read 32bit IEEE from disk and write to new file', function() {
     

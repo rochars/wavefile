@@ -6,9 +6,9 @@
  * 
  */
 
-const fs = require("fs");
-var assert = assert || require('assert');
-const WaveFile = require("../loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../loader.js';
 const path = "./test/files/";
 
 describe('errors', function() {

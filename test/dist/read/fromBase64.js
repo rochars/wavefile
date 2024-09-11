@@ -7,8 +7,8 @@
  * 
  */
 
-const assert = require("assert");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import WaveFile from '../../loader.js';
 
 describe('create 16-bit wave file from DataURI string', function() {
     

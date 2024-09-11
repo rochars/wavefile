@@ -7,9 +7,9 @@
  */
 
 
-const assert = require('assert');
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
 
 describe('8-bit a-law to 24-bit (a-law encoded with WaveFile)', function() {

@@ -6,8 +6,8 @@
  * 
  */
 
-var assert = assert || require('assert');
-var WaveFile = WaveFile || require('../loader.js');
+import WaveFile from '../loader.js';
+import assert from 'node:assert';
 
 describe('create 16-bit wave files with tags (LIST chunk)', function() {
 

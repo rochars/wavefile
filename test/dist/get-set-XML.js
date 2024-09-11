@@ -6,10 +6,8 @@
  * 
  */
 
-const fs = require("fs");
-var assert = assert || require('assert');
-const WaveFile = require("../loader.js");
-const path = "./test/files/";
+import assert from 'node:assert';
+import WaveFile from '../loader.js';
 
 describe('Get and set iXML chunks', function() {
     

@@ -6,8 +6,8 @@
  * 
  */
 
-var assert = assert || require('assert');
-var WaveFile = WaveFile || require('../loader.js');
+import WaveFile from '../loader.js';
+import assert from 'node:assert';
 
 describe('16-bit wave file to and from DataURI string', function() {
     

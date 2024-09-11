@@ -6,8 +6,9 @@
  * 
  */
 
-let assert = require('assert');
-let base64ArrayBuffer = require('../../lib/parsers/base64-arraybuffer.js')
+import '../loader.js';
+import assert from 'node:assert'
+import * as base64ArrayBuffer from '../../lib/parsers/base64-arraybuffer.js';
 
 describe('Test the lib/base64-arraybuffer module',
         function() {

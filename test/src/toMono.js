@@ -6,8 +6,8 @@
  * 
  */
 
-var assert = assert || require('assert');
-var WaveFile = WaveFile || require('../loader.js');
+import WaveFile from '../loader.js';
+import assert from 'node:assert';
 
 describe('Turn a file with 2 channels to a mono file', function() {
     

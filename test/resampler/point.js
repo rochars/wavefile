@@ -6,9 +6,9 @@
  * 
  */
 
-const assert = require('assert');
-const fs = require("fs");
-const WaveFile = require("../../test/loader.js");
+import WaveFile from '../loader.js';
+import assert from 'node:assert'
+import fs from 'fs';
 const path = "./test/files/";
 
 console.log('point');

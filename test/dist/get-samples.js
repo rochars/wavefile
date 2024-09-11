@@ -6,8 +6,8 @@
  * 
  */
 
-const assert = require("assert");
-const WaveFile = require("../../test/loader.js");
+import assert from 'node:assert';
+import WaveFile from '../loader.js';
 
 describe('getSamples() with a mono 16-bit file', function() {
     let samples = [0, 1, -32768, 32767, 12];

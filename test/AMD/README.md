@@ -1,1 +1,0 @@
-AMD app template from https://github.com/volojs/create-template

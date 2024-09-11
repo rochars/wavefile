@@ -6,9 +6,9 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
 
 function getLtxt_(wav) {
@@ -31,8 +31,8 @@ describe("read smpl_cue.wav and write to a new file", function() {
 
     //ltxt
     it("ltxt chunks should have empty 'value' field", function() {
-        wavLtxt = getLtxt_(wav);
-        wav2Ltxt = getLtxt_(wav2);
+        const wavLtxt = getLtxt_(wav);
+        const wav2Ltxt = getLtxt_(wav2);
         assert.equal(wav2Ltxt.value, '');
     });
 
@@ -52,8 +52,8 @@ describe("read smpl_cue.wav and write to a new file", function() {
     //ltxt
     it("ltxt in wav should not same ltxt in wav2 (original was broken)" + 
         " with chunkSize = 20 (should be 25)", function() {
-        wavLtxt = getLtxt_(wav);
-        wav2Ltxt = getLtxt_(wav2);
+        const wavLtxt = getLtxt_(wav);
+        const wav2Ltxt = getLtxt_(wav2);
         assert.ok(wav2Ltxt.chunkSize = 25);
     });
     // Other tests

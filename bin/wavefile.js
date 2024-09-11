@@ -27,9 +27,8 @@
  * @fileoverview wavefile CLI.
  * @see https://github.com/rochars/wavefile
  */
-
-const WaveFile = require('../dist/wavefile.js').WaveFile;
-const fs = require('fs');
+import { WaveFile } from '../index.js';
+import fs from 'fs';
 
 /** @type {string} */
 const presentation = " WaveFile 8.1.0\n" +
@@ -148,7 +147,7 @@ for (let command in commands) {
   // --list-tag
   } else if (command == '--list-tags') {
     /** @type {!Object} */
-    tags = wav.listTags();
+    const tags = wav.listTags();
     for (var tag in tags) {
       if (tags.hasOwnProperty(tag)) {
          console.log(tag + ': ' + tags[tag]);

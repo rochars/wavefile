@@ -6,9 +6,10 @@
 * 
 */
 
-const assert = require('assert');
-const fs = require("fs");
-const WaveFile = require("../../test/loader.js");
+import WaveFile from '../loader.js';
+import assert from 'node:assert'
+import fs from 'fs';
+import { after } from 'node:test';
 const path = "./test/files/";
 
 console.log('sinc');
@@ -17,13 +18,13 @@ let hrstart = process.hrtime();
 
 // Chirps, FP
 
-describe('Downsample a 32-bit 44.1kHz log sine sweep', function() {
+describe('Downsample a 32-bit 44.1kHz log sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(16000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -31,13 +32,13 @@ describe('Downsample a 32-bit 44.1kHz log sine sweep', function() {
     wav.toBuffer());
 });
 
-describe('Upsample a 32-bit 44.1kHz log sine sweep', function() {
+describe('Upsample a 32-bit 44.1kHz log sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(96000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -45,13 +46,13 @@ describe('Upsample a 32-bit 44.1kHz log sine sweep', function() {
     wav.toBuffer());
 });
 
-describe('Downsample a 32-bit 44.1kHz linear sine sweep', function() {
+describe('Downsample a 32-bit 44.1kHz linear sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(16000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -59,13 +60,13 @@ describe('Downsample a 32-bit 44.1kHz linear sine sweep', function() {
     wav.toBuffer());
 });
 
-describe('Upsample a 32-bit 44.1kHz linear sine sweep', function() {
+describe('Upsample a 32-bit 44.1kHz linear sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "32fp-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(96000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -75,13 +76,13 @@ describe('Upsample a 32-bit 44.1kHz linear sine sweep', function() {
 
 // Chirps, int
 
-describe('Downsample a 16-bit 44.1kHz log sine sweep', function() {
+describe('Downsample a 16-bit 44.1kHz log sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(16000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -89,13 +90,13 @@ describe('Downsample a 16-bit 44.1kHz log sine sweep', function() {
     wav.toBuffer());
 });
 
-describe('Upsample a 16-bit 44.1kHz log sine sweep', function() {
+describe('Upsample a 16-bit 44.1kHz log sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-log.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(96000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -103,13 +104,13 @@ describe('Upsample a 16-bit 44.1kHz log sine sweep', function() {
     wav.toBuffer());
 });
 
-describe('Downsample a 16-bit 44.1kHz linear sine sweep', function() {
+describe('Downsample a 16-bit 44.1kHz linear sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(16000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -117,13 +118,13 @@ describe('Downsample a 16-bit 44.1kHz linear sine sweep', function() {
     wav.toBuffer());
 });
 
-describe('Upsample a 16-bit 44.1kHz linear sine sweep', function() {
+describe('Upsample a 16-bit 44.1kHz linear sine sweep', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "16bit-44100Hz-mono-chirp-1-22050-linear.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(96000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -133,13 +134,13 @@ describe('Upsample a 16-bit 44.1kHz linear sine sweep', function() {
 
 // Songs
 
-describe('Downsample a 16bit 44.1kHz file', function() {
+describe('Downsample a 16bit 44.1kHz file', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "song1.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(16000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(16000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -147,13 +148,13 @@ describe('Downsample a 16bit 44.1kHz file', function() {
     wav.toBuffer());
 });
 
-describe('Upsample a 16bit 44.1kHz file', function() {
+describe('Upsample a 16bit 44.1kHz file', function () {
   // Read a 8kHz wav 
   let wav = new WaveFile(
     fs.readFileSync(path + "song1.wav"));
 
   // Convert to another sample rate
-  wav.toSampleRate(96000, {method: 'sinc', LPFType: 'FIR'});
+  wav.toSampleRate(96000, { method: 'sinc', LPFType: 'FIR' });
 
   // Write the file
   fs.writeFileSync(
@@ -161,5 +162,8 @@ describe('Upsample a 16bit 44.1kHz file', function() {
     wav.toBuffer());
 });
 
-hrend = process.hrtime(hrstart);
-console.info('%ds %dms', hrend[0], hrend[1] / 1000000);
+after(function () {
+  const hrend = process.hrtime(hrstart);
+  console.info('%ds %dms', hrend[0], hrend[1] / 1000000);
+});
+

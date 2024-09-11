@@ -6,9 +6,9 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
 
 describe('read M1F1-int12WE-AFsp-NEW-TAGS.wav', function() {
@@ -550,10 +550,6 @@ describe('read Audacity-16bit.wav and write to new file', function() {
 });
 
 describe('read M1F1-int12WE-AFsp.wav and write to new file', function() {
-    
-    let fs = require("fs");
-    const WaveFile = require("../../../test/loader.js");
-    let path = "./test/files/";
     let wav = new WaveFile(
         fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
     fs.writeFileSync(

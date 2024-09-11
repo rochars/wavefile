@@ -6,9 +6,9 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../loader.js';
 const path = "./test/files/";
 
 describe('Float files with 1, -1, 0, -0, Infinity, -Infinity', function() {
@@ -87,7 +87,7 @@ describe('Write and read some edge cases to 64 bit file', function() {
 
 // Int samples
 describe('Should clamp int samples on overflow', function() {
-    wav = new WaveFile();
+    const wav = new WaveFile();
     it('should limit the sample', function() {
         wav.fromScratch(1, 8000, '16', [32768, -32769], {container: 'RIFX'});
         assert.deepEqual(wav.getSamples(), new Float64Array([32767, -32768]));

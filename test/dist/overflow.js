@@ -10,10 +10,11 @@
  */
 
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../loader.js';
 const path = "./test/files/";
+
 describe("32-bit IEEE from file to 8-bit", function() {
     let wav = new WaveFile(
         fs.readFileSync(path + "64bit-48kHz-noBext-mono-overflow.wav"));

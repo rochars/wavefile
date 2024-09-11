@@ -7,9 +7,9 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
 
 describe('create 44100 kHz 24-bit stereo wave file with one region',

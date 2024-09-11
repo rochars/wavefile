@@ -6,9 +6,9 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
 
 describe("Handle instances of RIFF and RIFX at the same time", function() {
@@ -274,10 +274,6 @@ describe("16-bit RIFX to RIFF", function() {
 });
 
 describe("RF64 to RIFF", function() {
-
-    let fs = require("fs");
-    const WaveFile = require("../../../test/loader.js");
-    let path = "./test/files/";
     let wav2 = new WaveFile(
         fs.readFileSync(path + "RF64-16bit-8kHz-stereo-reaper.wav"));
     wav2.toRIFF();

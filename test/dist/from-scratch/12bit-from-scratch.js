@@ -6,10 +6,11 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
+import bd from 'byte-data';
 
 describe('create 12-bit wave files from scratch', function() {
     
@@ -87,8 +88,6 @@ describe('create 12-bit wav with samples from a existing 12-bit wav',
         fs.readFileSync(path + "M1F1-int12WE-AFsp.wav"));
 
     let wav = new WaveFile();
-    require = require("esm")(module);
-    bd = require("byte-data");
     // original file has samples over the 12-bit limit; bits are set to 16
     wav.fromScratch(2, 8000, '12', bd.unpackArray(sourcewav.data.samples, {bits: 16, signed: true}));
     fs.writeFileSync(

@@ -6,9 +6,9 @@
  * 
  */
 
-const assert = require("assert");
-const fs = require("fs");
-const WaveFile = require("../../../test/loader.js");
+import assert from 'node:assert';
+import fs from 'fs';
+import WaveFile from '../../loader.js';
 const path = "./test/files/";
 
 describe('update cue point label', function() {
@@ -34,7 +34,7 @@ describe('update cue point label', function() {
         assert.equal(wavCue2.cue.points.length, 17);
     });
     it("updated label should be 'updated label'", function() {
-        labelText = wavCue2.LIST[0]["subChunks"][1]["value"];
+        const labelText = wavCue2.LIST[0]["subChunks"][1]["value"];
         assert.equal(labelText, "updated label");
     });
 });
@@ -287,7 +287,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
     wavThis.setCuePoint({position: 1550, label: "cue marker 7"});
 
     // cue points in the original file
-    originalCuePoints = wavThis.listCuePoints();
+    const originalCuePoints = wavThis.listCuePoints();
     it("fromScratch-CUE7, original, cue point 1 name", function() {
         assert.equal(originalCuePoints[0].label, 'cue marker 4');
     });
@@ -338,7 +338,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
     wavThis.setCuePoint({position: 1750, label: "cue marker 6"});
 
     // cue points in the original file
-    originalCuePoints = wavThis.listCuePoints();
+    const originalCuePoints = wavThis.listCuePoints();
     it("fromScratch-CUE7, original, cue point 1 name", function() {
         assert.equal(originalCuePoints[0].label, 'cue marker 4');
     });
@@ -387,7 +387,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
     wavThis.toBuffer()
 
     // cue points in the original file after toBuffer
-    toBufferCuePoints = wavThis.listCuePoints();
+    const toBufferCuePoints = wavThis.listCuePoints();
     it("fromScratch-CUE7, toBuffer, cue point 1 name", function() {
         assert.equal(toBufferCuePoints[0].label, 'cue marker 4');
     });
@@ -463,7 +463,7 @@ describe('create 44100 kHz 24-bit stereo wave file with lots of cue points',
     });
 
     // cue points in the written file
-    cuePoints = wavCue2.listCuePoints();
+    const cuePoints = wavCue2.listCuePoints();
     it("fromScratch-CUE7, written, cue point 1 name", function() {
         assert.equal(cuePoints[0].label, 'cue marker 4');
     });
